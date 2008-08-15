@@ -1,0 +1,6 @@
+; JVM options to improve application performance.
+; Uncomment the "-server" line if your JRE has the Server JVM.
+; See http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp
+-Xmx128m
+-ea
+;-server

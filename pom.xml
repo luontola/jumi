@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.orfjackal.dimdwarf</groupId>
+    <artifactId>dimdwarf</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Dimdwarf</name>
+    <description>A lightweight application container for Java with the same programming model as Project Darkstar
+    </description>
+    <url>http://dimdwarf.sourceforge.net/</url>
+    <inceptionYear>2008</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>http://www.opensource.org/licenses/bsd-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>orfjackal</id>
+            <name>Esko Luontola</name>
+            <url>http://www.orfjackal.net/</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:svn:https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/trunk</connection>
+        <developerConnection>scm:svn:https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/trunk</developerConnection>
+        <url>http://dimdwarf.svn.sourceforge.net/viewvc/dimdwarf/trunk</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>orfjackal</id>
+            <url>file://H:/repo.orfjackal.net/maven2</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>orfjackal</id>
+            <url>http://repo.orfjackal.net/maven2</url>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>dimdwarf-api</module>
+        <module>dimdwarf-server</module>
+        <module>dimdwarf-server-dist</module>
+    </modules>
+
+    <dependencies>
+
+        <!-- Logging -->
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Testing -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jdave</groupId>
+            <artifactId>jdave-junit4</artifactId>
+            <version>1.1-rc1</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Dimdwarf -->
+
+            <dependency>
+                <groupId>net.orfjackal.dimdwarf</groupId>
+                <artifactId>dimdwarf-api</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.orfjackal.dimdwarf</groupId>
+                <artifactId>dimdwarf-server</artifactId>
+                <version>${version}</version>
+            </dependency>
+
+            <!-- Project Darkstar -->
+
+            <dependency>
+                <groupId>net.orfjackal.darkstar-exp</groupId>
+                <artifactId>darkstar-shared</artifactId>
+                <version>0.9.6_2</version>
+            </dependency>
+
+            <!-- Other dependencies -->
+
+            <dependency>
+                <groupId>com.google.code.guice</groupId>
+                <artifactId>guice</artifactId>
+                <version>1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>1.1.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <!--<version>2.4.3</version>-->
+                <configuration>
+                    <includes>
+                        <include>**/*Spec.java</include>
+                    </includes>
+                    <systemProperties>
+                        <property>
+                            <name>jdave.tools.specdox.format</name>
+                            <value>txt</value>
+                        </property>
+                        <property>
+                            <name>jdave.tools.specdox.dir</name>
+                            <value>target/jdave</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <inherited>false</inherited>
+                <configuration>
+                    <attach>false</attach>
+                    <descriptors>
+                        <descriptor>src/main/assembly/src.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
