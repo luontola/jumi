@@ -79,6 +79,15 @@ public class Transaction {
         }
     }
 
+    public void rollback() {
+        changeStatus(ACTIVE, ROLLING_BACK);
+        if (rollbackAllParticipants()) {
+            changeStatus(ROLLING_BACK, ROLLBACK_OK);
+        } else {
+            changeStatus(ROLLING_BACK, ROLLBACK_FAILED);
+        }
+    }
+
     private void prepareAllParticipants() throws Throwable {
         for (TransactionParticipant p : participants) {
             p.prepare(this);
@@ -93,6 +102,19 @@ public class Transaction {
             } catch (Throwable t) {
                 allSucceeded = false;
                 logger.error("Commit failed for participant " + p, t);
+            }
+        }
+        return allSucceeded;
+    }
+
+    private boolean rollbackAllParticipants() {
+        boolean allSucceeded = true;
+        for (TransactionParticipant p : participants) {
+            try {
+                p.rollback(this);
+            } catch (Throwable t) {
+                allSucceeded = false;
+                logger.error("Rollback failed for participant " + p, t);
             }
         }
         return allSucceeded;
@@ -119,6 +141,6 @@ public class Transaction {
         ACTIVE,
         PREPARING, PREPARE_OK, PREPARE_FAILED,
         COMMITTING, COMMIT_OK, COMMIT_FAILED,
-        ROLLING_BACK, ROLLED_BACK
+        ROLLING_BACK, ROLLBACK_OK, ROLLBACK_FAILED
     }
 }

@@ -103,6 +103,13 @@ public class TransactionSpec extends Specification<Object> {
         }};
     }
 
+    private Expectations allParticipantsAreRolledBack() {
+        return new Expectations() {{
+            one(participant1).rollback(tx);
+            one(participant2).rollback(tx);
+        }};
+    }
+
 
     public class WhenTransactionBegins {
 
@@ -317,6 +324,80 @@ public class TransactionSpec extends Specification<Object> {
         }
     }
 
+    public class RollingBackATransaction {
+
+        public Object create() {
+            checking(isNotifiedOnJoin(participant1));
+            checking(isNotifiedOnJoin(participant2));
+            tx.join(participant1);
+            tx.join(participant2);
+            return null;
+        }
+
+        public void allParticipantsAreToldToRollBack() {
+            checking(allParticipantsAreRolledBack());
+            tx.rollback();
+        }
+
+        public void transactionIsRolledBack() {
+            checking(allParticipantsAreRolledBack());
+            tx.rollback();
+            specify(tx.getStatus(), should.equal(ROLLBACK_OK));
+        }
+
+        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+        public void theRestOfTheParticipantsAreRolledBackEvenIfTheFirstParticipantFailsToRollBack() {
+            final Sequence sq = sequence("rollback-sequence");
+            final Throwable t = new AssertionError("Failed to rollback");
+            checking(new Expectations() {{
+                one(participant1).rollback(tx); will(throwException(t)); inSequence(sq);
+                one(txLoggerFilter).isLoggable(with(any(LogRecord.class))); inSequence(sq);
+                one(participant2).rollback(tx); inSequence(sq);
+            }});
+            tx.rollback();
+            specify(tx.getStatus(), should.equal(ROLLBACK_FAILED));
+        }
+
+        public void canNotRollbackTwise() {
+            checking(allParticipantsAreRolledBack());
+            tx.rollback();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.rollback();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+
+        public void canNotRollbackTwiseConcurrently() {
+            checking(allParticipantsAreRolledBack());
+            Blocker blocker = new Blocker() {
+                public void rollback(Transaction tx) {
+                    waitHere();
+                }
+            };
+            tx.join(blocker);
+
+            Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
+                public void run() {
+                    tx.rollback();
+                }
+            });
+
+            specify(tx.getStatus(), should.equal(ROLLING_BACK));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.rollback();
+                }
+            }, should.raise(IllegalStateException.class));
+            t.interrupt();
+        }
+
+        public void mayRollbackWhenActive() {
+            checking(allParticipantsAreRolledBack());
+            tx.rollback();
+        }
+    }
+
 
     private static class Blocker extends DummyTransactionParticipant {
 
@@ -351,6 +432,9 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void commit(Transaction tx) {
+        }
+
+        public void rollback(Transaction tx) {
         }
     }
 }

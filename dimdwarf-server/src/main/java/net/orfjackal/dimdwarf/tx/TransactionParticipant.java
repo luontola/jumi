@@ -35,4 +35,6 @@ public interface TransactionParticipant {
     void prepare(Transaction tx) throws Throwable;
 
     void commit(Transaction tx);
+
+    void rollback(Transaction tx);
 }
