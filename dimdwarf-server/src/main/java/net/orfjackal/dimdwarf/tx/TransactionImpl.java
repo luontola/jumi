@@ -60,9 +60,9 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
         changeStatus(ACTIVE, PREPARING);
         try {
             checkIsNotRollbackOnly();
-            prepareAllParticipants();
+            tryPrepareAllParticipants();
             checkIsNotRollbackOnly();
-            changeStatus(PREPARING, PREPARE_OK);
+            changeStatus(PREPARING, PREPARED);
         } catch (Throwable t) {
             changeStatus(PREPARING, PREPARE_FAILED);
             throw new TransactionFailedException("Prepare failed", t);
@@ -71,54 +71,42 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
 
     public void commit() {
         checkIsNotRollbackOnly();
-        changeStatus(PREPARE_OK, COMMITTING);
-        if (commitAllParticipants()) {
-            changeStatus(COMMITTING, COMMIT_OK);
-        } else {
-            changeStatus(COMMITTING, COMMIT_FAILED);
-        }
+        changeStatus(PREPARED, COMMITTING);
+        commitAllParticipants();
+        changeStatus(COMMITTING, COMMITTED);
     }
 
     public void rollback() {
-        TransactionStatus[] from = {ACTIVE, PREPARE_OK, PREPARE_FAILED};
-        changeStatus(from, ROLLBACKING);
-        if (rollbackAllParticipants()) {
-            changeStatus(ROLLBACKING, ROLLBACK_OK);
-        } else {
-            changeStatus(ROLLBACKING, ROLLBACK_FAILED);
-        }
+        TransactionStatus[] from = {ACTIVE, PREPARED, PREPARE_FAILED};
+        changeStatus(from, ROLLING_BACK);
+        rollbackAllParticipants();
+        changeStatus(ROLLING_BACK, ROLLED_BACK);
     }
 
-    private void prepareAllParticipants() throws Throwable {
+    private void tryPrepareAllParticipants() throws Throwable {
         for (TransactionParticipant p : participants) {
             p.prepare(getTransaction());
         }
     }
 
-    private boolean commitAllParticipants() {
-        boolean allSucceeded = true;
+    private void commitAllParticipants() {
         for (TransactionParticipant p : participants) {
             try {
                 p.commit(getTransaction());
             } catch (Throwable t) {
-                allSucceeded = false;
                 logger.error("Commit failed for participant " + p, t);
             }
         }
-        return allSucceeded;
     }
 
-    private boolean rollbackAllParticipants() {
-        boolean allSucceeded = true;
+    private void rollbackAllParticipants() {
         for (TransactionParticipant p : participants) {
             try {
                 p.rollback(getTransaction());
             } catch (Throwable t) {
-                allSucceeded = false;
                 logger.error("Rollback failed for participant " + p, t);
             }
         }
-        return allSucceeded;
     }
 
     public int getParticipants() {

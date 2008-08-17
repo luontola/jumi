@@ -193,7 +193,7 @@ public class TransactionSpec extends Specification<Object> {
         public void transactionIsPrepared() {
             checking(allParticipantsArePrepared());
             tx.prepare();
-            specify(tx.getStatus(), should.equal(PREPARE_OK));
+            specify(tx.getStatus(), should.equal(PREPARED));
         }
 
         public void prepareFailsIfOneParticipantFailsToPrepare() {
@@ -283,7 +283,7 @@ public class TransactionSpec extends Specification<Object> {
         public void transactionIsCommitted() {
             checking(allParticipantsAreCommitted());
             tx.commit();
-            specify(tx.getStatus(), should.equal(COMMIT_OK));
+            specify(tx.getStatus(), should.equal(COMMITTED));
         }
 
         @SuppressWarnings({"ThrowableInstanceNeverThrown"})
@@ -296,7 +296,7 @@ public class TransactionSpec extends Specification<Object> {
                 one(participant2).commit(tx); inSequence(sq);
             }});
             tx.commit();
-            specify(tx.getStatus(), should.equal(COMMIT_FAILED));
+            specify(tx.getStatus(), should.equal(COMMITTED));
         }
 
         public void canNotCommitTwise() {
@@ -353,7 +353,7 @@ public class TransactionSpec extends Specification<Object> {
         public void transactionIsRolledBack() {
             checking(allParticipantsAreRolledBack());
             tx.rollback();
-            specify(tx.getStatus(), should.equal(ROLLBACK_OK));
+            specify(tx.getStatus(), should.equal(ROLLED_BACK));
         }
 
         @SuppressWarnings({"ThrowableInstanceNeverThrown"})
@@ -366,7 +366,7 @@ public class TransactionSpec extends Specification<Object> {
                 one(participant2).rollback(tx); inSequence(sq);
             }});
             tx.rollback();
-            specify(tx.getStatus(), should.equal(ROLLBACK_FAILED));
+            specify(tx.getStatus(), should.equal(ROLLED_BACK));
         }
 
         public void canNotRollbackTwise() {
@@ -394,7 +394,7 @@ public class TransactionSpec extends Specification<Object> {
                 }
             });
 
-            specify(tx.getStatus(), should.equal(ROLLBACKING));
+            specify(tx.getStatus(), should.equal(ROLLING_BACK));
             specify(new Block() {
                 public void run() throws Throwable {
                     tx.rollback();
@@ -483,13 +483,13 @@ public class TransactionSpec extends Specification<Object> {
         public void commitFailsIfRollbackOnly() {
             tx.prepare();
             tx.setRollbackOnly();
-            specify(tx.getStatus(), should.equal(PREPARE_OK));
+            specify(tx.getStatus(), should.equal(PREPARED));
             specify(new Block() {
                 public void run() throws Throwable {
                     tx.commit();
                 }
             }, should.raise(IllegalStateException.class));
-            specify(tx.getStatus(), should.equal(PREPARE_OK));
+            specify(tx.getStatus(), should.equal(PREPARED));
         }
     }
 
