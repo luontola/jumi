@@ -33,15 +33,29 @@ import java.nio.ByteBuffer;
  */
 public class Blob {
 
+    private final byte[] bytes;
+
+    public Blob() {
+        this(new byte[0]);
+    }
+
+    private Blob(byte[] bytes) {
+        this.bytes = bytes;
+    }
+
     public int length() {
-        return 0;
+        return bytes.length;
     }
 
     public ByteArrayInputStream getInputStream() {
-        return new ByteArrayInputStream(new byte[0]);
+        return new ByteArrayInputStream(bytes);
     }
 
     public ByteBuffer getByteBuffer() {
-        return ByteBuffer.allocate(0).asReadOnlyBuffer();
+        return ByteBuffer.allocate(bytes.length);
+    }
+
+    public static Blob fromBytes(byte[] bytes) {
+        return new Blob(bytes);
     }
 }

@@ -29,6 +29,9 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
+import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
+
 /**
  * @author Esko Luontola
  * @since 18.8.2008
@@ -38,6 +41,7 @@ import org.junit.runner.RunWith;
 public class BlobSpec extends Specification<Object> {
 
     private Blob blob;
+    private byte[] bytes = {42};
 
 
     public class AnEmptyBlob {
@@ -51,14 +55,38 @@ public class BlobSpec extends Specification<Object> {
             specify(blob.length(), should.equal(0));
         }
 
-
-        public void hasNoBytesInStream() {
-            specify(blob.getInputStream().available(), should.equal(0));
-            specify(blob.getInputStream().read(), should.equal(-1));
+        public void hasNoBytesThroughInputStream() {
+            ByteArrayInputStream in = blob.getInputStream();
+            specify(in.available(), should.equal(0));
+            specify(in.read(), should.equal(-1));
         }
 
-        public void hasNoBytesInBuffer() {
+        public void hasNoBytesThroughByteBuffer() {
             specify(blob.getByteBuffer().capacity(), should.equal(0));
+        }
+    }
+
+    public class ABlobCreatedFromAByteArray {
+
+        public Object create() {
+            blob = Blob.fromBytes(bytes);
+            return null;
+        }
+
+        public void hasTheSameLengthAsTheArray() {
+            specify(blob.length(), should.equal(bytes.length));
+        }
+
+        public void hasTheSameBytesThroughInputStream() {
+            ByteArrayInputStream in = blob.getInputStream();
+            specify(in.available(), should.equal(bytes.length));
+            specify(in.read(), should.equal(bytes[0]));
+            specify(in.read(), should.equal(-1));
+        }
+
+        public void hasTheSameBytesThroughByteBuffer() {
+            ByteBuffer buf = blob.getByteBuffer();
+            specify(buf.capacity(), should.equal(bytes.length));
         }
     }
 }
