@@ -34,7 +34,8 @@ import java.util.List;
 public class Transaction {
 
     private final List<TransactionParticipant> participants = new ArrayList<TransactionParticipant>();
-    private Status status = Status.ACTIVE;
+    private volatile Status status = Status.ACTIVE;
+    private final Object lock = new Object();
 
     public int getParticipants() {
         return participants.size();
@@ -54,7 +55,42 @@ public class Transaction {
         }
     }
 
+    public void prepare() throws TransactionFailedException {
+        beginPrepare();
+        try {
+            for (TransactionParticipant p : participants) {
+                p.prepare(this);
+            }
+            prepareSucceeded();
+
+        } catch (Throwable t) {
+            prepareFailed();
+            throw new TransactionFailedException("Prepare failed", t);
+        }
+    }
+
+    private void beginPrepare() {
+        synchronized (lock) {
+            if (!status.equals(Status.ACTIVE)) {
+                throw new IllegalStateException("Transaction not active");
+            }
+            status = Status.PREPARING;
+        }
+    }
+
+    private void prepareSucceeded() {
+        status = Status.PREPARE_OK;
+    }
+
+    private void prepareFailed() {
+        status = Status.PREPARE_FAILED;
+    }
+
+    public void commit() {
+        throw new IllegalStateException("Not prepared");
+    }
+
     public enum Status {
-        ACTIVE
+        ACTIVE, PREPARING, PREPARE_OK, PREPARE_FAILED, COMMITTING, COMMIT_OK, COMMIT_FAILED, ROLLED_BACK
     }
 }

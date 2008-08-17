@@ -24,9 +24,11 @@
 
 package net.orfjackal.dimdwarf.tx;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import static net.orfjackal.dimdwarf.tx.Transaction.Status.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -48,7 +50,7 @@ public class TransactionSpec extends Specification<Object> {
         participant2 = mock(TransactionParticipant.class, "participant2");
     }
 
-    private Expectations isNotifiedOnJoin(final TransactionParticipant participant) {
+    private static Expectations isNotifiedOnJoin(final TransactionParticipant participant, final Transaction tx) {
         return new Expectations() {{
             one(participant).joinedTransaction(tx);
         }};
@@ -62,7 +64,7 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void itIsActive() {
-            specify(tx.getStatus(), should.equal(Transaction.Status.ACTIVE));
+            specify(tx.getStatus(), should.equal(ACTIVE));
             tx.mustBeActive();
         }
 
@@ -74,7 +76,7 @@ public class TransactionSpec extends Specification<Object> {
     public class WhenParticipantJoinsTransaction {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1));
+            checking(isNotifiedOnJoin(participant1, tx));
             tx.join(participant1);
             return null;
         }
@@ -84,7 +86,7 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void otherParticipantsMayJoinTheSameTransaction() {
-            checking(isNotifiedOnJoin(participant2));
+            checking(isNotifiedOnJoin(participant2, tx));
             tx.join(participant2);
             specify(tx.getParticipants(), should.equal(2));
         }
@@ -92,6 +94,102 @@ public class TransactionSpec extends Specification<Object> {
         public void theSameParticipantCanNotJoinTwise() {
             tx.join(participant1);
             specify(tx.getParticipants(), should.equal(1));
+        }
+    }
+
+    public class WhenTransactionPreparesForCommit {
+
+        public Object create() {
+            checking(isNotifiedOnJoin(participant1, tx));
+            checking(isNotifiedOnJoin(participant2, tx));
+            tx.join(participant1);
+            tx.join(participant2);
+            return null;
+        }
+
+        public void allParticipantsAreToldToPrepare() {
+            checking(new Expectations() {{
+                one(participant1).prepare(tx);
+                one(participant2).prepare(tx);
+            }});
+            tx.prepare();
+        }
+
+        public void transactionIsPrepared() {
+            allParticipantsAreToldToPrepare();
+            specify(tx.getStatus(), should.equal(PREPARE_OK));
+        }
+
+        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+        public void prepareFailsIfOneParticipantFailsToPrepare() {
+            checking(new Expectations() {{
+                one(participant1).prepare(tx);
+                one(participant2).prepare(tx); will(throwException(new Throwable("Failed to prepare")));
+            }});
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            specify(tx.getStatus(), should.equal(PREPARE_FAILED));
+        }
+
+        public void canNotPrepareTwise() {
+            allParticipantsAreToldToPrepare();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+
+        public void canNotPrepareTwiseConcurrently() {
+            WaitOnPrepare blocker = new WaitOnPrepare();
+            tx.join(blocker);
+
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    allParticipantsAreToldToPrepare();
+                }
+            });
+            t.setDaemon(true);
+            t.start();
+            while (t.isAlive() && !blocker.begunPrepare) {
+                Thread.yield();
+            }
+
+            specify(tx.getStatus(), should.equal(PREPARING));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(IllegalStateException.class));
+            t.interrupt();
+        }
+
+        public void canNotCommitBeforePrepare() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.commit();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+    }
+
+    private static class WaitOnPrepare implements TransactionParticipant {
+
+        public volatile boolean begunPrepare = false;
+
+        public void joinedTransaction(Transaction tx) {
+        }
+
+        public void prepare(Transaction tx) {
+            begunPrepare = true;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // ignore; test has ended
+            }
         }
     }
 }

@@ -28,9 +28,21 @@ package net.orfjackal.dimdwarf.tx;
  * @author Esko Luontola
  * @since 17.8.2008
  */
-public interface TransactionParticipant {
+public class TransactionFailedException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
-    void joinedTransaction(Transaction tx);
+    public TransactionFailedException() {
+    }
 
-    void prepare(Transaction tx) throws TransactionFailedException;
+    public TransactionFailedException(String message) {
+        super(message);
+    }
+
+    public TransactionFailedException(Throwable cause) {
+        super(cause);
+    }
+
+    public TransactionFailedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
