@@ -442,40 +442,54 @@ public class TransactionSpec extends Specification<Object> {
     public class MarkingATransactionForRollback {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1));
-            checking(isNotifiedOnJoin(participant2));
-            tx.join(participant1);
-            tx.join(participant2);
             return null;
         }
 
-        public void atFirstIsNotMarked() {
+        public void atFirstIsNotMarkedForRollback() {
             specify(!tx.isMarkedForRollback());
         }
 
-        public void mayBeMarkedWhenActive() {
+        public void isMarkedAfterMarkingForRollback() {
             tx.markForRollback();
             specify(tx.isMarkedForRollback());
         }
 
-        public void mayBeMarkedWhenPrepared() {
-            checking(allParticipantsArePrepared());
-            tx.prepare();
+        public void prepareFailsIfMarkedForRollbackBeforePrepare() {
             tx.markForRollback();
-            specify(tx.isMarkedForRollback());
-        }
-
-        public void mayNotBeMarkedWhenCommitted() {
-            checking(allParticipantsArePrepared());
-            tx.prepare();
-            checking(allParticipantsAreCommitted());
-            tx.commit();
+            specify(tx.getStatus(), should.equal(ACTIVE));
             specify(new Block() {
                 public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            specify(tx.getStatus(), should.equal(PREPARE_FAILED));
+        }
+
+        public void prepareFailsIfMarkedForRollbackDuringPrepare() {
+            tx.join(new DummyTransactionParticipant() {
+                public void prepare(Transaction tx) throws Throwable {
                     tx.markForRollback();
                 }
+            });
+            specify(tx.getStatus(), should.equal(ACTIVE));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            specify(tx.getStatus(), should.equal(PREPARE_FAILED));
+        }
+
+        public void commitFailsIfMarkedForRollbackBeforeCommit() {
+            tx.prepare();
+            tx.markForRollback();
+            specify(tx.getStatus(), should.equal(PREPARE_OK));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.commit();
+                }
             }, should.raise(IllegalStateException.class));
-            specify(!tx.isMarkedForRollback());
+            specify(tx.getStatus(), should.equal(PREPARE_OK));
         }
     }
 

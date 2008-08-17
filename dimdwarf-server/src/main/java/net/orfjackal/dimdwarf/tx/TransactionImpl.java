@@ -55,7 +55,9 @@ public class TransactionImpl implements Transaction {
     public void prepare() throws TransactionFailedException {
         changeStatus(ACTIVE, PREPARING);
         try {
+            checkIsNotMarkedForRollback();
             prepareAllParticipants();
+            checkIsNotMarkedForRollback();
             changeStatus(PREPARING, PREPARE_OK);
         } catch (Throwable t) {
             changeStatus(PREPARING, PREPARE_FAILED);
@@ -64,6 +66,7 @@ public class TransactionImpl implements Transaction {
     }
 
     public void commit() {
+        checkIsNotMarkedForRollback();
         changeStatus(PREPARE_OK, COMMITTING);
         if (commitAllParticipants()) {
             changeStatus(COMMITTING, COMMIT_OK);
@@ -143,6 +146,12 @@ public class TransactionImpl implements Transaction {
         }
     }
 
+    private void checkIsNotMarkedForRollback() {
+        if (markedForRollback) {
+            throw new IllegalStateException("Marked for rollback");
+        }
+    }
+
     // public interface
 
     public void mustBeActive() throws IllegalStateException {
@@ -156,9 +165,6 @@ public class TransactionImpl implements Transaction {
     }
 
     public void markForRollback() {
-        if (status.equals(COMMIT_OK)) {
-            throw new IllegalStateException("Already committed");
-        }
         markedForRollback = true;
     }
 
