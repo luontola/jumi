@@ -56,6 +56,10 @@ public class Blob {
         return new Blob(asByteArray(in));
     }
 
+    public static Blob fromByteBuffer(ByteBuffer buffer) {
+        return new Blob(asByteArray(buffer));
+    }
+
     public int length() {
         return bytes.length;
     }

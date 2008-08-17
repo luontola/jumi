@@ -117,9 +117,36 @@ public class BlobSpec extends Specification<Object> {
             return null;
         }
 
-        public void readsTheInputStreamFully() {
+        public void readsTheStreamFully() {
             specify(blob.length(), should.equal(bytes.length));
             specify(blob.getByteBuffer().get(), should.equal(bytes[0]));
+        }
+    }
+
+    public class ABlobCreatedFromAByteBuffer {
+
+        private ByteBuffer buffer;
+
+        public Object create() {
+            buffer = ByteBuffer.wrap(bytes);
+            blob = Blob.fromByteBuffer(buffer);
+            return null;
+        }
+
+        public void readsTheBufferFully() {
+            specify(blob.length(), should.equal(bytes.length));
+            specify(blob.getInputStream().read(), should.equal(bytes[0]));
+        }
+
+        public void canNotBeModifiedThroughTheSourceBuffer() {
+            byte before = bytes[0];
+            buffer.put((byte) (before + 1));
+            specify(blob.getInputStream().read(), should.equal(before));
+        }
+
+        public void theSourceBufferIsNotModified() {
+            specify(buffer.position(), should.equal(0));
+            specify(buffer.limit(), should.equal(bytes.length));
         }
     }
 }

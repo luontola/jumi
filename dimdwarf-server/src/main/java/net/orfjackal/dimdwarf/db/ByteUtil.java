@@ -27,6 +27,7 @@ package net.orfjackal.dimdwarf.db;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 /**
  * @author Esko Luontola
@@ -37,10 +38,10 @@ public class ByteUtil {
     private ByteUtil() {
     }
 
-    public static byte[] copyOf(byte[] source) {
-        byte[] target = new byte[source.length];
-        System.arraycopy(source, 0, target, 0, source.length);
-        return target;
+    public static byte[] copyOf(byte[] src) {
+        byte[] dest = new byte[src.length];
+        System.arraycopy(src, 0, dest, 0, src.length);
+        return dest;
     }
 
     public static byte[] asByteArray(InputStream in) throws IOException {
@@ -55,5 +56,11 @@ public class ByteUtil {
         } finally {
             in.close();
         }
+    }
+
+    public static byte[] asByteArray(ByteBuffer buf) {
+        byte[] dest = new byte[buf.remaining()];
+        buf.duplicate().get(dest);
+        return dest;
     }
 }
