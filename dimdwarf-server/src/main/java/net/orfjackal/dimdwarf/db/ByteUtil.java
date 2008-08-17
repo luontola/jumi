@@ -24,47 +24,36 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import static net.orfjackal.dimdwarf.db.ByteUtil.asByteArray;
-import static net.orfjackal.dimdwarf.db.ByteUtil.copyOf;
-
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 /**
  * @author Esko Luontola
  * @since 18.8.2008
  */
-public class Blob {
+public class ByteUtil {
 
-    private final byte[] bytes;
-
-    public Blob() {
-        this(new byte[0]);
+    private ByteUtil() {
     }
 
-    private Blob(byte[] bytes) {
-        this.bytes = bytes;
+    public static byte[] copyOf(byte[] source) {
+        byte[] target = new byte[source.length];
+        System.arraycopy(source, 0, target, 0, source.length);
+        return target;
     }
 
-    public static Blob fromBytes(byte[] bytes) {
-        return new Blob(copyOf(bytes));
-    }
-
-    public static Blob fromInputStream(InputStream in) throws IOException {
-        return new Blob(asByteArray(in));
-    }
-
-    public int length() {
-        return bytes.length;
-    }
-
-    public ByteArrayInputStream getInputStream() {
-        return new ByteArrayInputStream(bytes);
-    }
-
-    public ByteBuffer getByteBuffer() {
-        return ByteBuffer.wrap(bytes).asReadOnlyBuffer();
+    public static byte[] asByteArray(InputStream in) throws IOException {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream(in.available());
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > -1) {
+                out.write(buf, 0, len);
+            }
+            return out.toByteArray();
+        } finally {
+            in.close();
+        }
     }
 }

@@ -31,6 +31,7 @@ import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 
@@ -89,6 +90,7 @@ public class BlobSpec extends Specification<Object> {
         public void hasTheSameBytesThroughByteBuffer() {
             ByteBuffer buf = blob.getByteBuffer();
             specify(buf.capacity(), should.equal(bytes.length));
+            specify(buf.get(), should.equal(bytes[0]));
         }
 
         public void canNotBeModifiedThroughTheSourceByteArray() {
@@ -105,6 +107,19 @@ public class BlobSpec extends Specification<Object> {
                 }
             }, should.raise(ReadOnlyBufferException.class));
             specify(blob.getInputStream().read(), should.equal(before));
+        }
+    }
+
+    public class ABlobCreatedFromAnInputStream {
+
+        public Object create() throws IOException {
+            blob = Blob.fromInputStream(new ByteArrayInputStream(bytes));
+            return null;
+        }
+
+        public void readsTheInputStreamFully() {
+            specify(blob.length(), should.equal(bytes.length));
+            specify(blob.getByteBuffer().get(), should.equal(bytes[0]));
         }
     }
 }
