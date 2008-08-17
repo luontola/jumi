@@ -394,7 +394,7 @@ public class TransactionSpec extends Specification<Object> {
                 }
             });
 
-            specify(tx.getStatus(), should.equal(ROLLING_BACK));
+            specify(tx.getStatus(), should.equal(ROLLBACKING));
             specify(new Block() {
                 public void run() throws Throwable {
                     tx.rollback();

@@ -73,11 +73,11 @@ public class Transaction {
 
     public void rollback() {
         Status[] from = {ACTIVE, PREPARE_OK, PREPARE_FAILED};
-        changeStatus(from, ROLLING_BACK);
+        changeStatus(from, ROLLBACKING);
         if (rollbackAllParticipants()) {
-            changeStatus(ROLLING_BACK, ROLLBACK_OK);
+            changeStatus(ROLLBACKING, ROLLBACK_OK);
         } else {
-            changeStatus(ROLLING_BACK, ROLLBACK_FAILED);
+            changeStatus(ROLLBACKING, ROLLBACK_FAILED);
         }
     }
 
@@ -156,6 +156,6 @@ public class Transaction {
         ACTIVE,
         PREPARING, PREPARE_OK, PREPARE_FAILED,
         COMMITTING, COMMIT_OK, COMMIT_FAILED,
-        ROLLING_BACK, ROLLBACK_OK, ROLLBACK_FAILED
+        ROLLBACKING, ROLLBACK_OK, ROLLBACK_FAILED
     }
 }
