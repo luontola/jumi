@@ -24,8 +24,8 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import static net.orfjackal.dimdwarf.db.ByteUtil.asByteArray;
-import static net.orfjackal.dimdwarf.db.ByteUtil.copyOf;
+import static net.orfjackal.dimdwarf.util.ByteUtil.asByteArray;
+import static net.orfjackal.dimdwarf.util.ByteUtil.copyOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
