@@ -37,14 +37,27 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class TransactionSpec extends Specification<Object> {
 
-    public class WhenTransactionIsStarted {
+    private Transaction tx;
+
+    public void create() throws Exception {
+        tx = new Transaction();
+    }
+
+
+    public class WhenTransactionBegins {
 
         public Object create() {
             return null;
         }
 
-        public void todo() {
+        public void itIsActive() {
+            specify(tx.getStatus(), should.equal(Transaction.Status.ACTIVE));
+            tx.mustBeActive();
+        }
 
+        public void itHasNoParticipants() {
+            specify(tx.getParticipants(), should.equal(0));
         }
     }
+
 }

@@ -24,30 +24,9 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Esko Luontola
- * @since 15.8.2008
+ * @since 17.8.2008
  */
-public class Transaction {
-
-    private final List<TransactionParticipant> participants = new ArrayList<TransactionParticipant>();
-    private Status status = Status.ACTIVE;
-
-    public int getParticipants() {
-        return participants.size();
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void mustBeActive() {
-    }
-
-    public enum Status {
-        ACTIVE
-    }
+public interface TransactionParticipant {
 }
