@@ -29,4 +29,6 @@ package net.orfjackal.dimdwarf.tx;
  * @since 17.8.2008
  */
 public interface TransactionParticipant {
+
+    void joinedTransaction(Transaction tx);
 }

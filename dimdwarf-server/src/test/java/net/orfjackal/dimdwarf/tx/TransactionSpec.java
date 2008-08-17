@@ -27,6 +27,7 @@ package net.orfjackal.dimdwarf.tx;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 /**
@@ -38,9 +39,19 @@ import org.junit.runner.RunWith;
 public class TransactionSpec extends Specification<Object> {
 
     private Transaction tx;
+    private TransactionParticipant participant1;
+    private TransactionParticipant participant2;
 
     public void create() throws Exception {
         tx = new Transaction();
+        participant1 = mock(TransactionParticipant.class, "participant1");
+        participant2 = mock(TransactionParticipant.class, "participant2");
+    }
+
+    private Expectations isNotifiedOnJoin(final TransactionParticipant participant) {
+        return new Expectations() {{
+            one(participant).joinedTransaction(tx);
+        }};
     }
 
 
@@ -60,4 +71,27 @@ public class TransactionSpec extends Specification<Object> {
         }
     }
 
+    public class WhenParticipantJoinsTransaction {
+
+        public Object create() {
+            checking(isNotifiedOnJoin(participant1));
+            tx.join(participant1);
+            return null;
+        }
+
+        public void itHasParticipants() {
+            specify(tx.getParticipants(), should.equal(1));
+        }
+
+        public void otherParticipantsMayJoinTheSameTransaction() {
+            checking(isNotifiedOnJoin(participant2));
+            tx.join(participant2);
+            specify(tx.getParticipants(), should.equal(2));
+        }
+
+        public void theSameParticipantCanNotJoinTwise() {
+            tx.join(participant1);
+            specify(tx.getParticipants(), should.equal(1));
+        }
+    }
 }

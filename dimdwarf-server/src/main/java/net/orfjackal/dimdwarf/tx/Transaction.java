@@ -47,6 +47,13 @@ public class Transaction {
     public void mustBeActive() {
     }
 
+    public void join(TransactionParticipant p) {
+        if (!participants.contains(p)) {
+            p.joinedTransaction(this);
+            participants.add(p);
+        }
+    }
+
     public enum Status {
         ACTIVE
     }
