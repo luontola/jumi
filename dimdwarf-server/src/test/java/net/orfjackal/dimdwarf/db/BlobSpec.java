@@ -67,6 +67,10 @@ public class BlobSpec extends Specification<Object> {
         public void hasNoBytesThroughByteBuffer() {
             specify(blob.getByteBuffer().capacity(), should.equal(0));
         }
+
+        public void hasNoBytesThroughByteArray() {
+            specify(blob.getByteArray().length, should.equal(0));
+        }
     }
 
     public class ABlobCreatedFromAByteArray {
@@ -76,7 +80,7 @@ public class BlobSpec extends Specification<Object> {
             return null;
         }
 
-        public void hasTheSameLengthAsTheArray() {
+        public void hasTheSameLengthAsTheSourceByteArray() {
             specify(blob.length(), should.equal(bytes.length));
         }
 
@@ -93,19 +97,30 @@ public class BlobSpec extends Specification<Object> {
             specify(buf.get(), should.equal(bytes[0]));
         }
 
+        public void hasTheSameBytesThroughByteArray() {
+            specify(blob.getByteArray(), should.containInOrder(bytes));
+        }
+
         public void canNotBeModifiedThroughTheSourceByteArray() {
             byte before = bytes[0];
             bytes[0]++;
             specify(blob.getInputStream().read(), should.equal(before));
         }
 
-        public void canNotBeModifiedThroughtTheByteBuffer() {
+        public void canNotBeModifiedThroughtTheResultByteBuffer() {
             final byte before = bytes[0];
             specify(new Block() {
                 public void run() throws Throwable {
                     blob.getByteBuffer().put((byte) (before + 1));
                 }
             }, should.raise(ReadOnlyBufferException.class));
+            specify(blob.getInputStream().read(), should.equal(before));
+        }
+
+        public void canNotBeModifiedThroughtTheResultByteArray() {
+            byte before = bytes[0];
+            blob.getByteArray()[0]++;
+            specify(blob.getByteArray()[0], should.equal(before));
             specify(blob.getInputStream().read(), should.equal(before));
         }
     }
@@ -118,8 +133,7 @@ public class BlobSpec extends Specification<Object> {
         }
 
         public void readsTheStreamFully() {
-            specify(blob.length(), should.equal(bytes.length));
-            specify(blob.getByteBuffer().get(), should.equal(bytes[0]));
+            specify(blob.getByteArray(), should.containInOrder(bytes));
         }
     }
 
@@ -134,8 +148,7 @@ public class BlobSpec extends Specification<Object> {
         }
 
         public void readsTheBufferFully() {
-            specify(blob.length(), should.equal(bytes.length));
-            specify(blob.getInputStream().read(), should.equal(bytes[0]));
+            specify(blob.getByteArray(), should.containInOrder(bytes));
         }
 
         public void canNotBeModifiedThroughTheSourceBuffer() {

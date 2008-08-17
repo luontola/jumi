@@ -75,6 +75,10 @@ public final class Blob {
         return ByteBuffer.wrap(bytes).asReadOnlyBuffer();
     }
 
+    public byte[] getByteArray() {
+        return copyOf(bytes);
+    }
+
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
