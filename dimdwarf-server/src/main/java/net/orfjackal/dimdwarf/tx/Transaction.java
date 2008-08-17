@@ -24,6 +24,7 @@
 
 package net.orfjackal.dimdwarf.tx;
 
+import static net.orfjackal.dimdwarf.tx.Transaction.Status.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +40,10 @@ public class Transaction {
 
     private final Object lock = new Object();
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
-    private volatile Status status = Status.ACTIVE;
-
-    public int getParticipants() {
-        return participants.size();
-    }
-
-    public Status getStatus() {
-        return status;
-    }
+    private volatile Status status = ACTIVE;
 
     public boolean isActive() {
-        return status.equals(Status.ACTIVE);
+        return status.equals(ACTIVE);
     }
 
     public void mustBeActive() throws IllegalStateException {
@@ -67,25 +60,28 @@ public class Transaction {
     }
 
     public void prepare() throws TransactionFailedException {
-        beginPrepare();
+        changeStatus(ACTIVE, PREPARING);
         try {
-            for (TransactionParticipant p : participants) {
-                p.prepare(this);
-            }
-            prepareSucceeded();
-
+            prepareAllParticipants();
+            changeStatus(PREPARING, PREPARE_OK);
         } catch (Throwable t) {
-            prepareFailed();
+            changeStatus(PREPARING, PREPARE_FAILED);
             throw new TransactionFailedException("Prepare failed", t);
         }
     }
 
     public void commit() {
-        beginCommit();
+        changeStatus(PREPARE_OK, COMMITTING);
         if (commitAllParticipants()) {
-            commitSucceeded();
+            changeStatus(COMMITTING, COMMIT_OK);
         } else {
-            commitFailed();
+            changeStatus(COMMITTING, COMMIT_FAILED);
+        }
+    }
+
+    private void prepareAllParticipants() throws Throwable {
+        for (TransactionParticipant p : participants) {
+            p.prepare(this);
         }
     }
 
@@ -102,40 +98,21 @@ public class Transaction {
         return allSucceeded;
     }
 
-    // Status changes
+    public int getParticipants() {
+        return participants.size();
+    }
 
-    private void beginPrepare() {
+    public Status getStatus() {
+        return status;
+    }
+
+    private void changeStatus(Status from, Status to) {
         synchronized (lock) {
-            if (!status.equals(Status.ACTIVE)) {
-                throw new IllegalStateException("Transaction not active");
+            if (!status.equals(from)) {
+                throw new IllegalStateException("Expected " + from + " but was " + status);
             }
-            status = Status.PREPARING;
+            status = to;
         }
-    }
-
-    private void prepareSucceeded() {
-        status = Status.PREPARE_OK;
-    }
-
-    private void prepareFailed() {
-        status = Status.PREPARE_FAILED;
-    }
-
-    private void beginCommit() {
-        synchronized (lock) {
-            if (!status.equals(Status.PREPARE_OK)) {
-                throw new IllegalStateException("Not prepared");
-            }
-            status = Status.COMMITTING;
-        }
-    }
-
-    private void commitSucceeded() {
-        status = Status.COMMIT_OK;
-    }
-
-    private void commitFailed() {
-        status = Status.COMMIT_FAILED;
     }
 
     public enum Status {
