@@ -24,18 +24,22 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author Esko Luontola
  * @since 15.8.2008
  */
 public class Transaction {
+    private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
-    private final List<TransactionParticipant> participants = new ArrayList<TransactionParticipant>();
-    private volatile Status status = Status.ACTIVE;
     private final Object lock = new Object();
+    private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
+    private volatile Status status = Status.ACTIVE;
 
     public int getParticipants() {
         return participants.size();
@@ -69,6 +73,30 @@ public class Transaction {
         }
     }
 
+    public void commit() {
+        beginCommit();
+        if (commitAllParticipants()) {
+            commitSucceeded();
+        } else {
+            commitFailed();
+        }
+    }
+
+    private boolean commitAllParticipants() {
+        boolean allSucceeded = true;
+        for (TransactionParticipant p : participants) {
+            try {
+                p.commit(this);
+            } catch (Throwable t) {
+                allSucceeded = false;
+                logger.error("Commit failed for participant " + p, t);
+            }
+        }
+        return allSucceeded;
+    }
+
+    // Status changes
+
     private void beginPrepare() {
         synchronized (lock) {
             if (!status.equals(Status.ACTIVE)) {
@@ -86,8 +114,20 @@ public class Transaction {
         status = Status.PREPARE_FAILED;
     }
 
-    public void commit() {
-        throw new IllegalStateException("Not prepared");
+    private void beginCommit() {
+        synchronized (lock) {
+            if (!status.equals(Status.PREPARE_OK)) {
+                throw new IllegalStateException("Not prepared");
+            }
+        }
+    }
+
+    private void commitSucceeded() {
+        status = Status.COMMIT_OK;
+    }
+
+    private void commitFailed() {
+        status = Status.COMMIT_FAILED;
     }
 
     public enum Status {

@@ -32,5 +32,7 @@ public interface TransactionParticipant {
 
     void joinedTransaction(Transaction tx);
 
-    void prepare(Transaction tx) throws TransactionFailedException;
+    void prepare(Transaction tx) throws Throwable;
+
+    void commit(Transaction tx);
 }

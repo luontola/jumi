@@ -30,7 +30,12 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.tx.Transaction.Status.*;
 import org.jmock.Expectations;
+import org.jmock.Sequence;
 import org.junit.runner.RunWith;
+
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -44,10 +49,21 @@ public class TransactionSpec extends Specification<Object> {
     private TransactionParticipant participant1;
     private TransactionParticipant participant2;
 
+    private Logger txLogger;
+    private Filter txLoggerFilter;
+
     public void create() throws Exception {
+        txLoggerFilter = mock(Filter.class);
+        txLogger = Logger.getLogger(Transaction.class.getName());
+        txLogger.setFilter(txLoggerFilter);
+
         tx = new Transaction();
         participant1 = mock(TransactionParticipant.class, "participant1");
         participant2 = mock(TransactionParticipant.class, "participant2");
+    }
+
+    public void destroy() throws Exception {
+        txLogger.setFilter(null);
     }
 
     private Expectations isNotifiedOnJoin(final TransactionParticipant participant) {
@@ -57,18 +73,33 @@ public class TransactionSpec extends Specification<Object> {
     }
 
     private Expectations allParticipantsArePrepared() {
-        return new Expectations() {{
-            one(participant1).prepare(tx);
-            one(participant2).prepare(tx);
-        }};
+        try {
+            return new Expectations() {{
+                one(participant1).prepare(tx);
+                one(participant2).prepare(tx);
+            }};
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     private Expectations prepareFailsFor(final TransactionParticipant participant) {
+        try {
+            return new Expectations() {{
+                one(participant).prepare(tx); will(throwException(new Throwable("Failed to prepare")));
+                allowing(participant1).prepare(tx);
+                allowing(participant2).prepare(tx);
+            }};
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    private Expectations allParticipantsAreCommitted() {
         return new Expectations() {{
-            one(participant).prepare(tx); will(throwException(new Throwable("Failed to prepare")));
-            allowing(participant1).prepare(tx);
-            allowing(participant2).prepare(tx);
+            one(participant1).commit(tx);
+            one(participant2).commit(tx);
         }};
     }
 
@@ -202,7 +233,45 @@ public class TransactionSpec extends Specification<Object> {
         }
     }
 
-    
+    public class WhenTransactionCommits {
+
+        public Object create() {
+            checking(isNotifiedOnJoin(participant1));
+            checking(isNotifiedOnJoin(participant2));
+            tx.join(participant1);
+            tx.join(participant2);
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+            return null;
+        }
+
+        public void allParticipantsAreToldToCommit() {
+            checking(allParticipantsAreCommitted());
+            tx.commit();
+        }
+
+        public void transactionIsCommitted() {
+            checking(allParticipantsAreCommitted());
+            tx.commit();
+            specify(tx.getStatus(), should.equal(COMMIT_OK));
+        }
+
+        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+        public void theRestOfTheParticipantsAreCommittedEvenIfTheFirstParticipantFailsToCommit() {
+            final Sequence sq = sequence("commit-sequence");
+            final Throwable t = new AssertionError("Failed to commit");
+            checking(new Expectations() {{
+                one(participant1).commit(tx); will(throwException(t)); inSequence(sq);
+                one(txLoggerFilter).isLoggable(with(any(LogRecord.class))); inSequence(sq);
+                one(participant2).commit(tx); inSequence(sq);
+            }});
+            tx.commit();
+            specify(tx.getStatus(), should.equal(COMMIT_FAILED));
+        }
+
+    }
+
+
     private static class WaitOnPrepare implements TransactionParticipant {
 
         public volatile boolean begunPrepare = false;
@@ -217,6 +286,9 @@ public class TransactionSpec extends Specification<Object> {
             } catch (InterruptedException e) {
                 // ignore; test has ended
             }
+        }
+
+        public void commit(Transaction tx) {
         }
     }
 }
