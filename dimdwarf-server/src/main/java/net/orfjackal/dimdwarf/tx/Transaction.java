@@ -49,7 +49,14 @@ public class Transaction {
         return status;
     }
 
-    public void mustBeActive() {
+    public boolean isActive() {
+        return status.equals(Status.ACTIVE);
+    }
+
+    public void mustBeActive() throws IllegalStateException {
+        if (!isActive()) {
+            throw new IllegalStateException("Transaction not active");
+        }
     }
 
     public void join(TransactionParticipant p) {
@@ -119,6 +126,7 @@ public class Transaction {
             if (!status.equals(Status.PREPARE_OK)) {
                 throw new IllegalStateException("Not prepared");
             }
+            status = Status.COMMITTING;
         }
     }
 
@@ -131,6 +139,9 @@ public class Transaction {
     }
 
     public enum Status {
-        ACTIVE, PREPARING, PREPARE_OK, PREPARE_FAILED, COMMITTING, COMMIT_OK, COMMIT_FAILED, ROLLED_BACK
+        ACTIVE,
+        PREPARING, PREPARE_OK, PREPARE_FAILED,
+        COMMITTING, COMMIT_OK, COMMIT_FAILED,
+        ROLLING_BACK, ROLLED_BACK
     }
 }

@@ -154,6 +154,20 @@ public class TransactionSpec extends Specification<Object> {
             return null;
         }
 
+        public void transactionIsDeactivatedBeforeParticipantsArePrepared() {
+            tx.join(new DummyTransactionParticipant() {
+                public void prepare(final Transaction tx) throws Throwable {
+                    specify(new Block() {
+                        public void run() throws Throwable {
+                            tx.mustBeActive();
+                        }
+                    }, should.raise(IllegalStateException.class));
+                }
+            });
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+        }
+
         public void allParticipantsAreToldToPrepare() {
             checking(allParticipantsArePrepared());
             tx.prepare();
@@ -187,19 +201,18 @@ public class TransactionSpec extends Specification<Object> {
 
         public void canNotPrepareTwiseConcurrently() {
             checking(allParticipantsArePrepared());
-            WaitOnPrepare blocker = new WaitOnPrepare();
+            Blocker blocker = new Blocker() {
+                public void prepare(Transaction tx) {
+                    waitHere();
+                }
+            };
             tx.join(blocker);
 
-            Thread t = new Thread(new Runnable() {
+            Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
                 public void run() {
                     tx.prepare();
                 }
             });
-            t.setDaemon(true);
-            t.start();
-            while (t.isAlive() && !blocker.begunPrepare) {
-                Thread.yield();
-            }
 
             specify(tx.getStatus(), should.equal(PREPARING));
             specify(new Block() {
@@ -269,23 +282,72 @@ public class TransactionSpec extends Specification<Object> {
             specify(tx.getStatus(), should.equal(COMMIT_FAILED));
         }
 
+        public void canNotCommitTwise() {
+            checking(allParticipantsAreCommitted());
+            tx.commit();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.commit();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+
+        public void canNotCommitTwiseConcurrently() {
+            checking(allParticipantsAreCommitted());
+            Blocker blocker = new Blocker() {
+                public void commit(Transaction tx) {
+                    waitHere();
+                }
+            };
+            tx.join(blocker);
+
+            Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
+                public void run() {
+                    tx.commit();
+                }
+            });
+
+            specify(tx.getStatus(), should.equal(COMMITTING));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.commit();
+                }
+            }, should.raise(IllegalStateException.class));
+            t.interrupt();
+        }
     }
 
 
-    private static class WaitOnPrepare implements TransactionParticipant {
+    private static class Blocker extends DummyTransactionParticipant {
 
-        public volatile boolean begunPrepare = false;
+        private volatile boolean isReached = false;
 
-        public void joinedTransaction(Transaction tx) {
-        }
-
-        public void prepare(Transaction tx) {
-            begunPrepare = true;
+        protected void waitHere() {
+            isReached = true;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // ignore; test has ended
             }
+        }
+
+        public Thread waitUntilBlockerBeginsWaiting(Runnable r) {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            t.start();
+            while (t.isAlive() && !isReached) {
+                Thread.yield();
+            }
+            return t;
+        }
+    }
+
+    private static class DummyTransactionParticipant implements TransactionParticipant {
+
+        public void joinedTransaction(Transaction tx) {
+        }
+
+        public void prepare(Transaction tx) throws Throwable {
         }
 
         public void commit(Transaction tx) {
