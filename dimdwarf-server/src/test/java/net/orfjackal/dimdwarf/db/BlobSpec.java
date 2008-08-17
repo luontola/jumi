@@ -149,4 +149,56 @@ public class BlobSpec extends Specification<Object> {
             specify(buffer.limit(), should.equal(bytes.length));
         }
     }
+
+    public class BlobEqualityAndHashcode {
+
+        private Blob blob1a;
+        private Blob blob1b;
+        private Blob blob2;
+        private Blob blob23;
+
+        public Object create() {
+            blob1a = Blob.fromBytes(new byte[]{1});
+            blob1b = Blob.fromBytes(new byte[]{1});
+            blob2 = Blob.fromBytes(new byte[]{2});
+            blob23 = Blob.fromBytes(new byte[]{2, 3});
+            return null;
+        }
+
+        public void equalsItself() {
+            areEqual(blob1a, blob1a);
+        }
+
+        public void equalsAnotherBlobWithSameLengthAndContent() {
+            areEqual(blob1a, blob1b);
+        }
+
+        public void differsFromAnotherBlobWithDifferentContent() {
+            areDifferent(blob1a, blob2);
+        }
+
+        public void differsFromAnotherBlobWithDifferentLength() {
+            areDifferent(blob2, blob23);
+        }
+
+        public void differsFromObjectsOfAnotherType() {
+            areDifferent(blob1a, "foo");
+        }
+
+        public void differsFromNull() {
+            specify(blob1a, should.not().equal(null));
+        }
+
+        private void areEqual(Object a, Object b) {
+            specify(a.equals(b));
+            specify(b.equals(a));
+            specify(a.hashCode(), should.equal(b.hashCode()));
+        }
+
+        private void areDifferent(Object a, Object b) {
+            specify(a.equals(b), should.equal(false));
+            specify(b.equals(a), should.equal(false));
+            specify(a.hashCode(), should.not().equal(b.hashCode()));
+        }
+    }
 }

@@ -31,14 +31,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * @author Esko Luontola
  * @since 18.8.2008
  */
-public class Blob {
+public final class Blob {
 
     private final byte[] bytes;
+    private volatile Integer hashCode;
 
     public Blob() {
         this(new byte[0]);
@@ -46,6 +48,7 @@ public class Blob {
 
     private Blob(byte[] bytes) {
         this.bytes = bytes;
+        this.hashCode = null;
     }
 
     public static Blob fromBytes(byte[] bytes) {
@@ -70,5 +73,25 @@ public class Blob {
 
     public ByteBuffer getByteBuffer() {
         return ByteBuffer.wrap(bytes).asReadOnlyBuffer();
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof Blob) {
+            Blob other = (Blob) obj;
+            return Arrays.equals(this.bytes, other.bytes);
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        if (hashCode == null) {
+            synchronized (bytes) {
+                hashCode = Arrays.hashCode(bytes);
+            }
+        }
+        return hashCode;
     }
 }
