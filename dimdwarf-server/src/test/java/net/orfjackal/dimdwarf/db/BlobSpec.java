@@ -107,7 +107,7 @@ public class BlobSpec extends Specification<Object> {
             specify(blob.getInputStream().read(), should.equal(before));
         }
 
-        public void canNotBeModifiedThroughtTheResultByteBuffer() {
+        public void canNotBeModifiedThroughTheResultByteBuffer() {
             final byte before = bytes[0];
             specify(new Block() {
                 public void run() throws Throwable {
@@ -117,7 +117,7 @@ public class BlobSpec extends Specification<Object> {
             specify(blob.getInputStream().read(), should.equal(before));
         }
 
-        public void canNotBeModifiedThroughtTheResultByteArray() {
+        public void canNotBeModifiedThroughTheResultByteArray() {
             byte before = bytes[0];
             blob.getByteArray()[0]++;
             specify(blob.getByteArray()[0], should.equal(before));
