@@ -1,2 +1,4 @@
 @echo off
-mvn clean deploy
+call mvn clean deploy && goto :eof
+echo.
+pause

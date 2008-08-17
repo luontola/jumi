@@ -1,2 +1,4 @@
 @echo off
-mvn clean package
+call mvn clean package && goto :eof
+echo.
+pause
