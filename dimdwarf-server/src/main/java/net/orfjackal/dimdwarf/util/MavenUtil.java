@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf;
+package net.orfjackal.dimdwarf.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

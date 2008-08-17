@@ -22,8 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf;
+package net.orfjackal.dimdwarf.server;
 
+import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,8 @@ import java.io.IOException;
  * @author Esko Luontola
  * @since 15.8.2008
  */
-public class Dimdwarf {
-    private static final Logger logger = LoggerFactory.getLogger(Dimdwarf.class);
+public class Startup {
+    private static final Logger logger = LoggerFactory.getLogger(Startup.class);
 
     public static void main(String[] args) throws IOException {
         logger.info("Dimdwarf {} starting up", getVersion());

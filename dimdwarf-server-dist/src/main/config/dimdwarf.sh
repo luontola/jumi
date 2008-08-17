@@ -66,4 +66,4 @@ done
 
 # Start up Dimdwarf
 "$JAVA" $VMOPTIONS -cp $CP \
-    net.orfjackal.dimdwarf.Dimdwarf "$DIMDWARF_HOME/dimdwarf.properties" "$APP_CONFIG_FILE"
+    net.orfjackal.dimdwarf.server.Startup "$DIMDWARF_HOME/dimdwarf.properties" "$APP_CONFIG_FILE"
