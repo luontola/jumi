@@ -28,7 +28,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import static net.orfjackal.dimdwarf.tx.Transaction.Status.*;
+import static net.orfjackal.dimdwarf.tx.TransactionImpl.Status.*;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.junit.runner.RunWith;
@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 @Group({"fast"})
 public class TransactionSpec extends Specification<Object> {
 
-    private Transaction tx;
+    private TransactionImpl tx;
     private TransactionParticipant participant1;
     private TransactionParticipant participant2;
 
@@ -54,10 +54,10 @@ public class TransactionSpec extends Specification<Object> {
 
     public void create() throws Exception {
         txLoggerFilter = mock(Filter.class);
-        txLogger = Logger.getLogger(Transaction.class.getName());
+        txLogger = Logger.getLogger(TransactionImpl.class.getName());
         txLogger.setFilter(txLoggerFilter);
 
-        tx = new Transaction();
+        tx = new TransactionImpl();
         participant1 = mock(TransactionParticipant.class, "participant1");
         participant2 = mock(TransactionParticipant.class, "participant2");
     }
@@ -310,7 +310,7 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void canNotCommitTwiseConcurrently() {
-            tx = new Transaction();
+            tx = new TransactionImpl();
             Blocker blocker = new Blocker() {
                 public void commit(Transaction tx) {
                     waitHere();
