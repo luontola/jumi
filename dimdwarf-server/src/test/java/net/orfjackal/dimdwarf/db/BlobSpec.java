@@ -41,7 +41,7 @@ import java.nio.ReadOnlyBufferException;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class BlobSpec extends Specification<Object> {
+public class BlobSpec extends Specification<Blob> {
 
     private Blob blob;
     private byte[] bytes = {42};

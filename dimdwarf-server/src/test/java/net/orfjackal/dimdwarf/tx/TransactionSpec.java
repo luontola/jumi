@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class TransactionSpec extends Specification<Object> {
+public class TransactionSpec extends Specification<TransactionImpl> {
 
     private TransactionImpl tx;
     private TransactionParticipant participant1;
@@ -248,7 +248,7 @@ public class TransactionSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
         }
 
-        public void canNotCommitIfFailedToPrepare() {
+        public void canNotCommitIfPrepareFailed() {
             checking(prepareFailsFor(participant2));
             specify(new Block() {
                 public void run() throws Throwable {
@@ -445,16 +445,16 @@ public class TransactionSpec extends Specification<Object> {
             return null;
         }
 
-        public void atFirstIsNotRollbackOnly() {
+        public void atFirstItIsNotRollbackOnly() {
             specify(!tx.isRollbackOnly());
         }
 
-        public void afterMarkingIsRollbackOnly() {
+        public void afterMarkingItIsRollbackOnly() {
             tx.setRollbackOnly();
             specify(tx.isRollbackOnly());
         }
 
-        public void prepareFailsIfRollbackOnly() {
+        public void prepareFailsWhenItIsRollbackOnly() {
             tx.setRollbackOnly();
             specify(tx.getStatus(), should.equal(ACTIVE));
             specify(new Block() {
@@ -465,7 +465,7 @@ public class TransactionSpec extends Specification<Object> {
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 
-        public void prepareFailsIfDuringPrepareIsMarkedRollbackOnly() {
+        public void prepareFailsWhenItIsMarkedRollbackOnlyDuringPrepare() {
             tx.join(new DummyTransactionParticipant() {
                 public void prepare(Transaction tx) throws Throwable {
                     tx.setRollbackOnly();
@@ -480,7 +480,7 @@ public class TransactionSpec extends Specification<Object> {
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 
-        public void commitFailsIfRollbackOnly() {
+        public void commitFailsWhenItIsRollbackOnly() {
             tx.prepare();
             tx.setRollbackOnly();
             specify(tx.getStatus(), should.equal(PREPARED));
