@@ -407,6 +407,36 @@ public class TransactionSpec extends Specification<Object> {
             checking(allParticipantsAreRolledBack());
             tx.rollback();
         }
+
+        public void mayRollbackWhenPrepared() {
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+            checking(allParticipantsAreRolledBack());
+            tx.rollback();
+        }
+
+        public void mayRollbackWhenPrepareFailed() {
+            checking(prepareFailsFor(participant1));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            checking(allParticipantsAreRolledBack());
+            tx.rollback();
+        }
+
+        public void canNotRollbackWhenCommitted() {
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+            checking(allParticipantsAreCommitted());
+            tx.commit();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.rollback();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
     }
 
 

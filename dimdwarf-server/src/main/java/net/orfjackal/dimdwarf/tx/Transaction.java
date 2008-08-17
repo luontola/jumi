@@ -28,6 +28,7 @@ import static net.orfjackal.dimdwarf.tx.Transaction.Status.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -71,7 +72,8 @@ public class Transaction {
     }
 
     public void rollback() {
-        changeStatus(ACTIVE, ROLLING_BACK);
+        Status[] from = {ACTIVE, PREPARE_OK, PREPARE_FAILED};
+        changeStatus(from, ROLLING_BACK);
         if (rollbackAllParticipants()) {
             changeStatus(ROLLING_BACK, ROLLBACK_OK);
         } else {
@@ -115,6 +117,16 @@ public class Transaction {
         return participants.size();
     }
 
+    public void mustBeActive() throws IllegalStateException {
+        if (!isActive()) {
+            throw new IllegalStateException("Transaction not active");
+        }
+    }
+
+    public boolean isActive() {
+        return status.equals(ACTIVE);
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -128,13 +140,15 @@ public class Transaction {
         }
     }
 
-    public boolean isActive() {
-        return status.equals(ACTIVE);
-    }
-
-    public void mustBeActive() throws IllegalStateException {
-        if (!isActive()) {
-            throw new IllegalStateException("Transaction not active");
+    private void changeStatus(Status[] fromAny, Status to) {
+        synchronized (lock) {
+            for (Status from : fromAny) {
+                if (status.equals(from)) {
+                    status = to;
+                    return;
+                }
+            }
+            throw new IllegalStateException("Expected one of " + Arrays.toString(fromAny) + " but was " + status);
         }
     }
 
