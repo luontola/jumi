@@ -42,17 +42,8 @@ public class Transaction {
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
     private volatile Status status = ACTIVE;
 
-    public boolean isActive() {
-        return status.equals(ACTIVE);
-    }
-
-    public void mustBeActive() throws IllegalStateException {
-        if (!isActive()) {
-            throw new IllegalStateException("Transaction not active");
-        }
-    }
-
     public void join(TransactionParticipant p) {
+        mustBeActive();
         if (!participants.contains(p)) {
             p.joinedTransaction(this);
             participants.add(p);
@@ -134,6 +125,16 @@ public class Transaction {
                 throw new IllegalStateException("Expected " + from + " but was " + status);
             }
             status = to;
+        }
+    }
+
+    public boolean isActive() {
+        return status.equals(ACTIVE);
+    }
+
+    public void mustBeActive() throws IllegalStateException {
+        if (!isActive()) {
+            throw new IllegalStateException("Transaction not active");
         }
     }
 

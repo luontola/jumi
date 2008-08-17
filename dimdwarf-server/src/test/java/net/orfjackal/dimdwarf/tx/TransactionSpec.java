@@ -175,6 +175,16 @@ public class TransactionSpec extends Specification<Object> {
             tx.prepare();
         }
 
+        public void transactionMayNotBeJoinedAfterItIsDeactivated() {
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.join(new DummyTransactionParticipant());
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+
         public void allParticipantsAreToldToPrepare() {
             checking(allParticipantsArePrepared());
             tx.prepare();
@@ -300,13 +310,14 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void canNotCommitTwiseConcurrently() {
-            checking(allParticipantsAreCommitted());
+            tx = new Transaction();
             Blocker blocker = new Blocker() {
                 public void commit(Transaction tx) {
                     waitHere();
                 }
             };
             tx.join(blocker);
+            tx.prepare();
 
             Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
                 public void run() {
