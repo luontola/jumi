@@ -42,6 +42,7 @@ public class TransactionImpl implements Transaction {
     private final Object lock = new Object();
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
     private volatile Status status = ACTIVE;
+    private volatile boolean markedForRollback = false;
 
     public void join(TransactionParticipant p) {
         mustBeActive();
@@ -117,16 +118,6 @@ public class TransactionImpl implements Transaction {
         return participants.size();
     }
 
-    public void mustBeActive() throws IllegalStateException {
-        if (!isActive()) {
-            throw new IllegalStateException("Transaction not active");
-        }
-    }
-
-    public boolean isActive() {
-        return status.equals(ACTIVE);
-    }
-
     public Status getStatus() {
         return status;
     }
@@ -150,6 +141,29 @@ public class TransactionImpl implements Transaction {
             }
             throw new IllegalStateException("Expected one of " + Arrays.toString(fromAny) + " but was " + status);
         }
+    }
+
+    // public interface
+
+    public void mustBeActive() throws IllegalStateException {
+        if (!isActive()) {
+            throw new IllegalStateException("Transaction not active");
+        }
+    }
+
+    public boolean isActive() {
+        return status.equals(ACTIVE);
+    }
+
+    public void markForRollback() {
+        if (status.equals(COMMIT_OK)) {
+            throw new IllegalStateException("Already committed");
+        }
+        markedForRollback = true;
+    }
+
+    public boolean isMarkedForRollback() {
+        return markedForRollback;
     }
 
     public enum Status {

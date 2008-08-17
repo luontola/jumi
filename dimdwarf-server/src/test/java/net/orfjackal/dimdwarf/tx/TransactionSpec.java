@@ -439,6 +439,46 @@ public class TransactionSpec extends Specification<Object> {
         }
     }
 
+    public class MarkingATransactionForRollback {
+
+        public Object create() {
+            checking(isNotifiedOnJoin(participant1));
+            checking(isNotifiedOnJoin(participant2));
+            tx.join(participant1);
+            tx.join(participant2);
+            return null;
+        }
+
+        public void atFirstIsNotMarked() {
+            specify(!tx.isMarkedForRollback());
+        }
+
+        public void mayBeMarkedWhenActive() {
+            tx.markForRollback();
+            specify(tx.isMarkedForRollback());
+        }
+
+        public void mayBeMarkedWhenPrepared() {
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+            tx.markForRollback();
+            specify(tx.isMarkedForRollback());
+        }
+
+        public void mayNotBeMarkedWhenCommitted() {
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+            checking(allParticipantsAreCommitted());
+            tx.commit();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.markForRollback();
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(!tx.isMarkedForRollback());
+        }
+    }
+
 
     private static class Blocker extends DummyTransactionParticipant {
 

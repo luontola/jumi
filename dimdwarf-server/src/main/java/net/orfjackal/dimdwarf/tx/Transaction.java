@@ -33,4 +33,8 @@ public interface Transaction {
     void mustBeActive() throws IllegalStateException;
 
     boolean isActive();
+
+    void markForRollback();
+
+    boolean isMarkedForRollback();
 }
