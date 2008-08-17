@@ -26,17 +26,17 @@ package net.orfjackal.dimdwarf.tx;
 
 /**
  * @author Esko Luontola
- * @since 17.8.2008
+ * @since 18.8.2008
  */
-public interface Transaction {
+public interface TransactionCoordinator {
 
-    TransactionStatus getStatus();
+    Transaction getTransaction();
 
-    boolean isActive();
+    void join(TransactionParticipant p);
 
-    void mustBeActive() throws IllegalStateException;
+    void prepare() throws TransactionFailedException;
 
-    boolean isRollbackOnly();
+    void commit();
 
-    void setRollbackOnly();
+    void rollback();
 }

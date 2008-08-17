@@ -24,7 +24,7 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-import static net.orfjackal.dimdwarf.tx.TransactionImpl.Status.*;
+import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,18 +36,22 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Esko Luontola
  * @since 15.8.2008
  */
-public class TransactionImpl implements Transaction {
+public class TransactionImpl implements Transaction, TransactionCoordinator {
     private static final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
     private final Object lock = new Object();
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
-    private volatile Status status = ACTIVE;
-    private volatile boolean markedForRollback = false;
+    private volatile TransactionStatus status = ACTIVE;
+    private volatile boolean rollbackOnly = false;
+
+    public Transaction getTransaction() {
+        return this;
+    }
 
     public void join(TransactionParticipant p) {
         mustBeActive();
         if (!participants.contains(p)) {
-            p.joinedTransaction(this);
+            p.joinedTransaction(getTransaction());
             participants.add(p);
         }
     }
@@ -55,9 +59,9 @@ public class TransactionImpl implements Transaction {
     public void prepare() throws TransactionFailedException {
         changeStatus(ACTIVE, PREPARING);
         try {
-            checkIsNotMarkedForRollback();
+            checkIsNotRollbackOnly();
             prepareAllParticipants();
-            checkIsNotMarkedForRollback();
+            checkIsNotRollbackOnly();
             changeStatus(PREPARING, PREPARE_OK);
         } catch (Throwable t) {
             changeStatus(PREPARING, PREPARE_FAILED);
@@ -66,7 +70,7 @@ public class TransactionImpl implements Transaction {
     }
 
     public void commit() {
-        checkIsNotMarkedForRollback();
+        checkIsNotRollbackOnly();
         changeStatus(PREPARE_OK, COMMITTING);
         if (commitAllParticipants()) {
             changeStatus(COMMITTING, COMMIT_OK);
@@ -76,7 +80,7 @@ public class TransactionImpl implements Transaction {
     }
 
     public void rollback() {
-        Status[] from = {ACTIVE, PREPARE_OK, PREPARE_FAILED};
+        TransactionStatus[] from = {ACTIVE, PREPARE_OK, PREPARE_FAILED};
         changeStatus(from, ROLLBACKING);
         if (rollbackAllParticipants()) {
             changeStatus(ROLLBACKING, ROLLBACK_OK);
@@ -87,7 +91,7 @@ public class TransactionImpl implements Transaction {
 
     private void prepareAllParticipants() throws Throwable {
         for (TransactionParticipant p : participants) {
-            p.prepare(this);
+            p.prepare(getTransaction());
         }
     }
 
@@ -95,7 +99,7 @@ public class TransactionImpl implements Transaction {
         boolean allSucceeded = true;
         for (TransactionParticipant p : participants) {
             try {
-                p.commit(this);
+                p.commit(getTransaction());
             } catch (Throwable t) {
                 allSucceeded = false;
                 logger.error("Commit failed for participant " + p, t);
@@ -108,7 +112,7 @@ public class TransactionImpl implements Transaction {
         boolean allSucceeded = true;
         for (TransactionParticipant p : participants) {
             try {
-                p.rollback(this);
+                p.rollback(getTransaction());
             } catch (Throwable t) {
                 allSucceeded = false;
                 logger.error("Rollback failed for participant " + p, t);
@@ -121,11 +125,11 @@ public class TransactionImpl implements Transaction {
         return participants.size();
     }
 
-    public Status getStatus() {
+    public TransactionStatus getStatus() {
         return status;
     }
 
-    private void changeStatus(Status from, Status to) {
+    private void changeStatus(TransactionStatus from, TransactionStatus to) {
         synchronized (lock) {
             if (!status.equals(from)) {
                 throw new IllegalStateException("Expected " + from + " but was " + status);
@@ -134,9 +138,9 @@ public class TransactionImpl implements Transaction {
         }
     }
 
-    private void changeStatus(Status[] fromAny, Status to) {
+    private void changeStatus(TransactionStatus[] fromAny, TransactionStatus to) {
         synchronized (lock) {
-            for (Status from : fromAny) {
+            for (TransactionStatus from : fromAny) {
                 if (status.equals(from)) {
                     status = to;
                     return;
@@ -146,13 +150,9 @@ public class TransactionImpl implements Transaction {
         }
     }
 
-    private void checkIsNotMarkedForRollback() {
-        if (markedForRollback) {
-            throw new IllegalStateException("Marked for rollback");
-        }
+    public boolean isActive() {
+        return status.equals(ACTIVE);
     }
-
-    // public interface
 
     public void mustBeActive() throws IllegalStateException {
         if (!isActive()) {
@@ -160,22 +160,17 @@ public class TransactionImpl implements Transaction {
         }
     }
 
-    public boolean isActive() {
-        return status.equals(ACTIVE);
+    public boolean isRollbackOnly() {
+        return rollbackOnly;
     }
 
-    public void markForRollback() {
-        markedForRollback = true;
+    public void setRollbackOnly() {
+        rollbackOnly = true;
     }
 
-    public boolean isMarkedForRollback() {
-        return markedForRollback;
-    }
-
-    public enum Status {
-        ACTIVE,
-        PREPARING, PREPARE_OK, PREPARE_FAILED,
-        COMMITTING, COMMIT_OK, COMMIT_FAILED,
-        ROLLBACKING, ROLLBACK_OK, ROLLBACK_FAILED
+    private void checkIsNotRollbackOnly() {
+        if (rollbackOnly) {
+            throw new IllegalStateException("Marked for rollback");
+        }
     }
 }

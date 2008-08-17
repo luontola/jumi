@@ -28,7 +28,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import static net.orfjackal.dimdwarf.tx.TransactionImpl.Status.*;
+import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.junit.runner.RunWith;
@@ -439,23 +439,23 @@ public class TransactionSpec extends Specification<Object> {
         }
     }
 
-    public class MarkingATransactionForRollback {
+    public class MarkingATransactionForRollbackOnly {
 
         public Object create() {
             return null;
         }
 
-        public void atFirstIsNotMarkedForRollback() {
-            specify(!tx.isMarkedForRollback());
+        public void atFirstIsNotRollbackOnly() {
+            specify(!tx.isRollbackOnly());
         }
 
-        public void isMarkedAfterMarkingForRollback() {
-            tx.markForRollback();
-            specify(tx.isMarkedForRollback());
+        public void afterMarkingIsRollbackOnly() {
+            tx.setRollbackOnly();
+            specify(tx.isRollbackOnly());
         }
 
-        public void prepareFailsIfMarkedForRollbackBeforePrepare() {
-            tx.markForRollback();
+        public void prepareFailsIfRollbackOnly() {
+            tx.setRollbackOnly();
             specify(tx.getStatus(), should.equal(ACTIVE));
             specify(new Block() {
                 public void run() throws Throwable {
@@ -465,10 +465,10 @@ public class TransactionSpec extends Specification<Object> {
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 
-        public void prepareFailsIfMarkedForRollbackDuringPrepare() {
+        public void prepareFailsIfDuringPrepareIsMarkedRollbackOnly() {
             tx.join(new DummyTransactionParticipant() {
                 public void prepare(Transaction tx) throws Throwable {
-                    tx.markForRollback();
+                    tx.setRollbackOnly();
                 }
             });
             specify(tx.getStatus(), should.equal(ACTIVE));
@@ -480,9 +480,9 @@ public class TransactionSpec extends Specification<Object> {
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 
-        public void commitFailsIfMarkedForRollbackBeforeCommit() {
+        public void commitFailsIfRollbackOnly() {
             tx.prepare();
-            tx.markForRollback();
+            tx.setRollbackOnly();
             specify(tx.getStatus(), should.equal(PREPARE_OK));
             specify(new Block() {
                 public void run() throws Throwable {

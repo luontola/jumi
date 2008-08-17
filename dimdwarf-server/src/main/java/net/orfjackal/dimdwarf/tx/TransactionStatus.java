@@ -26,17 +26,11 @@ package net.orfjackal.dimdwarf.tx;
 
 /**
  * @author Esko Luontola
- * @since 17.8.2008
+ * @since 18.8.2008
  */
-public interface Transaction {
-
-    TransactionStatus getStatus();
-
-    boolean isActive();
-
-    void mustBeActive() throws IllegalStateException;
-
-    boolean isRollbackOnly();
-
-    void setRollbackOnly();
+public enum TransactionStatus {
+    ACTIVE,
+    PREPARING, PREPARE_OK, PREPARE_FAILED,
+    COMMITTING, COMMIT_OK, COMMIT_FAILED,
+    ROLLBACKING, ROLLBACK_OK, ROLLBACK_FAILED
 }
