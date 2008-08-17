@@ -50,9 +50,25 @@ public class TransactionSpec extends Specification<Object> {
         participant2 = mock(TransactionParticipant.class, "participant2");
     }
 
-    private static Expectations isNotifiedOnJoin(final TransactionParticipant participant, final Transaction tx) {
+    private Expectations isNotifiedOnJoin(final TransactionParticipant participant) {
         return new Expectations() {{
             one(participant).joinedTransaction(tx);
+        }};
+    }
+
+    private Expectations allParticipantsArePrepared() {
+        return new Expectations() {{
+            one(participant1).prepare(tx);
+            one(participant2).prepare(tx);
+        }};
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    private Expectations prepareFailsFor(final TransactionParticipant participant) {
+        return new Expectations() {{
+            one(participant).prepare(tx); will(throwException(new Throwable("Failed to prepare")));
+            allowing(participant1).prepare(tx);
+            allowing(participant2).prepare(tx);
         }};
     }
 
@@ -76,7 +92,7 @@ public class TransactionSpec extends Specification<Object> {
     public class WhenParticipantJoinsTransaction {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1, tx));
+            checking(isNotifiedOnJoin(participant1));
             tx.join(participant1);
             return null;
         }
@@ -86,7 +102,7 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void otherParticipantsMayJoinTheSameTransaction() {
-            checking(isNotifiedOnJoin(participant2, tx));
+            checking(isNotifiedOnJoin(participant2));
             tx.join(participant2);
             specify(tx.getParticipants(), should.equal(2));
         }
@@ -97,35 +113,29 @@ public class TransactionSpec extends Specification<Object> {
         }
     }
 
-    public class WhenTransactionPreparesForCommit {
+    public class WhenTransactionPreparesToCommit {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1, tx));
-            checking(isNotifiedOnJoin(participant2, tx));
+            checking(isNotifiedOnJoin(participant1));
+            checking(isNotifiedOnJoin(participant2));
             tx.join(participant1);
             tx.join(participant2);
             return null;
         }
 
         public void allParticipantsAreToldToPrepare() {
-            checking(new Expectations() {{
-                one(participant1).prepare(tx);
-                one(participant2).prepare(tx);
-            }});
+            checking(allParticipantsArePrepared());
             tx.prepare();
         }
 
         public void transactionIsPrepared() {
-            allParticipantsAreToldToPrepare();
+            checking(allParticipantsArePrepared());
+            tx.prepare();
             specify(tx.getStatus(), should.equal(PREPARE_OK));
         }
 
-        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
         public void prepareFailsIfOneParticipantFailsToPrepare() {
-            checking(new Expectations() {{
-                one(participant1).prepare(tx);
-                one(participant2).prepare(tx); will(throwException(new Throwable("Failed to prepare")));
-            }});
+            checking(prepareFailsFor(participant1));
             specify(new Block() {
                 public void run() throws Throwable {
                     tx.prepare();
@@ -135,7 +145,8 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void canNotPrepareTwise() {
-            allParticipantsAreToldToPrepare();
+            checking(allParticipantsArePrepared());
+            tx.prepare();
             specify(new Block() {
                 public void run() throws Throwable {
                     tx.prepare();
@@ -144,12 +155,13 @@ public class TransactionSpec extends Specification<Object> {
         }
 
         public void canNotPrepareTwiseConcurrently() {
+            checking(allParticipantsArePrepared());
             WaitOnPrepare blocker = new WaitOnPrepare();
             tx.join(blocker);
 
             Thread t = new Thread(new Runnable() {
                 public void run() {
-                    allParticipantsAreToldToPrepare();
+                    tx.prepare();
                 }
             });
             t.setDaemon(true);
@@ -174,8 +186,23 @@ public class TransactionSpec extends Specification<Object> {
                 }
             }, should.raise(IllegalStateException.class));
         }
+
+        public void canNotCommitIfFailedToPrepare() {
+            checking(prepareFailsFor(participant2));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx.commit();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
     }
 
+    
     private static class WaitOnPrepare implements TransactionParticipant {
 
         public volatile boolean begunPrepare = false;
