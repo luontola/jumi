@@ -40,7 +40,8 @@ public class Blob {
     }
 
     private Blob(byte[] bytes) {
-        this.bytes = bytes;
+        this.bytes = new byte[bytes.length];
+        System.arraycopy(bytes, 0, this.bytes, 0, bytes.length);
     }
 
     public int length() {
@@ -52,7 +53,7 @@ public class Blob {
     }
 
     public ByteBuffer getByteBuffer() {
-        return ByteBuffer.allocate(bytes.length);
+        return ByteBuffer.allocate(bytes.length).asReadOnlyBuffer();
     }
 
     public static Blob fromBytes(byte[] bytes) {

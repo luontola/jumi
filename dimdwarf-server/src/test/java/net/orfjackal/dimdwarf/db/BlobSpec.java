@@ -24,6 +24,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
@@ -31,6 +32,7 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
+import java.nio.ReadOnlyBufferException;
 
 /**
  * @author Esko Luontola
@@ -87,6 +89,22 @@ public class BlobSpec extends Specification<Object> {
         public void hasTheSameBytesThroughByteBuffer() {
             ByteBuffer buf = blob.getByteBuffer();
             specify(buf.capacity(), should.equal(bytes.length));
+        }
+
+        public void canNotBeModifiedThroughTheSourceByteArray() {
+            byte before = bytes[0];
+            bytes[0]++;
+            specify(blob.getInputStream().read(), should.equal(before));
+        }
+
+        public void canNotBeModifiedThroughtTheByteBuffer() {
+            final byte before = bytes[0];
+            specify(new Block() {
+                public void run() throws Throwable {
+                    blob.getByteBuffer().put((byte) (before + 1));
+                }
+            }, should.raise(ReadOnlyBufferException.class));
+            specify(blob.getInputStream().read(), should.equal(before));
         }
     }
 }
