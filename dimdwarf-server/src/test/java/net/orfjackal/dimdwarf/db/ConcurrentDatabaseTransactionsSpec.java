@@ -60,6 +60,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
         value2 = Blob.fromBytes(new byte[]{2});
+        specify(db.openConnections(), should.equal(0));
     }
 
     private Blob readInNewTransaction(Blob key) {
@@ -88,6 +89,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.update(key, value1);
+            specify(db.openConnections(), should.equal(2));
             return null;
         }
 
@@ -128,6 +130,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.update(key, value2);
+            specify(db.openConnections(), should.equal(2));
             return null;
         }
 
@@ -168,6 +171,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.delete(ConcurrentDatabaseTransactionsSpec.this.key);
+            specify(db.openConnections(), should.equal(2));
             return null;
         }
 

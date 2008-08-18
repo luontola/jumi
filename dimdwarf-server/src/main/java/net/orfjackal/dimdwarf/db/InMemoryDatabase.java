@@ -40,11 +40,13 @@ public class InMemoryDatabase {
 
     private final ConcurrentMap<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
+    private final Set<Transaction> openConnections = Collections.synchronizedSet(new HashSet<Transaction>());
     private volatile int currentRevision = 1;
 
     public Database openConnection(Transaction tx) {
         TransactionalDatabase db = new TransactionalDatabase(currentRevision);
         tx.join(db);
+        openConnections.add(tx);
         return db;
     }
 
@@ -53,7 +55,7 @@ public class InMemoryDatabase {
         return specificRevision(revision, revs);
     }
 
-    private void prepareModifications(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
+    private void prepareTransaction(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
         synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
                 SortedMap<Integer, Blob> revs = allRevisions(entry.getKey());
@@ -65,7 +67,7 @@ public class InMemoryDatabase {
         }
     }
 
-    private void commitModifications(Transaction tx, Map<Blob, Blob> updates) {
+    private void commitTransaction(Transaction tx, Map<Blob, Blob> updates) {
         synchronized (lockedForCommit) {
             int nextRevision = currentRevision + 1;
             try {
@@ -79,7 +81,7 @@ public class InMemoryDatabase {
         }
     }
 
-    private void rollbackModifications(Transaction tx, Map<Blob, Blob> updates) {
+    private void rollbackTransaction(Transaction tx, Map<Blob, Blob> updates) {
         synchronized (lockedForCommit) {
             unlockKeysForCommit(tx, updates.keySet());
         }
@@ -102,7 +104,7 @@ public class InMemoryDatabase {
     }
 
     private static void checkNotModifiedAfterRevision(int revision, SortedMap<Integer, Blob> revs) {
-        Integer lastWrite = revs.lastKey();
+        int lastWrite = revs.lastKey();
         if (lastWrite > revision) {
             throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
         }
@@ -131,6 +133,10 @@ public class InMemoryDatabase {
         return value;
     }
 
+    public int openConnections() {
+        return openConnections.size();
+    }
+
     private class TransactionalDatabase implements Database, TransactionParticipant {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
@@ -149,15 +155,23 @@ public class InMemoryDatabase {
         }
 
         public void prepare(Transaction tx) throws Throwable {
-            prepareModifications(tx, updates, visibleRevision);
+            prepareTransaction(tx, updates, visibleRevision);
         }
 
         public void commit(Transaction tx) {
-            commitModifications(tx, updates);
+            try {
+                commitTransaction(tx, updates);
+            } finally {
+                openConnections.remove(tx);
+            }
         }
 
         public void rollback(Transaction tx) {
-            rollbackModifications(tx, updates);
+            try {
+                rollbackTransaction(tx, updates);
+            } finally {
+                openConnections.remove(tx);
+            }
         }
 
         public Blob read(Blob key) {
