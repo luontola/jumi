@@ -24,6 +24,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 
@@ -115,7 +116,7 @@ public class InMemoryDatabase {
                 blob = readCommitted(key, visibleRevision);
             }
             if (blob == null) {
-                blob = Blob.EMPTY_BLOB;
+                blob = EMPTY_BLOB;
             }
             return blob;
         }
@@ -125,7 +126,7 @@ public class InMemoryDatabase {
         }
 
         public void delete(Blob key) {
-            updates.remove(key);
+            updates.put(key, EMPTY_BLOB);
         }
     }
 }

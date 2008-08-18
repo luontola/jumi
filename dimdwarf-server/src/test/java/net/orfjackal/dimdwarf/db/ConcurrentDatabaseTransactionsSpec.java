@@ -134,7 +134,46 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         }
     }
 
-    // TODO: delete
+    public class WhenEntryIsDeletedInATransaction {
+
+        public Object create() {
+            TransactionCoordinator tx0 = new TransactionImpl();
+            Database db0 = db.openConnection(tx0.getTransaction());
+            db0.update(key, value1);
+            tx0.prepare();
+            tx0.commit();
+
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
+            db1.delete(key);
+            return null;
+        }
+
+        public void otherTransactionsCanNotSeeIt() {
+            specify(db2.read(key), should.equal(value1));
+        }
+
+        public void afterCommitNewTransactionsCanSeeIt() {
+            tx1.prepare();
+            tx1.commit();
+            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
+            specify(db3.read(key), should.equal(EMPTY_BLOB));
+        }
+
+        public void afterCommitOldTransactionsStillCanNotSeeIt() {
+            tx1.prepare();
+            tx1.commit();
+            specify(db2.read(key), should.equal(value1));
+        }
+
+        public void onRollbackTheModificationsAreDiscarded() {
+            tx1.prepare();
+            tx1.rollback();
+            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
+            specify(db3.read(key), should.equal(value1));
+        }
+    }
+
     // TODO: conflict in create
     // TODO: conflict in update
     // TODO: conflict in delete
