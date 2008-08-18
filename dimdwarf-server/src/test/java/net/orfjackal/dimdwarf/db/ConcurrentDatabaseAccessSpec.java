@@ -126,10 +126,6 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             tx2.rollback();
             updateInNewTransaction(key, value1); // only entry in database - oldestStoredRevision will reflect changes
 
-            specify(db.currentRevision(), should.equal(2));
-            specify(db.oldestUncommittedRevision(), should.equal(2));
-            specify(db.oldestStoredRevision(), should.equal(2));
-
             TransactionCoordinator tx3 = new TransactionImpl();
             db.openConnection(tx3.getTransaction()); // reads rev 2
             updateInNewTransaction(key, value1);
@@ -141,7 +137,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             tx3.rollback();
 
             specify(db.currentRevision(), should.equal(3));
-            specify(db.oldestUncommittedRevision(), should.equal(3));
+            specify(db.oldestUncommittedRevision(), should.equal(3));   // no transactions are open
             specify(db.oldestStoredRevision(), should.equal(2));        // cleanup of rev 2 left for next use
 
             TransactionCoordinator tx4 = new TransactionImpl();
@@ -151,6 +147,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             specify(db.currentRevision(), should.equal(3));
             specify(db.oldestUncommittedRevision(), should.equal(3));
             specify(db.oldestStoredRevision(), should.equal(3));        // old revision cleaned up
+
+            // TODO: removing whole entries when deleting
         }
     }
 

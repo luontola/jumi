@@ -136,8 +136,8 @@ public class InMemoryDatabase {
     private EntryRevisions getCommitted(Blob key) {
         EntryRevisions revs = committed.get(key);
         if (revs == null) {
-            revs = new EntryRevisions();
-            committed.put(key, revs);
+            committed.putIfAbsent(key, new EntryRevisions());
+            revs = committed.get(key);
         } else {
             revs.purgeRevisionsOlderThan(oldestUncommittedRevision);
         }
