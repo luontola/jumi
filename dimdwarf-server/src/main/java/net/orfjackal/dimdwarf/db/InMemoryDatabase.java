@@ -33,23 +33,32 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Esko Luontola
  * @since 18.8.2008
  */
-public class InMemoryDatabase implements Database {
+public class InMemoryDatabase {
 
     private final Map<Blob, Blob> values = new ConcurrentHashMap<Blob, Blob>();
 
-    public Blob read(Blob key) {
-        return values.get(key);
-    }
-
-    public void update(Blob key, Blob value) {
-        values.put(key, value);
-    }
-
-    public void delete(Blob key) {
-        values.remove(key);
-    }
-
     public Database joinTransaction(Transaction tx) {
-        return this;
+        return new DatabaseViewInsideTransaction(tx);
+    }
+
+    private class DatabaseViewInsideTransaction implements Database {
+
+        private final Transaction tx;
+
+        public DatabaseViewInsideTransaction(Transaction tx) {
+            this.tx = tx;
+        }
+
+        public Blob read(Blob key) {
+            return values.get(key);
+        }
+
+        public void update(Blob key, Blob value) {
+            values.put(key, value);
+        }
+
+        public void delete(Blob key) {
+            values.remove(key);
+        }
     }
 }
