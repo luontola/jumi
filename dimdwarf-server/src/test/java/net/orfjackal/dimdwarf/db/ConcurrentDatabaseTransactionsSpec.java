@@ -140,6 +140,10 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
     // TODO: conflict in delete
     // TODO: allow only one transaction to prepare at a time (?), no conflicts are allowed on commit
     // TODO: do not allow using database outside a transaction (once prepare has started)
-    // TODO: iterator, used for writing all entries to disk
-    // TODO: auto-increment keys, create should not conflict when using them
+    // TODO: multiple tables per database
+    // TODO: iterator (for tables and entries), used for writing all entries to disk
+
+    // TODO: String and BigInteger wrappers for keys
+    // TODO: auto-increment keys (BigInteger), create should not conflict when using them
+    // TODO: find all keys (String) starting with a string
 }
