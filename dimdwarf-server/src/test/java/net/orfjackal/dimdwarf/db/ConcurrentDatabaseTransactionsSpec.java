@@ -85,5 +85,12 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             tx1.commit();
             specify(db2.read(key), should.equal(EMPTY_BLOB));
         }
+
+        public void onRollbackTheModificationsAreDiscarded() {
+            tx1.prepare();
+            tx1.rollback();
+            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
+            specify(db3.read(key), should.equal(EMPTY_BLOB));
+        }
     }
 }
