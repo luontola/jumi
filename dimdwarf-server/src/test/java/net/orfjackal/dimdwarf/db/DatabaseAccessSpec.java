@@ -29,7 +29,7 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
@@ -43,7 +43,7 @@ public class DatabaseAccessSpec extends Specification<Object> {
 
     private InMemoryDatabase dbService;
     private DatabaseConnection db;
-    private Transaction tx;
+    private TransactionCoordinator tx;
 
     private Blob key;
     private Blob value;
@@ -51,8 +51,8 @@ public class DatabaseAccessSpec extends Specification<Object> {
 
     public void create() throws Exception {
         dbService = new InMemoryDatabase();
-        tx = new TransactionImpl().getTransaction();
-        db = dbService.openConnection(tx);
+        tx = new TransactionImpl();
+        db = dbService.openConnection(tx.getTransaction());
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});
@@ -68,15 +68,71 @@ public class DatabaseAccessSpec extends Specification<Object> {
         public void theConnectionIsOpen() {
             specify(db, should.not().equal(null));
             specify(dbService.openConnections(), should.equal(1));
+            specify(dbService.currentRevision(), should.equal(1));
+            specify(dbService.oldestUncommittedRevision(), should.equal(1));
         }
 
         public void onlyOneConnectionExistsPerTransaction() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    dbService.openConnection(tx);
+                    dbService.openConnection(tx.getTransaction());
                 }
             }, should.raise(IllegalArgumentException.class));
             specify(dbService.openConnections(), should.equal(1));
+            specify(dbService.currentRevision(), should.equal(1));
+            specify(dbService.oldestUncommittedRevision(), should.equal(1));
+        }
+
+        public void connectionCanNotBeUsedAfterPrepare() {
+            tx.prepare();
+            canNotBeUsed(db);
+            specify(dbService.openConnections(), should.equal(1));
+            specify(dbService.currentRevision(), should.equal(1));
+            specify(dbService.oldestUncommittedRevision(), should.equal(1));
+        }
+
+        public void connectionCanNotBeUsedAfterCommit() {
+            tx.prepare();
+            tx.commit();
+            canNotBeUsed(db);
+            specify(dbService.openConnections(), should.equal(0));
+            specify(dbService.currentRevision(), should.equal(2));
+            specify(dbService.oldestUncommittedRevision(), should.equal(2));
+        }
+
+        public void connectionCanNotBeUsedAfterRollback() {
+            tx.rollback();
+            canNotBeUsed(db);
+            specify(dbService.openConnections(), should.equal(0));
+            specify(dbService.currentRevision(), should.equal(1));
+            specify(dbService.oldestUncommittedRevision(), should.equal(1));
+        }
+
+        public void connectionCanNotBeUsedAfterPrepareAndRollback() {
+            tx.prepare();
+            tx.rollback();
+            canNotBeUsed(db);
+            specify(dbService.openConnections(), should.equal(0));
+            specify(dbService.currentRevision(), should.equal(1));
+            specify(dbService.oldestUncommittedRevision(), should.equal(1));
+        }
+
+        private void canNotBeUsed(final DatabaseConnection db) {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    db.read(key);
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    db.update(key, value);
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    db.delete(key);
+                }
+            }, should.raise(IllegalStateException.class));
         }
     }
 

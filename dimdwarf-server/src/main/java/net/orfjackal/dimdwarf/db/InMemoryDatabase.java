@@ -44,6 +44,7 @@ public class InMemoryDatabase {
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final ConcurrentMap<Transaction, Integer> openConnections = new ConcurrentHashMap<Transaction, Integer>();
     private volatile int currentRevision = 1;
+    private volatile int oldestUncommittedRevision = 1;
 
     public DatabaseConnection openConnection(Transaction tx) {
         if (openConnections.containsKey(tx)) {
@@ -53,6 +54,11 @@ public class InMemoryDatabase {
         tx.join(db);
         openConnections.put(tx, currentRevision);
         return db;
+    }
+
+    private void closeConnection(Transaction tx) {
+        openConnections.remove(tx);
+        oldestUncommittedRevision = currentRevision;
     }
 
     private void prepareTransaction(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
@@ -113,6 +119,14 @@ public class InMemoryDatabase {
         return openConnections.size();
     }
 
+    public int currentRevision() {
+        return currentRevision;
+    }
+
+    public int oldestUncommittedRevision() {
+        return oldestUncommittedRevision;
+    }
+
 
     private class TransactionalDatabaseConnection implements DatabaseConnection, TransactionParticipant {
 
@@ -139,7 +153,7 @@ public class InMemoryDatabase {
             try {
                 commitTransaction(tx, updates);
             } finally {
-                openConnections.remove(tx);
+                closeConnection(tx);
             }
         }
 
@@ -147,11 +161,12 @@ public class InMemoryDatabase {
             try {
                 rollbackTransaction(tx, updates);
             } finally {
-                openConnections.remove(tx);
+                closeConnection(tx);
             }
         }
 
         public Blob read(Blob key) {
+            tx.mustBeActive();
             Blob blob = updates.get(key);
             if (blob == null) {
                 blob = getCommitted(key).read(visibleRevision);
@@ -163,10 +178,12 @@ public class InMemoryDatabase {
         }
 
         public void update(Blob key, Blob value) {
+            tx.mustBeActive();
             updates.put(key, value);
         }
 
         public void delete(Blob key) {
+            tx.mustBeActive();
             updates.put(key, EMPTY_BLOB);
         }
     }

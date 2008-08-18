@@ -244,7 +244,6 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     // TODO: conflict in update
     // TODO: conflict in delete
     // TODO: allow only one transaction to prepare at a time (?), no conflicts are allowed on commit
-    // TODO: do not allow using database outside a transaction (once prepare has started)
     // TODO: multiple tables per database
     // TODO: iterator (for tables and entries), used for writing all entries to disk
 
