@@ -56,7 +56,7 @@ public class DatabaseSpec extends Specification<Object> {
             return null;
         }
 
-        public void itDoesNotExists() {
+        public void itDoesNotExist() {
             specify(db.read(key), should.equal(null));
         }
     }
@@ -68,7 +68,7 @@ public class DatabaseSpec extends Specification<Object> {
             return null;
         }
 
-        public void itDoesExist() {
+        public void theValueCanBeRead() {
             specify(db.read(key), should.equal(value));
         }
     }
@@ -81,7 +81,7 @@ public class DatabaseSpec extends Specification<Object> {
             return null;
         }
 
-        public void theLatestValueIsReturned() {
+        public void theLatestValueCanBeRead() {
             specify(db.read(key), should.equal(otherValue));
         }
     }
@@ -94,7 +94,7 @@ public class DatabaseSpec extends Specification<Object> {
             return null;
         }
 
-        public void itDoesNotAnymoreExist() {
+        public void itDoesNotExistAnymore() {
             specify(db.read(key), should.equal(null));
         }
     }
