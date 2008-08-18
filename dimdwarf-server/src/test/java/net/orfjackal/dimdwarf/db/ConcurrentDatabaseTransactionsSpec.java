@@ -27,6 +27,7 @@ package net.orfjackal.dimdwarf.db;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
@@ -69,7 +70,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         }
 
         public void otherTransactionsCanNotSeeIt() {
-            specify(db2.read(key), should.equal(null));
+            specify(db2.read(key), should.equal(EMPTY_BLOB));
         }
 
         public void afterCommitNewTransactionsCanSeeIt() {
@@ -82,7 +83,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
             tx1.prepare();
             tx1.commit();
-            specify(db2.read(key), should.equal(null));
+            specify(db2.read(key), should.equal(EMPTY_BLOB));
         }
     }
 }

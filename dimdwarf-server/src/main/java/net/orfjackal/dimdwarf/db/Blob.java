@@ -39,12 +39,10 @@ import java.util.Arrays;
  */
 public final class Blob {
 
+    public static final Blob EMPTY_BLOB = new Blob(new byte[0]);
+
     private final byte[] bytes;
     private volatile Integer hashCode;
-
-    public Blob() {
-        this(new byte[0]);
-    }
 
     private Blob(byte[] bytes) {
         this.bytes = bytes;

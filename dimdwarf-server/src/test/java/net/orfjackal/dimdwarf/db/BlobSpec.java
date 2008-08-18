@@ -50,7 +50,7 @@ public class BlobSpec extends Specification<Blob> {
     public class AnEmptyBlob {
 
         public Object create() {
-            blob = new Blob();
+            blob = Blob.EMPTY_BLOB;
             return null;
         }
 

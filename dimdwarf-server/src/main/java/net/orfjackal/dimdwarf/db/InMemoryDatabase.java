@@ -106,6 +106,9 @@ public class InMemoryDatabase {
             if (blob == null) {
                 blob = readCommitted(key, visibleRevision);
             }
+            if (blob == null) {
+                blob = Blob.EMPTY_BLOB;
+            }
             return blob;
         }
 
