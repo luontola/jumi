@@ -24,11 +24,13 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import net.orfjackal.dimdwarf.tx.TransactionFailedException;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
@@ -60,6 +62,26 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         value2 = Blob.fromBytes(new byte[]{2});
     }
 
+    private Blob readInNewTransaction(Blob key) {
+        TransactionCoordinator tx = new TransactionImpl();
+        try {
+            return db.openConnection(tx.getTransaction())
+                    .read(key);
+        } finally {
+            tx.prepare();
+            tx.commit();
+        }
+    }
+
+    private void updateInNewTransaction(Blob key, Blob value) {
+        TransactionCoordinator tx = new TransactionImpl();
+        db.openConnection(tx.getTransaction())
+                .update(key, value);
+        tx.prepare();
+        tx.commit();
+    }
+
+
     public class WhenEntryIsCreatedInATransaction {
 
         public Object create() {
@@ -76,8 +98,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void afterCommitNewTransactionsCanSeeIt() {
             tx1.prepare();
             tx1.commit();
-            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
-            specify(db3.read(key), should.equal(value1));
+            specify(readInNewTransaction(key), should.equal(value1));
         }
 
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
@@ -89,20 +110,14 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void onRollbackTheModificationsAreDiscarded() {
             tx1.prepare();
             tx1.rollback();
-            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
-            specify(db3.read(key), should.equal(EMPTY_BLOB));
+            specify(readInNewTransaction(key), should.equal(EMPTY_BLOB));
         }
     }
 
     public class WhenEntryIsUpdatedInATransaction {
 
         public Object create() {
-            TransactionCoordinator tx0 = new TransactionImpl();
-            Database db0 = db.openConnection(tx0.getTransaction());
-            db0.update(key, value1);
-            tx0.prepare();
-            tx0.commit();
-
+            updateInNewTransaction(key, value1);
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.update(key, value2);
@@ -116,8 +131,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void afterCommitNewTransactionsCanSeeIt() {
             tx1.prepare();
             tx1.commit();
-            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
-            specify(db3.read(key), should.equal(value2));
+            specify(readInNewTransaction(key), should.equal(value2));
         }
 
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
@@ -129,25 +143,20 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void onRollbackTheModificationsAreDiscarded() {
             tx1.prepare();
             tx1.rollback();
-            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
-            specify(db3.read(key), should.equal(value1));
+            specify(readInNewTransaction(key), should.equal(value1));
         }
     }
 
     public class WhenEntryIsDeletedInATransaction {
 
         public Object create() {
-            TransactionCoordinator tx0 = new TransactionImpl();
-            Database db0 = db.openConnection(tx0.getTransaction());
-            db0.update(key, value1);
-            tx0.prepare();
-            tx0.commit();
-
+            updateInNewTransaction(key, value1);
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
-            db1.delete(key);
+            db1.delete(ConcurrentDatabaseTransactionsSpec.this.key);
             return null;
         }
+
 
         public void otherTransactionsCanNotSeeIt() {
             specify(db2.read(key), should.equal(value1));
@@ -156,8 +165,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void afterCommitNewTransactionsCanSeeIt() {
             tx1.prepare();
             tx1.commit();
-            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
-            specify(db3.read(key), should.equal(EMPTY_BLOB));
+            specify(readInNewTransaction(key), should.equal(EMPTY_BLOB));
         }
 
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
@@ -169,12 +177,45 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         public void onRollbackTheModificationsAreDiscarded() {
             tx1.prepare();
             tx1.rollback();
-            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
-            specify(db3.read(key), should.equal(value1));
+            specify(readInNewTransaction(key), should.equal(value1));
         }
     }
 
-    // TODO: conflict in create
+    public class IfTwoTransactionsCreateAnEntryWithTheSameKey {
+
+        public Object create() {
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
+            db1.update(key, value1);
+            db2.update(key, value2);
+            return null;
+        }
+
+        public void onlyTheFirstToCommitWillSucceed() {
+            tx1.prepare();
+            tx1.commit();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx2.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            tx2.rollback();
+            specify(readInNewTransaction(key), should.equal(value1));
+        }
+
+        public void onlyTheFirstToPrepareWillSucceed() {
+            tx1.prepare();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx2.prepare();
+                }
+            }, should.raise(TransactionFailedException.class));
+            tx1.commit();
+            tx2.rollback();
+            specify(readInNewTransaction(key), should.equal(value1));
+        }
+    }
+
     // TODO: conflict in update
     // TODO: conflict in delete
     // TODO: allow only one transaction to prepare at a time (?), no conflicts are allowed on commit

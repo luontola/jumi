@@ -28,9 +28,7 @@ import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -41,6 +39,7 @@ public class InMemoryDatabase {
 
     private final Map<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
     private volatile int latestRevision = 1;
+    private final Set<Blob> pendingWrites = new HashSet<Blob>();
 
     public Database openConnection(Transaction tx) {
         TransactionalDatabase db = new TransactionalDatabase(latestRevision);
@@ -53,9 +52,30 @@ public class InMemoryDatabase {
         return specificRevision(revision, revs);
     }
 
-    private void commitModifications(Map<Blob, Blob> updates) {
+    private synchronized void prepareModifications(Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
+        for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+            SortedMap<Integer, Blob> revs = allRevisions(entry.getKey());
+            if (revs.size() > 0) {
+                checkNotModifiedAfterRevision(revision, revs);
+            }
+        }
+        for (Blob key : updates.keySet()) {
+            boolean didNotContain = pendingWrites.add(key);
+            assert didNotContain;
+        }
+    }
+
+    private static void checkNotModifiedAfterRevision(int revision, SortedMap<Integer, Blob> revs) {
+        Integer lastWrite = revs.lastKey();
+        if (lastWrite > revision) {
+            throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
+        }
+    }
+
+    private synchronized void commitModifications(Map<Blob, Blob> updates) {
         latestRevision = latestRevision + 1;
         for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+            pendingWrites.remove(entry.getKey());
             writeRevision(entry.getKey(), entry.getValue(), latestRevision);
         }
     }
@@ -101,6 +121,7 @@ public class InMemoryDatabase {
         }
 
         public void prepare(Transaction tx) throws Throwable {
+            prepareModifications(updates, visibleRevision);
         }
 
         public void commit(Transaction tx) {
