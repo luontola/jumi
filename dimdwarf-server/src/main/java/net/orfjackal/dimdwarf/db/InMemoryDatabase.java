@@ -24,6 +24,8 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import net.orfjackal.dimdwarf.tx.Transaction;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InMemoryDatabase implements Database {
 
-    private Map<Blob, Blob> values = new ConcurrentHashMap<Blob, Blob>();
+    private final Map<Blob, Blob> values = new ConcurrentHashMap<Blob, Blob>();
 
     public Blob read(Blob key) {
         return values.get(key);
@@ -45,5 +47,9 @@ public class InMemoryDatabase implements Database {
 
     public void delete(Blob key) {
         values.remove(key);
+    }
+
+    public Database joinTransaction(Transaction tx) {
+        return this;
     }
 }

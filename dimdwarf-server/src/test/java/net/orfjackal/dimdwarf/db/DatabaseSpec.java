@@ -27,6 +27,7 @@ package net.orfjackal.dimdwarf.db;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
 /**
@@ -43,7 +44,7 @@ public class DatabaseSpec extends Specification<Object> {
     private Blob otherValue;
 
     public void create() throws Exception {
-        db = new InMemoryDatabase();
+        db = new InMemoryDatabase().joinTransaction(new TransactionImpl());
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});

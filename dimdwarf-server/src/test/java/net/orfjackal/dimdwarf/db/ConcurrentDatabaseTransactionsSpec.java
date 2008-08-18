@@ -27,6 +27,8 @@ package net.orfjackal.dimdwarf.db;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
 /**
@@ -36,4 +38,20 @@ import org.junit.runner.RunWith;
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
+
+    private InMemoryDatabase db;
+    private Transaction tx1;
+    private Transaction tx2;
+    private Database dbTx1;
+    private Database dbTx2;
+
+    public void create() throws Exception {
+        db = new InMemoryDatabase();
+        tx1 = new TransactionImpl();
+        tx2 = new TransactionImpl();
+        dbTx1 = db.joinTransaction(tx1);
+        dbTx2 = db.joinTransaction(tx2);
+    }
+
+
 }
