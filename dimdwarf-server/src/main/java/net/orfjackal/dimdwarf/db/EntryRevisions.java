@@ -47,7 +47,7 @@ public class EntryRevisions {
         return value;
     }
 
-    public void write(int revision, Blob value) {
+    public void write(Blob value, int revision) {
         revs.put(revision, value);
     }
 

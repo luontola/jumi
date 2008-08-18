@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class InMemoryDatabase {
 
-    private final ConcurrentMap<Blob, EntryRevisions> values = new ConcurrentHashMap<Blob, EntryRevisions>();
+    private final ConcurrentMap<Blob, EntryRevisions> committed = new ConcurrentHashMap<Blob, EntryRevisions>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final ConcurrentMap<Transaction, Integer> openConnections = new ConcurrentHashMap<Transaction, Integer>();
     private volatile int currentRevision = 1;
@@ -58,35 +58,55 @@ public class InMemoryDatabase {
 
     private void closeConnection(Transaction tx) {
         openConnections.remove(tx);
-        oldestUncommittedRevision = currentRevision;
+        updateOldestUncommittedRevision();
     }
 
-    private void prepareTransaction(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
+    private void updateOldestUncommittedRevision() {
+        int oldest = currentRevision;
+        for (int rev : openConnections.values()) {
+            oldest = Math.min(oldest, rev);
+        }
+        oldestUncommittedRevision = oldest;
+    }
+
+    public int openConnections() {
+        return openConnections.size();
+    }
+
+    public int currentRevision() {
+        return currentRevision;
+    }
+
+    public int oldestUncommittedRevision() {
+        return oldestUncommittedRevision;
+    }
+
+    private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, int revision) throws ConcurrentModificationException {
         synchronized (lockedForCommit) {
-            for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+            for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
                 getCommitted(entry.getKey()).checkNotModifiedAfter(revision);
             }
-            lockKeysForCommit(tx, updates.keySet());
+            lockKeysForCommit(tx, modified.keySet());
         }
     }
 
-    private void commitTransaction(Transaction tx, Map<Blob, Blob> updates) {
+    private void commitTransaction(Transaction tx, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
             int nextRevision = currentRevision + 1;
             try {
-                for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                    getCommitted(entry.getKey()).write(nextRevision, entry.getValue());
+                for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
+                    getCommitted(entry.getKey()).write(entry.getValue(), nextRevision);
                 }
             } finally {
                 currentRevision = nextRevision;
-                unlockKeysForCommit(tx, updates.keySet());
+                unlockKeysForCommit(tx, modified.keySet());
             }
         }
     }
 
-    private void rollbackTransaction(Transaction tx, Map<Blob, Blob> updates) {
+    private void rollbackTransaction(Transaction tx, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
-            unlockKeysForCommit(tx, updates.keySet());
+            unlockKeysForCommit(tx, modified.keySet());
         }
     }
 
@@ -107,24 +127,12 @@ public class InMemoryDatabase {
     }
 
     private EntryRevisions getCommitted(Blob key) {
-        EntryRevisions revs = values.get(key);
+        EntryRevisions revs = committed.get(key);
         if (revs == null) {
             revs = new EntryRevisions();
-            values.put(key, revs);
+            committed.put(key, revs);
         }
         return revs;
-    }
-
-    public int openConnections() {
-        return openConnections.size();
-    }
-
-    public int currentRevision() {
-        return currentRevision;
-    }
-
-    public int oldestUncommittedRevision() {
-        return oldestUncommittedRevision;
     }
 
 

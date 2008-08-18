@@ -68,8 +68,6 @@ public class DatabaseAccessSpec extends Specification<Object> {
         public void theConnectionIsOpen() {
             specify(db, should.not().equal(null));
             specify(dbService.openConnections(), should.equal(1));
-            specify(dbService.currentRevision(), should.equal(1));
-            specify(dbService.oldestUncommittedRevision(), should.equal(1));
         }
 
         public void onlyOneConnectionExistsPerTransaction() {
@@ -79,42 +77,28 @@ public class DatabaseAccessSpec extends Specification<Object> {
                 }
             }, should.raise(IllegalArgumentException.class));
             specify(dbService.openConnections(), should.equal(1));
-            specify(dbService.currentRevision(), should.equal(1));
-            specify(dbService.oldestUncommittedRevision(), should.equal(1));
         }
 
         public void connectionCanNotBeUsedAfterPrepare() {
             tx.prepare();
             canNotBeUsed(db);
-            specify(dbService.openConnections(), should.equal(1));
-            specify(dbService.currentRevision(), should.equal(1));
-            specify(dbService.oldestUncommittedRevision(), should.equal(1));
         }
 
         public void connectionCanNotBeUsedAfterCommit() {
             tx.prepare();
             tx.commit();
             canNotBeUsed(db);
-            specify(dbService.openConnections(), should.equal(0));
-            specify(dbService.currentRevision(), should.equal(2));
-            specify(dbService.oldestUncommittedRevision(), should.equal(2));
         }
 
         public void connectionCanNotBeUsedAfterRollback() {
             tx.rollback();
             canNotBeUsed(db);
-            specify(dbService.openConnections(), should.equal(0));
-            specify(dbService.currentRevision(), should.equal(1));
-            specify(dbService.oldestUncommittedRevision(), should.equal(1));
         }
 
         public void connectionCanNotBeUsedAfterPrepareAndRollback() {
             tx.prepare();
             tx.rollback();
             canNotBeUsed(db);
-            specify(dbService.openConnections(), should.equal(0));
-            specify(dbService.currentRevision(), should.equal(1));
-            specify(dbService.oldestUncommittedRevision(), should.equal(1));
         }
 
         private void canNotBeUsed(final DatabaseConnection db) {

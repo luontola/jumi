@@ -83,6 +83,45 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     }
 
 
+    public class WhenMultipleDatabaseConnectionsAreOpen {
+
+        public Object create() {
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
+            return null;
+        }
+
+        public void databaseKeepsTrackOfTheNumberOfOpenConnections() {
+            specify(db.openConnections(), should.equal(2));
+            tx1.prepare();
+            tx1.commit();
+            specify(db.openConnections(), should.equal(1));
+            tx2.prepare();
+            tx2.commit();
+            specify(db.openConnections(), should.equal(0));
+        }
+
+        public void databaseKeepsTrackOfTheCurrentRevision() {
+            specify(db.currentRevision(), should.equal(1));
+            tx1.prepare();
+            tx1.commit();
+            specify(db.currentRevision(), should.equal(2));
+            tx2.prepare();
+            tx2.commit();
+            specify(db.currentRevision(), should.equal(3));
+        }
+
+        public void databaseKeepsTrackOfTheOldestUncommittedRevision() {
+            specify(db.oldestUncommittedRevision(), should.equal(1));
+            tx1.prepare();
+            tx1.commit();
+            specify(db.oldestUncommittedRevision(), should.equal(1));
+            tx2.prepare();
+            tx2.commit();
+            specify(db.oldestUncommittedRevision(), should.equal(3));
+        }
+    }
+
     public class WhenEntryIsCreatedInATransaction {
 
         public Object create() {
