@@ -120,6 +120,38 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             tx2.commit();
             specify(db.oldestUncommittedRevision(), should.equal(3));
         }
+
+        public void databaseCleansUpRevisionsWhichAreNotAnymoreNeeded() {
+            tx1.rollback();
+            tx2.rollback();
+            updateInNewTransaction(key, value1); // only entry in database - oldestStoredRevision will reflect changes
+
+            specify(db.currentRevision(), should.equal(2));
+            specify(db.oldestUncommittedRevision(), should.equal(2));
+            specify(db.oldestStoredRevision(), should.equal(2));
+
+            TransactionCoordinator tx3 = new TransactionImpl();
+            db.openConnection(tx3.getTransaction()); // reads rev 2
+            updateInNewTransaction(key, value1);
+
+            specify(db.currentRevision(), should.equal(3));
+            specify(db.oldestUncommittedRevision(), should.equal(2));   // tx3 is still open
+            specify(db.oldestStoredRevision(), should.equal(2));        // tx3 could still read rev 2
+
+            tx3.rollback();
+
+            specify(db.currentRevision(), should.equal(3));
+            specify(db.oldestUncommittedRevision(), should.equal(3));
+            specify(db.oldestStoredRevision(), should.equal(2));        // cleanup of rev 2 left for next use
+
+            TransactionCoordinator tx4 = new TransactionImpl();
+            DatabaseConnection db4 = db.openConnection(tx4.getTransaction()); // reads rev 3
+            db4.read(key); // should remove rev 2 because the entry's newest rev is 3, and no rev 2 connections are open
+
+            specify(db.currentRevision(), should.equal(3));
+            specify(db.oldestUncommittedRevision(), should.equal(3));
+            specify(db.oldestStoredRevision(), should.equal(3));        // old revision cleaned up
+        }
     }
 
     public class WhenEntryIsCreatedInATransaction {

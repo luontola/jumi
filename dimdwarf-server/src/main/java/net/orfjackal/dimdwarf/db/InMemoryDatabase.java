@@ -50,10 +50,9 @@ public class InMemoryDatabase {
         if (openConnections.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
-        TransactionalDatabaseConnection db = new TransactionalDatabaseConnection(currentRevision);
-        tx.join(db);
+        DatabaseConnection con = new TransactionalDatabaseConnection(tx, currentRevision);
         openConnections.put(tx, currentRevision);
-        return db;
+        return con;
     }
 
     private void closeConnection(Transaction tx) {
@@ -69,16 +68,24 @@ public class InMemoryDatabase {
         oldestUncommittedRevision = oldest;
     }
 
-    public int openConnections() {
+    protected int openConnections() {
         return openConnections.size();
     }
 
-    public int currentRevision() {
+    protected int currentRevision() {
         return currentRevision;
     }
 
-    public int oldestUncommittedRevision() {
+    protected int oldestUncommittedRevision() {
         return oldestUncommittedRevision;
+    }
+
+    protected int oldestStoredRevision() {
+        int oldest = currentRevision;
+        for (EntryRevisions revs : committed.values()) {
+            oldest = Math.min(oldest, revs.oldestRevision());
+        }
+        return oldest;
     }
 
     private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, int revision) throws ConcurrentModificationException {
@@ -131,6 +138,8 @@ public class InMemoryDatabase {
         if (revs == null) {
             revs = new EntryRevisions();
             committed.put(key, revs);
+        } else {
+            revs.purgeRevisionsOlderThan(oldestUncommittedRevision);
         }
         return revs;
     }
@@ -140,17 +149,16 @@ public class InMemoryDatabase {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
         private final int visibleRevision;
-        private Transaction tx;
+        private final Transaction tx;
 
-        public TransactionalDatabaseConnection(int visibleRevision) {
+        public TransactionalDatabaseConnection(Transaction tx, int visibleRevision) {
+            this.tx = tx;
             this.visibleRevision = visibleRevision;
+            tx.join(this);
         }
 
         public void joinedTransaction(Transaction tx) {
-            if (this.tx != null) {
-                throw new IllegalStateException();
-            }
-            this.tx = tx;
+            assert this.tx == tx;
         }
 
         public void prepare(Transaction tx) throws Throwable {

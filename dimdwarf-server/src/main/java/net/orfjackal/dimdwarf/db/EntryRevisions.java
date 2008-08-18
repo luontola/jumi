@@ -35,11 +35,11 @@ import java.util.TreeMap;
  */
 public class EntryRevisions {
 
-    private SortedMap<Integer, Blob> revs = new TreeMap<Integer, Blob>();
+    private final SortedMap<Integer, Blob> revisions = new TreeMap<Integer, Blob>();
 
-    public Blob read(int revision) {
+    public synchronized Blob read(int revision) {
         Blob value = null;
-        for (Map.Entry<Integer, Blob> e : revs.entrySet()) {
+        for (Map.Entry<Integer, Blob> e : revisions.entrySet()) {
             if (e.getKey() <= revision) {
                 value = e.getValue();
             }
@@ -47,16 +47,31 @@ public class EntryRevisions {
         return value;
     }
 
-    public void write(Blob value, int revision) {
-        revs.put(revision, value);
+    public synchronized void write(Blob value, int revision) {
+        revisions.put(revision, value);
     }
 
-    public void checkNotModifiedAfter(int revision) {
-        if (revs.size() > 0) {
-            int lastWrite = revs.lastKey();
+    public synchronized void checkNotModifiedAfter(int revision) {
+        if (revisions.size() > 0) {
+            int lastWrite = latestRevision();
             if (lastWrite > revision) {
                 throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
             }
+        }
+    }
+
+    public synchronized int oldestRevision() {
+        return revisions.firstKey();
+    }
+
+    private synchronized int latestRevision() {
+        return revisions.lastKey();
+    }
+
+    public synchronized void purgeRevisionsOlderThan(int revision) {
+        if (revisions.size() >= 2) {
+            SortedMap<Integer, Blob> purge = revisions.headMap(Math.min(revision, latestRevision()));
+            purge.clear();
         }
     }
 }
