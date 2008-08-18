@@ -78,5 +78,11 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             Database db3 = db.openConnection(new TransactionImpl().getTransaction());
             specify(db3.read(key), should.equal(value1));
         }
+
+        public void afterCommitOldTransactionsStillCanNotSeeIt() {
+            tx1.prepare();
+            tx1.commit();
+            specify(db2.read(key), should.equal(null));
+        }
     }
 }

@@ -28,6 +28,8 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,18 +38,47 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InMemoryDatabase {
 
-    private final Map<Blob, Blob> values = new ConcurrentHashMap<Blob, Blob>();
+    private final Map<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
+    private volatile int latestRevision = 1;
 
     public Database openConnection(Transaction tx) {
-        TransactionalDatabase db = new TransactionalDatabase();
+        TransactionalDatabase db = new TransactionalDatabase(latestRevision);
         tx.join(db);
         return db;
     }
 
+    private Blob readCommitted(Blob key, int revision) {
+        SortedMap<Integer, Blob> revs = values.get(key);
+        if (revs == null) {
+            return null;
+        }
+        Blob value = null;
+        for (Map.Entry<Integer, Blob> e : revs.entrySet()) {
+            if (e.getKey() <= revision) {
+                value = e.getValue();
+            }
+        }
+        return value;
+    }
+
+    private void commitWrites(Map<Blob, Blob> updates) {
+        latestRevision++;
+        for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+            TreeMap<Integer, Blob> revs = new TreeMap<Integer, Blob>();
+            revs.put(latestRevision, entry.getValue());
+            values.put(entry.getKey(), revs);
+        }
+    }
+
     private class TransactionalDatabase implements Database, TransactionParticipant {
 
-        private Transaction tx;
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
+        private final int visibleRevision;
+        private Transaction tx;
+
+        public TransactionalDatabase(int visibleRevision) {
+            this.visibleRevision = visibleRevision;
+        }
 
         public void joinedTransaction(Transaction tx) {
             if (this.tx != null) {
@@ -60,9 +91,7 @@ public class InMemoryDatabase {
         }
 
         public void commit(Transaction tx) {
-            for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                values.put(entry.getKey(), entry.getValue());
-            }
+            commitWrites(updates);
         }
 
         public void rollback(Transaction tx) {
@@ -71,7 +100,7 @@ public class InMemoryDatabase {
         public Blob read(Blob key) {
             Blob blob = updates.get(key);
             if (blob == null) {
-                blob = values.get(key);
+                blob = readCommitted(key, visibleRevision);
             }
             return blob;
         }
