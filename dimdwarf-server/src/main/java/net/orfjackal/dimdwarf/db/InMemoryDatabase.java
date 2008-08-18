@@ -27,21 +27,19 @@ package net.orfjackal.dimdwarf.db;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Esko Luontola
  * @since 18.8.2008
  */
 public class InMemoryDatabase {
-    private static final Logger logger = LoggerFactory.getLogger(InMemoryDatabase.class);
 
-    private final Map<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
-    private final Set<Blob> preparedKeys = new HashSet<Blob>();
+    private final ConcurrentMap<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
+    private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private volatile int currentRevision = 1;
 
     public Database openConnection(Transaction tx) {
@@ -55,27 +53,20 @@ public class InMemoryDatabase {
         return specificRevision(revision, revs);
     }
 
-    private void prepareModifications(Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
-        synchronized (preparedKeys) {
+    private void prepareModifications(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
+        synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
                 SortedMap<Integer, Blob> revs = allRevisions(entry.getKey());
                 if (revs.size() > 0) {
                     checkNotModifiedAfterRevision(revision, revs);
                 }
             }
-            lockKeysForCommit(updates.keySet());
+            lockKeysForCommit(tx, updates.keySet());
         }
     }
 
-    private static void checkNotModifiedAfterRevision(int revision, SortedMap<Integer, Blob> revs) {
-        Integer lastWrite = revs.lastKey();
-        if (lastWrite > revision) {
-            throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
-        }
-    }
-
-    private void commitModifications(Map<Blob, Blob> updates) {
-        synchronized (preparedKeys) {
+    private void commitModifications(Transaction tx, Map<Blob, Blob> updates) {
+        synchronized (lockedForCommit) {
             int nextRevision = currentRevision + 1;
             try {
                 for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
@@ -83,22 +74,37 @@ public class InMemoryDatabase {
                 }
             } finally {
                 currentRevision = nextRevision;
-                unlockKeysForCommit(updates.keySet());
+                unlockKeysForCommit(tx, updates.keySet());
             }
         }
     }
 
-    private void lockKeysForCommit(Set<Blob> keys) {
-        for (Blob key : keys) {
-            boolean didNotContain = preparedKeys.add(key);
-            assert didNotContain : "key = " + key;
+    private void rollbackModifications(Transaction tx, Map<Blob, Blob> updates) {
+        synchronized (lockedForCommit) {
+            unlockKeysForCommit(tx, updates.keySet());
         }
     }
 
-    private void unlockKeysForCommit(Set<Blob> keys) {
+    private void lockKeysForCommit(Transaction tx, Set<Blob> keys) {
         for (Blob key : keys) {
-            boolean didContain = preparedKeys.remove(key);
-            assert didContain : "key = " + key;
+            Transaction alreadyLockedBy = lockedForCommit.putIfAbsent(key, tx);
+            assert alreadyLockedBy == null : "key = " + key;
+        }
+    }
+
+    private void unlockKeysForCommit(Transaction tx, Set<Blob> keys) {
+        for (Blob key : keys) {
+            if (lockedForCommit.containsKey(key)) {
+                boolean wasLockedByMe = lockedForCommit.remove(key, tx);
+                assert wasLockedByMe : "key = " + key;
+            }
+        }
+    }
+
+    private static void checkNotModifiedAfterRevision(int revision, SortedMap<Integer, Blob> revs) {
+        Integer lastWrite = revs.lastKey();
+        if (lastWrite > revision) {
+            throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
         }
     }
 
@@ -143,14 +149,15 @@ public class InMemoryDatabase {
         }
 
         public void prepare(Transaction tx) throws Throwable {
-            prepareModifications(updates, visibleRevision);
+            prepareModifications(tx, updates, visibleRevision);
         }
 
         public void commit(Transaction tx) {
-            commitModifications(updates);
+            commitModifications(tx, updates);
         }
 
         public void rollback(Transaction tx) {
+            rollbackModifications(tx, updates);
         }
 
         public Blob read(Blob key) {

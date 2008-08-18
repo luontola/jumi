@@ -108,9 +108,16 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         }
 
         public void onRollbackTheModificationsAreDiscarded() {
+            tx1.rollback();
+            specify(readInNewTransaction(key), should.equal(EMPTY_BLOB));
+        }
+
+        public void onPrepareAndRollbackTheLocksAreReleased() {
             tx1.prepare();
             tx1.rollback();
             specify(readInNewTransaction(key), should.equal(EMPTY_BLOB));
+            updateInNewTransaction(key, value2);
+            specify(readInNewTransaction(key), should.equal(value2));
         }
     }
 
@@ -141,9 +148,16 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         }
 
         public void onRollbackTheModificationsAreDiscarded() {
+            tx1.rollback();
+            specify(readInNewTransaction(key), should.equal(value1));
+        }
+
+        public void onPrepareAndRollbackTheLocksAreReleased() {
             tx1.prepare();
             tx1.rollback();
             specify(readInNewTransaction(key), should.equal(value1));
+            updateInNewTransaction(key, value2);
+            specify(readInNewTransaction(key), should.equal(value2));
         }
     }
 
@@ -175,9 +189,16 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         }
 
         public void onRollbackTheModificationsAreDiscarded() {
+            tx1.rollback();
+            specify(readInNewTransaction(key), should.equal(value1));
+        }
+
+        public void onPrepareAndRollbackTheLocksAreReleased() {
             tx1.prepare();
             tx1.rollback();
             specify(readInNewTransaction(key), should.equal(value1));
+            updateInNewTransaction(key, value2);
+            specify(readInNewTransaction(key), should.equal(value2));
         }
     }
 
