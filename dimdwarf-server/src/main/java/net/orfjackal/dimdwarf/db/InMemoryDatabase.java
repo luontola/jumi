@@ -28,7 +28,9 @@ import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 
-import java.util.*;
+import java.util.ConcurrentModificationException;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,7 +40,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class InMemoryDatabase {
 
-    private final ConcurrentMap<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
+    private final ConcurrentMap<Blob, EntryRevisions> values = new ConcurrentHashMap<Blob, EntryRevisions>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final ConcurrentMap<Transaction, Integer> openConnections = new ConcurrentHashMap<Transaction, Integer>();
     private volatile int currentRevision = 1;
@@ -54,14 +56,14 @@ public class InMemoryDatabase {
     }
 
     private Blob readCommitted(Blob key, int revision) {
-        SortedMap<Integer, Blob> revs = allRevisions(key);
+        EntryRevisions revs = allRevisions(key);
         return specificRevision(revision, revs);
     }
 
     private void prepareTransaction(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
         synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                SortedMap<Integer, Blob> revs = allRevisions(entry.getKey());
+                EntryRevisions revs = allRevisions(entry.getKey());
                 if (revs.size() > 0) {
                     checkNotModifiedAfterRevision(revision, revs);
                 }
@@ -106,7 +108,7 @@ public class InMemoryDatabase {
         }
     }
 
-    private static void checkNotModifiedAfterRevision(int revision, SortedMap<Integer, Blob> revs) {
+    private static void checkNotModifiedAfterRevision(int revision, EntryRevisions revs) {
         int lastWrite = revs.lastKey();
         if (lastWrite > revision) {
             throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
@@ -117,16 +119,16 @@ public class InMemoryDatabase {
         allRevisions(key).put(revision, value);
     }
 
-    private SortedMap<Integer, Blob> allRevisions(Blob key) {
-        SortedMap<Integer, Blob> revs = values.get(key);
+    private EntryRevisions allRevisions(Blob key) {
+        EntryRevisions revs = values.get(key);
         if (revs == null) {
-            revs = new TreeMap<Integer, Blob>();
+            revs = new EntryRevisions();
             values.put(key, revs);
         }
         return revs;
     }
 
-    private static Blob specificRevision(int revision, SortedMap<Integer, Blob> revs) {
+    private static Blob specificRevision(int revision, EntryRevisions revs) {
         Blob value = null;
         for (Map.Entry<Integer, Blob> e : revs.entrySet()) {
             if (e.getKey() <= revision) {
