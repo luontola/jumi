@@ -134,5 +134,9 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         }
     }
 
-    // TODO
+    // TODO: delete
+    // TODO: create conflict
+    // TODO: update conflict
+    // TODO: delete conflict
+    // TODO: allow only one transaction to prepare at a time (?), no conflicts are allowed on commit
 }
