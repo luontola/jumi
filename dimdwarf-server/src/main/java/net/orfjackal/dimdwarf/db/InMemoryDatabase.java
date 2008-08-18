@@ -55,18 +55,10 @@ public class InMemoryDatabase {
         return db;
     }
 
-    private Blob readCommitted(Blob key, int revision) {
-        EntryRevisions revs = allRevisions(key);
-        return specificRevision(revision, revs);
-    }
-
     private void prepareTransaction(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
         synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                EntryRevisions revs = allRevisions(entry.getKey());
-                if (revs.size() > 0) {
-                    checkNotModifiedAfterRevision(revision, revs);
-                }
+                revisionsOf(entry.getKey()).checkNotModifiedAfter(revision);
             }
             lockKeysForCommit(tx, updates.keySet());
         }
@@ -77,7 +69,7 @@ public class InMemoryDatabase {
             int nextRevision = currentRevision + 1;
             try {
                 for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                    writeRevision(entry.getKey(), entry.getValue(), nextRevision);
+                    revisionsOf(entry.getKey()).write(nextRevision, entry.getValue());
                 }
             } finally {
                 currentRevision = nextRevision;
@@ -108,18 +100,7 @@ public class InMemoryDatabase {
         }
     }
 
-    private static void checkNotModifiedAfterRevision(int revision, EntryRevisions revs) {
-        int lastWrite = revs.lastKey();
-        if (lastWrite > revision) {
-            throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
-        }
-    }
-
-    private void writeRevision(Blob key, Blob value, int revision) {
-        allRevisions(key).put(revision, value);
-    }
-
-    private EntryRevisions allRevisions(Blob key) {
+    private EntryRevisions revisionsOf(Blob key) {
         EntryRevisions revs = values.get(key);
         if (revs == null) {
             revs = new EntryRevisions();
@@ -128,19 +109,10 @@ public class InMemoryDatabase {
         return revs;
     }
 
-    private static Blob specificRevision(int revision, EntryRevisions revs) {
-        Blob value = null;
-        for (Map.Entry<Integer, Blob> e : revs.entrySet()) {
-            if (e.getKey() <= revision) {
-                value = e.getValue();
-            }
-        }
-        return value;
-    }
-
     public int openConnections() {
         return openConnections.size();
     }
+
 
     private class TransactionalDatabaseConnection implements DatabaseConnection, TransactionParticipant {
 
@@ -182,7 +154,7 @@ public class InMemoryDatabase {
         public Blob read(Blob key) {
             Blob blob = updates.get(key);
             if (blob == null) {
-                blob = readCommitted(key, visibleRevision);
+                blob = revisionsOf(key).read(visibleRevision);
             }
             if (blob == null) {
                 blob = EMPTY_BLOB;

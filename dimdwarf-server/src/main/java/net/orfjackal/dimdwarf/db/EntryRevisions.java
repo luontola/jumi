@@ -24,8 +24,8 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.util.ConcurrentModificationException;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -37,19 +37,26 @@ public class EntryRevisions {
 
     private SortedMap<Integer, Blob> revs = new TreeMap<Integer, Blob>();
 
-    public void put(int revision, Blob value) {
+    public Blob read(int revision) {
+        Blob value = null;
+        for (Map.Entry<Integer, Blob> e : revs.entrySet()) {
+            if (e.getKey() <= revision) {
+                value = e.getValue();
+            }
+        }
+        return value;
+    }
+
+    public void write(int revision, Blob value) {
         revs.put(revision, value);
     }
 
-    public int size() {
-        return revs.size();
-    }
-
-    public int lastKey() {
-        return revs.lastKey();
-    }
-
-    public Set<Map.Entry<Integer, Blob>> entrySet() {
-        return revs.entrySet();
+    public void checkNotModifiedAfter(int revision) {
+        if (revs.size() > 0) {
+            int lastWrite = revs.lastKey();
+            if (lastWrite > revision) {
+                throw new ConcurrentModificationException("Already modified in revision " + lastWrite);
+            }
+        }
     }
 }
