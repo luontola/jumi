@@ -27,6 +27,8 @@ package net.orfjackal.dimdwarf.db;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,13 +38,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 18.8.2008
  */
 public class InMemoryDatabase {
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryDatabase.class);
 
     private final Map<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
-    private volatile int latestRevision = 1;
-    private final Set<Blob> pendingWrites = new HashSet<Blob>();
+    private final Set<Blob> preparedKeys = new HashSet<Blob>();
+    private volatile int currentRevision = 1;
 
     public Database openConnection(Transaction tx) {
-        TransactionalDatabase db = new TransactionalDatabase(latestRevision);
+        TransactionalDatabase db = new TransactionalDatabase(currentRevision);
         tx.join(db);
         return db;
     }
@@ -52,16 +55,15 @@ public class InMemoryDatabase {
         return specificRevision(revision, revs);
     }
 
-    private synchronized void prepareModifications(Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
-        for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-            SortedMap<Integer, Blob> revs = allRevisions(entry.getKey());
-            if (revs.size() > 0) {
-                checkNotModifiedAfterRevision(revision, revs);
+    private void prepareModifications(Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
+        synchronized (preparedKeys) {
+            for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+                SortedMap<Integer, Blob> revs = allRevisions(entry.getKey());
+                if (revs.size() > 0) {
+                    checkNotModifiedAfterRevision(revision, revs);
+                }
             }
-        }
-        for (Blob key : updates.keySet()) {
-            boolean didNotContain = pendingWrites.add(key);
-            assert didNotContain;
+            lockKeysForCommit(updates.keySet());
         }
     }
 
@@ -72,11 +74,31 @@ public class InMemoryDatabase {
         }
     }
 
-    private synchronized void commitModifications(Map<Blob, Blob> updates) {
-        latestRevision = latestRevision + 1;
-        for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-            pendingWrites.remove(entry.getKey());
-            writeRevision(entry.getKey(), entry.getValue(), latestRevision);
+    private void commitModifications(Map<Blob, Blob> updates) {
+        synchronized (preparedKeys) {
+            int nextRevision = currentRevision + 1;
+            try {
+                for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+                    writeRevision(entry.getKey(), entry.getValue(), nextRevision);
+                }
+            } finally {
+                currentRevision = nextRevision;
+                unlockKeysForCommit(updates.keySet());
+            }
+        }
+    }
+
+    private void lockKeysForCommit(Set<Blob> keys) {
+        for (Blob key : keys) {
+            boolean didNotContain = preparedKeys.add(key);
+            assert didNotContain : "key = " + key;
+        }
+    }
+
+    private void unlockKeysForCommit(Set<Blob> keys) {
+        for (Blob key : keys) {
+            boolean didContain = preparedKeys.remove(key);
+            assert didContain : "key = " + key;
         }
     }
 
