@@ -28,7 +28,7 @@ package net.orfjackal.dimdwarf.db;
  * @author Esko Luontola
  * @since 18.8.2008
  */
-public interface Database {
+public interface DatabaseConnection {
 
     Blob read(Blob key);
 

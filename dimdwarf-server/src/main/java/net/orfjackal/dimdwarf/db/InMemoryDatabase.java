@@ -40,13 +40,16 @@ public class InMemoryDatabase {
 
     private final ConcurrentMap<Blob, SortedMap<Integer, Blob>> values = new ConcurrentHashMap<Blob, SortedMap<Integer, Blob>>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
-    private final Set<Transaction> openConnections = Collections.synchronizedSet(new HashSet<Transaction>());
+    private final ConcurrentMap<Transaction, Integer> openConnections = new ConcurrentHashMap<Transaction, Integer>();
     private volatile int currentRevision = 1;
 
-    public Database openConnection(Transaction tx) {
-        TransactionalDatabase db = new TransactionalDatabase(currentRevision);
+    public DatabaseConnection openConnection(Transaction tx) {
+        if (openConnections.containsKey(tx)) {
+            throw new IllegalArgumentException("Connection already open in this transaction");
+        }
+        TransactionalDatabaseConnection db = new TransactionalDatabaseConnection(currentRevision);
         tx.join(db);
-        openConnections.add(tx);
+        openConnections.put(tx, currentRevision);
         return db;
     }
 
@@ -137,13 +140,13 @@ public class InMemoryDatabase {
         return openConnections.size();
     }
 
-    private class TransactionalDatabase implements Database, TransactionParticipant {
+    private class TransactionalDatabaseConnection implements DatabaseConnection, TransactionParticipant {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
         private final int visibleRevision;
         private Transaction tx;
 
-        public TransactionalDatabase(int visibleRevision) {
+        public TransactionalDatabaseConnection(int visibleRevision) {
             this.visibleRevision = visibleRevision;
         }
 

@@ -24,6 +24,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
@@ -38,21 +39,46 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class DatabaseSpec extends Specification<Object> {
+public class DatabaseAccessSpec extends Specification<Object> {
 
-    private Database db;
+    private InMemoryDatabase dbService;
+    private DatabaseConnection db;
+    private Transaction tx;
+
     private Blob key;
     private Blob value;
     private Blob otherValue;
 
     public void create() throws Exception {
-        Transaction tx = new TransactionImpl().getTransaction();
-        db = new InMemoryDatabase().openConnection(tx);
+        dbService = new InMemoryDatabase();
+        tx = new TransactionImpl().getTransaction();
+        db = dbService.openConnection(tx);
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});
     }
 
+
+    public class WhenDatabaseConnectionIsOpened {
+
+        public Object create() {
+            return null;
+        }
+
+        public void theConnectionIsOpen() {
+            specify(db, should.not().equal(null));
+            specify(dbService.openConnections(), should.equal(1));
+        }
+
+        public void onlyOneConnectionExistsPerTransaction() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    dbService.openConnection(tx);
+                }
+            }, should.raise(IllegalArgumentException.class));
+            specify(dbService.openConnections(), should.equal(1));
+        }
+    }
 
     public class WhenEntryDoesNotExist {
 

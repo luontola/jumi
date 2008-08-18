@@ -40,13 +40,13 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
+public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     private InMemoryDatabase db;
     private TransactionCoordinator tx1;
     private TransactionCoordinator tx2;
-    private Database db1;
-    private Database db2;
+    private DatabaseConnection db1;
+    private DatabaseConnection db2;
 
     private Blob key;
     private Blob value1;
@@ -170,7 +170,7 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             updateInNewTransaction(key, value1);
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
-            db1.delete(ConcurrentDatabaseTransactionsSpec.this.key);
+            db1.delete(key);
             specify(db.openConnections(), should.equal(2));
             return null;
         }
