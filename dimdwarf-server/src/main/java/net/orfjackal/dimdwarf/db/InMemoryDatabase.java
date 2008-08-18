@@ -62,12 +62,16 @@ public class InMemoryDatabase {
     }
 
     private void commitWrites(Map<Blob, Blob> updates) {
-        latestRevision++;
+        latestRevision = latestRevision + 1;
         for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-            TreeMap<Integer, Blob> revs = new TreeMap<Integer, Blob>();
-            revs.put(latestRevision, entry.getValue());
-            values.put(entry.getKey(), revs);
+            write(entry.getKey(), entry.getValue(), latestRevision);
         }
+    }
+
+    private void write(Blob key, Blob value, int revision) {
+        TreeMap<Integer, Blob> revs = new TreeMap<Integer, Blob>();
+        revs.put(revision, value);
+        values.put(key, revs);
     }
 
     private class TransactionalDatabase implements Database, TransactionParticipant {
