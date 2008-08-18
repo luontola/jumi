@@ -37,5 +37,65 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class DatabaseSpec extends Specification<Object> {
 
-    // TODO
+    private Database db;
+    private Blob key;
+    private Blob value;
+    private Blob otherValue;
+
+    public void create() throws Exception {
+        db = new Database();
+        key = Blob.fromBytes(new byte[]{1});
+        value = Blob.fromBytes(new byte[]{2});
+        otherValue = Blob.fromBytes(new byte[]{3});
+    }
+
+
+    public class WhenEntryDoesNotExist {
+
+        public Object create() {
+            return null;
+        }
+
+        public void itDoesNotExists() {
+            specify(db.read(key), should.equal(null));
+        }
+    }
+
+    public class WhenEntryIsCreated {
+
+        public Object create() {
+            db.update(key, value);
+            return null;
+        }
+
+        public void itDoesExist() {
+            specify(db.read(key), should.equal(value));
+        }
+    }
+
+    public class WhenEntryIsUpdated {
+
+        public Object create() {
+            db.update(key, value);
+            db.update(key, otherValue);
+            return null;
+        }
+
+        public void theLatestValueIsReturned() {
+            specify(db.read(key), should.equal(otherValue));
+        }
+    }
+
+    public class WhenEntryIsDeleted {
+
+        public Object create() {
+            db.update(key, value);
+            db.delete(key);
+            return null;
+        }
+
+        public void itDoesNotAnymoreExist() {
+            specify(db.read(key), should.equal(null));
+        }
+    }
 }
