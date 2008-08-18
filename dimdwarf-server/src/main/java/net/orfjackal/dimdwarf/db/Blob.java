@@ -96,4 +96,8 @@ public final class Blob {
         }
         return hashCode;
     }
+
+    public String toString() {
+        return "Blob[length=" + length() + ",bytes=" + Arrays.toString(bytes) + "]";
+    }
 }

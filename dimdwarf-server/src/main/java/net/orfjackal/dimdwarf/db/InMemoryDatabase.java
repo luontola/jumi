@@ -48,10 +48,31 @@ public class InMemoryDatabase {
     }
 
     private Blob readCommitted(Blob key, int revision) {
+        SortedMap<Integer, Blob> revs = allRevisions(key);
+        return specificRevision(revision, revs);
+    }
+
+    private void commitModifications(Map<Blob, Blob> updates) {
+        latestRevision = latestRevision + 1;
+        for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+            writeRevision(entry.getKey(), entry.getValue(), latestRevision);
+        }
+    }
+
+    private void writeRevision(Blob key, Blob value, int revision) {
+        allRevisions(key).put(revision, value);
+    }
+
+    private SortedMap<Integer, Blob> allRevisions(Blob key) {
         SortedMap<Integer, Blob> revs = values.get(key);
         if (revs == null) {
-            return null;
+            revs = new TreeMap<Integer, Blob>();
+            values.put(key, revs);
         }
+        return revs;
+    }
+
+    private static Blob specificRevision(int revision, SortedMap<Integer, Blob> revs) {
         Blob value = null;
         for (Map.Entry<Integer, Blob> e : revs.entrySet()) {
             if (e.getKey() <= revision) {
@@ -59,19 +80,6 @@ public class InMemoryDatabase {
             }
         }
         return value;
-    }
-
-    private void commitWrites(Map<Blob, Blob> updates) {
-        latestRevision = latestRevision + 1;
-        for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-            write(entry.getKey(), entry.getValue(), latestRevision);
-        }
-    }
-
-    private void write(Blob key, Blob value, int revision) {
-        TreeMap<Integer, Blob> revs = new TreeMap<Integer, Blob>();
-        revs.put(revision, value);
-        values.put(key, revs);
     }
 
     private class TransactionalDatabase implements Database, TransactionParticipant {
@@ -95,7 +103,7 @@ public class InMemoryDatabase {
         }
 
         public void commit(Transaction tx) {
-            commitWrites(updates);
+            commitModifications(updates);
         }
 
         public void rollback(Transaction tx) {

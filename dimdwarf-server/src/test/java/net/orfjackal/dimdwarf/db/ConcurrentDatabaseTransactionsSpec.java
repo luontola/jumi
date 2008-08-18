@@ -54,8 +54,6 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         db = new InMemoryDatabase();
         tx1 = new TransactionImpl();
         tx2 = new TransactionImpl();
-        db1 = db.openConnection(tx1.getTransaction());
-        db2 = db.openConnection(tx2.getTransaction());
 
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
@@ -65,6 +63,8 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
     public class WhenEntryIsCreatedInATransaction {
 
         public Object create() {
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
             db1.update(key, value1);
             return null;
         }
@@ -91,6 +91,39 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
             tx1.rollback();
             Database db3 = db.openConnection(new TransactionImpl().getTransaction());
             specify(db3.read(key), should.equal(EMPTY_BLOB));
+        }
+    }
+
+    public class WhenEntryIsUpdatedInATransaction {
+
+        public Object create() {
+            TransactionCoordinator tx0 = new TransactionImpl();
+            Database db0 = db.openConnection(tx0.getTransaction());
+            db0.update(key, value1);
+            tx0.prepare();
+            tx0.commit();
+
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
+            db1.update(key, value2);
+            return null;
+        }
+
+        public void otherTransactionsCanNotSeeIt() {
+            specify(db2.read(key), should.equal(value1));
+        }
+
+        public void afterCommitNewTransactionsCanSeeIt() {
+            tx1.prepare();
+            tx1.commit();
+            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
+            specify(db3.read(key), should.equal(value2));
+        }
+
+        public void afterCommitOldTransactionsStillCanNotSeeIt() {
+            tx1.prepare();
+            tx1.commit();
+            specify(db2.read(key), should.equal(value1));
         }
     }
 }
