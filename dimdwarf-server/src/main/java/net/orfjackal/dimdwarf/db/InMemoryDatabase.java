@@ -24,15 +24,26 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author Esko Luontola
  * @since 18.8.2008
  */
-public interface Database {
+public class InMemoryDatabase implements Database {
 
-    Blob read(Blob key);
+    private Map<Blob, Blob> values = new ConcurrentHashMap<Blob, Blob>();
 
-    void update(Blob key, Blob value);
+    public Blob read(Blob key) {
+        return values.get(key);
+    }
 
-    void delete(Blob key);
+    public void update(Blob key, Blob value) {
+        values.put(key, value);
+    }
+
+    public void delete(Blob key) {
+        values.remove(key);
+    }
 }

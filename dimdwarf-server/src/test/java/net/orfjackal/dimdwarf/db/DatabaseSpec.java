@@ -43,7 +43,7 @@ public class DatabaseSpec extends Specification<Object> {
     private Blob otherValue;
 
     public void create() throws Exception {
-        db = new Database();
+        db = new InMemoryDatabase();
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});
