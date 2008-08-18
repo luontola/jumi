@@ -58,7 +58,7 @@ public class InMemoryDatabase {
     private void prepareTransaction(Transaction tx, Map<Blob, Blob> updates, int revision) throws ConcurrentModificationException {
         synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                revisionsOf(entry.getKey()).checkNotModifiedAfter(revision);
+                getCommitted(entry.getKey()).checkNotModifiedAfter(revision);
             }
             lockKeysForCommit(tx, updates.keySet());
         }
@@ -69,7 +69,7 @@ public class InMemoryDatabase {
             int nextRevision = currentRevision + 1;
             try {
                 for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
-                    revisionsOf(entry.getKey()).write(nextRevision, entry.getValue());
+                    getCommitted(entry.getKey()).write(nextRevision, entry.getValue());
                 }
             } finally {
                 currentRevision = nextRevision;
@@ -100,7 +100,7 @@ public class InMemoryDatabase {
         }
     }
 
-    private EntryRevisions revisionsOf(Blob key) {
+    private EntryRevisions getCommitted(Blob key) {
         EntryRevisions revs = values.get(key);
         if (revs == null) {
             revs = new EntryRevisions();
@@ -154,7 +154,7 @@ public class InMemoryDatabase {
         public Blob read(Blob key) {
             Blob blob = updates.get(key);
             if (blob == null) {
-                blob = revisionsOf(key).read(visibleRevision);
+                blob = getCommitted(key).read(visibleRevision);
             }
             if (blob == null) {
                 blob = EMPTY_BLOB;
