@@ -30,6 +30,8 @@ package net.orfjackal.dimdwarf.tx;
  */
 public interface Transaction {
 
+    void join(TransactionParticipant p);
+
     TransactionStatus getStatus();
 
     boolean isActive();

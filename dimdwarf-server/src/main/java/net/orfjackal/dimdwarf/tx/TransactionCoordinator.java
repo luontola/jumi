@@ -32,8 +32,6 @@ public interface TransactionCoordinator {
 
     Transaction getTransaction();
 
-    void join(TransactionParticipant p);
-
     void prepare() throws TransactionFailedException;
 
     void commit();

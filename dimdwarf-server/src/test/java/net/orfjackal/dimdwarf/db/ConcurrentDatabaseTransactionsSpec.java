@@ -49,8 +49,8 @@ public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
         db = new InMemoryDatabase();
         tx1 = new TransactionImpl();
         tx2 = new TransactionImpl();
-        dbTx1 = db.joinTransaction(tx1);
-        dbTx2 = db.joinTransaction(tx2);
+        dbTx1 = db.openConnection(tx1);
+        dbTx2 = db.openConnection(tx2);
     }
 
 
