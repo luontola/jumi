@@ -27,7 +27,7 @@ package net.orfjackal.dimdwarf.db;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
@@ -40,18 +40,43 @@ import org.junit.runner.RunWith;
 public class ConcurrentDatabaseTransactionsSpec extends Specification<Object> {
 
     private InMemoryDatabase db;
-    private Transaction tx1;
-    private Transaction tx2;
-    private Database dbTx1;
-    private Database dbTx2;
+    private TransactionCoordinator tx1;
+    private TransactionCoordinator tx2;
+    private Database db1;
+    private Database db2;
+
+    private Blob key;
+    private Blob value1;
+    private Blob value2;
 
     public void create() throws Exception {
         db = new InMemoryDatabase();
         tx1 = new TransactionImpl();
         tx2 = new TransactionImpl();
-        dbTx1 = db.openConnection(tx1);
-        dbTx2 = db.openConnection(tx2);
+        db1 = db.openConnection(tx1.getTransaction());
+        db2 = db.openConnection(tx2.getTransaction());
+
+        key = Blob.fromBytes(new byte[]{0});
+        value1 = Blob.fromBytes(new byte[]{1});
+        value2 = Blob.fromBytes(new byte[]{2});
     }
 
+    public class WhenEntryIsCreatedInATransaction {
 
+        public Object create() {
+            db1.update(key, value1);
+            return null;
+        }
+
+        public void otherTransactionsCanNotSeeIt() {
+            specify(db2.read(key), should.equal(null));
+        }
+
+        public void afterCommitNewTransactionsCanSeeIt() {
+            tx1.prepare();
+            tx1.commit();
+            Database db3 = db.openConnection(new TransactionImpl().getTransaction());
+            specify(db3.read(key), should.equal(value1));
+        }
+    }
 }

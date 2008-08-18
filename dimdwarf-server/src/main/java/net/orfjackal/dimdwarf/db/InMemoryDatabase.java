@@ -47,6 +47,7 @@ public class InMemoryDatabase {
     private class TransactionalDatabase implements Database, TransactionParticipant {
 
         private Transaction tx;
+        private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
 
         public void joinedTransaction(Transaction tx) {
             if (this.tx != null) {
@@ -59,21 +60,28 @@ public class InMemoryDatabase {
         }
 
         public void commit(Transaction tx) {
+            for (Map.Entry<Blob, Blob> entry : updates.entrySet()) {
+                values.put(entry.getKey(), entry.getValue());
+            }
         }
 
         public void rollback(Transaction tx) {
         }
 
         public Blob read(Blob key) {
-            return values.get(key);
+            Blob blob = updates.get(key);
+            if (blob == null) {
+                blob = values.get(key);
+            }
+            return blob;
         }
 
         public void update(Blob key, Blob value) {
-            values.put(key, value);
+            updates.put(key, value);
         }
 
         public void delete(Blob key) {
-            values.remove(key);
+            updates.remove(key);
         }
     }
 }
