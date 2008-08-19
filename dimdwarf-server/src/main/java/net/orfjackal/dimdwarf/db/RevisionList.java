@@ -32,15 +32,21 @@ public class RevisionList<T> {
 
     private final int revision;
     private final T value;
+    private final RevisionList<T> previous;
 
     public RevisionList(int revision, T value) {
+        this(revision, value, null);
+    }
+
+    public RevisionList(int revision, T value, RevisionList<T> previous) {
         this.revision = revision;
         this.value = value;
+        this.previous = previous;
     }
 
     public T get(int revision) {
         if (revision < this.revision) {
-            return null;
+            return previous != null ? previous.get(revision) : null;
         }
         return value;
     }

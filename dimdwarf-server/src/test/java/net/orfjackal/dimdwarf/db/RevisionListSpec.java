@@ -42,20 +42,47 @@ public class RevisionListSpec extends Specification<Object> {
         private RevisionList<String> list;
 
         public Object create() {
-            list = new RevisionList<String>(1, "foo");
+            list = new RevisionList<String>(1, "one");
             return null;
         }
 
         public void thatRevisionCanBeRead() {
-            specify(list.get(1), should.equal("foo"));
+            specify(list.get(1), should.equal("one"));
         }
 
         public void olderRevisionsDoNotExist() {
             specify(list.get(0), should.equal(null));
         }
 
-        public void newerRevisionsFallBackToTheAvailableRevision() {
-            specify(list.get(2), should.equal("foo"));
+        public void newerRevisionsFallBackToTheNewestAvailableRevision() {
+            specify(list.get(2), should.equal("one"));
+        }
+    }
+
+    public class WhenThereAreManyRevisions {
+
+        private RevisionList<String> list;
+
+        public Object create() {
+            RevisionList<String> previous = new RevisionList<String>(1, "one");
+            list = new RevisionList<String>(2, "two", previous);
+            return null;
+        }
+
+        public void theLatestRevisionCanBeRead() {
+            specify(list.get(2), should.equal("two"));
+        }
+
+        public void thePreviousRevisionCanBeRead() {
+            specify(list.get(1), should.equal("one"));
+        }
+
+        public void olderRevisionsDoNotExist() {
+            specify(list.get(0), should.equal(null));
+        }
+
+        public void newerRevisionsFallBackToTheNewestAvailableRevision() {
+            specify(list.get(3), should.equal("two"));
         }
     }
 }
