@@ -22,55 +22,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
-
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+package net.orfjackal.dimdwarf.tx;
 
 /**
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 17.8.2008
  */
-public class EntryRevisions {
+public class TransactionException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
-    private final SortedMap<Integer, Blob> revisions = new TreeMap<Integer, Blob>();
-
-    public synchronized Blob read(int revision) {
-        Blob value = null;
-        for (Map.Entry<Integer, Blob> e : revisions.entrySet()) {
-            if (e.getKey() <= revision) {
-                value = e.getValue();
-            }
-        }
-        return value;
+    public TransactionException() {
     }
 
-    public synchronized void write(Blob value, int revision) {
-        revisions.put(revision, value);
+    public TransactionException(String message) {
+        super(message);
     }
 
-    public synchronized void checkNotModifiedAfter(int revision) {
-        if (revisions.size() > 0) {
-            int lastWrite = latestRevision();
-            if (lastWrite > revision) {
-                throw new OptimisticLockException("Already modified in revision " + lastWrite);
-            }
-        }
+    public TransactionException(Throwable cause) {
+        super(cause);
     }
 
-    public synchronized int oldestRevision() {
-        return revisions.firstKey();
-    }
-
-    private synchronized int latestRevision() {
-        return revisions.lastKey();
-    }
-
-    public synchronized void purgeRevisionsOlderThan(int revision) {
-        if (revisions.size() >= 2) {
-            SortedMap<Integer, Blob> purge = revisions.headMap(Math.min(revision, latestRevision()));
-            purge.clear();
-        }
+    public TransactionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -56,7 +56,7 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
         }
     }
 
-    public void prepare() throws TransactionFailedException {
+    public void prepare() throws TransactionException {
         changeStatus(ACTIVE, PREPARING);
         try {
             checkIsNotRollbackOnly();
@@ -65,7 +65,7 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
             changeStatus(PREPARING, PREPARED);
         } catch (Throwable t) {
             changeStatus(PREPARING, PREPARE_FAILED);
-            throw new TransactionFailedException("Prepare failed", t);
+            throw new TransactionException("Prepare failed", t);
         }
     }
 

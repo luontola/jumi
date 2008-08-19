@@ -22,27 +22,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tx;
+package net.orfjackal.dimdwarf.db;
+
+import net.orfjackal.dimdwarf.tx.TransactionException;
 
 /**
  * @author Esko Luontola
- * @since 17.8.2008
+ * @since 19.8.2008
  */
-public class TransactionFailedException extends RuntimeException {
+public class OptimisticLockException extends TransactionException {
     private static final long serialVersionUID = 1L;
 
-    public TransactionFailedException() {
+    public OptimisticLockException() {
     }
 
-    public TransactionFailedException(String message) {
+    public OptimisticLockException(String message) {
         super(message);
     }
 
-    public TransactionFailedException(Throwable cause) {
+    public OptimisticLockException(Throwable cause) {
         super(cause);
     }
 
-    public TransactionFailedException(String message, Throwable cause) {
+    public OptimisticLockException(String message, Throwable cause) {
         super(message, cause);
     }
 }

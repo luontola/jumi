@@ -202,7 +202,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 
@@ -254,7 +254,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             specify(new Block() {
                 public void run() throws Throwable {
                     tx.commit();
@@ -421,7 +421,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             checking(allParticipantsAreRolledBack());
             tx.rollback();
         }
@@ -461,7 +461,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 
@@ -476,7 +476,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             specify(tx.getStatus(), should.equal(PREPARE_FAILED));
         }
 

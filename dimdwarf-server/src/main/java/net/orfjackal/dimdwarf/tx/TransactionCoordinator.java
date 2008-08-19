@@ -32,7 +32,7 @@ public interface TransactionCoordinator {
 
     Transaction getTransaction();
 
-    void prepare() throws TransactionFailedException;
+    void prepare() throws TransactionException;
 
     void commit();
 

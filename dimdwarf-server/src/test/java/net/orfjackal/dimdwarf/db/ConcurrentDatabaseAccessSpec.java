@@ -30,7 +30,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionFailedException;
+import net.orfjackal.dimdwarf.tx.TransactionException;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
@@ -292,7 +292,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     tx2.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             tx2.rollback();
             specify(readInNewTransaction(key), should.equal(value1));
         }
@@ -303,7 +303,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     tx2.prepare();
                 }
-            }, should.raise(TransactionFailedException.class));
+            }, should.raise(TransactionException.class));
             tx1.commit();
             tx2.rollback();
             specify(readInNewTransaction(key), should.equal(value1));

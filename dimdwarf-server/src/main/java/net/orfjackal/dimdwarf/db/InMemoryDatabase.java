@@ -28,7 +28,6 @@ import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 
-import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +87,7 @@ public class InMemoryDatabase {
         return oldest;
     }
 
-    private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, int revision) throws ConcurrentModificationException {
+    private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, int revision) throws Exception {
         synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
                 getCommitted(entry.getKey()).checkNotModifiedAfter(revision);
