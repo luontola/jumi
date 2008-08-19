@@ -59,7 +59,7 @@ public class RevisionListSpec extends Specification<Object> {
         }
     }
 
-    public class WhenThereAreManyRevisions {
+    public class WhenThereAreManySequentialRevisions {
 
         private RevisionList<String> list;
 
@@ -76,13 +76,28 @@ public class RevisionListSpec extends Specification<Object> {
         public void thePreviousRevisionCanBeRead() {
             specify(list.get(1), should.equal("one"));
         }
+    }
 
-        public void olderRevisionsDoNotExist() {
-            specify(list.get(0), should.equal(null));
+    public class WhenThereAreManySparseRevisions {
+
+        private RevisionList<String> list;
+
+        public Object create() {
+            RevisionList<String> previous = new RevisionList<String>(1, "one");
+            list = new RevisionList<String>(3, "three", previous);
+            return null;
         }
 
-        public void newerRevisionsFallBackToTheNewestAvailableRevision() {
-            specify(list.get(3), should.equal("two"));
+        public void theLatestRevisionCanBeRead() {
+            specify(list.get(3), should.equal("three"));
+        }
+
+        public void inBetweenRevisionsFallBackToThePreviousRevision() {
+            specify(list.get(2), should.equal("one"));
+        }
+
+        public void theOldestRevisionCanBeRead() {
+            specify(list.get(1), should.equal("one"));
         }
     }
 }
