@@ -168,7 +168,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                         public void run() throws Throwable {
                             tx.mustBeActive();
                         }
-                    }, should.raise(IllegalStateException.class));
+                    }, should.raise(TransactionRequiredException.class));
                 }
             });
             checking(allParticipantsArePrepared());
@@ -182,7 +182,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.join(new DummyTransactionParticipant());
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(TransactionRequiredException.class));
         }
 
         public void allParticipantsAreToldToPrepare() {
@@ -488,7 +488,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                 public void run() throws Throwable {
                     tx.commit();
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(TransactionRolledbackException.class));
             specify(tx.getStatus(), should.equal(PREPARED));
         }
     }

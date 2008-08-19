@@ -22,31 +22,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
-
-import net.orfjackal.dimdwarf.tx.TransactionException;
+package net.orfjackal.dimdwarf.tx;
 
 /**
- * Thrown when an optimistic locking conflict occurs.
+ * Indicates that the transaction has been rolled back, or marked to roll back.
  *
  * @author Esko Luontola
  * @since 19.8.2008
  */
-public class OptimisticLockException extends TransactionException {
+public class TransactionRolledbackException extends TransactionException {
     private static final long serialVersionUID = 1L;
 
-    public OptimisticLockException() {
+    public TransactionRolledbackException() {
     }
 
-    public OptimisticLockException(String message) {
+    public TransactionRolledbackException(String message) {
         super(message);
     }
 
-    public OptimisticLockException(Throwable cause) {
+    public TransactionRolledbackException(Throwable cause) {
         super(cause);
     }
 
-    public OptimisticLockException(String message, Throwable cause) {
+    public TransactionRolledbackException(String message, Throwable cause) {
         super(message, cause);
     }
 }

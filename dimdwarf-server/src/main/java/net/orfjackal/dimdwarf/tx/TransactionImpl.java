@@ -142,9 +142,9 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
         return status.equals(ACTIVE);
     }
 
-    public void mustBeActive() throws IllegalStateException {
+    public void mustBeActive() throws TransactionRequiredException {
         if (!isActive()) {
-            throw new IllegalStateException("Transaction not active");
+            throw new TransactionRequiredException();
         }
     }
 
@@ -156,9 +156,9 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
         rollbackOnly = true;
     }
 
-    private void checkIsNotRollbackOnly() {
+    private void checkIsNotRollbackOnly() throws TransactionRolledbackException {
         if (rollbackOnly) {
-            throw new IllegalStateException("Marked for rollback");
+            throw new TransactionRolledbackException("Marked for rollback");
         }
     }
 }

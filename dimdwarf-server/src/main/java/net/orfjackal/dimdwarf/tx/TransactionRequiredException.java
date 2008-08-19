@@ -22,31 +22,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
-
-import net.orfjackal.dimdwarf.tx.TransactionException;
+package net.orfjackal.dimdwarf.tx;
 
 /**
- * Thrown when an optimistic locking conflict occurs.
+ * Thrown when a transaction is required but is not active.
  *
  * @author Esko Luontola
  * @since 19.8.2008
  */
-public class OptimisticLockException extends TransactionException {
+public class TransactionRequiredException extends TransactionException {
     private static final long serialVersionUID = 1L;
 
-    public OptimisticLockException() {
+    public TransactionRequiredException() {
     }
 
-    public OptimisticLockException(String message) {
+    public TransactionRequiredException(String message) {
         super(message);
     }
 
-    public OptimisticLockException(Throwable cause) {
+    public TransactionRequiredException(Throwable cause) {
         super(cause);
     }
 
-    public OptimisticLockException(String message, Throwable cause) {
+    public TransactionRequiredException(String message, Throwable cause) {
         super(message, cause);
     }
 }

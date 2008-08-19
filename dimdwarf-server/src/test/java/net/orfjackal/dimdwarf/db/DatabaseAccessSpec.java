@@ -31,6 +31,7 @@ import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
+import net.orfjackal.dimdwarf.tx.TransactionRequiredException;
 import org.junit.runner.RunWith;
 
 /**
@@ -106,17 +107,17 @@ public class DatabaseAccessSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     db.read(key);
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(TransactionRequiredException.class));
             specify(new Block() {
                 public void run() throws Throwable {
                     db.update(key, value);
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(TransactionRequiredException.class));
             specify(new Block() {
                 public void run() throws Throwable {
                     db.delete(key);
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(TransactionRequiredException.class));
         }
     }
 
