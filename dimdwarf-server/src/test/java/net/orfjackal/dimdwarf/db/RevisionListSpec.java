@@ -100,4 +100,6 @@ public class RevisionListSpec extends Specification<Object> {
             specify(list.get(1), should.equal("one"));
         }
     }
+
+    // TODO: purging old revisions
 }
