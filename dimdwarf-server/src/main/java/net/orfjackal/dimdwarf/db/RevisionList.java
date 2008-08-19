@@ -45,9 +45,11 @@ public class RevisionList<T> {
     }
 
     public T get(int revision) {
-        if (revision < this.revision) {
-            return previous != null ? previous.get(revision) : null;
+        for (RevisionList<T> node = this; node != null; node = node.previous) {
+            if (revision >= node.revision) {
+                return node.value;
+            }
         }
-        return value;
+        return null;
     }
 }
