@@ -25,26 +25,24 @@
 package net.orfjackal.dimdwarf.db;
 
 /**
- * Thrown when an optimistic locking conflict occurs.
- *
  * @author Esko Luontola
  * @since 19.8.2008
  */
-public class OptimisticLockException extends PersistenceException {
+public class PersistenceException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public OptimisticLockException() {
+    public PersistenceException() {
     }
 
-    public OptimisticLockException(String message) {
+    public PersistenceException(String message) {
         super(message);
     }
 
-    public OptimisticLockException(Throwable cause) {
+    public PersistenceException(Throwable cause) {
         super(cause);
     }
 
-    public OptimisticLockException(String message, Throwable cause) {
+    public PersistenceException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -25,26 +25,26 @@
 package net.orfjackal.dimdwarf.db;
 
 /**
- * Thrown when an optimistic locking conflict occurs.
+ * Thrown when trying to follow a reference to an entity which does not exist.
  *
  * @author Esko Luontola
  * @since 19.8.2008
  */
-public class OptimisticLockException extends PersistenceException {
+public class EntityNotFoundException extends PersistenceException {
     private static final long serialVersionUID = 1L;
 
-    public OptimisticLockException() {
+    public EntityNotFoundException() {
     }
 
-    public OptimisticLockException(String message) {
+    public EntityNotFoundException(String message) {
         super(message);
     }
 
-    public OptimisticLockException(Throwable cause) {
+    public EntityNotFoundException(Throwable cause) {
         super(cause);
     }
 
-    public OptimisticLockException(String message, Throwable cause) {
+    public EntityNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 }
