@@ -48,9 +48,9 @@ public class InMemoryDatabase {
 
     private final ConcurrentMap<Blob, EntryRevisions> committed = new ConcurrentHashMap<Blob, EntryRevisions>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
-    private final ConcurrentMap<Transaction, Integer> openConnections = new ConcurrentHashMap<Transaction, Integer>();
-    private volatile int currentRevision = 1;
-    private volatile int oldestUncommittedRevision = 1;
+    private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
+    private volatile long currentRevision = 1;
+    private volatile long oldestUncommittedRevision = 1;
 
     public DatabaseConnection openConnection(Transaction tx) {
         if (openConnections.containsKey(tx)) {
@@ -67,8 +67,8 @@ public class InMemoryDatabase {
     }
 
     private void updateOldestUncommittedRevision() {
-        int oldest = currentRevision;
-        for (int rev : openConnections.values()) {
+        long oldest = currentRevision;
+        for (long rev : openConnections.values()) {
             oldest = Math.min(oldest, rev);
         }
         oldestUncommittedRevision = oldest;
@@ -78,23 +78,23 @@ public class InMemoryDatabase {
         return openConnections.size();
     }
 
-    protected int currentRevision() {
+    protected long currentRevision() {
         return currentRevision;
     }
 
-    protected int oldestUncommittedRevision() {
+    protected long oldestUncommittedRevision() {
         return oldestUncommittedRevision;
     }
 
-    protected int oldestStoredRevision() {
-        int oldest = currentRevision;
+    protected long oldestStoredRevision() {
+        long oldest = currentRevision;
         for (EntryRevisions revs : committed.values()) {
             oldest = Math.min(oldest, revs.oldestRevision());
         }
         return oldest;
     }
 
-    private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, int revision) throws Exception {
+    private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, long revision) throws Exception {
         synchronized (lockedForCommit) {
             for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
                 getCommitted(entry.getKey()).checkNotModifiedAfter(revision);
@@ -105,7 +105,7 @@ public class InMemoryDatabase {
 
     private void commitTransaction(Transaction tx, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
-            int nextRevision = currentRevision + 1;
+            long nextRevision = currentRevision + 1;
             try {
                 for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
                     getCommitted(entry.getKey()).write(entry.getValue(), nextRevision);
@@ -154,10 +154,10 @@ public class InMemoryDatabase {
     private class TransactionalDatabaseConnection implements DatabaseConnection, TransactionParticipant {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
-        private final int visibleRevision;
+        private final long visibleRevision;
         private final Transaction tx;
 
-        public TransactionalDatabaseConnection(Transaction tx, int visibleRevision) {
+        public TransactionalDatabaseConnection(Transaction tx, long visibleRevision) {
             this.tx = tx;
             this.visibleRevision = visibleRevision;
             tx.join(this);

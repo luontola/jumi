@@ -37,21 +37,21 @@ package net.orfjackal.dimdwarf.db;
  */
 public class RevisionList<T> {
 
-    private final int revision;
+    private final long revision;
     private final T value;
     private volatile RevisionList<T> previous;
 
-    public RevisionList(int revision, T value) {
+    public RevisionList(long revision, T value) {
         this(revision, value, null);
     }
 
-    public RevisionList(int revision, T value, RevisionList<T> previous) {
+    public RevisionList(long revision, T value, RevisionList<T> previous) {
         this.revision = revision;
         this.value = value;
         this.previous = previous;
     }
 
-    public T get(int revision) {
+    public T get(long revision) {
         for (RevisionList<T> node = this; node != null; node = node.previous) {
             if (node.revision <= revision) {
                 return node.value;
@@ -60,7 +60,7 @@ public class RevisionList<T> {
         return null;
     }
 
-    public void purgeRevisionsOlderThan(int revisionToKeep) {
+    public void purgeRevisionsOlderThan(long revisionToKeep) {
         for (RevisionList<T> node = this; node != null; node = node.previous) {
             if (node.revision <= revisionToKeep) {
                 node.previous = null;
