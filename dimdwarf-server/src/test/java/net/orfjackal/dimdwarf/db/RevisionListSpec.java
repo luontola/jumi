@@ -108,5 +108,52 @@ public class RevisionListSpec extends Specification<Object> {
         }
     }
 
-    // TODO: purging old revisions
+    public class WhenOldRevisionsArePurged {
+
+        private RevisionList<String> tail;
+        private RevisionList<String> list;
+
+        public Object create() {
+            tail = new RevisionList<String>(1, "one");
+            RevisionList<String> two = new RevisionList<String>(2, "two", tail);
+            RevisionList<String> four = new RevisionList<String>(4, "four", two);
+            list = new RevisionList<String>(5, null, four);
+            return null;
+        }
+
+        public void purgingAlreadyPurgedRevisionsHasNoEffect() {
+            list.purgeRevisionsOlderThan(0);
+            list.purgeRevisionsOlderThan(1);
+            specify(list.get(1), should.equal("one"));
+        }
+
+        public void sequentialRevisionsCanBePurged() {
+            list.purgeRevisionsOlderThan(2);
+            specify(list.get(1), should.equal(null));
+            specify(list.get(2), should.equal("two"));
+        }
+
+        public void sparseRevisionsCanBePurged() {
+            list.purgeRevisionsOlderThan(3);
+            specify(list.get(1), should.equal(null));
+            specify(list.get(2), should.equal("two"));
+            specify(list.get(3), should.equal("two"));
+            specify(list.get(4), should.equal("four"));
+        }
+
+        public void anOnlyNonNullRevisionCanNotBePurged() {
+            tail.purgeRevisionsOlderThan(5);
+            specify(tail.get(1), should.equal("one"));
+            specify(tail.isEmpty(), should.equal(false));
+        }
+
+        public void theListCanBeDiscardedIfAfterPurgeItContainsOnlyANullRevision() {
+            specify(list.get(5), should.equal(null));
+            specify(list.isEmpty(), should.equal(false));
+            list.purgeRevisionsOlderThan(5);
+            specify(list.get(4), should.equal(null));
+            specify(list.get(5), should.equal(null));
+            specify(list.isEmpty(), should.equal(true));
+        }
+    }
 }

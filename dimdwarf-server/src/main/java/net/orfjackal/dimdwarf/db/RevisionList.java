@@ -39,7 +39,7 @@ public class RevisionList<T> {
 
     private final int revision;
     private final T value;
-    private final RevisionList<T> previous;
+    private volatile RevisionList<T> previous;
 
     public RevisionList(int revision, T value) {
         this(revision, value, null);
@@ -53,10 +53,23 @@ public class RevisionList<T> {
 
     public T get(int revision) {
         for (RevisionList<T> node = this; node != null; node = node.previous) {
-            if (revision >= node.revision) {
+            if (node.revision <= revision) {
                 return node.value;
             }
         }
         return null;
+    }
+
+    public void purgeRevisionsOlderThan(int revisionToKeep) {
+        for (RevisionList<T> node = this; node != null; node = node.previous) {
+            if (node.revision <= revisionToKeep) {
+                node.previous = null;
+                return;
+            }
+        }
+    }
+
+    public boolean isEmpty() {
+        return value == null && previous == null;
     }
 }
