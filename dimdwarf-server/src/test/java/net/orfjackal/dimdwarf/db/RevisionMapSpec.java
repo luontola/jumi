@@ -94,11 +94,14 @@ public class RevisionMapSpec extends Specification<Object> {
         }
     }
 
-    public class AfterPuttingAValueToARevisionMap {
+    public class WhenAValueIsAdded {
+
+        private long revision;
 
         public Object create() {
             map.incrementRevision();
             map.put("key", "value");
+            revision = map.getCurrentRevision();
             return null;
         }
 
@@ -107,38 +110,48 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void theValueExistsOnCurrentRevision() {
-            specify(map.get("key", map.getCurrentRevision()), should.equal("value"));
+            specify(map.get("key", revision), should.equal("value"));
         }
 
         public void theValueExistsOnFutureRevisions() {
-            specify(map.get("key", map.getCurrentRevision() + 1), should.equal("value"));
+            specify(map.get("key", revision + 1), should.equal("value"));
         }
 
         public void theValueDoesNotExistOnPreviousRevision() {
-            specify(map.get("key", map.getCurrentRevision() - 1), should.equal(null));
+            specify(map.get("key", revision - 1), should.equal(null));
+        }
+    }
+
+    public class WhenAnExistingValueIsUpdated {
+
+        private long revision;
+
+        public Object create() {
+            map.incrementRevision();
+            map.put("key", "value");
+            revision = map.getCurrentRevision();
+            return null;
         }
 
-        public void theValueCanNotBeOverwrittenDuringTheSameRevision() {
+        public void theValueCanNotBeUpdatedTwiseDuringTheSameRevision() {
             specify(new Block() {
                 public void run() throws Throwable {
                     map.put("key", "new");
                 }
             }, should.raise(IllegalArgumentException.class));
-            specify(map.get("key", map.getCurrentRevision()), should.equal("value"));
+            specify(map.get("key", revision), should.equal("value"));
         }
 
-        public void theValueCanBeOverwrittenDuringAFollowingRevision() {
-            long followingRevision = map.getCurrentRevision() + 1;
+        public void theValueCanBeUpdatedDuringAFollowingRevision() {
             map.incrementRevision();
             map.put("key", "new");
-            specify(map.get("key", followingRevision), should.equal("new"));
+            specify(map.get("key", revision + 1), should.equal("new"));
         }
 
-        public void theValueBeingOverwrittenStillRemainsInThePreviousRevision() {
-            long previousRevision = map.getCurrentRevision();
+        public void theOldValueStillRemainsInThePreviousRevision() {
             map.incrementRevision();
             map.put("key", "new");
-            specify(map.get("key", previousRevision), should.equal("value"));
+            specify(map.get("key", revision), should.equal("value"));
         }
     }
 }

@@ -41,29 +41,8 @@ import java.util.concurrent.ConcurrentMap;
 public class RevisionMap<K, V> {
 
     private final ConcurrentMap<K, RevisionList<V>> map = new ConcurrentHashMap<K, RevisionList<V>>();
-
     private volatile long currentRevision = 0;
     private volatile long oldestRevision = 0;
-
-    public long getCurrentRevision() {
-        return currentRevision;
-    }
-
-    public long getOldestRevision() {
-        return oldestRevision;
-    }
-
-    public void incrementRevision() {
-        currentRevision++;
-    }
-
-    public void purgeRevisionsOlderThan(long revisionToKeep) {
-        oldestRevision = Math.min(revisionToKeep, currentRevision);
-    }
-
-    public int size() {
-        return map.size();
-    }
 
     public V get(K key, long revision) {
         RevisionList<V> revs = map.get(key);
@@ -76,5 +55,25 @@ public class RevisionMap<K, V> {
             throw new IllegalArgumentException("Key already set in this revision: " + key);
         }
         map.put(key, new RevisionList<V>(currentRevision, value, previous));
+    }
+
+    public void purgeRevisionsOlderThan(long revisionToKeep) {
+        oldestRevision = Math.min(revisionToKeep, currentRevision);
+    }
+
+    public int size() {
+        return map.size();
+    }
+
+    public long getCurrentRevision() {
+        return currentRevision;
+    }
+
+    public long getOldestRevision() {
+        return oldestRevision;
+    }
+
+    public void incrementRevision() {
+        currentRevision++;
     }
 }
