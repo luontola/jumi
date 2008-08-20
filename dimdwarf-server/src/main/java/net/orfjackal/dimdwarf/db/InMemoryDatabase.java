@@ -106,6 +106,7 @@ public class InMemoryDatabase {
     private void commitTransaction(Transaction tx, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
             if (currentRevision == Long.MAX_VALUE) {
+                // TODO: any good ideas on how to allow the revisions to loop freely?
                 throw new Error("Numeric overflow: tried to increment past Long.MAX_VALUE");
             }
             long nextRevision = currentRevision + 1;
