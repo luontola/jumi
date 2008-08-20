@@ -65,11 +65,16 @@ public class RevisionMap<K, V> {
         return map.size();
     }
 
-    public void put(K key, V value) {
-        map.put(key, new RevisionList<V>(0, value));
+    public V get(K key, long revision) {
+        RevisionList<V> revs = map.get(key);
+        return revs != null ? revs.get(revision) : null;
     }
 
-    public V get(K key, long revision) {
-        return map.get(key).get(0);
+    public void put(K key, V value) {
+        RevisionList<V> previous = map.get(key);
+        if (previous != null && previous.latestRevision() == currentRevision) {
+            throw new IllegalArgumentException("Key already set in this revision: " + key);
+        }
+        map.put(key, new RevisionList<V>(currentRevision, value, previous));
     }
 }

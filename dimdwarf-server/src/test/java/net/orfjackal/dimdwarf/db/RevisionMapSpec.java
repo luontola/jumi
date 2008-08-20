@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
@@ -88,22 +89,60 @@ public class RevisionMapSpec extends Specification<Object> {
             specify(map.size(), should.equal(0));
         }
 
+        public void doesNotContainAnyValues() {
+            specify(map.get("key", map.getCurrentRevision()), should.equal(null));
+        }
     }
 
     public class AfterPuttingAValueToARevisionMap {
 
         public Object create() {
+            map.incrementRevision();
             map.put("key", "value");
             return null;
         }
 
-        public void itIsNotEmpty() {
+        public void theMapIsNotEmpty() {
             specify(map.size(), should.equal(1));
         }
 
         public void theValueExistsOnCurrentRevision() {
-            long currentRevision = map.getCurrentRevision();
-            specify(map.get("key", currentRevision), should.equal("value"));
+            specify(map.get("key", map.getCurrentRevision()), should.equal("value"));
+        }
+
+        public void theValueExistsOnFutureRevisions() {
+            specify(map.get("key", map.getCurrentRevision() + 1), should.equal("value"));
+        }
+
+        public void theValueDoesNotExistOnPreviousRevision() {
+            specify(map.get("key", map.getCurrentRevision() - 1), should.equal(null));
+        }
+
+        public void theValueCanNotBeOverwrittenDuringTheSameRevision() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    map.put("key", "new");
+                }
+            }, should.raise(IllegalArgumentException.class));
+            specify(map.get("key", map.getCurrentRevision()), should.equal("value"));
+        }
+
+        public void theValueCanBeOverwrittenDuringAFollowingRevision() {
+            long followingRevision = map.getCurrentRevision() + 1;
+            map.incrementRevision();
+            map.put("key", "new");
+            specify(map.get("key", followingRevision), should.equal("new"));
+        }
+
+        public void theValueBeingOverwrittenStillRemainsInThePreviousRevision() {
+            long previousRevision = map.getCurrentRevision();
+            map.incrementRevision();
+            map.put("key", "new");
+            specify(map.get("key", previousRevision), should.equal("value"));
         }
     }
 }
+
+// TODO: remove
+// TODO: purge
+// TODO: iterator

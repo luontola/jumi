@@ -69,6 +69,10 @@ public class RevisionList<T> {
         }
     }
 
+    public long latestRevision() {
+        return revision;
+    }
+
     public boolean isEmpty() {
         return value == null && previous == null;
     }
