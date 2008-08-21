@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -64,10 +65,12 @@ public class RevisionMap<K, V> {
 
     public void purgeRevisionsOlderThan(long revisionToKeep) {
         oldestRevision = Math.min(revisionToKeep, currentRevision);
-        for (Map.Entry<K, RevisionList<V>> entry : map.entrySet()) {
-            entry.getValue().purgeRevisionsOlderThan(oldestRevision);
-            if (entry.getValue().isEmpty()) {
-                map.remove(entry.getKey());
+        for (Iterator<Map.Entry<K, RevisionList<V>>> iterator = map.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry<K, RevisionList<V>> entry = iterator.next();
+            RevisionList<V> value = entry.getValue();
+            value.purgeRevisionsOlderThan(oldestRevision);
+            if (value.isEmpty()) {
+                iterator.remove();
             }
         }
     }
