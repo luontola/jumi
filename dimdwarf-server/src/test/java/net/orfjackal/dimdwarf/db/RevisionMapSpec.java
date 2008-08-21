@@ -194,8 +194,17 @@ public class RevisionMapSpec extends Specification<Object> {
         public void theValueStillExistsInThePreviousRevision() {
             specify(map.get("key", beforeRemove), should.equal("value"));
         }
+
+        public void theWholeEntryCanBePurged() {
+            map.purgeRevisionsOlderThan(beforeRemove);
+            specify(map.size(), should.equal(1));
+            specify(map.get("key", beforeRemove), should.equal("value"));
+
+            map.purgeRevisionsOlderThan(afterRemove);
+            specify(map.size(), should.equal(0));
+            specify(map.get("key", beforeRemove), should.equal(null));
+        }
     }
 }
 
-// TODO: purge
 // TODO: iterator

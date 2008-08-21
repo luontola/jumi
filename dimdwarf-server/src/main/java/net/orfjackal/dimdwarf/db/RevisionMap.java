@@ -66,6 +66,9 @@ public class RevisionMap<K, V> {
         oldestRevision = Math.min(revisionToKeep, currentRevision);
         for (Map.Entry<K, RevisionList<V>> entry : map.entrySet()) {
             entry.getValue().purgeRevisionsOlderThan(oldestRevision);
+            if (entry.getValue().isEmpty()) {
+                map.remove(entry.getKey());
+            }
         }
     }
 
