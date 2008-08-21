@@ -154,8 +154,31 @@ public class RevisionMapSpec extends Specification<Object> {
             specify(map.get("key", revision), should.equal("value"));
         }
     }
+
+    public class WhenAValueIsRemoved {
+
+        private long beforeRemove;
+        private long afterRemove;
+
+        public Object create() {
+            map.incrementRevision();
+            map.put("key", "value");
+            beforeRemove = map.getCurrentRevision();
+            map.incrementRevision();
+            map.remove("key");
+            afterRemove = map.getCurrentRevision();
+            return null;
+        }
+
+        public void theValueDoesNotExistInTheCurrentRevision() {
+            specify(map.get("key", afterRemove), should.equal(null));
+        }
+
+        public void theValueStillExistsInThePreviousRevision() {
+            specify(map.get("key", beforeRemove), should.equal("value"));
+        }
+    }
 }
 
-// TODO: remove
 // TODO: purge
 // TODO: iterator

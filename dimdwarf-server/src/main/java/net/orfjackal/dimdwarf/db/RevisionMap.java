@@ -57,6 +57,10 @@ public class RevisionMap<K, V> {
         map.put(key, new RevisionList<V>(currentRevision, value, previous));
     }
 
+    public void remove(K key) {
+        put(key, null);
+    }
+
     public void purgeRevisionsOlderThan(long revisionToKeep) {
         oldestRevision = Math.min(revisionToKeep, currentRevision);
     }
