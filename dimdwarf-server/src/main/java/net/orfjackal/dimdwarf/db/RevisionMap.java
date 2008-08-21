@@ -86,7 +86,7 @@ public class RevisionMap<K, V> {
                     purgeQueueIter.remove();
                 }
                 if (value.isEmpty()) {
-                    map.remove(key);
+                    map.remove(key, value);
                 }
             }
         }
