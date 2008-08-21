@@ -74,6 +74,10 @@ public class RevisionList<T> {
     }
 
     public boolean isEmpty() {
-        return value == null && previous == null;
+        return value == null && !hasOldRevisions();
+    }
+
+    public boolean hasOldRevisions() {
+        return previous != null;
     }
 }

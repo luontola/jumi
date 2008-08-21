@@ -31,8 +31,9 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -43,6 +44,8 @@ import java.util.concurrent.ConcurrentMap;
 public class RevisionMap<K, V> {
 
     private final ConcurrentMap<K, RevisionList<V>> map = new ConcurrentHashMap<K, RevisionList<V>>();
+    private final Set<K> hasOldRevisions = new HashSet<K>();
+    private final Object writeLock = new Object();
     private volatile long currentRevision = 0;
     private volatile long oldestRevision = 0;
 
@@ -52,11 +55,17 @@ public class RevisionMap<K, V> {
     }
 
     public void put(K key, V value) {
-        RevisionList<V> previous = map.get(key);
-        if (previous != null && previous.latestRevision() == currentRevision) {
-            throw new IllegalArgumentException("Key already set in this revision: " + key);
+        synchronized (writeLock) {
+            RevisionList<V> previous = map.get(key);
+            if (previous != null && previous.latestRevision() == currentRevision) {
+                throw new IllegalArgumentException("Key already set in this revision: " + key);
+            }
+            RevisionList<V> updated = new RevisionList<V>(currentRevision, value, previous);
+            map.put(key, updated);
+            if (previous != null) {
+                hasOldRevisions.add(key);
+            }
         }
-        map.put(key, new RevisionList<V>(currentRevision, value, previous));
     }
 
     public void remove(K key) {
@@ -64,13 +73,21 @@ public class RevisionMap<K, V> {
     }
 
     public void purgeRevisionsOlderThan(long revisionToKeep) {
-        oldestRevision = Math.min(revisionToKeep, currentRevision);
-        for (Iterator<Map.Entry<K, RevisionList<V>>> iterator = map.entrySet().iterator(); iterator.hasNext();) {
-            Map.Entry<K, RevisionList<V>> entry = iterator.next();
-            RevisionList<V> value = entry.getValue();
-            value.purgeRevisionsOlderThan(oldestRevision);
-            if (value.isEmpty()) {
-                iterator.remove();
+        synchronized (writeLock) {
+            revisionToKeep = Math.min(revisionToKeep, currentRevision);
+            oldestRevision = Math.max(revisionToKeep, oldestRevision);
+
+            for (Iterator<K> purgeQueueIter = hasOldRevisions.iterator(); purgeQueueIter.hasNext();) {
+                K key = purgeQueueIter.next();
+                RevisionList<V> value = map.get(key);
+
+                value.purgeRevisionsOlderThan(oldestRevision);
+                if (!value.hasOldRevisions()) {
+                    purgeQueueIter.remove();
+                }
+                if (value.isEmpty()) {
+                    map.remove(key);
+                }
             }
         }
     }
@@ -88,6 +105,8 @@ public class RevisionMap<K, V> {
     }
 
     public void incrementRevision() {
-        currentRevision++;
+        synchronized (writeLock) {
+            currentRevision++;
+        }
     }
 }
