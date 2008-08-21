@@ -120,38 +120,55 @@ public class RevisionMapSpec extends Specification<Object> {
         public void theValueDoesNotExistOnPreviousRevision() {
             specify(map.get("key", revision - 1), should.equal(null));
         }
+
+        public void theOnlyRevisionOfAValueCanNotBePurged() {
+            map.purgeRevisionsOlderThan(revision + 1);
+            specify(map.size(), should.equal(1));
+            specify(map.get("key", revision), should.equal("value"));
+        }
     }
 
     public class WhenAnExistingValueIsUpdated {
 
-        private long revision;
+        private long beforeUpdate;
+        private long afterUpdate;
 
         public Object create() {
             map.incrementRevision();
-            map.put("key", "value");
-            revision = map.getCurrentRevision();
+            map.put("key", "old");
+            beforeUpdate = map.getCurrentRevision();
+
+            map.incrementRevision();
+            map.put("key", "new");
+            afterUpdate = map.getCurrentRevision();
             return null;
         }
 
-        public void theValueCanNotBeUpdatedTwiseDuringTheSameRevision() {
+        public void theValueNewValueExistsInTheCurrentRevision() {
+            specify(map.get("key", afterUpdate), should.equal("new"));
+        }
+
+        public void theOldValueStillExistsInThePreviousRevision() {
+            specify(map.get("key", beforeUpdate), should.equal("old"));
+        }
+
+        public void aValueCanNotBeUpdatedTwiseDuringTheSameRevision() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    map.put("key", "new");
+                    map.put("key", "even newer");
                 }
             }, should.raise(IllegalArgumentException.class));
-            specify(map.get("key", revision), should.equal("value"));
+            specify(map.get("key", afterUpdate), should.equal("new"));
         }
 
-        public void theValueCanBeUpdatedDuringAFollowingRevision() {
-            map.incrementRevision();
-            map.put("key", "new");
-            specify(map.get("key", revision + 1), should.equal("new"));
-        }
+        public void theOldValueCanBePurged() {
+            map.purgeRevisionsOlderThan(beforeUpdate);
+            specify(map.size(), should.equal(1));
+            specify(map.get("key", beforeUpdate), should.equal("old"));
 
-        public void theOldValueStillRemainsInThePreviousRevision() {
-            map.incrementRevision();
-            map.put("key", "new");
-            specify(map.get("key", revision), should.equal("value"));
+            map.purgeRevisionsOlderThan(afterUpdate);
+            specify(map.size(), should.equal(1));
+            specify(map.get("key", beforeUpdate), should.equal(null));
         }
     }
 
