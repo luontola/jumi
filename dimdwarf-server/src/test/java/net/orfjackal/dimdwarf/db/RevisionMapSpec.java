@@ -37,6 +37,11 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Esko Luontola
  * @since 20.8.2008
@@ -205,6 +210,41 @@ public class RevisionMapSpec extends Specification<Object> {
             specify(map.get("key", beforeRemove), should.equal(null));
         }
     }
-}
 
-// TODO: iterator
+    public class IteratingOverARevision {
+
+        private List<String> keys = new ArrayList<String>();
+        private List<String> values = new ArrayList<String>();
+
+        public Object create() {
+            map.incrementRevision();
+            map.put("a", "AA");
+            map.put("b", "BB");
+            map.put("c", "X");
+            map.incrementRevision();
+            map.remove("c");
+            long revision = map.getCurrentRevision();
+            map.incrementRevision();
+            map.put("b", "Y");
+
+            Iterator<Map.Entry<String, String>> it = map.iterator(revision);
+            while (it.hasNext()) {
+                Map.Entry<String, String> e = it.next();
+                keys.add(e.getKey());
+                values.add(e.getValue());
+            }
+            return null;
+        }
+
+        public void iteratesOverAllValuesInTheRevision() {
+            specify(keys, should.containInOrder("a", "b"));
+            specify(values, should.containInOrder("AA", "BB"));
+        }
+
+        public void doesNotIterateOverValuesOfOtherRevisions() {
+            specify(keys, should.not().contain("c"));
+            specify(values, should.not().contain("X"));
+            specify(values, should.not().contain("Y"));
+        }
+    }
+}

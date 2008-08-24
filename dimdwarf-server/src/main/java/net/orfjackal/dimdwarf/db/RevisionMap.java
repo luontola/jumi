@@ -31,11 +31,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -43,7 +39,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class RevisionMap<K, V> {
 
-    private final ConcurrentMap<K, RevisionList<V>> map = new ConcurrentHashMap<K, RevisionList<V>>();
+    private final SortedMap<K, RevisionList<V>> map = Collections.synchronizedSortedMap(new TreeMap<K, RevisionList<V>>());
     private final Set<K> hasOldRevisions = new HashSet<K>();
     private final Object writeLock = new Object();
     private volatile long currentRevision = 0;
@@ -86,7 +82,7 @@ public class RevisionMap<K, V> {
                     purgeQueueIter.remove();
                 }
                 if (value.isEmpty()) {
-                    map.remove(key, value);
+                    map.remove(key);
                 }
             }
         }
@@ -107,6 +103,76 @@ public class RevisionMap<K, V> {
     public void incrementRevision() {
         synchronized (writeLock) {
             currentRevision++;
+        }
+    }
+
+    public Iterator<Map.Entry<K, V>> iterator(long revision) {
+        return new MyIterator<K, V>(this, revision);
+    }
+
+    private static class MyIterator<K, V> implements Iterator<Map.Entry<K, V>> {
+        private final long revision;
+        private final Iterator<Map.Entry<K, RevisionList<V>>> it;
+        private Map.Entry<K, V> fetchedNext;
+
+        public MyIterator(RevisionMap<K, V> map, long revision) {
+            this.revision = revision;
+            it = map.map.entrySet().iterator();
+        }
+
+        public boolean hasNext() {
+            fetchNext();
+            return fetchedNext != null;
+        }
+
+        public Map.Entry<K, V> next() {
+            fetchNext();
+            return returnNext();
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private void fetchNext() {
+            while (fetchedNext == null && it.hasNext()) {
+                Map.Entry<K, RevisionList<V>> e = it.next();
+                V value = e.getValue().get(revision);
+                if (value != null) {
+                    fetchedNext = new MyEntry<K, V>(e.getKey(), value);
+                }
+            }
+        }
+
+        private Map.Entry<K, V> returnNext() {
+            Map.Entry<K, V> next = fetchedNext;
+            if (next == null) {
+                throw new NoSuchElementException();
+            }
+            fetchedNext = null;
+            return next;
+        }
+    }
+
+    private static class MyEntry<K, V> implements Map.Entry<K, V> {
+        private final K key;
+        private final V value;
+
+        public MyEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public V setValue(V value) {
+            throw new UnsupportedOperationException();
         }
     }
 }
