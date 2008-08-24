@@ -45,12 +45,6 @@ public class ByteUtil {
     private ByteUtil() {
     }
 
-    public static byte[] copyOf(byte[] src) {
-        byte[] dest = new byte[src.length];
-        System.arraycopy(src, 0, dest, 0, src.length);
-        return dest;
-    }
-
     public static byte[] asByteArray(InputStream in) throws IOException {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream(in.available());

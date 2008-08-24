@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.db;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.Map;
 import java.util.Set;
@@ -46,58 +47,55 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class InMemoryDatabase {
 
-    private final ConcurrentMap<Blob, EntryRevisions> committed = new ConcurrentHashMap<Blob, EntryRevisions>();
+    private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
-    private volatile long currentRevision = 1;
-    private volatile long oldestUncommittedRevision = 1;
+    private volatile long committedRevision = revisions.getCurrentRevision();
 
     public DatabaseConnection openConnection(Transaction tx) {
         if (openConnections.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
-        DatabaseConnection con = new TransactionalDatabaseConnection(tx, currentRevision);
-        openConnections.put(tx, currentRevision);
+        DatabaseConnection con = new TransactionalDatabaseConnection(tx, committedRevision);
+        openConnections.put(tx, committedRevision);
         return con;
     }
 
     private void closeConnection(Transaction tx) {
         openConnections.remove(tx);
-        updateOldestUncommittedRevision();
+        revisions.purgeRevisionsOlderThan(getOldestUncommittedRevision());
     }
 
-    private void updateOldestUncommittedRevision() {
-        long oldest = currentRevision;
-        for (long rev : openConnections.values()) {
-            oldest = Math.min(oldest, rev);
-        }
-        oldestUncommittedRevision = oldest;
-    }
-
-    protected int openConnections() {
-        return openConnections.size();
-    }
-
-    protected long currentRevision() {
-        return currentRevision;
-    }
-
-    protected long oldestUncommittedRevision() {
-        return oldestUncommittedRevision;
-    }
-
-    protected long oldestStoredRevision() {
-        long oldest = currentRevision;
-        for (EntryRevisions revs : committed.values()) {
-            oldest = Math.min(oldest, revs.oldestRevision());
+    protected long getOldestUncommittedRevision() {
+        long oldest = committedRevision;
+        for (long revision : openConnections.values()) {
+            oldest = Math.min(oldest, revision);
         }
         return oldest;
     }
 
+    @TestOnly
+    protected int getOpenConnections() {
+        return openConnections.size();
+    }
+
+    @TestOnly
+    protected long getCurrentRevision() {
+        return committedRevision;
+    }
+
+    @TestOnly
+    protected long getOldestStoredRevision() {
+        return revisions.getOldestRevision();
+    }
+
     private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, long revision) throws Exception {
         synchronized (lockedForCommit) {
-            for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
-                getCommitted(entry.getKey()).checkNotModifiedAfter(revision);
+            for (Map.Entry<Blob, Blob> e : modified.entrySet()) {
+                long lastWrite = revisions.getLatestRevisionForKey(e.getKey());
+                if (lastWrite > revision) {
+                    throw new OptimisticLockException("Key " + e.getKey() + " already modified in revision " + lastWrite);
+                }
             }
             lockKeysForCommit(tx, modified.keySet());
         }
@@ -105,17 +103,13 @@ public class InMemoryDatabase {
 
     private void commitTransaction(Transaction tx, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
-            if (currentRevision == Long.MAX_VALUE) {
-                // TODO: any good ideas on how to allow the revisions to loop freely?
-                throw new Error("Numeric overflow: tried to increment past Long.MAX_VALUE");
-            }
-            long nextRevision = currentRevision + 1;
             try {
-                for (Map.Entry<Blob, Blob> entry : modified.entrySet()) {
-                    getCommitted(entry.getKey()).write(entry.getValue(), nextRevision);
+                revisions.incrementRevision();
+                for (Map.Entry<Blob, Blob> e : modified.entrySet()) {
+                    revisions.put(e.getKey(), e.getValue());
                 }
             } finally {
-                currentRevision = nextRevision;
+                committedRevision = revisions.getCurrentRevision();
                 unlockKeysForCommit(tx, modified.keySet());
             }
         }
@@ -141,17 +135,6 @@ public class InMemoryDatabase {
                 assert wasLockedByMe : "key = " + key;
             }
         }
-    }
-
-    private EntryRevisions getCommitted(Blob key) {
-        EntryRevisions revs = committed.get(key);
-        if (revs == null) {
-            committed.putIfAbsent(key, new EntryRevisions());
-            revs = committed.get(key);
-        } else {
-            revs.purgeRevisionsOlderThan(oldestUncommittedRevision);
-        }
-        return revs;
     }
 
 
@@ -195,7 +178,7 @@ public class InMemoryDatabase {
             tx.mustBeActive();
             Blob blob = updates.get(key);
             if (blob == null) {
-                blob = getCommitted(key).read(visibleRevision);
+                blob = revisions.get(key, visibleRevision);
             }
             if (blob == null) {
                 blob = EMPTY_BLOB;

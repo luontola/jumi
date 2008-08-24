@@ -51,6 +51,11 @@ public class RevisionMap<K, V> {
         return revs != null ? revs.get(revision) : null;
     }
 
+    public long getLatestRevisionForKey(K key) {
+        RevisionList<V> revs = map.get(key);
+        return revs != null ? revs.latestRevision() : currentRevision;
+    }
+
     public void put(K key, V value) {
         synchronized (writeLock) {
             RevisionList<V> previous = map.get(key);
@@ -102,6 +107,10 @@ public class RevisionMap<K, V> {
     }
 
     public void incrementRevision() {
+        if (currentRevision == Long.MAX_VALUE) {
+            // TODO: any good ideas on how to allow the revisions to loop freely?
+            throw new Error("Numeric overflow: tried to increment past Long.MAX_VALUE");
+        }
         synchronized (writeLock) {
             currentRevision++;
         }

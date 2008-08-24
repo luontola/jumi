@@ -32,7 +32,6 @@
 package net.orfjackal.dimdwarf.db;
 
 import static net.orfjackal.dimdwarf.util.ByteUtil.asByteArray;
-import static net.orfjackal.dimdwarf.util.ByteUtil.copyOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -44,9 +43,10 @@ import java.util.Arrays;
  * @author Esko Luontola
  * @since 18.8.2008
  */
-public final class Blob {
+public final class Blob implements Comparable<Blob> {
 
     public static final Blob EMPTY_BLOB = new Blob(new byte[0]);
+    private static final int TO_STRING_SAFETY_LIMIT = 100;
 
     private final byte[] bytes;
     private volatile Integer hashCode;
@@ -57,7 +57,7 @@ public final class Blob {
     }
 
     public static Blob fromBytes(byte[] bytes) {
-        return new Blob(copyOf(bytes));
+        return new Blob(Arrays.copyOf(bytes, bytes.length));
     }
 
     public static Blob fromInputStream(InputStream in) throws IOException {
@@ -81,7 +81,7 @@ public final class Blob {
     }
 
     public byte[] getByteArray() {
-        return copyOf(bytes);
+        return Arrays.copyOf(bytes, bytes.length);
     }
 
     public boolean equals(Object obj) {
@@ -104,7 +104,21 @@ public final class Blob {
         return hashCode;
     }
 
+    public int compareTo(Blob other) {
+        if (this == other) {
+            return 0;
+        }
+        for (int i = 0; i < bytes.length && i < other.bytes.length; i++) {
+            int cmp = bytes[i] - other.bytes[i];
+            if (cmp != 0) {
+                return cmp;
+            }
+        }
+        return bytes.length - other.bytes.length;
+    }
+
     public String toString() {
-        return "Blob[length=" + length() + ",bytes=" + Arrays.toString(bytes) + "]";
+        byte[] truncatedBytes = Arrays.copyOf(bytes, Math.min(bytes.length, TO_STRING_SAFETY_LIMIT));
+        return "Blob[length=" + length() + ",bytes=" + Arrays.toString(truncatedBytes) + "]";
     }
 }

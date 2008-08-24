@@ -67,7 +67,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
         value2 = Blob.fromBytes(new byte[]{2});
-        specify(db.openConnections(), should.equal(0));
+        specify(db.getOpenConnections(), should.equal(0));
     }
 
     private Blob readInNewTransaction(Blob key) {
@@ -99,63 +99,43 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void databaseKeepsTrackOfTheNumberOfOpenConnections() {
-            specify(db.openConnections(), should.equal(2));
+            specify(db.getOpenConnections(), should.equal(2));
             tx1.prepare();
             tx1.commit();
-            specify(db.openConnections(), should.equal(1));
+            specify(db.getOpenConnections(), should.equal(1));
             tx2.prepare();
             tx2.commit();
-            specify(db.openConnections(), should.equal(0));
+            specify(db.getOpenConnections(), should.equal(0));
         }
 
         public void databaseKeepsTrackOfTheCurrentRevision() {
-            specify(db.currentRevision(), should.equal(1));
+            specify(db.getCurrentRevision(), should.equal(0));
             tx1.prepare();
             tx1.commit();
-            specify(db.currentRevision(), should.equal(2));
+            specify(db.getCurrentRevision(), should.equal(1));
             tx2.prepare();
             tx2.commit();
-            specify(db.currentRevision(), should.equal(3));
+            specify(db.getCurrentRevision(), should.equal(2));
         }
 
         public void databaseKeepsTrackOfTheOldestUncommittedRevision() {
-            specify(db.oldestUncommittedRevision(), should.equal(1));
+            specify(db.getOldestUncommittedRevision(), should.equal(0));
             tx1.prepare();
             tx1.commit();
-            specify(db.oldestUncommittedRevision(), should.equal(1));
+            specify(db.getOldestUncommittedRevision(), should.equal(0));
             tx2.prepare();
             tx2.commit();
-            specify(db.oldestUncommittedRevision(), should.equal(3));
+            specify(db.getOldestUncommittedRevision(), should.equal(2));
         }
 
-        public void databaseCleansUpRevisionsWhichAreNotAnymoreNeeded() {
-            tx1.rollback();
-            tx2.rollback();
-            updateInNewTransaction(key, value1); // only entry in database - oldestStoredRevision will reflect changes
-
-            TransactionCoordinator tx3 = new TransactionImpl();
-            db.openConnection(tx3.getTransaction()); // reads rev 2
-            updateInNewTransaction(key, value1);
-
-            specify(db.currentRevision(), should.equal(3));
-            specify(db.oldestUncommittedRevision(), should.equal(2));   // tx3 is still open
-            specify(db.oldestStoredRevision(), should.equal(2));        // tx3 could still read rev 2
-
-            tx3.rollback();
-
-            specify(db.currentRevision(), should.equal(3));
-            specify(db.oldestUncommittedRevision(), should.equal(3));   // no transactions are open
-            specify(db.oldestStoredRevision(), should.equal(2));        // cleanup of rev 2 left for next use
-
-            TransactionCoordinator tx4 = new TransactionImpl();
-            DatabaseConnection db4 = db.openConnection(tx4.getTransaction()); // reads rev 3
-            db4.read(key); // should remove rev 2 because the entry's newest rev is 3, and no rev 2 connections are open
-
-            specify(db.currentRevision(), should.equal(3));
-            specify(db.oldestUncommittedRevision(), should.equal(3));
-            specify(db.oldestStoredRevision(), should.equal(3));        // old revision cleaned up
-
-            // TODO: removing whole entries when deleting
+        public void databasePurgesOldRevisionsRegularly() {
+            specify(db.getOldestStoredRevision(), should.equal(0));
+            tx1.prepare();
+            tx1.commit();
+            specify(db.getOldestStoredRevision(), should.equal(0));
+            tx2.prepare();
+            tx2.commit();
+            specify(db.getOldestStoredRevision(), should.equal(2));
         }
     }
 
@@ -165,7 +145,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.update(key, value1);
-            specify(db.openConnections(), should.equal(2));
+            specify(db.getOpenConnections(), should.equal(2));
             return null;
         }
 
@@ -206,7 +186,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.update(key, value2);
-            specify(db.openConnections(), should.equal(2));
+            specify(db.getOpenConnections(), should.equal(2));
             return null;
         }
 
@@ -247,7 +227,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             db1 = db.openConnection(tx1.getTransaction());
             db2 = db.openConnection(tx2.getTransaction());
             db1.delete(key);
-            specify(db.openConnections(), should.equal(2));
+            specify(db.getOpenConnections(), should.equal(2));
             return null;
         }
 

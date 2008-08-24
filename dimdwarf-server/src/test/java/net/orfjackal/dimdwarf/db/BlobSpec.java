@@ -221,4 +221,38 @@ public class BlobSpec extends Specification<Blob> {
             specify(a.hashCode(), should.not().equal(b.hashCode()));
         }
     }
+
+    public class BlobComparability {
+
+        private Blob blob1a;
+        private Blob blob1b;
+        private Blob blob2;
+        private Blob blob23;
+
+        public Object create() {
+            blob1a = Blob.fromBytes(new byte[]{1});
+            blob1b = Blob.fromBytes(new byte[]{1});
+            blob2 = Blob.fromBytes(new byte[]{2});
+            blob23 = Blob.fromBytes(new byte[]{2, 3});
+            return null;
+        }
+
+        public void equalsItself() {
+            specify(blob1a.compareTo(blob1a) == 0);
+        }
+
+        public void equalsAnotherWithSameContent() {
+            specify(blob1a.compareTo(blob1b) == 0);
+        }
+
+        public void theOneWithSmallerCommonHeadWillBeFirst() {
+            specify(blob1a.compareTo(blob2) < 0);
+            specify(blob2.compareTo(blob1a) > 0);
+        }
+
+        public void whenCommonHeadsAreEqualTheShorterOneIsFirst() {
+            specify(blob2.compareTo(blob23) < 0);
+            specify(blob23.compareTo(blob2) > 0);
+        }
+    }
 }

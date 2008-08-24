@@ -75,7 +75,7 @@ public class DatabaseAccessSpec extends Specification<Object> {
 
         public void theConnectionIsOpen() {
             specify(db, should.not().equal(null));
-            specify(dbService.openConnections(), should.equal(1));
+            specify(dbService.getOpenConnections(), should.equal(1));
         }
 
         public void onlyOneConnectionExistsPerTransaction() {
@@ -84,7 +84,7 @@ public class DatabaseAccessSpec extends Specification<Object> {
                     dbService.openConnection(tx.getTransaction());
                 }
             }, should.raise(IllegalArgumentException.class));
-            specify(dbService.openConnections(), should.equal(1));
+            specify(dbService.getOpenConnections(), should.equal(1));
         }
 
         public void connectionCanNotBeUsedAfterPrepare() {
