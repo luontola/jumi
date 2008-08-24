@@ -29,7 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
+package net.orfjackal.dimdwarf.entities;
+
+import net.orfjackal.dimdwarf.db.PersistenceException;
 
 /**
  * Thrown when trying to follow a reference to an entity which does not exist.
