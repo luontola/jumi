@@ -62,7 +62,6 @@
             <groupId>com.intellij</groupId>
             <artifactId>annotations</artifactId>
             <version>7.0.3</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- Logging -->
