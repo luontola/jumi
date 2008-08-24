@@ -47,7 +47,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class DatabaseAccessSpec extends Specification<Object> {
+public class SerializableDatabaseAccessSpec extends Specification<Object> {
 
     private InMemoryDatabase dbService;
     private DatabaseConnection db;
