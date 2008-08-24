@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.db;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @author Esko Luontola
@@ -39,7 +40,7 @@ import java.util.*;
  */
 public class RevisionMap<K, V> {
 
-    private final SortedMap<K, RevisionList<V>> map = Collections.synchronizedSortedMap(new TreeMap<K, RevisionList<V>>());
+    private final SortedMap<K, RevisionList<V>> map = new ConcurrentSkipListMap<K, RevisionList<V>>();
     private final Set<K> hasOldRevisions = new HashSet<K>();
     private final Object writeLock = new Object();
     private volatile long currentRevision = 0;
@@ -111,17 +112,13 @@ public class RevisionMap<K, V> {
     }
 
     private static class MyIterator<K, V> implements Iterator<Map.Entry<K, V>> {
-        private final SortedMap<K, RevisionList<V>> map;
         private final long revision;
-        private K nextKey;
+        private final Iterator<Map.Entry<K, RevisionList<V>>> it;
         private Map.Entry<K, V> fetchedNext;
 
         public MyIterator(SortedMap<K, RevisionList<V>> map, long revision) {
-            this.map = map;
             this.revision = revision;
-            if (!map.isEmpty()) {
-                nextKey = map.firstKey();
-            }
+            it = map.entrySet().iterator();
         }
 
         public boolean hasNext() {
@@ -139,30 +136,22 @@ public class RevisionMap<K, V> {
         }
 
         private void fetchNext() {
-            while (fetchedNext == null && nextKey != null) {
-                V value = map.get(nextKey).get(revision);
+            while (fetchedNext == null && it.hasNext()) {
+                Map.Entry<K, RevisionList<V>> e = it.next();
+                V value = e.getValue().get(revision);
                 if (value != null) {
-                    fetchedNext = new MyEntry<K, V>(nextKey, value);
+                    fetchedNext = new MyEntry<K, V>(e.getKey(), value);
                 }
-                nextKey = nextKeyAfter(nextKey);
             }
-        }
-
-        private K nextKeyAfter(K key) {
-            Iterator<K> it = map.tailMap(key).keySet().iterator();
-            it.next(); // skip key given as parameter
-            return it.hasNext() ? it.next() : null;
         }
 
         private Map.Entry<K, V> returnNext() {
-            if (fetchedNext == null) {
+            Map.Entry<K, V> next = fetchedNext;
+            if (next == null) {
                 throw new NoSuchElementException();
             }
-            try {
-                return fetchedNext;
-            } finally {
-                fetchedNext = null;
-            }
+            fetchedNext = null;
+            return next;
         }
     }
 
