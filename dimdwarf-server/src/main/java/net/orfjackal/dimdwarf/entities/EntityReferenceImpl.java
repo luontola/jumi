@@ -31,59 +31,25 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
-import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.Entity;
-import org.junit.runner.RunWith;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 25.8.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class EntityRegistrationSpec extends Specification<Object> {
+public class EntityReferenceImpl<T> implements EntityReference<T> {
 
-    private EntityManager manager;
-    private Entity entity;
-
-    public void create() throws Exception {
-        manager = new EntityManager(null);
-        entity = new DummyEntity();
+    public T get() {
+        return null;
     }
 
-
-    public class WhenThereAreNoEntities {
-
-        public Object create() {
-            return null;
-        }
-
-        public void theManagerIsEmpty() {
-            specify(manager.getRegisteredEntities(), should.equal(0));
-        }
+    public Class<T> getType() {
+        return null;
     }
 
-    public class WhenAnEntityIsRegistered {
-
-        public Object create() {
-            manager.registerEntity(entity);
-            return null;
-        }
-
-        public void theManagerIsNotEmpty() {
-            specify(manager.getRegisteredEntities(), should.equal(1));
-        }
-
-        public void manyEntitiesMayBeRegistered() {
-            manager.registerEntity(new DummyEntity());
-            specify(manager.getRegisteredEntities(), should.equal(2));
-        }
-
-        public void registeringTheSameEntityManyTimesIsIgnored() {
-            manager.registerEntity(entity);
-            specify(manager.getRegisteredEntities(), should.equal(1));
-        }
+    public BigInteger getId() {
+        return null;
     }
 }

@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -42,15 +43,20 @@ import java.util.Map;
  */
 public class EntityManager {
 
-    private final Map<Entity, Object> entities = new IdentityHashMap<Entity, Object>();
+    private final Map<Entity, EntityReferenceImpl<?>> entities = new IdentityHashMap<Entity, EntityReferenceImpl<?>>();
     private final EntitySaver saver;
 
     public EntityManager(EntitySaver saver) {
         this.saver = saver;
     }
 
-    public void registerEntity(Entity entity) {
-        entities.put(entity, entity);
+    public <T> EntityReference<T> createReference(T entity) {
+        EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
+        if (ref == null) {
+            ref = new EntityReferenceImpl<T>();
+            entities.put((Entity) entity, ref);
+        }
+        return ref;
     }
 
     public int getRegisteredEntities() {
