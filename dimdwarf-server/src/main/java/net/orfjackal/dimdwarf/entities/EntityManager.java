@@ -31,18 +31,29 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
-import jdave.junit4.JDaveRunner;
-import org.junit.runner.RunWith;
+import net.orfjackal.dimdwarf.api.Entity;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * @author Esko Luontola
  * @since 25.8.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class EntitySpec extends Specification<Object> {
+public class EntityManager {
 
-    // TODO
+    private final Map<Entity, Object> entities = new IdentityHashMap<Entity, Object>();
+    private final EntitySaver saver;
+
+    public EntityManager(EntitySaver saver) {
+        this.saver = saver;
+    }
+
+    public void registerEntity(Entity entity) {
+        entities.put(entity, entity);
+    }
+
+    public int getRegisteredEntities() {
+        return entities.size();
+    }
 }
