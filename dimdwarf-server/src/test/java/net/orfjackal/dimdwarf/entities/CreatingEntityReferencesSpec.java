@@ -44,7 +44,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class EntityReferenceCreationSpec extends Specification<Object> {
+public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     private EntityManager manager;
     private Entity entity;
