@@ -65,7 +65,6 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
         this.entityLoader = loader;
     }
 
-    @SuppressWarnings({"unchecked"})
     public T get() {
         if (entity == null) {
             entity = entityLoader.loadEntity(this);
