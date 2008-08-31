@@ -59,17 +59,17 @@ public class FlushingEntitiesSpec extends Specification<Object> {
         manager = new EntityManager(new DummyEntityIdFactory(), storage);
         entity = new DummyEntity();
         newEntity = new DummyEntity();
+        manager.createReference(entity);
     }
 
 
-    public class WhenARegisteredEntityIsFlushed {
+    public class WhenRegisteredEntitiesAreFlushed {
 
         public Object create() {
-            manager.createReference(entity);
             return null;
         }
 
-        public void itIsStoredInDatabase() {
+        public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
             }});
@@ -77,17 +77,30 @@ public class FlushingEntitiesSpec extends Specification<Object> {
         }
     }
 
-    public class WhenNewEntitiesAreDiscoveredDuringFlush {
+    public class WhenNewEntitiesAreRegisteredDuringFlush {
 
         public Object create() {
-            manager.createReference(entity);
             return null;
         }
 
-        public void theyWillAlsoBeStoredInDatabased() {
+        public void theyAreAlsoStoredInDatabase() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
                 one(storage).update(BigInteger.valueOf(2), newEntity);
+            }});
+            manager.flushAllEntities();
+        }
+    }
+
+    public class WhenAlreadyRegisteredEntitiesAreRegisteredDuringFlush {
+
+        public Object create() {
+            return null;
+        }
+
+        public void theyWillBeFlushedOnlyOnce() {
+            checking(new Expectations() {{
+                one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(entity));
             }});
             manager.flushAllEntities();
         }

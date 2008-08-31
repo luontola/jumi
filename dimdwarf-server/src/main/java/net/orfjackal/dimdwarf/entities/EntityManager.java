@@ -45,10 +45,10 @@ public class EntityManager implements EntityLoader {
 
     private final Map<Entity, EntityReference<?>> entities = new IdentityHashMap<Entity, EntityReference<?>>();
     private final Map<EntityReference<?>, Entity> cache = new HashMap<EntityReference<?>, Entity>();
+    private final Queue<Entity> flushQueue = new ArrayDeque<Entity>();
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
     private State state = State.ACTIVE;
-    private final Queue<Entity> flushQueue = new LinkedList<Entity>();
 
     public EntityManager(EntityIdFactory idFactory, EntityStorage storage) {
         this.idFactory = idFactory;
@@ -60,11 +60,11 @@ public class EntityManager implements EntityLoader {
     }
 
     public <T> EntityReference<T> createReference(T entity) {
-        if (state == State.FLUSHING) {
-            flushQueue.add((Entity) entity);
-        }
         EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
         if (ref == null) {
+            if (state == State.FLUSHING) {
+                flushQueue.add((Entity) entity);
+            }
             ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
             EntityReference<?> prev = entities.put((Entity) entity, ref);
             assert prev == null;
@@ -90,7 +90,6 @@ public class EntityManager implements EntityLoader {
     public void flushAllEntities() {
         state = State.FLUSHING;
         flushQueue.addAll(entities.keySet());
-
         Entity entity;
         while ((entity = flushQueue.poll()) != null) {
             BigInteger id = entities.get(entity).getId();
