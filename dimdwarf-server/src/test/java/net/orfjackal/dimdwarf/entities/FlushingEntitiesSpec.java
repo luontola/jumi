@@ -89,7 +89,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
         }
 
-        public void managerCanNotBeUsedAfterFlushHasEnded() {
+        public void theEntityManagerCanNotBeUsedAfterFlushHasEnded() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
             }});
@@ -113,7 +113,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             return null;
         }
 
-        public void theyAreAlsoStoredInDatabase() {
+        public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
                 one(storage).update(BigInteger.valueOf(2), newEntity);
@@ -128,7 +128,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             return null;
         }
 
-        public void theyWillBeFlushedOnlyOnce() {
+        public void theyAreStoredInDatabaseOnlyOnce() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(entity));
             }});
