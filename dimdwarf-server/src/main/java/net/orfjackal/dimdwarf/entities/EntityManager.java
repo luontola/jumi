@@ -89,27 +89,39 @@ public class EntityManager implements EntityLoader {
     }
 
     public void flushAllEntities() {
+        beginFlush();
+        flush();
+        endFlush();
+    }
+
+    private void beginFlush() {
         checkStateIs(State.ACTIVE);
         state = State.FLUSHING;
-
+        assert flushQueue.isEmpty();
         flushQueue.addAll(entities.keySet());
+    }
+
+    private void flush() {
         Entity entity;
         while ((entity = flushQueue.poll()) != null) {
             BigInteger id = entities.get(entity).getId();
             storage.update(id, entity);
         }
-
-        checkStateIs(State.FLUSHING);
-        state = State.CLOSED;
     }
 
-    private void checkStateIs(State... allowed) {
-        for (State expected : allowed) {
+    private void endFlush() {
+        checkStateIs(State.FLUSHING);
+        state = State.CLOSED;
+        assert flushQueue.isEmpty();
+    }
+
+    private void checkStateIs(State... expectedStates) {
+        for (State expected : expectedStates) {
             if (state == expected) {
                 return;
             }
         }
-        throw new IllegalStateException("Expected state " + Arrays.toString(allowed) + " but was " + state);
+        throw new IllegalStateException("Expected state " + Arrays.toString(expectedStates) + " but was " + state);
     }
 
     private enum State {
