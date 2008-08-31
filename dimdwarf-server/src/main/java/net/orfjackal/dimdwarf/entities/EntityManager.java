@@ -59,6 +59,10 @@ public class EntityManager implements EntityLoader {
         if (ref == null) {
             ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
             entities.put((Entity) entity, ref);
+            // There should be no need to put the entity and reference to 'cache' here, because:
+            // - If the entity was loaded from database, it was already put there by 'loadEntity'.
+            // - If the object was just created, it will not be in the database during this task,
+            //   so 'loadEntity' will not be called for a reference pointing to it.
         }
         return ref;
     }
