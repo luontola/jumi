@@ -91,6 +91,27 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         tx.commit();
     }
 
+    private void tx1PreparesBeforeTx2() {
+        tx1.prepare();
+        specify(new Block() {
+            public void run() throws Throwable {
+                tx2.prepare();
+            }
+        }, should.raise(TransactionException.class));
+        tx1.commit();
+        tx2.rollback();
+    }
+
+    private void tx1PreparesAndCommitsBeforeTx2() {
+        tx1.prepare();
+        tx1.commit();
+        specify(new Block() {
+            public void run() throws Throwable {
+                tx2.prepare();
+            }
+        }, should.raise(TransactionException.class));
+        tx2.rollback();
+    }
 
     public class WhenMultipleDatabaseConnectionsAreOpen {
 
@@ -275,26 +296,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {
-            tx1.prepare();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    tx2.prepare();
-                }
-            }, should.raise(TransactionException.class));
-            tx1.commit();
-            tx2.rollback();
+            tx1PreparesBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
         }
 
         public void onlyTheFirstToPrepareAndCommitWillSucceed() {
-            tx1.prepare();
-            tx1.commit();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    tx2.prepare();
-                }
-            }, should.raise(TransactionException.class));
-            tx2.rollback();
+            tx1PreparesAndCommitsBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
         }
     }
@@ -311,26 +318,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {
-            tx1.prepare();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    tx2.prepare();
-                }
-            }, should.raise(TransactionException.class));
-            tx1.commit();
-            tx2.rollback();
+            tx1PreparesBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
         }
 
         public void onlyTheFirstToPrepareAndCommitWillSucceed() {
-            tx1.prepare();
-            tx1.commit();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    tx2.prepare();
-                }
-            }, should.raise(TransactionException.class));
-            tx2.rollback();
+            tx1PreparesAndCommitsBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
         }
     }
@@ -347,26 +340,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {
-            tx1.prepare();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    tx2.prepare();
-                }
-            }, should.raise(TransactionException.class));
-            tx1.commit();
-            tx2.rollback();
+            tx1PreparesBeforeTx2();
             specify(readInNewTransaction(key), should.equal(Blob.EMPTY_BLOB));
         }
 
         public void onlyTheFirstToPrepareAndCommitWillSucceed() {
-            tx1.prepare();
-            tx1.commit();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    tx2.prepare();
-                }
-            }, should.raise(TransactionException.class));
-            tx2.rollback();
+            tx1PreparesAndCommitsBeforeTx2();
             specify(readInNewTransaction(key), should.equal(Blob.EMPTY_BLOB));
         }
     }
