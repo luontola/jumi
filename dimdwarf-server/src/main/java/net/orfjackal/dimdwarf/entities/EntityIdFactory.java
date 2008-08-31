@@ -39,5 +39,7 @@ import java.math.BigInteger;
  */
 public interface EntityIdFactory {
 
+    // TODO: implementation
+
     BigInteger newId();
 }

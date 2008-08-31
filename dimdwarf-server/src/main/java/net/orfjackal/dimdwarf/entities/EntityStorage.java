@@ -41,6 +41,8 @@ import java.math.BigInteger;
  */
 public interface EntityStorage {
 
+    // TODO: implementation
+
     Entity read(BigInteger id) throws EntityNotFoundException;
 
     void update(BigInteger id, Entity entity);
