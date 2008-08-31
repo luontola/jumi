@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
@@ -74,6 +75,35 @@ public class FlushingEntitiesSpec extends Specification<Object> {
                 one(storage).update(BigInteger.ONE, entity);
             }});
             manager.flushAllEntities();
+        }
+
+        public void flushingTwiseIsNotAllowed() {
+            checking(new Expectations() {{
+                one(storage).update(BigInteger.ONE, entity);
+            }});
+            manager.flushAllEntities();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.flushAllEntities();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+
+        public void managerCanNotBeUsedAfterFlushHasEnded() {
+            checking(new Expectations() {{
+                one(storage).update(BigInteger.ONE, entity);
+            }});
+            manager.flushAllEntities();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.createReference(entity);
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.loadEntity(new EntityReferenceImpl<Object>(BigInteger.ONE, null));
+                }
+            }, should.raise(IllegalStateException.class));
         }
     }
 

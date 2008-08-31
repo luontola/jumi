@@ -60,6 +60,9 @@ public class EntityManager implements EntityLoader {
     }
 
     public <T> EntityReference<T> createReference(T entity) {
+        if (state == State.CLOSED) {
+            throw new IllegalStateException("Already closed");
+        }
         EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
         if (ref == null) {
             if (state == State.FLUSHING) {
@@ -77,6 +80,10 @@ public class EntityManager implements EntityLoader {
     }
 
     public <T> T loadEntity(EntityReference<T> ref) {
+        if (state != State.ACTIVE) {
+            throw new IllegalStateException("Already closed");
+        }
+
         Entity entity = cache.get(ref);
         if (entity == null) {
             entity = storage.read(ref.getId());
@@ -88,13 +95,19 @@ public class EntityManager implements EntityLoader {
     }
 
     public void flushAllEntities() {
+        if (state != State.ACTIVE) {
+            throw new IllegalStateException("Already flushed");
+        }
         state = State.FLUSHING;
+
         flushQueue.addAll(entities.keySet());
         Entity entity;
         while ((entity = flushQueue.poll()) != null) {
             BigInteger id = entities.get(entity).getId();
             storage.update(id, entity);
         }
+
+        state = State.CLOSED;
     }
 
     private enum State {
