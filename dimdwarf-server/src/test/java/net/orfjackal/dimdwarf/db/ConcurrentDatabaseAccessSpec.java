@@ -58,6 +58,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private Blob key;
     private Blob value1;
     private Blob value2;
+    private Blob value3;
 
     public void create() throws Exception {
         db = new InMemoryDatabase();
@@ -67,6 +68,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
         value2 = Blob.fromBytes(new byte[]{2});
+        value3 = Blob.fromBytes(new byte[]{3});
         specify(db.getOpenConnections(), should.equal(0));
     }
 
@@ -272,7 +274,19 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             return null;
         }
 
-        public void onlyTheFirstToCommitWillSucceed() {
+        public void onlyTheFirstToPrepareWillSucceed() {
+            tx1.prepare();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx2.prepare();
+                }
+            }, should.raise(TransactionException.class));
+            tx1.commit();
+            tx2.rollback();
+            specify(readInNewTransaction(key), should.equal(value1));
+        }
+
+        public void onlyTheFirstToPrepareAndCommitWillSucceed() {
             tx1.prepare();
             tx1.commit();
             specify(new Block() {
@@ -282,6 +296,18 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             }, should.raise(TransactionException.class));
             tx2.rollback();
             specify(readInNewTransaction(key), should.equal(value1));
+        }
+    }
+
+    public class IfTwoTransactionsUpdateAnEntryWithTheSameKey {
+
+        public Object create() {
+            updateInNewTransaction(key, value3);
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
+            db1.update(key, value1);
+            db2.update(key, value2);
+            return null;
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {
@@ -295,10 +321,56 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             tx2.rollback();
             specify(readInNewTransaction(key), should.equal(value1));
         }
+
+        public void onlyTheFirstToPrepareAndCommitWillSucceed() {
+            tx1.prepare();
+            tx1.commit();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx2.prepare();
+                }
+            }, should.raise(TransactionException.class));
+            tx2.rollback();
+            specify(readInNewTransaction(key), should.equal(value1));
+        }
     }
 
-    // TODO: conflict in update
-    // TODO: conflict in delete
+    public class IfTwoTransactionsDeleteAnEntryWithTheSameKey {
+
+        public Object create() {
+            updateInNewTransaction(key, value3);
+            db1 = db.openConnection(tx1.getTransaction());
+            db2 = db.openConnection(tx2.getTransaction());
+            db1.delete(key);
+            db2.delete(key);
+            return null;
+        }
+
+        public void onlyTheFirstToPrepareWillSucceed() {
+            tx1.prepare();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx2.prepare();
+                }
+            }, should.raise(TransactionException.class));
+            tx1.commit();
+            tx2.rollback();
+            specify(readInNewTransaction(key), should.equal(Blob.EMPTY_BLOB));
+        }
+
+        public void onlyTheFirstToPrepareAndCommitWillSucceed() {
+            tx1.prepare();
+            tx1.commit();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tx2.prepare();
+                }
+            }, should.raise(TransactionException.class));
+            tx2.rollback();
+            specify(readInNewTransaction(key), should.equal(Blob.EMPTY_BLOB));
+        }
+    }
+
     // TODO: allow only one transaction to prepare at a time (?), no conflicts are allowed on commit
     // TODO: multiple tables per database
     // TODO: iterator (for tables and entries), used for writing all entries to disk
