@@ -13,7 +13,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="com.intellij:annotations:7.0.3">
         <CLASSES>
           <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3.jar!/" />
