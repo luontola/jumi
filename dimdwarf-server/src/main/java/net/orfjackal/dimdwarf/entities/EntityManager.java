@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.entities;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -43,7 +44,8 @@ import java.util.Map;
  */
 public class EntityManager implements EntityLoader {
 
-    private final Map<Entity, EntityReferenceImpl<?>> entities = new IdentityHashMap<Entity, EntityReferenceImpl<?>>();
+    private final Map<Entity, EntityReference<?>> entities = new IdentityHashMap<Entity, EntityReference<?>>();
+    private final Map<EntityReference<?>, Entity> cache = new HashMap<EntityReference<?>, Entity>();
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
 
@@ -66,8 +68,12 @@ public class EntityManager implements EntityLoader {
     }
 
     public <T> T loadEntity(EntityReference<T> ref) {
-        Entity entity = storage.read(ref.getId());
-        entities.put(entity, (EntityReferenceImpl<?>) ref);
+        Entity entity = cache.get(ref);
+        if (entity == null) {
+            entity = storage.read(ref.getId());
+            cache.put(ref, entity);
+            entities.put(entity, (EntityReferenceImpl<?>) ref);
+        }
         return (T) entity;
     }
 }

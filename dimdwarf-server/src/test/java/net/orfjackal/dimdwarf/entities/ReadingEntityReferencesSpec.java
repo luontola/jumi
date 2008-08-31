@@ -139,4 +139,25 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
             specify(manager.createReference(entity) == ref);
         }
     }
+
+    public class WhenManyReferencesToTheSameEntityAreDeserialized {
+        private EntityReferenceImpl<DummyEntity> ref1;
+        private EntityReferenceImpl<DummyEntity> ref2;
+
+        @SuppressWarnings({"unchecked"})
+        public Object create() throws IOException, ClassNotFoundException {
+            byte[] bytes = serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
+            ref1 = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
+            ref1.setEntityLoader(manager);
+            ref2 = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
+            ref2.setEntityLoader(manager);
+            return null;
+        }
+
+        public void theEntityIsLoadedFromDatabaseOnlyOnce() {
+            checking(loadsFromStorage(ENTITY_ID, entity));
+            specify(ref1.get(), should.equal(entity));
+            specify(ref2.get(), should.equal(entity));
+        }
+    }
 }
