@@ -58,7 +58,8 @@ public class EntityManager implements EntityLoader {
         EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
         if (ref == null) {
             ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
-            entities.put((Entity) entity, ref);
+            EntityReference<?> prev = entities.put((Entity) entity, ref);
+            assert prev == null;
             // There should be no need to put the entity and reference to 'cache' here, because:
             // - If the entity was loaded from database, it was already put there by 'loadEntity'.
             // - If the object was just created, it will not be in the database during this task,
@@ -76,7 +77,8 @@ public class EntityManager implements EntityLoader {
         if (entity == null) {
             entity = storage.read(ref.getId());
             cache.put(ref, entity);
-            entities.put(entity, (EntityReferenceImpl<?>) ref);
+            EntityReference<?> prev = entities.put(entity, (EntityReferenceImpl<?>) ref);
+            assert prev == null;
         }
         return (T) entity;
     }
