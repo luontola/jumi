@@ -48,18 +48,32 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
     private static final long serialVersionUID = 1L;
 
     private BigInteger id;
-    private T entity;
-    private EntityLoader entityLoader;
-
-    public EntityReferenceImpl() {
-        // default constructor is required by Externalizable
-    }
+    private transient T entity;
+    private transient EntityLoader entityLoader;
 
     public EntityReferenceImpl(BigInteger id, T entity) {
         this.id = id;
         this.entity = entity;
     }
 
+    public EntityReferenceImpl() {
+        // default constructor is required by Externalizable
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        byte[] bytes = id.toByteArray();
+        out.writeObject(bytes);
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        byte[] bytes = (byte[]) in.readObject();
+        id = new BigInteger(bytes);
+    }
+
+    /**
+     * Needs to be injected when the reference is deserialized. No need inject when
+     * the reference is created, because then the entity is already cached locally.
+     */
     @Inject
     public void setEntityLoader(EntityLoader loader) {
         this.entityLoader = loader;
@@ -90,15 +104,5 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
 
     public String toString() {
         return getClass().getSimpleName() + "[id=" + id + "]";
-    }
-
-    public void writeExternal(ObjectOutput out) throws IOException {
-        byte[] bytes = id.toByteArray();
-        out.writeObject(bytes);
-    }
-
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        byte[] bytes = (byte[]) in.readObject();
-        id = new BigInteger(bytes);
     }
 }
