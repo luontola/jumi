@@ -35,6 +35,8 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.jmock.Expectations;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.CustomAction;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
@@ -50,26 +52,59 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     private EntityStorage storage;
     private EntityManager manager;
     private DummyEntity entity;
+    private DummyEntity newEntity;
 
     public void create() throws Exception {
         storage = mock(EntityStorage.class);
         manager = new EntityManager(new DummyEntityIdFactory(), storage);
         entity = new DummyEntity();
+        newEntity = new DummyEntity();
     }
 
 
-    public class WhenThereIsARegisteredEntity {
+    public class WhenARegisteredEntityIsFlushed {
 
         public Object create() {
             manager.createReference(entity);
             return null;
         }
 
-        public void itIsStoredOnFlush() {
+        public void itIsStoredInDatabase() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
             }});
             manager.flushAllEntities();
+        }
+    }
+
+    public class WhenNewEntitiesAreDiscoveredDuringFlush {
+
+        public Object create() {
+            manager.createReference(entity);
+            return null;
+        }
+
+        public void theyWillAlsoBeStoredInDatabased() {
+            checking(new Expectations() {{
+                one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
+                one(storage).update(BigInteger.valueOf(2), newEntity);
+            }});
+            manager.flushAllEntities();
+        }
+    }
+
+
+    private class RegisterEntity extends CustomAction {
+        private final DummyEntity entity;
+
+        public RegisterEntity(DummyEntity entity) {
+            super("");
+            this.entity = entity;
+        }
+
+        public Object invoke(Invocation invocation) throws Throwable {
+            manager.createReference(entity);
+            return null;
         }
     }
 }

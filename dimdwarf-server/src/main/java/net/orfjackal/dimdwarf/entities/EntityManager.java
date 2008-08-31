@@ -34,9 +34,8 @@ package net.orfjackal.dimdwarf.entities;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -48,6 +47,8 @@ public class EntityManager implements EntityLoader {
     private final Map<EntityReference<?>, Entity> cache = new HashMap<EntityReference<?>, Entity>();
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
+    private State state = State.ACTIVE;
+    private final Queue<Entity> flushQueue = new LinkedList<Entity>();
 
     public EntityManager(EntityIdFactory idFactory, EntityStorage storage) {
         this.idFactory = idFactory;
@@ -59,6 +60,9 @@ public class EntityManager implements EntityLoader {
     }
 
     public <T> EntityReference<T> createReference(T entity) {
+        if (state == State.FLUSHING) {
+            flushQueue.add((Entity) entity);
+        }
         EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
         if (ref == null) {
             ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
@@ -84,10 +88,17 @@ public class EntityManager implements EntityLoader {
     }
 
     public void flushAllEntities() {
-        for (Map.Entry<Entity, EntityReference<?>> e : entities.entrySet()) {
-            Entity entity = e.getKey();
-            EntityReference<?> ref = e.getValue();
-            storage.update(ref.getId(), entity);
+        state = State.FLUSHING;
+        flushQueue.addAll(entities.keySet());
+
+        Entity entity;
+        while ((entity = flushQueue.poll()) != null) {
+            BigInteger id = entities.get(entity).getId();
+            storage.update(id, entity);
         }
+    }
+
+    private enum State {
+        ACTIVE, FLUSHING, CLOSED
     }
 }
