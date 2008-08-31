@@ -54,6 +54,10 @@ public class EntityManager implements EntityLoader {
         this.storage = storage;
     }
 
+    public int getRegisteredEntities() {
+        return entities.size();
+    }
+
     public <T> EntityReference<T> createReference(T entity) {
         EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
         if (ref == null) {
@@ -68,10 +72,6 @@ public class EntityManager implements EntityLoader {
         return ref;
     }
 
-    public int getRegisteredEntities() {
-        return entities.size();
-    }
-
     public <T> T loadEntity(EntityReference<T> ref) {
         Entity entity = cache.get(ref);
         if (entity == null) {
@@ -81,5 +81,13 @@ public class EntityManager implements EntityLoader {
             assert prev == null;
         }
         return (T) entity;
+    }
+
+    public void flushAllEntities() {
+        for (Map.Entry<Entity, EntityReference<?>> e : entities.entrySet()) {
+            Entity entity = e.getKey();
+            EntityReference<?> ref = e.getValue();
+            storage.update(ref.getId(), entity);
+        }
     }
 }

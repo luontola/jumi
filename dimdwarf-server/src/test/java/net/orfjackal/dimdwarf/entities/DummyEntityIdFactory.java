@@ -31,45 +31,21 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
-import jdave.junit4.JDaveRunner;
-import org.jmock.Expectations;
-import org.junit.runner.RunWith;
-
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 25.8.2008
+ * @since 31.8.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class FlushingEntitiesSpec extends Specification<Object> {
+public class DummyEntityIdFactory implements EntityIdFactory {
 
-    private EntityStorage storage;
-    private EntityManager manager;
-    private DummyEntity entity;
+    private BigInteger next = BigInteger.ONE;
 
-    public void create() throws Exception {
-        storage = mock(EntityStorage.class);
-        manager = new EntityManager(new DummyEntityIdFactory(), storage);
-        entity = new DummyEntity();
-    }
-
-
-    public class WhenThereIsARegisteredEntity {
-
-        public Object create() {
-            manager.createReference(entity);
-            return null;
-        }
-
-        public void itIsStoredOnFlush() {
-            checking(new Expectations() {{
-                one(storage).update(BigInteger.ONE, entity);
-            }});
-            manager.flushAllEntities();
+    public BigInteger newId() {
+        try {
+            return next;
+        } finally {
+            next = next.add(BigInteger.ONE);
         }
     }
 }
