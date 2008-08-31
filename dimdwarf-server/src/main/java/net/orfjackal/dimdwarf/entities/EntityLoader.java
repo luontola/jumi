@@ -31,39 +31,9 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 /**
  * @author Esko Luontola
- * @since 25.8.2008
+ * @since 31.8.2008
  */
-public class EntityManager {
-
-    private final Map<Entity, EntityReferenceImpl<?>> entities = new IdentityHashMap<Entity, EntityReferenceImpl<?>>();
-    private final EntityIdFactory idFactory;
-    private final EntitySaver saver;
-    private final EntityLoader loader;
-
-    public EntityManager(EntityIdFactory idFactory, EntitySaver saver, EntityLoader loader) {
-        this.idFactory = idFactory;
-        this.saver = saver;
-        this.loader = loader;
-    }
-
-    public <T> EntityReference<T> createReference(T entity) {
-        EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
-        if (ref == null) {
-            ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
-            entities.put((Entity) entity, ref);
-        }
-        return ref;
-    }
-
-    public int getRegisteredEntities() {
-        return entities.size();
-    }
+public interface EntityLoader {
 }

@@ -34,7 +34,11 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -44,5 +48,31 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class ReadingEntityReferencesSpec extends Specification<Object> {
 
-    // TODO
+    private EntityIdFactory idFactory;
+    private EntityLoader loader;
+    private EntityManager manager;
+    private DummyEntity entity;
+    private EntityReference<DummyEntity> ref;
+
+    public void create() throws Exception {
+        idFactory = mock(EntityIdFactory.class);
+        loader = mock(EntityLoader.class);
+        manager = new EntityManager(idFactory, null, loader);
+        entity = new DummyEntity();
+    }
+
+    public class WhenTheReferenceWasJustCreated {
+
+        public Object create() {
+            checking(new Expectations() {{
+                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(42)));
+            }});
+            ref = manager.createReference(entity);
+            return null;
+        }
+
+        public void theEntityCanBeAccessed() {
+            specify(ref.get(), should.equal(entity));
+        }
+    }
 }

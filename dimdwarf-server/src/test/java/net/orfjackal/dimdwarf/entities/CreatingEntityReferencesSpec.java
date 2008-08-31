@@ -36,7 +36,10 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -48,9 +51,11 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     private EntityManager manager;
     private Entity entity;
+    private EntityIdFactory idFactory;
 
     public void create() throws Exception {
-        manager = new EntityManager(null);
+        idFactory = mock(EntityIdFactory.class);
+        manager = new EntityManager(idFactory, null, null);
         entity = new DummyEntity();
     }
 
@@ -71,6 +76,9 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         private EntityReference<Entity> ref;
 
         public Object create() {
+            checking(new Expectations() {{
+                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(42)));
+            }});
             ref = manager.createReference(entity);
             return null;
         }
@@ -81,6 +89,10 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
         public void theEntityIsRegistered() {
             specify(manager.getRegisteredEntities(), should.equal(1));
+        }
+
+        public void theEntityGetsAnId() {
+            specify(ref.getId(), should.equal(BigInteger.valueOf(42)));
         }
 
         public void onMultipleCallsTheSameReferenceInstanceIsReturned() {
@@ -99,6 +111,10 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         private EntityReference<DummyEntity> ref2;
 
         public Object create() {
+            checking(new Expectations() {{
+                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(1)));
+                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(2)));
+            }});
             ref1 = manager.createReference(entity);
             ref2 = manager.createReference(new DummyEntity());
             return null;
@@ -108,8 +124,13 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
             specify(manager.getRegisteredEntities(), should.equal(2));
         }
 
-        public void eachEntityWillGetItsOwnReference() {
+        public void eachEntityGetsItsOwnReference() {
             specify(ref1, should.not().equal(ref2));
+        }
+
+        public void eachEntityGetsItsOwnId() {
+            specify(ref1.getId(), should.equal(BigInteger.valueOf(1)));
+            specify(ref2.getId(), should.equal(BigInteger.valueOf(2)));
         }
     }
 }

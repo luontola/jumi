@@ -43,7 +43,5 @@ public interface EntityReference<T> {
 
     T get();
 
-    Class<T> getType();
-
     BigInteger getId();
 }

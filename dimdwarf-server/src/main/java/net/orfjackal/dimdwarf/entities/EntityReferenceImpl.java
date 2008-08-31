@@ -33,23 +33,30 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 25.8.2008
  */
-public class EntityReferenceImpl<T> implements EntityReference<T> {
+public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    public T get() {
-        return null;
+    private final BigInteger id;
+    @SuppressWarnings({"TransientFieldNotInitialized"})
+    private transient T entity;
+
+    public EntityReferenceImpl(BigInteger id, T entity) {
+        this.id = id;
+        this.entity = entity;
     }
 
-    public Class<T> getType() {
-        return null;
+    public T get() {
+        return entity;
     }
 
     public BigInteger getId() {
-        return null;
+        return id;
     }
 }
