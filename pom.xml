@@ -8,7 +8,8 @@
     <packaging>pom</packaging>
 
     <name>Dimdwarf</name>
-    <description>A lightweight application container for Java with the same programming model as Project Darkstar
+    <description>
+        A lightweight application container for Java with the same programming model as Project Darkstar
     </description>
     <url>http://dimdwarf.sourceforge.net/</url>
     <inceptionYear>2008</inceptionYear>

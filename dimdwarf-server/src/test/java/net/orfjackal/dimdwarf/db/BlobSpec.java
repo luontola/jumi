@@ -1,7 +1,7 @@
 /*
- * Dimdwarf Application Server
- * Copyright (c) 2008, Esko Luontola
- * All Rights Reserved.
+ * This file is part of Dimdwarf Application Server <http://dimdwarf.sourceforge.net/>
+ *
+ * Copyright (c) 2008, Esko Luontola. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
