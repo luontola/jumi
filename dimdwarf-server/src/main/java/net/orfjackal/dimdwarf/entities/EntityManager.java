@@ -60,44 +60,36 @@ public class EntityManager implements EntityLoader {
     }
 
     public <T> EntityReference<T> createReference(T entity) {
-        if (state == State.CLOSED) {
-            throw new IllegalStateException("Already closed");
-        }
-        EntityReferenceImpl<T> ref = (EntityReferenceImpl<T>) entities.get((Entity) entity);
+        checkStateIs(State.ACTIVE, State.FLUSHING);
+        EntityReference<T> ref = (EntityReference<T>) entities.get((Entity) entity);
         if (ref == null) {
-            if (state == State.FLUSHING) {
-                flushQueue.add((Entity) entity);
-            }
             ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
-            EntityReference<?> prev = entities.put((Entity) entity, ref);
-            assert prev == null;
-            // There should be no need to put the entity and reference to 'cache' here, because:
-            // - If the entity was loaded from database, it was already put there by 'loadEntity'.
-            // - If the object was just created, it will not be in the database during this task,
-            //   so 'loadEntity' will not be called for a reference pointing to it.
+            register((Entity) entity, ref);
         }
         return ref;
     }
 
     public <T> T loadEntity(EntityReference<T> ref) {
-        if (state != State.ACTIVE) {
-            throw new IllegalStateException("Already closed");
-        }
-
+        checkStateIs(State.ACTIVE);
         Entity entity = cache.get(ref);
         if (entity == null) {
             entity = storage.read(ref.getId());
-            cache.put(ref, entity);
-            EntityReference<?> prev = entities.put(entity, (EntityReferenceImpl<?>) ref);
-            assert prev == null;
+            register(entity, ref);
         }
         return (T) entity;
     }
 
-    public void flushAllEntities() {
-        if (state != State.ACTIVE) {
-            throw new IllegalStateException("Already flushed");
+    private void register(Entity entity, EntityReference<?> ref) {
+        if (state == State.FLUSHING) {
+            flushQueue.add(entity);
         }
+        cache.put(ref, entity);
+        EntityReference<?> previous = entities.put((Entity) entity, ref);
+        assert previous == null : "Registered an entity twise: " + entity + ", " + ref;
+    }
+
+    public void flushAllEntities() {
+        checkStateIs(State.ACTIVE);
         state = State.FLUSHING;
 
         flushQueue.addAll(entities.keySet());
@@ -107,7 +99,17 @@ public class EntityManager implements EntityLoader {
             storage.update(id, entity);
         }
 
+        checkStateIs(State.FLUSHING);
         state = State.CLOSED;
+    }
+
+    private void checkStateIs(State... allowed) {
+        for (State expected : allowed) {
+            if (state == expected) {
+                return;
+            }
+        }
+        throw new IllegalStateException("Expected state " + Arrays.toString(allowed) + " but was " + state);
     }
 
     private enum State {
