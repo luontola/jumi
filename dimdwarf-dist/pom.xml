@@ -8,10 +8,10 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dimdwarf-server-dist</artifactId>
+    <artifactId>dimdwarf-dist</artifactId>
     <packaging>pom</packaging>
 
-    <name>dimdwarf-server-dist</name>
+    <name>dimdwarf-dist</name>
 
     <dependencies>
 

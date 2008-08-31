@@ -274,8 +274,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/dimdwarf.iml" filepath="$PROJECT_DIR$/dimdwarf.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api/dimdwarf-api.iml" filepath="$PROJECT_DIR$/dimdwarf-api/dimdwarf-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dimdwarf-dist/dimdwarf-dist.iml" filepath="$PROJECT_DIR$/dimdwarf-dist/dimdwarf-dist.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-server/dimdwarf-server.iml" filepath="$PROJECT_DIR$/dimdwarf-server/dimdwarf-server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-server-dist/dimdwarf-server-dist.iml" filepath="$PROJECT_DIR$/dimdwarf-server-dist/dimdwarf-server-dist.iml" />
     </modules>
   </component>
   <component name="ProjectRootConfigurable.UI">

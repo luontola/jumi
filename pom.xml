@@ -50,8 +50,8 @@
 
     <modules>
         <module>dimdwarf-api</module>
+        <module>dimdwarf-dist</module>
         <module>dimdwarf-server</module>
-        <module>dimdwarf-server-dist</module>
     </modules>
 
     <dependencies>
