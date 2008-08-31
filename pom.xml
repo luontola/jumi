@@ -171,7 +171,6 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!--<version>2.4.3</version>-->
                 <configuration>
                     <includes>
                         <include>**/*Spec.java</include>
@@ -186,6 +185,7 @@
                             <value>target/jdave</value>
                         </property>
                     </systemProperties>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
 
