@@ -49,13 +49,15 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class CreatingEntityReferencesSpec extends Specification<Object> {
 
+    private EntityIdFactory idFactory;
+    private EntityStorage storage;
     private EntityManager manager;
     private Entity entity;
-    private EntityIdFactory idFactory;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
-        manager = new EntityManager(idFactory, null, null);
+        storage = mock(EntityStorage.class);
+        manager = new EntityManager(idFactory, storage);
         entity = new DummyEntity();
     }
 
@@ -97,6 +99,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
         public void onMultipleCallsTheSameReferenceInstanceIsReturned() {
             specify(manager.createReference(entity), should.equal(ref));
+            specify(manager.createReference(entity) == ref);
         }
 
         public void onMultipleCallsTheEntityIsRegisteredOnlyOnce() {

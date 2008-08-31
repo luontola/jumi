@@ -31,9 +31,19 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import net.orfjackal.dimdwarf.api.Entity;
+
+import java.math.BigInteger;
+
 /**
  * @author Esko Luontola
- * @since 25.8.2008
+ * @since 31.8.2008
  */
-public interface EntitySaver {
+public interface EntityStorage {
+
+    Entity read(BigInteger id) throws EntityNotFoundException;
+
+    void update(BigInteger id, Entity entity);
+
+    void delete(BigInteger id) throws EntityNotFoundException;
 }

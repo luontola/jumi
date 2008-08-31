@@ -52,15 +52,21 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private EntityIdFactory idFactory;
-    private EntityLoader loader;
+    private EntityStorage storage;
     private EntityManager manager;
     private DummyEntity entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
-        loader = mock(EntityLoader.class);
-        manager = new EntityManager(idFactory, null, loader);
+        storage = mock(EntityStorage.class);
+        manager = new EntityManager(idFactory, storage);
         entity = new DummyEntity();
+    }
+
+    private Expectations loadsFromStorage(final BigInteger id, final DummyEntity entity) {
+        return new Expectations() {{
+            one(storage).read(id); will(returnValue(entity));
+        }};
     }
 
     private static byte[] serialize(Object obj) throws IOException {
@@ -106,7 +112,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         public Object create() throws IOException, ClassNotFoundException {
             byte[] bytes = serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
             ref = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
-            ref.setEntityLoader(loader);
+            ref.setEntityLoader(manager);
             return null;
         }
 
@@ -115,10 +121,22 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theEntityIsLazyLoadedFromDatabase() {
-            checking(new Expectations() {{
-                one(loader).readEntity(ENTITY_ID); will(returnValue(entity));
-            }});
+            checking(loadsFromStorage(ENTITY_ID, entity));
             specify(ref.get(), should.equal(entity));
+        }
+
+        public void theEntityIsRegisteredOnLoad() {
+            specify(manager.getRegisteredEntities(), should.equal(0));
+            checking(loadsFromStorage(ENTITY_ID, entity));
+            ref.get();
+            specify(manager.getRegisteredEntities(), should.equal(1));
+        }
+
+        public void theReferenceInstanceIsCachedOnLoad() {
+            checking(loadsFromStorage(ENTITY_ID, entity));
+            ref.get();
+            specify(manager.createReference(entity), should.equal(ref));
+            specify(manager.createReference(entity) == ref);
         }
     }
 }

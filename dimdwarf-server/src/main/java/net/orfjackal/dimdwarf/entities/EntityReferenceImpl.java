@@ -68,13 +68,29 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
     @SuppressWarnings({"unchecked"})
     public T get() {
         if (entity == null) {
-            entity = (T) entityLoader.readEntity(id);
+            entity = entityLoader.loadEntity(this);
         }
         return entity;
     }
 
     public BigInteger getId() {
         return id;
+    }
+
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof EntityReferenceImpl) {
+            EntityReferenceImpl<?> other = (EntityReferenceImpl<?>) obj;
+            return id.equals(other.id);
+        }
+        return false;
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + "[id=" + id + "]";
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {

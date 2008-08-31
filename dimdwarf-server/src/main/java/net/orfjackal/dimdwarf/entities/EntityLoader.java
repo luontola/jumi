@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.Entity;
-
-import java.math.BigInteger;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 /**
  * @author Esko Luontola
@@ -41,5 +39,5 @@ import java.math.BigInteger;
  */
 public interface EntityLoader {
 
-    Entity readEntity(BigInteger id);
+    <T> T loadEntity(EntityReference<T> ref);
 }

@@ -41,17 +41,15 @@ import java.util.Map;
  * @author Esko Luontola
  * @since 25.8.2008
  */
-public class EntityManager {
+public class EntityManager implements EntityLoader {
 
     private final Map<Entity, EntityReferenceImpl<?>> entities = new IdentityHashMap<Entity, EntityReferenceImpl<?>>();
     private final EntityIdFactory idFactory;
-    private final EntitySaver saver;
-    private final EntityLoader loader;
+    private final EntityStorage storage;
 
-    public EntityManager(EntityIdFactory idFactory, EntitySaver saver, EntityLoader loader) {
+    public EntityManager(EntityIdFactory idFactory, EntityStorage storage) {
         this.idFactory = idFactory;
-        this.saver = saver;
-        this.loader = loader;
+        this.storage = storage;
     }
 
     public <T> EntityReference<T> createReference(T entity) {
@@ -65,5 +63,11 @@ public class EntityManager {
 
     public int getRegisteredEntities() {
         return entities.size();
+    }
+
+    public <T> T loadEntity(EntityReference<T> ref) {
+        Entity entity = storage.read(ref.getId());
+        entities.put(entity, (EntityReferenceImpl<?>) ref);
+        return (T) entity;
     }
 }
