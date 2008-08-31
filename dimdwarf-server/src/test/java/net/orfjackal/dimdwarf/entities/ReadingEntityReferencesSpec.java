@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
+import java.io.*;
 import java.math.BigInteger;
 
 /**
@@ -48,11 +49,12 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class ReadingEntityReferencesSpec extends Specification<Object> {
 
+    private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
+
     private EntityIdFactory idFactory;
     private EntityLoader loader;
     private EntityManager manager;
     private DummyEntity entity;
-    private EntityReference<DummyEntity> ref;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
@@ -61,17 +63,61 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         entity = new DummyEntity();
     }
 
+    private static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bytes);
+        out.writeObject(obj);
+        out.close();
+        return bytes.toByteArray();
+    }
+
+    private static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
+        Object obj = in.readObject();
+        in.close();
+        return obj;
+    }
+
+
     public class WhenTheReferenceWasJustCreated {
+        private EntityReference<DummyEntity> ref;
 
         public Object create() {
             checking(new Expectations() {{
-                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(42)));
+                one(idFactory).newId(); will(returnValue(ENTITY_ID));
             }});
             ref = manager.createReference(entity);
             return null;
         }
 
-        public void theEntityCanBeAccessed() {
+        public void theReferenceHasTheEntityId() {
+            specify(ref.getId(), should.equal(ENTITY_ID));
+        }
+
+        public void theEntityIsCachedLocally() {
+            specify(ref.get(), should.equal(entity));
+        }
+    }
+
+    public class WhenAReferenceIsDeserialized {
+        private EntityReferenceImpl<DummyEntity> ref;
+
+        @SuppressWarnings({"unchecked"})
+        public Object create() throws IOException, ClassNotFoundException {
+            byte[] bytes = serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
+            ref = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
+            ref.setEntityLoader(loader);
+            return null;
+        }
+
+        public void theReferenceHasTheEntityId() {
+            specify(ref.getId(), should.equal(ENTITY_ID));
+        }
+
+        public void theEntityIsLazyLoadedFromDatabase() {
+            checking(new Expectations() {{
+                one(loader).readEntity(ENTITY_ID); will(returnValue(entity));
+            }});
             specify(ref.get(), should.equal(entity));
         }
     }

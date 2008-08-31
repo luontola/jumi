@@ -31,32 +31,59 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 25.8.2008
  */
-public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable {
+public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private final BigInteger id;
-    @SuppressWarnings({"TransientFieldNotInitialized"})
-    private transient T entity;
+    private BigInteger id;
+    private T entity;
+    private EntityLoader entityLoader;
+
+    public EntityReferenceImpl() {
+        // default constructor is required by Externalizable
+    }
 
     public EntityReferenceImpl(BigInteger id, T entity) {
         this.id = id;
         this.entity = entity;
     }
 
+    @Inject
+    public void setEntityLoader(EntityLoader loader) {
+        this.entityLoader = loader;
+    }
+
+    @SuppressWarnings({"unchecked"})
     public T get() {
+        if (entity == null) {
+            entity = (T) entityLoader.readEntity(id);
+        }
         return entity;
     }
 
     public BigInteger getId() {
         return id;
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        byte[] bytes = id.toByteArray();
+        out.writeObject(bytes);
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        byte[] bytes = (byte[]) in.readObject();
+        id = new BigInteger(bytes);
     }
 }
