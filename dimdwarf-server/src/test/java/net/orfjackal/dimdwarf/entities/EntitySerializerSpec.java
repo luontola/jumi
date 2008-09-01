@@ -31,16 +31,44 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.Entity;
-
-import java.io.Serializable;
+import jdave.Group;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.db.Blob;
+import org.junit.runner.RunWith;
 
 /**
  * @author Esko Luontola
- * @since 25.8.2008
+ * @since 1.9.2008
  */
-public class DummyEntity implements Entity, Serializable {
-    private static final long serialVersionUID = 1L;
+@RunWith(JDaveRunner.class)
+@Group({"fast"})
+public class EntitySerializerSpec extends Specification<Object> {
 
-    public Object other;
+    private EntitySerializerImpl serializer;
+    private DummyEntity entity;
+
+    public void create() throws Exception {
+        serializer = new EntitySerializerImpl();
+        entity = new DummyEntity();
+    }
+
+    public class AnEntitySerializer {
+
+        public Object create() {
+            return null;
+        }
+
+        public void serializesAndDeserializesEntities() {
+            entity.other = "foo";
+
+            Blob serialized = serializer.serialize(entity);
+            specify(serialized, should.not().equal(null));
+            specify(serialized, should.not().equal(Blob.EMPTY_BLOB));
+
+            DummyEntity deserialized = (DummyEntity) serializer.deserialize(serialized);
+            specify(deserialized, should.not().equal(null));
+            specify(deserialized.other, should.equal("foo"));
+        }
+    }
 }

@@ -40,8 +40,6 @@ import net.orfjackal.dimdwarf.db.Blob;
  */
 public interface EntitySerializer {
 
-    // TODO: implementation
-
     Blob serialize(Entity entity);
 
     Entity deserialize(Blob serialized);

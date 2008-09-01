@@ -32,15 +32,46 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.db.Blob;
 
-import java.io.Serializable;
+import java.io.*;
 
 /**
  * @author Esko Luontola
- * @since 25.8.2008
+ * @since 1.9.2008
  */
-public class DummyEntity implements Entity, Serializable {
-    private static final long serialVersionUID = 1L;
+public class EntitySerializerImpl implements EntitySerializer {
 
-    public Object other;
+    public Blob serialize(Entity entity) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        serializeToStream(entity, bytes);
+        return Blob.fromBytes(bytes.toByteArray());
+    }
+
+    public Entity deserialize(Blob serialized) {
+        return (Entity) deserializeFromStream(serialized.getInputStream());
+    }
+
+    private void serializeToStream(Entity entity, OutputStream target) {
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(target);
+            out.writeObject(entity);
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object deserializeFromStream(InputStream source) {
+        try {
+            ObjectInputStream out = new ObjectInputStream(source);
+            Object obj = out.readObject();
+            out.close();
+            return obj;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
