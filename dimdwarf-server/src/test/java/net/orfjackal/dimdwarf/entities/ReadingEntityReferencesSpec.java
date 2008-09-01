@@ -105,7 +105,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
     }
 
-    public class WhenAReferenceIsDeserialized {
+    public class WhenAReferenceHasBeenDeserialized {
         private EntityReferenceImpl<DummyEntity> ref;
 
         @SuppressWarnings({"unchecked"})
@@ -140,7 +140,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
     }
 
-    public class WhenManyReferencesToTheSameEntityAreDeserialized {
+    public class WhenManyReferencesToTheSameEntityHaveBeenDeserialized {
         private EntityReferenceImpl<DummyEntity> ref1;
         private EntityReferenceImpl<DummyEntity> ref2;
 
