@@ -29,9 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.serial;
 
-import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.db.Blob;
 
 import javax.swing.event.EventListenerList;
@@ -44,7 +43,7 @@ import java.io.*;
  * @since 1.9.2008
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class EntitySerializerImpl implements EntitySerializer {
+public class ObjectSerializerImpl implements ObjectSerializer {
 
     private final EventListenerList listeners = new EventListenerList();
 
@@ -56,22 +55,22 @@ public class EntitySerializerImpl implements EntitySerializer {
         listeners.add(SerializationReplacer.class, replacer);
     }
 
-    public Blob serialize(Entity entity) {
+    public Blob serialize(Object obj) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        serializeToStream(bytes, entity);
+        serializeToStream(bytes, obj);
         return Blob.fromBytes(bytes.toByteArray());
     }
 
-    public Entity deserialize(Blob serialized) {
-        return (Entity) deserializeFromStream(serialized.getInputStream());
+    public Object deserialize(Blob serialized) {
+        return deserializeFromStream(serialized.getInputStream());
     }
 
-    private void serializeToStream(OutputStream target, Entity entity) {
+    private void serializeToStream(OutputStream target, Object obj) {
         try {
-            ObjectOutputStream out = new MyObjectOutputStream(target, entity,
+            ObjectOutputStream out = new MyObjectOutputStream(target, obj,
                     listeners.getListeners(SerializationListener.class),
                     listeners.getListeners(SerializationReplacer.class));
-            out.writeObject(entity);
+            out.writeObject(obj);
             out.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -95,11 +94,11 @@ public class EntitySerializerImpl implements EntitySerializer {
 
 
     private static class MyObjectOutputStream extends ObjectOutputStream {
-        private final Entity rootObject;
+        private final Object rootObject;
         private final SerializationListener[] listeners;
         private final SerializationReplacer[] replacers;
 
-        public MyObjectOutputStream(OutputStream out, Entity rootObject,
+        public MyObjectOutputStream(OutputStream out, Object rootObject,
                                     SerializationListener[] listeners,
                                     SerializationReplacer[] replacers) throws IOException {
             super(out);
@@ -135,7 +134,7 @@ public class EntitySerializerImpl implements EntitySerializer {
 
         protected Object resolveObject(Object obj) throws IOException {
             for (int i = 0; i < replacers.length; i++) {
-                replacers[i].resolveDeserialized(obj);
+                obj = replacers[i].resolveDeserialized(obj);
             }
             for (int i = 0; i < listeners.length; i++) {
                 listeners[i].afterDeserialized(obj);

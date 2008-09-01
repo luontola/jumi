@@ -29,18 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.serial;
 
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.db.Blob;
+import java.util.EventListener;
 
 /**
  * @author Esko Luontola
  * @since 1.9.2008
  */
-public interface EntitySerializer {
+public interface SerializationListener extends EventListener {
 
-    Blob serialize(Entity entity);
+    void beforeSerialized(Object rootObject, Object obj);
 
-    Entity deserialize(Blob serialized);
+    void afterDeserialized(Object obj);
 }

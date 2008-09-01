@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.entities;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseConnection;
+import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
 import java.math.BigInteger;
 
@@ -46,9 +47,9 @@ import java.math.BigInteger;
 public class EntityStorageImpl implements EntityStorage {
 
     private final DatabaseConnection db;
-    private final EntitySerializer serializer;
+    private final ObjectSerializer serializer;
 
-    public EntityStorageImpl(DatabaseConnection db, EntitySerializer serializer) {
+    public EntityStorageImpl(DatabaseConnection db, ObjectSerializer serializer) {
         this.db = db;
         this.serializer = serializer;
     }
@@ -58,7 +59,7 @@ public class EntityStorageImpl implements EntityStorage {
         if (serialized.equals(Blob.EMPTY_BLOB)) {
             throw new EntityNotFoundException("id=" + id);
         }
-        return serializer.deserialize(serialized);
+        return (Entity) serializer.deserialize(serialized);
     }
 
     public void update(BigInteger id, Entity entity) {

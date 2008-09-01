@@ -29,12 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.serial;
 
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.entities.DummyEntity;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -44,28 +45,28 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class EntitySerializerSpec extends Specification<Object> {
+public class ObjectSerializerSpec extends Specification<Object> {
 
-    private EntitySerializerImpl serializer;
+    private ObjectSerializerImpl serializer;
     private SerializationListener listener;
-    private DummyEntity entity;
+    private DummyEntity obj;
 
     public void create() throws Exception {
-        serializer = new EntitySerializerImpl();
+        serializer = new ObjectSerializerImpl();
         listener = mock(SerializationListener.class);
-        entity = new DummyEntity();
-        entity.other = "foo";
+        obj = new DummyEntity();
+        obj.other = "foo";
     }
 
 
-    public class AnEntitySerializer {
+    public class AnObjectSerializer {
 
         public Object create() {
             return null;
         }
 
-        public void serializesAndDeserializesEntities() {
-            Blob bytes = serializer.serialize(entity);
+        public void serializesAndDeserializesObjects() {
+            Blob bytes = serializer.serialize(obj);
             specify(bytes, should.not().equal(null));
             specify(bytes, should.not().equal(Blob.EMPTY_BLOB));
 
@@ -76,15 +77,15 @@ public class EntitySerializerSpec extends Specification<Object> {
 
         public void notifiesListenersOfAllSerializedObjects() {
             checking(new Expectations() {{
-                one(listener).beforeSerialized(entity, entity);
-                one(listener).beforeSerialized(entity, "foo");
+                one(listener).beforeSerialized(obj, obj);
+                one(listener).beforeSerialized(obj, "foo");
             }});
             serializer.addSerializationListener(listener);
-            serializer.serialize(entity);
+            serializer.serialize(obj);
         }
 
         public void notifiesListenersOfAllDeserializedObjects() {
-            Blob bytes = serializer.serialize(entity);
+            Blob bytes = serializer.serialize(obj);
             checking(new Expectations() {{
                 one(listener).afterDeserialized(with(a(DummyEntity.class)));
                 one(listener).afterDeserialized("foo");
@@ -102,14 +103,14 @@ public class EntitySerializerSpec extends Specification<Object> {
                     return obj;
                 }
             });
-            Blob bytes = serializer.serialize(entity);
-            DummyEntity deserialized = (DummyEntity) new EntitySerializerImpl().deserialize(bytes);
-            specify(entity.other, should.equal("foo"));
+            Blob bytes = serializer.serialize(obj);
+            DummyEntity deserialized = (DummyEntity) new ObjectSerializerImpl().deserialize(bytes);
+            specify(obj.other, should.equal("foo"));
             specify(deserialized.other, should.equal("bar"));
         }
 
         public void allowsReplacingObjectsOnDeserialization() {
-            Blob bytes = serializer.serialize(entity);
+            Blob bytes = serializer.serialize(obj);
             serializer.addSerializationReplacer(new SerializationAdapter() {
                 public Object resolveDeserialized(Object obj) {
                     if (obj.equals("foo")) {
@@ -119,7 +120,7 @@ public class EntitySerializerSpec extends Specification<Object> {
                 }
             });
             DummyEntity deserialized = (DummyEntity) serializer.deserialize(bytes);
-            specify(entity.other, should.equal("foo"));
+            specify(obj.other, should.equal("foo"));
             specify(deserialized.other, should.equal("bar"));
         }
     }

@@ -38,6 +38,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseConnection;
+import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -54,14 +55,14 @@ public class EntityStorageSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private DatabaseConnection db;
-    private EntitySerializer serializer;
+    private ObjectSerializer serializer;
     private EntityStorageImpl storage;
     private Entity entity;
     private Blob serialized;
 
     public void create() throws Exception {
         db = mock(DatabaseConnection.class);
-        serializer = mock(EntitySerializer.class);
+        serializer = mock(ObjectSerializer.class);
         storage = new EntityStorageImpl(db, serializer);
         entity = new DummyEntity();
         serialized = Blob.fromBytes(new byte[]{1, 2, 3});

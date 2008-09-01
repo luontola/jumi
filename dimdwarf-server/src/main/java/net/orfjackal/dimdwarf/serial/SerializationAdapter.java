@@ -29,17 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
-
-import java.util.EventListener;
+package net.orfjackal.dimdwarf.serial;
 
 /**
  * @author Esko Luontola
  * @since 1.9.2008
  */
-public interface SerializationListener extends EventListener {
+public abstract class SerializationAdapter implements SerializationListener, SerializationReplacer {
 
-    void beforeSerialized(Object rootObject, Object obj);
+    public void beforeSerialized(Object rootObject, Object obj) {
+    }
 
-    void afterDeserialized(Object obj);
+    public Object replaceSerialized(Object rootObject, Object obj) {
+        return obj;
+    }
+
+    public Object resolveDeserialized(Object obj) {
+        return obj;
+    }
+
+    public void afterDeserialized(Object obj) {
+    }
 }

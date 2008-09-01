@@ -29,25 +29,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.serial;
+
+import net.orfjackal.dimdwarf.db.Blob;
 
 /**
  * @author Esko Luontola
  * @since 1.9.2008
  */
-public abstract class SerializationAdapter implements SerializationListener, SerializationReplacer {
+public interface ObjectSerializer {
 
-    public void beforeSerialized(Object rootObject, Object obj) {
-    }
+    void addSerializationListener(SerializationListener listener);
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        return obj;
-    }
+    void addSerializationReplacer(SerializationReplacer replacer);
 
-    public Object resolveDeserialized(Object obj) {
-        return obj;
-    }
+    Blob serialize(Object obj);
 
-    public void afterDeserialized(Object obj) {
-    }
+    Object deserialize(Blob serialized);
 }
