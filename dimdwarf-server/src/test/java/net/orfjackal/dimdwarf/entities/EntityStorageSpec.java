@@ -113,4 +113,7 @@ public class EntityStorageSpec extends Specification<Object> {
             storage.delete(ENTITY_ID);
         }
     }
+
+    // TODO: throw and exception during serialization if an entity was referred directly, without a reference
+    // TODO: warn about serializing anonymous classes? and non-static inner classes?
 }
