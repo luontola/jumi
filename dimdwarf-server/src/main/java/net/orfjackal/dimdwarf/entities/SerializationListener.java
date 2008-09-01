@@ -31,56 +31,13 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
-import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.Blob;
-import org.jmock.Expectations;
-import org.junit.runner.RunWith;
+import java.util.EventListener;
 
 /**
  * @author Esko Luontola
  * @since 1.9.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class EntitySerializerSpec extends Specification<Object> {
+public interface SerializationListener extends EventListener {
 
-    private EntitySerializerImpl serializer;
-    private SerializationListener listener;
-    private DummyEntity entity;
-
-    public void create() throws Exception {
-        serializer = new EntitySerializerImpl();
-        listener = mock(SerializationListener.class);
-        entity = new DummyEntity();
-        entity.other = "foo";
-    }
-
-
-    public class AnEntitySerializer {
-
-        public Object create() {
-            return null;
-        }
-
-        public void serializesAndDeserializesEntities() {
-            Blob serialized = serializer.serialize(entity);
-            specify(serialized, should.not().equal(null));
-            specify(serialized, should.not().equal(Blob.EMPTY_BLOB));
-
-            DummyEntity deserialized = (DummyEntity) serializer.deserialize(serialized);
-            specify(deserialized, should.not().equal(null));
-            specify(deserialized.other, should.equal("foo"));
-        }
-
-        public void notifiesListenersOfAllSerializedObjects() {
-            serializer.addSerializationListener(listener);
-            checking(new Expectations() {{
-                one(listener).serialized(entity, entity);
-                one(listener).serialized(entity, "foo");
-            }});
-            serializer.serialize(entity);
-        }
-    }
+    void serialized(Object rootObject, Object current);
 }

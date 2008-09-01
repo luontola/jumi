@@ -34,17 +34,26 @@ package net.orfjackal.dimdwarf.entities;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.db.Blob;
 
+import javax.swing.event.EventListenerList;
 import java.io.*;
 
 /**
+ * This class is NOT thread-safe.
+ *
  * @author Esko Luontola
  * @since 1.9.2008
  */
 public class EntitySerializerImpl implements EntitySerializer {
 
+    private final EventListenerList listeners = new EventListenerList();
+
+    public void addSerializationListener(SerializationListener listener) {
+        listeners.add(SerializationListener.class, listener);
+    }
+
     public Blob serialize(Entity entity) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        serializeToStream(entity, bytes);
+        serializeToStream(bytes, entity);
         return Blob.fromBytes(bytes.toByteArray());
     }
 
@@ -52,9 +61,10 @@ public class EntitySerializerImpl implements EntitySerializer {
         return (Entity) deserializeFromStream(serialized.getInputStream());
     }
 
-    private void serializeToStream(Entity entity, OutputStream target) {
+    private void serializeToStream(OutputStream target, Entity entity) {
         try {
-            ObjectOutputStream out = new ObjectOutputStream(target);
+            ObjectOutputStream out = new MyObjectOutputStream(target, entity,
+                    listeners.getListeners(SerializationListener.class));
             out.writeObject(entity);
             out.close();
         } catch (IOException e) {
@@ -72,6 +82,26 @@ public class EntitySerializerImpl implements EntitySerializer {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static class MyObjectOutputStream extends ObjectOutputStream {
+
+        private final Entity rootObject;
+        private final SerializationListener[] listeners;
+
+        public MyObjectOutputStream(OutputStream out, Entity rootObject, SerializationListener[] listeners) throws IOException {
+            super(out);
+            this.rootObject = rootObject;
+            this.listeners = listeners;
+            enableReplaceObject(true);
+        }
+
+        protected Object replaceObject(Object obj) throws IOException {
+            for (SerializationListener listener : listeners) {
+                listener.serialized(rootObject, obj);
+            }
+            return obj;
         }
     }
 }
