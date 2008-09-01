@@ -74,7 +74,8 @@ public class EntitySerializerImpl implements EntitySerializer {
 
     private Object deserializeFromStream(InputStream source) {
         try {
-            ObjectInputStream out = new ObjectInputStream(source);
+            ObjectInputStream out = new MyObjectInputStream(source,
+                    listeners.getListeners(SerializationListener.class));
             Object obj = out.readObject();
             out.close();
             return obj;
@@ -84,6 +85,7 @@ public class EntitySerializerImpl implements EntitySerializer {
             throw new RuntimeException(e);
         }
     }
+
 
     private static class MyObjectOutputStream extends ObjectOutputStream {
 
@@ -100,6 +102,24 @@ public class EntitySerializerImpl implements EntitySerializer {
         protected Object replaceObject(Object obj) throws IOException {
             for (SerializationListener listener : listeners) {
                 listener.serialized(rootObject, obj);
+            }
+            return obj;
+        }
+    }
+
+    private static class MyObjectInputStream extends ObjectInputStream {
+
+        private final SerializationListener[] listeners;
+
+        public MyObjectInputStream(InputStream in, SerializationListener[] listeners) throws IOException {
+            super(in);
+            this.listeners = listeners;
+            enableResolveObject(true);
+        }
+
+        protected Object resolveObject(Object obj) throws IOException {
+            for (SerializationListener listener : listeners) {
+                listener.deserialized(obj);
             }
             return obj;
         }

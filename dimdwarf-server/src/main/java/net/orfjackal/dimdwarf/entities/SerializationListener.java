@@ -39,5 +39,7 @@ import java.util.EventListener;
  */
 public interface SerializationListener extends EventListener {
 
-    void serialized(Object rootObject, Object current);
+    void serialized(Object rootObject, Object obj);
+
+    void deserialized(Object obj);
 }

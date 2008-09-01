@@ -75,12 +75,22 @@ public class EntitySerializerSpec extends Specification<Object> {
         }
 
         public void notifiesListenersOfAllSerializedObjects() {
-            serializer.addSerializationListener(listener);
             checking(new Expectations() {{
                 one(listener).serialized(entity, entity);
                 one(listener).serialized(entity, "foo");
             }});
+            serializer.addSerializationListener(listener);
             serializer.serialize(entity);
+        }
+
+        public void notifiesListenersOfAllDeserializedObjects() {
+            Blob serialized = serializer.serialize(entity);
+            checking(new Expectations() {{
+                one(listener).deserialized(with(a(DummyEntity.class)));
+                one(listener).deserialized("foo");
+            }});
+            serializer.addSerializationListener(listener);
+            serializer.deserialize(serialized);
         }
     }
 }
