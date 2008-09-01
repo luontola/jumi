@@ -115,7 +115,7 @@ public class ObjectSerializerImpl implements ObjectSerializer {
             for (int i = 0; i < replacers.length; i++) {
                 // TODO: replacement should be done before listeners, because otherwise entities
                 // can not be proxied before check for direct entity reference will fail serialization
-                // -> write a test when doing transparent references
+                // -> write a test when doing transparent references (also change order in SerializationAdapter)
                 obj = replacers[i].replaceSerialized(rootObject, obj);
             }
             return obj;
