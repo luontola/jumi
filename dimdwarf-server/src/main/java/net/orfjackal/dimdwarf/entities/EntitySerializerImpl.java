@@ -43,12 +43,17 @@ import java.io.*;
  * @author Esko Luontola
  * @since 1.9.2008
  */
+@SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class EntitySerializerImpl implements EntitySerializer {
 
     private final EventListenerList listeners = new EventListenerList();
 
     public void addSerializationListener(SerializationListener listener) {
         listeners.add(SerializationListener.class, listener);
+    }
+
+    public void addSerializationReplacer(SerializationReplacer replacer) {
+        listeners.add(SerializationReplacer.class, replacer);
     }
 
     public Blob serialize(Entity entity) {
@@ -64,7 +69,8 @@ public class EntitySerializerImpl implements EntitySerializer {
     private void serializeToStream(OutputStream target, Entity entity) {
         try {
             ObjectOutputStream out = new MyObjectOutputStream(target, entity,
-                    listeners.getListeners(SerializationListener.class));
+                    listeners.getListeners(SerializationListener.class),
+                    listeners.getListeners(SerializationReplacer.class));
             out.writeObject(entity);
             out.close();
         } catch (IOException e) {
@@ -75,7 +81,8 @@ public class EntitySerializerImpl implements EntitySerializer {
     private Object deserializeFromStream(InputStream source) {
         try {
             ObjectInputStream out = new MyObjectInputStream(source,
-                    listeners.getListeners(SerializationListener.class));
+                    listeners.getListeners(SerializationListener.class),
+                    listeners.getListeners(SerializationReplacer.class));
             Object obj = out.readObject();
             out.close();
             return obj;
@@ -88,38 +95,50 @@ public class EntitySerializerImpl implements EntitySerializer {
 
 
     private static class MyObjectOutputStream extends ObjectOutputStream {
-
         private final Entity rootObject;
         private final SerializationListener[] listeners;
+        private final SerializationReplacer[] replacers;
 
-        public MyObjectOutputStream(OutputStream out, Entity rootObject, SerializationListener[] listeners) throws IOException {
+        public MyObjectOutputStream(OutputStream out, Entity rootObject,
+                                    SerializationListener[] listeners,
+                                    SerializationReplacer[] replacers) throws IOException {
             super(out);
             this.rootObject = rootObject;
             this.listeners = listeners;
+            this.replacers = replacers;
             enableReplaceObject(true);
         }
 
         protected Object replaceObject(Object obj) throws IOException {
-            for (SerializationListener listener : listeners) {
-                listener.serialized(rootObject, obj);
+            for (int i = 0; i < listeners.length; i++) {
+                listeners[i].beforeSerialized(rootObject, obj);
+            }
+            for (int i = 0; i < replacers.length; i++) {
+                obj = replacers[i].replaceSerialized(rootObject, obj);
             }
             return obj;
         }
     }
 
     private static class MyObjectInputStream extends ObjectInputStream {
-
         private final SerializationListener[] listeners;
+        private final SerializationReplacer[] replacers;
 
-        public MyObjectInputStream(InputStream in, SerializationListener[] listeners) throws IOException {
+        public MyObjectInputStream(InputStream in,
+                                   SerializationListener[] listeners,
+                                   SerializationReplacer[] replacers) throws IOException {
             super(in);
             this.listeners = listeners;
+            this.replacers = replacers;
             enableResolveObject(true);
         }
 
         protected Object resolveObject(Object obj) throws IOException {
-            for (SerializationListener listener : listeners) {
-                listener.deserialized(obj);
+            for (int i = 0; i < replacers.length; i++) {
+                replacers[i].resolveDeserialized(obj);
+            }
+            for (int i = 0; i < listeners.length; i++) {
+                listeners[i].afterDeserialized(obj);
             }
             return obj;
         }

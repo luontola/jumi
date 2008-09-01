@@ -65,32 +65,62 @@ public class EntitySerializerSpec extends Specification<Object> {
         }
 
         public void serializesAndDeserializesEntities() {
-            Blob serialized = serializer.serialize(entity);
-            specify(serialized, should.not().equal(null));
-            specify(serialized, should.not().equal(Blob.EMPTY_BLOB));
+            Blob bytes = serializer.serialize(entity);
+            specify(bytes, should.not().equal(null));
+            specify(bytes, should.not().equal(Blob.EMPTY_BLOB));
 
-            DummyEntity deserialized = (DummyEntity) serializer.deserialize(serialized);
+            DummyEntity deserialized = (DummyEntity) serializer.deserialize(bytes);
             specify(deserialized, should.not().equal(null));
             specify(deserialized.other, should.equal("foo"));
         }
 
         public void notifiesListenersOfAllSerializedObjects() {
             checking(new Expectations() {{
-                one(listener).serialized(entity, entity);
-                one(listener).serialized(entity, "foo");
+                one(listener).beforeSerialized(entity, entity);
+                one(listener).beforeSerialized(entity, "foo");
             }});
             serializer.addSerializationListener(listener);
             serializer.serialize(entity);
         }
 
         public void notifiesListenersOfAllDeserializedObjects() {
-            Blob serialized = serializer.serialize(entity);
+            Blob bytes = serializer.serialize(entity);
             checking(new Expectations() {{
-                one(listener).deserialized(with(a(DummyEntity.class)));
-                one(listener).deserialized("foo");
+                one(listener).afterDeserialized(with(a(DummyEntity.class)));
+                one(listener).afterDeserialized("foo");
             }});
             serializer.addSerializationListener(listener);
-            serializer.deserialize(serialized);
+            serializer.deserialize(bytes);
+        }
+
+        public void allowsReplacingObjectsOnSerialization() {
+            serializer.addSerializationReplacer(new SerializationAdapter() {
+                public Object replaceSerialized(Object rootObject, Object obj) {
+                    if (obj.equals("foo")) {
+                        return "bar";
+                    }
+                    return obj;
+                }
+            });
+            Blob bytes = serializer.serialize(entity);
+            DummyEntity deserialized = (DummyEntity) new EntitySerializerImpl().deserialize(bytes);
+            specify(entity.other, should.equal("foo"));
+            specify(deserialized.other, should.equal("bar"));
+        }
+
+        public void allowsReplacingObjectsOnDeserialization() {
+            Blob bytes = serializer.serialize(entity);
+            serializer.addSerializationReplacer(new SerializationAdapter() {
+                public Object resolveDeserialized(Object obj) {
+                    if (obj.equals("foo")) {
+                        return "bar";
+                    }
+                    return obj;
+                }
+            });
+            DummyEntity deserialized = (DummyEntity) serializer.deserialize(bytes);
+            specify(entity.other, should.equal("foo"));
+            specify(deserialized.other, should.equal("bar"));
         }
     }
 }

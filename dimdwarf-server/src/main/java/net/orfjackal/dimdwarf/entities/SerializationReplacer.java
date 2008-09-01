@@ -37,9 +37,9 @@ import java.util.EventListener;
  * @author Esko Luontola
  * @since 1.9.2008
  */
-public interface SerializationListener extends EventListener {
+public interface SerializationReplacer extends EventListener {
 
-    void beforeSerialized(Object rootObject, Object obj);
+    Object replaceSerialized(Object rootObject, Object obj);
 
-    void afterDeserialized(Object obj);
+    Object resolveDeserialized(Object obj);
 }
