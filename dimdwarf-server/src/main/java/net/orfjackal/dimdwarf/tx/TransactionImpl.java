@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
+ * This class is thread-safe.
+ *
  * @author Esko Luontola
  * @since 15.8.2008
  */

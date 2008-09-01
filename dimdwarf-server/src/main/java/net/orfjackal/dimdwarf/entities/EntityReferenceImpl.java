@@ -41,6 +41,8 @@ import java.io.ObjectOutput;
 import java.math.BigInteger;
 
 /**
+ * This class is NOT thread-safe.
+ *
  * @author Esko Luontola
  * @since 25.8.2008
  */

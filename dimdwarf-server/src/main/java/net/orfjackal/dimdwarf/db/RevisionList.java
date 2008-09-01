@@ -32,6 +32,9 @@
 package net.orfjackal.dimdwarf.db;
 
 /**
+ * This class is thread-safe. The latest revision of the list is immutable
+ * (i.e. the only possible modification is that old revisions are purged).
+ *
  * @author Esko Luontola
  * @since 19.8.2008
  */

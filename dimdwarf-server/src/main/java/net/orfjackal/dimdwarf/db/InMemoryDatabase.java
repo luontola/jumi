@@ -42,6 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * This class is thread-safe.
+ *
  * @author Esko Luontola
  * @since 18.8.2008
  */
@@ -137,7 +139,9 @@ public class InMemoryDatabase {
         }
     }
 
-
+    /**
+     * This class is thread-safe.
+     */
     private class TransactionalDatabaseConnection implements DatabaseConnection, TransactionParticipant {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();

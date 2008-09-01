@@ -40,6 +40,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
  * @since 18.8.2008
  */

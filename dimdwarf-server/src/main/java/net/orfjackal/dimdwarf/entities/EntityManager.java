@@ -38,6 +38,8 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
+ * This class is NOT thread-safe.
+ *
  * @author Esko Luontola
  * @since 25.8.2008
  */

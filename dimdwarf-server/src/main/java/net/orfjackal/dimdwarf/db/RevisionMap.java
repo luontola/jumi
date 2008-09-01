@@ -35,6 +35,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
+ * Map which keeps track of its modification history. Within one revision, each key may be modified only once.
+ * The {@link #incrementRevision()} method must be called between every group of modifications. Once the revision
+ * is incremented, the values in older revisions can not be changed. The old revisions can be only purged with
+ * {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure that those revisions will not be
+ * accessed. The revision system used by this class was inspired by Subversion.
+ * <p/>
+ * This class is thread-safe.
+ *
  * @author Esko Luontola
  * @since 20.8.2008
  */
@@ -116,10 +124,18 @@ public class RevisionMap<K, V> {
         }
     }
 
+    /**
+     * The iterator returned by this method can be used in only one thread,
+     * but it allows concurrent modifications of the map (as long as the revision
+     * being iterated is not purged - in which case the behaviour is unspecified).
+     */
     public Iterator<Map.Entry<K, V>> iterator(long revision) {
         return new MyIterator<K, V>(map, revision);
     }
 
+    /**
+     * This class is NOT thread-safe.
+     */
     private static class MyIterator<K, V> implements Iterator<Map.Entry<K, V>> {
         private final long revision;
         private final Iterator<Map.Entry<K, RevisionList<V>>> it;
@@ -164,6 +180,9 @@ public class RevisionMap<K, V> {
         }
     }
 
+    /**
+     * This class is immutable.
+     */
     private static class MyEntry<K, V> implements Map.Entry<K, V> {
         private final K key;
         private final V value;
