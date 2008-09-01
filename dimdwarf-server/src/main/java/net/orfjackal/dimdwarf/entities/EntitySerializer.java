@@ -32,18 +32,17 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.Entity;
-
-import java.math.BigInteger;
+import net.orfjackal.dimdwarf.db.Blob;
 
 /**
  * @author Esko Luontola
- * @since 31.8.2008
+ * @since 1.9.2008
  */
-public interface EntityStorage {
+public interface EntitySerializer {
 
-    Entity read(BigInteger id) throws EntityNotFoundException;
+    // TODO: implementation
 
-    void update(BigInteger id, Entity entity);
+    Blob serialize(Entity entity);
 
-    void delete(BigInteger id);
+    Entity deserialize(Blob serialized);
 }
