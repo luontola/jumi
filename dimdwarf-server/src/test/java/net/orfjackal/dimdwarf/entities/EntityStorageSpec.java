@@ -72,13 +72,21 @@ public class EntityStorageSpec extends Specification<Object> {
     }
 
 
-    public class WhenAnEntityDoesNotExist {
+    public class AnEntityStorage {
 
         public Object create() {
             return null;
         }
 
-        public void itCanNotBeRead() {
+        public void readsEntitiesFromDatabase() {
+            checking(new Expectations() {{
+                one(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
+                one(serializer).deserialize(serialized); will(returnValue(entity));
+            }});
+            specify(storage.read(ENTITY_ID), should.equal(entity));
+        }
+
+        public void canNotBeReadNonexistentEntities() {
             checking(new Expectations() {{
                 one(db).read(asBytes(ENTITY_ID)); will(returnValue(Blob.EMPTY_BLOB));
             }});
@@ -89,7 +97,7 @@ public class EntityStorageSpec extends Specification<Object> {
             }, should.raise(EntityNotFoundException.class));
         }
 
-        public void creatingItIsPossible() {
+        public void writesEntitiesToDatabase() {
             checking(new Expectations() {{
                 one(serializer).serialize(entity); will(returnValue(serialized));
                 one(db).update(asBytes(ENTITY_ID), serialized);
@@ -97,37 +105,7 @@ public class EntityStorageSpec extends Specification<Object> {
             storage.update(ENTITY_ID, entity);
         }
 
-        public void deletingItIsPossible() {
-            checking(new Expectations() {{
-                one(db).delete(asBytes(ENTITY_ID));
-            }});
-            storage.delete(ENTITY_ID);
-        }
-    }
-
-    public class WhenAnEntityExists {
-
-        public Object create() {
-            return null;
-        }
-
-        public void readingItIsPossible() {
-            checking(new Expectations() {{
-                one(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
-                one(serializer).deserialize(serialized); will(returnValue(entity));
-            }});
-            specify(storage.read(ENTITY_ID), should.equal(entity));
-        }
-
-        public void updatingItIsPossible() {
-            checking(new Expectations() {{
-                one(serializer).serialize(entity); will(returnValue(serialized));
-                one(db).update(asBytes(ENTITY_ID), serialized);
-            }});
-            storage.update(ENTITY_ID, entity);
-        }
-
-        public void deletingItIsPossible() {
+        public void deletesEntitiesFromDatabase() {
             checking(new Expectations() {{
                 one(db).delete(asBytes(ENTITY_ID));
             }});

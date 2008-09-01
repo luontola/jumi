@@ -38,6 +38,8 @@ import net.orfjackal.dimdwarf.db.DatabaseConnection;
 import java.math.BigInteger;
 
 /**
+ * This class is stateless. Thread-safeness depends on the injected dependencies.
+ *
  * @author Esko Luontola
  * @since 1.9.2008
  */
