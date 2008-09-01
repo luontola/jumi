@@ -35,10 +35,11 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.util.TestUtil;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.io.*;
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -69,21 +70,6 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }};
     }
 
-    private static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(bytes);
-        out.writeObject(obj);
-        out.close();
-        return bytes.toByteArray();
-    }
-
-    private static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
-        Object obj = in.readObject();
-        in.close();
-        return obj;
-    }
-
 
     public class WhenTheReferenceWasJustCreated {
         private EntityReference<DummyEntity> ref;
@@ -110,8 +96,8 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
         @SuppressWarnings({"unchecked"})
         public Object create() throws IOException, ClassNotFoundException {
-            byte[] bytes = serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
-            ref = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
+            byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
+            ref = (EntityReferenceImpl<DummyEntity>) TestUtil.deserialize(bytes);
             ref.setEntityLoader(manager);
             return null;
         }
@@ -146,10 +132,10 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
         @SuppressWarnings({"unchecked"})
         public Object create() throws IOException, ClassNotFoundException {
-            byte[] bytes = serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
-            ref1 = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
+            byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
+            ref1 = (EntityReferenceImpl<DummyEntity>) TestUtil.deserialize(bytes);
             ref1.setEntityLoader(manager);
-            ref2 = (EntityReferenceImpl<DummyEntity>) deserialize(bytes);
+            ref2 = (EntityReferenceImpl<DummyEntity>) TestUtil.deserialize(bytes);
             ref2.setEntityLoader(manager);
             return null;
         }
