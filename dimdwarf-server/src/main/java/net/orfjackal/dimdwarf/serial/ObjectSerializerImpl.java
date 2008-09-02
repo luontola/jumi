@@ -42,7 +42,6 @@ import java.io.*;
  * @author Esko Luontola
  * @since 1.9.2008
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class ObjectSerializerImpl implements ObjectSerializer {
 
     private final EventListenerList listeners = new EventListenerList();
@@ -109,14 +108,14 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         }
 
         protected Object replaceObject(Object obj) throws IOException {
-            for (int i = 0; i < listeners.length; i++) {
-                listeners[i].beforeSerialized(rootObject, obj);
+            for (SerializationListener listener : listeners) {
+                listener.beforeSerialized(rootObject, obj);
             }
-            for (int i = 0; i < replacers.length; i++) {
+            for (SerializationReplacer replacer : replacers) {
                 // TODO: replacement should be done before listeners, because otherwise entities
                 // can not be proxied before check for direct entity reference will fail serialization
                 // -> write a test when doing transparent references (also change order in SerializationAdapter)
-                obj = replacers[i].replaceSerialized(rootObject, obj);
+                obj = replacer.replaceSerialized(rootObject, obj);
             }
             return obj;
         }
@@ -136,11 +135,11 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         }
 
         protected Object resolveObject(Object obj) throws IOException {
-            for (int i = 0; i < replacers.length; i++) {
-                obj = replacers[i].resolveDeserialized(obj);
+            for (SerializationReplacer replacer : replacers) {
+                obj = replacer.resolveDeserialized(obj);
             }
-            for (int i = 0; i < listeners.length; i++) {
-                listeners[i].afterDeserialized(obj);
+            for (SerializationListener listener : listeners) {
+                listener.afterDeserialized(obj);
             }
             return obj;
         }
