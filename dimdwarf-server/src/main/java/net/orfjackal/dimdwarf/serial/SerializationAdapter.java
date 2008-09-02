@@ -37,6 +37,8 @@ package net.orfjackal.dimdwarf.serial;
  */
 public abstract class SerializationAdapter implements SerializationListener, SerializationReplacer {
 
+    // TODO: more descriptive method names, in order: beforeReplace, replaceSerialized, beforeSerialize, afterDeserialize, resolveDeserialized, afterResolve
+
     public void beforeSerialized(Object rootObject, Object obj) {
     }
 
