@@ -116,4 +116,5 @@ public class EntityStorageSpec extends Specification<Object> {
 
     // TODO: throw and exception during serialization if an entity was referred directly, without a reference
     // TODO: warn about serializing anonymous classes? and non-static inner classes?
+    // TODO: warn about 'writeReplace' and 'readResolve' in an entity class. See: com.sun.sgs.impl.service.data.ClassesTable.checkObjectReplacement
 }
