@@ -76,33 +76,34 @@ public class ObjectSerializerSpec extends Specification<Object> {
         }
 
         public void notifiesListenersOfAllSerializedObjects() {
+            serializer = new ObjectSerializerImpl(new SerializationListener[]{listener}, new SerializationReplacer[0]);
             checking(new Expectations() {{
                 one(listener).beforeSerialized(obj, obj);
                 one(listener).beforeSerialized(obj, "foo");
             }});
-            serializer.addSerializationListener(listener);
             serializer.serialize(obj);
         }
 
         public void notifiesListenersOfAllDeserializedObjects() {
             Blob bytes = serializer.serialize(obj);
+            serializer = new ObjectSerializerImpl(new SerializationListener[]{listener}, new SerializationReplacer[0]);
             checking(new Expectations() {{
                 one(listener).afterDeserialized(with(a(DummyEntity.class)));
                 one(listener).afterDeserialized("foo");
             }});
-            serializer.addSerializationListener(listener);
             serializer.deserialize(bytes);
         }
 
         public void allowsReplacingObjectsOnSerialization() {
-            serializer.addSerializationReplacer(new SerializationAdapter() {
+            SerializationReplacer replacer = new SerializationAdapter() {
                 public Object replaceSerialized(Object rootObject, Object obj) {
                     if (obj.equals("foo")) {
                         return "bar";
                     }
                     return obj;
                 }
-            });
+            };
+            serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{replacer});
             Blob bytes = serializer.serialize(obj);
             DummyEntity deserialized = (DummyEntity) new ObjectSerializerImpl().deserialize(bytes);
             specify(obj.other, should.equal("foo"));
@@ -111,14 +112,15 @@ public class ObjectSerializerSpec extends Specification<Object> {
 
         public void allowsReplacingObjectsOnDeserialization() {
             Blob bytes = serializer.serialize(obj);
-            serializer.addSerializationReplacer(new SerializationAdapter() {
+            SerializationReplacer replacer = new SerializationAdapter() {
                 public Object resolveDeserialized(Object obj) {
                     if (obj.equals("foo")) {
                         return "bar";
                     }
                     return obj;
                 }
-            });
+            };
+            serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{replacer});
             DummyEntity deserialized = (DummyEntity) serializer.deserialize(bytes);
             specify(obj.other, should.equal("foo"));
             specify(deserialized.other, should.equal("bar"));

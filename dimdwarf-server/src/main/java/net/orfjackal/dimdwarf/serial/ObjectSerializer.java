@@ -39,10 +39,6 @@ import net.orfjackal.dimdwarf.db.Blob;
  */
 public interface ObjectSerializer {
 
-    void addSerializationListener(SerializationListener listener);
-
-    void addSerializationReplacer(SerializationReplacer replacer);
-
     Blob serialize(Object obj);
 
     Object deserialize(Blob serialized);

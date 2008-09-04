@@ -33,7 +33,6 @@ package net.orfjackal.dimdwarf.serial;
 
 import net.orfjackal.dimdwarf.db.Blob;
 
-import javax.swing.event.EventListenerList;
 import java.io.*;
 
 /**
@@ -44,14 +43,16 @@ import java.io.*;
  */
 public class ObjectSerializerImpl implements ObjectSerializer {
 
-    private final EventListenerList listeners = new EventListenerList();
+    private final SerializationListener[] listeners;
+    private final SerializationReplacer[] replacers;
 
-    public void addSerializationListener(SerializationListener listener) {
-        listeners.add(SerializationListener.class, listener);
+    public ObjectSerializerImpl() {
+        this(new SerializationListener[0], new SerializationReplacer[0]);
     }
 
-    public void addSerializationReplacer(SerializationReplacer replacer) {
-        listeners.add(SerializationReplacer.class, replacer);
+    public ObjectSerializerImpl(SerializationListener[] listeners, SerializationReplacer[] replacers) {
+        this.listeners = listeners;
+        this.replacers = replacers;
     }
 
     public Blob serialize(Object obj) {
@@ -66,9 +67,7 @@ public class ObjectSerializerImpl implements ObjectSerializer {
 
     private void serializeToStream(OutputStream target, Object obj) {
         try {
-            ObjectOutputStream out = new MyObjectOutputStream(target, obj,
-                    listeners.getListeners(SerializationListener.class),
-                    listeners.getListeners(SerializationReplacer.class));
+            ObjectOutputStream out = new MyObjectOutputStream(target, obj);
             out.writeObject(obj);
             out.close();
         } catch (IOException e) {
@@ -78,9 +77,7 @@ public class ObjectSerializerImpl implements ObjectSerializer {
 
     private Object deserializeFromStream(InputStream source) {
         try {
-            ObjectInputStream out = new MyObjectInputStream(source,
-                    listeners.getListeners(SerializationListener.class),
-                    listeners.getListeners(SerializationReplacer.class));
+            ObjectInputStream out = new MyObjectInputStream(source);
             Object obj = out.readObject();
             out.close();
             return obj;
@@ -92,18 +89,12 @@ public class ObjectSerializerImpl implements ObjectSerializer {
     }
 
 
-    private static class MyObjectOutputStream extends ObjectOutputStream {
+    private class MyObjectOutputStream extends ObjectOutputStream {
         private final Object rootObject;
-        private final SerializationListener[] listeners;
-        private final SerializationReplacer[] replacers;
 
-        public MyObjectOutputStream(OutputStream out, Object rootObject,
-                                    SerializationListener[] listeners,
-                                    SerializationReplacer[] replacers) throws IOException {
+        public MyObjectOutputStream(OutputStream out, Object rootObject) throws IOException {
             super(out);
             this.rootObject = rootObject;
-            this.listeners = listeners;
-            this.replacers = replacers;
             enableReplaceObject(true);
         }
 
@@ -121,16 +112,10 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         }
     }
 
-    private static class MyObjectInputStream extends ObjectInputStream {
-        private final SerializationListener[] listeners;
-        private final SerializationReplacer[] replacers;
+    private class MyObjectInputStream extends ObjectInputStream {
 
-        public MyObjectInputStream(InputStream in,
-                                   SerializationListener[] listeners,
-                                   SerializationReplacer[] replacers) throws IOException {
+        public MyObjectInputStream(InputStream in) throws IOException {
             super(in);
-            this.listeners = listeners;
-            this.replacers = replacers;
             enableResolveObject(true);
         }
 

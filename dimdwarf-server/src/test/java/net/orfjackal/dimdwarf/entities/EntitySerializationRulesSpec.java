@@ -39,6 +39,8 @@ import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseConnection;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+import net.orfjackal.dimdwarf.serial.SerializationListener;
+import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -55,15 +57,16 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private DatabaseConnection db;
-    private ObjectSerializer serializer;
     private EntityStorageImpl storage;
     private DummyEntity entity;
 
     public void create() throws Exception {
         db = mock(DatabaseConnection.class);
-        serializer = new ObjectSerializerImpl();
-        serializer.addSerializationListener(new CheckEntityReferredDirectly());
-        serializer.addSerializationListener(new CheckInnerClassSerialized());
+        SerializationListener[] listeners = {
+                new CheckEntityReferredDirectly(),
+                new CheckInnerClassSerialized()
+        };
+        ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[0]);
         storage = new EntityStorageImpl(db, serializer);
         entity = new DummyEntity();
     }
