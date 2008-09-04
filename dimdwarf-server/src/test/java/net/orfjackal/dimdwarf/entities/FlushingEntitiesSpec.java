@@ -51,13 +51,13 @@ import java.math.BigInteger;
 public class FlushingEntitiesSpec extends Specification<Object> {
 
     private EntityStorage storage;
-    private EntityManager manager;
+    private EntityManagerImpl manager;
     private DummyEntity entity;
     private DummyEntity newEntity;
 
     public void create() throws Exception {
         storage = mock(EntityStorage.class);
-        manager = new EntityManager(new DummyEntityIdFactory(), storage);
+        manager = new EntityManagerImpl(new DummyEntityIdFactory(), storage);
         entity = new DummyEntity();
         newEntity = new DummyEntity();
         manager.createReference(entity);

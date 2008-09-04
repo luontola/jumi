@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.tref;
 import net.orfjackal.dimdwarf.db.InMemoryDatabase;
 import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
 import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.EntityManagerImpl;
 import net.orfjackal.dimdwarf.entities.EntityStorageImpl;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
@@ -51,7 +52,7 @@ public class AppContext {
     private static EntityManager dataManager;
 
     public static void setMockDataManager() {
-        setDataManager(new EntityManager(
+        setDataManager(new EntityManagerImpl(
                 new EntityIdFactoryImpl(BigInteger.ONE),
                 new EntityStorageImpl(
                         new InMemoryDatabase().openConnection(new TransactionImpl()),
