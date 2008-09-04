@@ -37,10 +37,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseConnection;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
-import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
-import net.orfjackal.dimdwarf.serial.SerializationListener;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import net.orfjackal.dimdwarf.serial.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -59,6 +56,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
     private DatabaseConnection db;
     private EntityStorageImpl storage;
     private DummyEntity entity;
+    private DelegatingSerializationReplacer replacer;
 
     public void create() throws Exception {
         db = mock(DatabaseConnection.class);
@@ -66,7 +64,8 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
                 new CheckEntityReferredDirectly(),
                 new CheckInnerClassSerialized()
         };
-        ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[0]);
+        replacer = new DelegatingSerializationReplacer();
+        ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
         storage = new EntityStorageImpl(db, serializer);
         entity = new DummyEntity();
     }
@@ -97,6 +96,23 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             }});
             entity.other = new EntityReferenceImpl<DummyEntity>(BigInteger.valueOf(123), new DummyEntity());
             storage.update(ENTITY_ID, entity);
+        }
+
+        public void checksAreDoneAfterAnyObjectsArePossiblyReplaced() {
+            entity.other = "tmp";
+            replacer.delegate = new SerializationReplacerAdapter(){
+                public Object replaceSerialized(Object rootObject, Object obj) {
+                    if (obj.equals("tmp")) {
+                        return new DummyEntity();
+                    }
+                    return obj;
+                }
+            };
+            specify(new Block() {
+                public void run() throws Throwable {
+                    storage.update(ENTITY_ID, entity);
+                }
+            }, should.raise(IllegalArgumentException.class));
         }
     }
 
@@ -143,6 +159,24 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
 
 
     private static class StaticMemberClass extends DummyObject {
+    }
+
+    private static class DelegatingSerializationReplacer implements SerializationReplacer {
+        private SerializationReplacer delegate = null;
+
+        public Object replaceSerialized(Object rootObject, Object obj) {
+            if (delegate != null) {
+                return delegate.replaceSerialized(rootObject, obj);
+            }
+            return obj;
+        }
+
+        public Object resolveDeserialized(Object obj) {
+            if (delegate != null) {
+                return delegate.resolveDeserialized(obj);
+            }
+            return obj;
+        }
     }
 
     // TODO: warn about 'writeReplace' and 'readResolve' in an entity class (or is dimdwarf affected by this at all?). See: com.sun.sgs.impl.service.data.ClassesTable.checkObjectReplacement

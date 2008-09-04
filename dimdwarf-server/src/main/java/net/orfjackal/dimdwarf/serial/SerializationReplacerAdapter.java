@@ -29,20 +29,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
-
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.serial.SerializationAdapter;
+package net.orfjackal.dimdwarf.serial;
 
 /**
  * @author Esko Luontola
  * @since 4.9.2008
  */
-public class CheckEntityReferredDirectly extends SerializationAdapter {
+public class SerializationReplacerAdapter implements SerializationReplacer {
 
-    public void beforeSerialize(Object rootObject, Object obj) {
-        if (obj instanceof Entity && obj != rootObject) {
-            throw new IllegalArgumentException("Entity referred directly without an entity reference: " + obj.getClass());
-        }
+    public Object replaceSerialized(Object rootObject, Object obj) {
+        return obj;
+    }
+
+    public Object resolveDeserialized(Object obj) {
+        return obj;
     }
 }

@@ -116,6 +116,7 @@ public class ObjectSerializerSpec extends Specification<Object> {
             serializedBytes = new ObjectSerializerImpl().serialize(obj);
             listener = mock(SerializationListener.class);
             SerializationReplacer replacer = new SerializationReplacer() {
+                
                 public Object replaceSerialized(Object rootObject, Object obj) {
                     if (obj.equals("foo")) {
                         return "bar";
