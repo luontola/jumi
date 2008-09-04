@@ -113,4 +113,6 @@ public class EntityStorageSpec extends Specification<Object> {
             storage.delete(ENTITY_ID);
         }
     }
+
+    // TODO: do not update database if the entity has not changed
 }
