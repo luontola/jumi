@@ -121,6 +121,22 @@ public final class Blob implements Comparable<Blob> {
 
     public String toString() {
         byte[] truncatedBytes = Arrays.copyOf(bytes, Math.min(bytes.length, TO_STRING_SAFETY_LIMIT));
-        return "Blob[length=" + length() + ",bytes=" + Arrays.toString(truncatedBytes) + "]";
+        String hexBytes = asHex(truncatedBytes);
+        if (bytes.length > TO_STRING_SAFETY_LIMIT) {
+            hexBytes += " ...";
+        }
+        return "Blob[length=" + length() + ",bytes=[" + hexBytes + "]]";
+    }
+
+    private static String asHex(byte[] bytes) {
+        StringBuilder hexBytes = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(b & 0xFF).toUpperCase();
+            while (hex.length() < 2) {
+                hex = "0" + hex;
+            }
+            hexBytes.append(hex).append(' ');
+        }
+        return hexBytes.toString().trim();
     }
 }
