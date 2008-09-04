@@ -82,6 +82,9 @@ public class RevisionMap<K, V> {
         put(key, null);
     }
 
+    // TODO: add support for purging sparse revisions, i.e. purgeRevisionsOtherThan(long... revisionsToKeep)
+    // Will be useful for long running transactions, so that memory usage will not over 2x (with one long transaction).
+
     public void purgeRevisionsOlderThan(long revisionToKeep) {
         synchronized (writeLock) {
             revisionToKeep = Math.min(revisionToKeep, currentRevision);
