@@ -48,8 +48,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class TransactionImpl implements Transaction, TransactionCoordinator {
     private static final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
-    private final Object lock = new Object();
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
+    private final Object statusLock = new Object();
     private volatile TransactionStatus status = ACTIVE;
     private volatile boolean rollbackOnly = false;
 
@@ -127,7 +127,7 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
     }
 
     private void changeStatus(TransactionStatus from, TransactionStatus to) {
-        synchronized (lock) {
+        synchronized (statusLock) {
             if (!status.equals(from)) {
                 throw new IllegalStateException("Expected " + from + " but was " + status);
             }
@@ -136,7 +136,7 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
     }
 
     private void changeStatus(TransactionStatus[] fromAny, TransactionStatus to) {
-        synchronized (lock) {
+        synchronized (statusLock) {
             for (TransactionStatus from : fromAny) {
                 if (status.equals(from)) {
                     status = to;
