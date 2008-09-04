@@ -49,7 +49,7 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class EntitySerializationRulesSpec extends Specification<Object> {
+public class EntitySerializationChecksSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
@@ -81,7 +81,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             return null;
         }
 
-        public void referringAnEntityDirectlyIsNotAllowed() {
+        public void referringAnEntityDirectlyIsForbidden() {
             entity.other = new DummyEntity();
             specify(new Block() {
                 public void run() throws Throwable {
@@ -98,7 +98,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             storage.update(ENTITY_ID, entity);
         }
 
-        public void checksAreDoneAfterAnyObjectsArePossiblyReplaced() {
+        public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
             entity.other = "tmp";
             replacer.delegate = new SerializationReplacerAdapter(){
                 public Object replaceSerialized(Object rootObject, Object obj) {
@@ -127,7 +127,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             return null;
         }
 
-        public void serializingAnonymousClassesIsNotAllowed() {
+        public void serializingAnonymousClassesIsForbidden() {
             entity.other = newAnonymousClassInstance();
             specify(new Block() {
                 public void run() throws Throwable {
@@ -136,7 +136,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             }, should.raise(IllegalArgumentException.class));
         }
 
-        public void serializingLocalClassesIsNotAllowed() {
+        public void serializingLocalClassesIsForbidden() {
             entity.other = newLocalClassInstance();
             specify(new Block() {
                 public void run() throws Throwable {
@@ -153,7 +153,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             storage.update(ENTITY_ID, entity);
         }
 
-        public void checksAreDoneAfterAnyObjectsArePossiblyReplaced() {
+        public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
             entity.other = "tmp";
             replacer.delegate = new SerializationReplacerAdapter() {
                 public Object replaceSerialized(Object rootObject, Object obj) {
