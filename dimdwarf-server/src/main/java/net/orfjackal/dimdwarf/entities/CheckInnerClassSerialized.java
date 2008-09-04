@@ -37,9 +37,9 @@ import net.orfjackal.dimdwarf.serial.SerializationListener;
  * @author Esko Luontola
  * @since 4.9.2008
  */
-public class CheckInnerClassSerialized implements SerializationListener {
+public class CheckInnerClassSerialized implements SerializationListener { // TODO: use adapter
 
-    public void beforeSerialized(Object rootObject, Object obj) {
+    public void beforeReplace(Object rootObject, Object obj) {
         if (obj == null) {
             return;
         }
@@ -52,6 +52,13 @@ public class CheckInnerClassSerialized implements SerializationListener {
         }
     }
 
-    public void afterDeserialized(Object obj) {
+    public void beforeSerialize(Object rootObject, Object obj) {
+        // TODO: the above code should be here - need one more test for it
+    }
+
+    public void afterDeserialize(Object obj) {
+    }
+
+    public void afterResolve(Object obj) {
     }
 }

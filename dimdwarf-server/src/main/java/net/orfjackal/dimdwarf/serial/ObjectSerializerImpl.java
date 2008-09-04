@@ -100,13 +100,13 @@ public class ObjectSerializerImpl implements ObjectSerializer {
 
         protected Object replaceObject(Object obj) throws IOException {
             for (SerializationListener listener : listeners) {
-                listener.beforeSerialized(rootObject, obj);
+                listener.beforeReplace(rootObject, obj);
             }
             for (SerializationReplacer replacer : replacers) {
-                // TODO: replacement should be done before listeners, because otherwise entities
-                // can not be proxied before check for direct entity reference will fail serialization
-                // -> write a test when doing transparent references (also change order in SerializationAdapter)
                 obj = replacer.replaceSerialized(rootObject, obj);
+            }
+            for (SerializationListener listener : listeners) {
+                listener.beforeSerialize(rootObject, obj);
             }
             return obj;
         }
@@ -120,11 +120,14 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         }
 
         protected Object resolveObject(Object obj) throws IOException {
+            for (SerializationListener listener : listeners) {
+                listener.afterDeserialize(obj);
+            }
             for (SerializationReplacer replacer : replacers) {
                 obj = replacer.resolveDeserialized(obj);
             }
             for (SerializationListener listener : listeners) {
-                listener.afterDeserialized(obj);
+                listener.afterResolve(obj);
             }
             return obj;
         }

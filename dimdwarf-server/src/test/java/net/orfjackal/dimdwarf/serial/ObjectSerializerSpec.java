@@ -88,16 +88,20 @@ public class ObjectSerializerSpec extends Specification<Object> {
 
         public void areNotifiedOfAllSerializedObjects() {
             checking(new Expectations() {{
-                one(listener).beforeSerialized(obj, obj);
-                one(listener).beforeSerialized(obj, "foo");
+                one(listener).beforeReplace(obj, obj);
+                one(listener).beforeReplace(obj, "foo");
+                one(listener).beforeSerialize(obj, obj);
+                one(listener).beforeSerialize(obj, "foo");
             }});
             serializer.serialize(obj);
         }
 
         public void areNotifiedOfAllDeserializedObjects() {
             checking(new Expectations() {{
-                one(listener).afterDeserialized(with(a(DummyEntity.class)));
-                one(listener).afterDeserialized("foo");
+                one(listener).afterDeserialize(with(a(DummyEntity.class)));
+                one(listener).afterDeserialize("foo");
+                one(listener).afterResolve(with(a(DummyEntity.class)));
+                one(listener).afterResolve("foo");
             }});
             serializer.deserialize(serializedBytes);
         }
@@ -106,11 +110,12 @@ public class ObjectSerializerSpec extends Specification<Object> {
     public class SerializationReplacers {
         private Blob serializedBytes;
         private ObjectSerializerImpl serializer;
+        private SerializationListener listener;
 
         public Object create() {
             serializedBytes = new ObjectSerializerImpl().serialize(obj);
+            listener = mock(SerializationListener.class);
             SerializationReplacer replacer = new SerializationReplacer() {
-
                 public Object replaceSerialized(Object rootObject, Object obj) {
                     if (obj.equals("foo")) {
                         return "bar";
@@ -125,11 +130,19 @@ public class ObjectSerializerSpec extends Specification<Object> {
                     return obj;
                 }
             };
-            serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{replacer});
+            serializer = new ObjectSerializerImpl(
+                    new SerializationListener[]{listener},
+                    new SerializationReplacer[]{replacer});
             return null;
         }
 
         public void canReplaceObjectsOnSerialization() {
+            checking(new Expectations() {{
+                one(listener).beforeReplace(obj, obj);
+                one(listener).beforeReplace(obj, "foo");
+                one(listener).beforeSerialize(obj, obj);
+                one(listener).beforeSerialize(obj, "bar");
+            }});
             Blob bytes = serializer.serialize(obj);
             DummyEntity serialized = (DummyEntity) new ObjectSerializerImpl().deserialize(bytes);
             specify(obj.other, should.equal("foo"));
@@ -137,6 +150,12 @@ public class ObjectSerializerSpec extends Specification<Object> {
         }
 
         public void canResolveObjectsOnDeserialization() {
+            checking(new Expectations() {{
+                one(listener).afterDeserialize(with(a(DummyEntity.class)));
+                one(listener).afterDeserialize("foo");
+                one(listener).afterResolve(with(a(DummyEntity.class)));
+                one(listener).afterResolve("gazonk");
+            }});
             DummyEntity deserialized = (DummyEntity) serializer.deserialize(serializedBytes);
             specify(obj.other, should.equal("foo"));
             specify(deserialized.other, should.equal("gazonk"));
