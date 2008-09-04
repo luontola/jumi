@@ -38,11 +38,11 @@ import net.orfjackal.dimdwarf.serial.SerializationListener;
  * @author Esko Luontola
  * @since 4.9.2008
  */
-public class CheckEntityNotReferredDirectly implements SerializationListener {
+public class CheckEntityReferredDirectly implements SerializationListener {
 
     public void beforeSerialized(Object rootObject, Object obj) {
         if (obj instanceof Entity && obj != rootObject) {
-            throw new IllegalArgumentException("Entity referred directly without an entity reference");
+            throw new IllegalArgumentException("Entity referred directly without an entity reference: " + obj.getClass());
         }
     }
 

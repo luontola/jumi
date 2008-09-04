@@ -62,7 +62,8 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
     public void create() throws Exception {
         db = mock(DatabaseConnection.class);
         serializer = new ObjectSerializerImpl();
-        serializer.addSerializationListener(new CheckEntityNotReferredDirectly());
+        serializer.addSerializationListener(new CheckEntityReferredDirectly());
+        serializer.addSerializationListener(new CheckInnerClassSerialized());
         storage = new EntityStorageImpl(db, serializer);
         entity = new DummyEntity();
     }
@@ -96,6 +97,50 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
         }
     }
 
-    // TODO: warn about serializing anonymous classes and non-static inner classes
+    /**
+     * <a href="http://java.sun.com/javase/6/docs/platform/serialization/spec/serial-arch.html#4539">Java Object
+     * Serialization Specification</a> says that serialization of inner classes (i.e., nested classes that are not 
+     * static member classes), including local and anonymous classes, is strongly discouraged.
+     */
+    public class ReferringInnerClasses {
+
+        public Object create() {
+            return null;
+        }
+
+        public void serializingAnonymousClassesIsNotAllowed() {
+            entity.other = new DummyObject() {
+            };
+            specify(new Block() {
+                public void run() throws Throwable {
+                    storage.update(ENTITY_ID, entity);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+
+        public void serializingLocalClassesIsNotAllowed() {
+            class LocalClass extends DummyObject {
+            }
+            entity.other = new LocalClass();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    storage.update(ENTITY_ID, entity);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+
+        public void serializingStaticMemberClassesIsAllowed() {
+            checking(new Expectations() {{
+                one(db).update(with(equal(asBytes(ENTITY_ID))), with(aNonNull(Blob.class)));
+            }});
+            entity.other = new StaticMemberClass();
+            storage.update(ENTITY_ID, entity);
+        }
+    }
+
+
+    private static class StaticMemberClass extends DummyObject {
+    }
+
     // TODO: warn about 'writeReplace' and 'readResolve' in an entity class (or is dimdwarf affected by this at all?). See: com.sun.sgs.impl.service.data.ClassesTable.checkObjectReplacement
 }
