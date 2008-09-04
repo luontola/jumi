@@ -31,18 +31,15 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.serial.SerializationListener;
+import net.orfjackal.dimdwarf.serial.SerializationAdapter;
 
 /**
  * @author Esko Luontola
  * @since 4.9.2008
  */
-public class CheckInnerClassSerialized implements SerializationListener { // TODO: use adapter
+public class CheckInnerClassSerialized extends SerializationAdapter {
 
-    public void beforeReplace(Object rootObject, Object obj) {
-        if (obj == null) {
-            return;
-        }
+    public void beforeSerialize(Object rootObject, Object obj) {
         Class<?> cls = obj.getClass();
         if (cls.isAnonymousClass()) {
             throw new IllegalArgumentException("Tried to serialize an anonymous classes: " + cls.getName());
@@ -50,15 +47,5 @@ public class CheckInnerClassSerialized implements SerializationListener { // TOD
         if (cls.isLocalClass()) {
             throw new IllegalArgumentException("Tried to serialize a local classes: " + cls.getName());
         }
-    }
-
-    public void beforeSerialize(Object rootObject, Object obj) {
-        // TODO: the above code should be here - need one more test for it
-    }
-
-    public void afterDeserialize(Object obj) {
-    }
-
-    public void afterResolve(Object obj) {
     }
 }

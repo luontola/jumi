@@ -128,8 +128,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
         }
 
         public void serializingAnonymousClassesIsNotAllowed() {
-            entity.other = new DummyObject() {
-            };
+            entity.other = newAnonymousClassInstance();
             specify(new Block() {
                 public void run() throws Throwable {
                     storage.update(ENTITY_ID, entity);
@@ -138,9 +137,7 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
         }
 
         public void serializingLocalClassesIsNotAllowed() {
-            class LocalClass extends DummyObject {
-            }
-            entity.other = new LocalClass();
+            entity.other = newLocalClassInstance();
             specify(new Block() {
                 public void run() throws Throwable {
                     storage.update(ENTITY_ID, entity);
@@ -155,8 +152,36 @@ public class EntitySerializationRulesSpec extends Specification<Object> {
             entity.other = new StaticMemberClass();
             storage.update(ENTITY_ID, entity);
         }
+
+        public void checksAreDoneAfterAnyObjectsArePossiblyReplaced() {
+            entity.other = "tmp";
+            replacer.delegate = new SerializationReplacerAdapter() {
+                public Object replaceSerialized(Object rootObject, Object obj) {
+                    if (obj.equals("tmp")) {
+                        return newAnonymousClassInstance();
+                    }
+                    return obj;
+                }
+            };
+            specify(new Block() {
+                public void run() throws Throwable {
+                    storage.update(ENTITY_ID, entity);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
     }
 
+
+    private static Object newAnonymousClassInstance() {
+        return new DummyObject() {
+        };
+    }
+
+    private static Object newLocalClassInstance() {
+        class LocalClass extends DummyObject {
+        }
+        return new LocalClass();
+    }
 
     private static class StaticMemberClass extends DummyObject {
     }
