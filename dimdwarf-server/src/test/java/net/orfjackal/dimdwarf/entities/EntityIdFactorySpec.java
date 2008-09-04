@@ -31,13 +31,45 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import jdave.Group;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
+import org.junit.runner.RunWith;
+
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 31.8.2008
+ * @since 4.9.2008
  */
-public interface EntityIdFactory {
+@RunWith(JDaveRunner.class)
+@Group({"fast"})
+public class EntityIdFactorySpec extends Specification<Object> {
 
-    BigInteger newId();
+    private static final BigInteger LARGEST_USED_ID = BigInteger.valueOf(42);
+
+    private EntityIdFactoryImpl factory;
+
+    public void create() throws Exception {
+        factory = new EntityIdFactoryImpl(LARGEST_USED_ID);
+    }
+
+
+    public class AnEntityIdFactory {
+
+        public Object create() {
+            return null;
+        }
+
+        public void startsFromTheNextUnusedId() {
+            BigInteger nextUnused = LARGEST_USED_ID.add(BigInteger.ONE);
+            specify(factory.newId(), should.equal(nextUnused));
+        }
+
+        public void incrementsTheIdOnEveryCall() {
+            BigInteger id1 = factory.newId();
+            BigInteger id2 = factory.newId();
+            specify(id2, should.equal(id1.add(BigInteger.ONE)));
+        }
+    }
 }

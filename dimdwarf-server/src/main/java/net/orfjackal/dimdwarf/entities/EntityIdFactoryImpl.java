@@ -35,9 +35,21 @@ import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 31.8.2008
+ * @since 4.9.2008
  */
-public interface EntityIdFactory {
+public class EntityIdFactoryImpl implements EntityIdFactory {
 
-    BigInteger newId();
+    private BigInteger next;
+
+    public EntityIdFactoryImpl(BigInteger largestUsedId) {
+        next = largestUsedId.add(BigInteger.ONE);
+    }
+
+    public synchronized BigInteger newId() {
+        try {
+            return next;
+        } finally {
+            next = next.add(BigInteger.ONE);
+        }
+    }
 }
