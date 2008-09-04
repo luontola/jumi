@@ -35,10 +35,10 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseConnection;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -46,26 +46,25 @@ import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 4.9.2008
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class EntityStorageSpec extends Specification<Object> {
+public class EntitySerializationRulesSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private DatabaseConnection db;
     private ObjectSerializer serializer;
     private EntityStorageImpl storage;
-    private Entity entity;
-    private Blob serialized;
+    private DummyEntity entity;
 
     public void create() throws Exception {
         db = mock(DatabaseConnection.class);
-        serializer = mock(ObjectSerializer.class);
+        serializer = new ObjectSerializerImpl();
+        serializer.addSerializationListener(new CheckEntityNotReferredDirectly());
         storage = new EntityStorageImpl(db, serializer);
         entity = new DummyEntity();
-        serialized = Blob.fromBytes(new byte[]{1, 2, 3});
     }
 
     private static Blob asBytes(BigInteger id) {
@@ -73,44 +72,30 @@ public class EntityStorageSpec extends Specification<Object> {
     }
 
 
-    public class AnEntityStorage {
+    public class ReferringEntities {
 
         public Object create() {
             return null;
         }
 
-        public void readsEntitiesFromDatabase() {
-            checking(new Expectations() {{
-                one(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
-                one(serializer).deserialize(serialized); will(returnValue(entity));
-            }});
-            specify(storage.read(ENTITY_ID), should.equal(entity));
-        }
-
-        public void canNotBeReadNonexistentEntities() {
-            checking(new Expectations() {{
-                one(db).read(asBytes(ENTITY_ID)); will(returnValue(Blob.EMPTY_BLOB));
-            }});
+        public void referringAnEntityDirectlyIsNotAllowed() {
+            entity.other = new DummyEntity();
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.read(ENTITY_ID);
+                    storage.update(ENTITY_ID, entity);
                 }
-            }, should.raise(EntityNotFoundException.class));
+            }, should.raise(IllegalArgumentException.class));
         }
 
-        public void writesEntitiesToDatabase() {
+        public void referringAnEntityThroughAnEntityReferenceIsAllowed() {
             checking(new Expectations() {{
-                one(serializer).serialize(entity); will(returnValue(serialized));
-                one(db).update(asBytes(ENTITY_ID), serialized);
+                one(db).update(with(equal(asBytes(ENTITY_ID))), with(aNonNull(Blob.class)));
             }});
+            entity.other = new EntityReferenceImpl<DummyEntity>(BigInteger.valueOf(123), new DummyEntity());
             storage.update(ENTITY_ID, entity);
         }
-
-        public void deletesEntitiesFromDatabase() {
-            checking(new Expectations() {{
-                one(db).delete(asBytes(ENTITY_ID));
-            }});
-            storage.delete(ENTITY_ID);
-        }
     }
+
+    // TODO: warn about serializing anonymous classes and non-static inner classes
+    // TODO: warn about 'writeReplace' and 'readResolve' in an entity class (or is dimdwarf affected by this at all?). See: com.sun.sgs.impl.service.data.ClassesTable.checkObjectReplacement
 }
