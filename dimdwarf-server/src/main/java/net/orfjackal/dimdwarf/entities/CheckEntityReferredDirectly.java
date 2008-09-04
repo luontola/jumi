@@ -35,6 +35,8 @@ import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.serial.SerializationAdapter;
 
 /**
+ * This class is stateless.
+ *
  * @author Esko Luontola
  * @since 4.9.2008
  */

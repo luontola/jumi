@@ -36,7 +36,7 @@ import net.orfjackal.dimdwarf.db.Blob;
 import java.io.*;
 
 /**
- * This class is NOT thread-safe.
+ * This class is immutable.
  *
  * @author Esko Luontola
  * @since 1.9.2008

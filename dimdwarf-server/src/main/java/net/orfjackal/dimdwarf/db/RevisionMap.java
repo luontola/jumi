@@ -128,8 +128,8 @@ public class RevisionMap<K, V> {
     }
 
     /**
-     * The iterator returned by this method can be used in only one thread,
-     * but it allows concurrent modifications of the map (as long as the revision
+     * The iterator returned by this method is NOT thread-safe, but it allows
+     * concurrent modifications of the map in other threads (as long as the revision
      * being iterated is not purged - in which case the behaviour is unspecified).
      */
     public Iterator<Map.Entry<K, V>> iterator(long revision) {

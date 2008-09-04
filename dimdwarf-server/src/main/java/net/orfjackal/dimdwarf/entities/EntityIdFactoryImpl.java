@@ -34,6 +34,8 @@ package net.orfjackal.dimdwarf.entities;
 import java.math.BigInteger;
 
 /**
+ * This class is thread-safe.
+ *
  * @author Esko Luontola
  * @since 4.9.2008
  */
