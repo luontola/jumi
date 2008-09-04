@@ -47,6 +47,8 @@ import java.util.List;
  */
 public class TransparentReferenceTest {
 
+    // TODO: convert to JDave spec
+
     public static Test suite() {
         return new TestSuite(
                 WhenCreatingATransparentReferenceTest.class,

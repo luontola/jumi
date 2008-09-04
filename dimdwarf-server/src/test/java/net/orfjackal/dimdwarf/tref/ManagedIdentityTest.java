@@ -43,6 +43,8 @@ import net.orfjackal.dimdwarf.api.Entity;
  */
 public class ManagedIdentityTest {
 
+    // TODO: convert to JDave spec
+
     public static Test suite() {
         return new TestSuite(ManagedIdentityContracts.class);
     }

@@ -48,6 +48,8 @@ import java.io.*;
  */
 public class ManualTestTransparentReferenceSerialization {
 
+    // TODO: convert to JDave spec (?)
+
     public static final File FILE = new File(ManualTestTransparentReferenceSerialization.class.getName() + ".ser.tmp");
 
     public static final TransparentReferenceFactory FACTORY = new TransparentReferenceCglibProxyFactory();

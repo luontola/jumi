@@ -44,6 +44,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class BenchmarkTransparentReference {
 
+    // TODO: is this anymore needed? should this be converted to use the Benchmark class?
+
     enum Strategy {
         JDK_PROXYING, CGLIB_PROXYING
     }
