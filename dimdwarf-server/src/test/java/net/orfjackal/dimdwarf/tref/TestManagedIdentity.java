@@ -31,10 +31,14 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.db.InMemoryDatabase;
+import net.orfjackal.dimdwarf.entities.DummyEntityIdFactory;
+import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.EntityStorageImpl;
+import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
 
 
 /**
@@ -42,11 +46,6 @@ import net.orfjackal.dimdwarf.api.Entity;
  * @since 1.2.2008
  */
 public class TestManagedIdentity {
-
-    public static Test suite() {
-        return new TestSuite(TestManagedIdentity.class.getDeclaredClasses());
-    }
-
 
     public static class ManagedIdentityContracts extends TestCase {
 
@@ -59,7 +58,11 @@ public class TestManagedIdentity {
 
         protected void setUp() throws Exception {
             factory = new TransparentReferenceCglibProxyFactory();
-//            MockAppContext.install();
+            AppContext.setDataManager(new EntityManager(
+                    new DummyEntityIdFactory(),
+                    new EntityStorageImpl(
+                            new InMemoryDatabase().openConnection(new TransactionImpl()),
+                            new ObjectSerializerImpl())));
 
             man1 = new DummyManagedObject();
             man2 = new DummyManagedObject();
@@ -69,7 +72,7 @@ public class TestManagedIdentity {
         }
 
         protected void tearDown() throws Exception {
-//            MockAppContext.uninstall();
+            AppContext.setDataManager(null);
         }
 
         public void testManagedObjectEqualsManagedObject() {

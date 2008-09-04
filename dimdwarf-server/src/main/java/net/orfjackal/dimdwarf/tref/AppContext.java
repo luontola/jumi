@@ -39,7 +39,15 @@ import net.orfjackal.dimdwarf.entities.EntityManager;
  */
 public class AppContext {
 
+    //  TODO: remove this class, use dependency injection
+
+    private static EntityManager dataManager;
+
     public static EntityManager getDataManager() {
-        return null;
+        return dataManager;
+    }
+
+    public static void setDataManager(EntityManager dataManager) {
+        AppContext.dataManager = dataManager;
     }
 }
