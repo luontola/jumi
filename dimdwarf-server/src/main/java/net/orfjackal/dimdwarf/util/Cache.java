@@ -31,27 +31,28 @@
 
 package net.orfjackal.dimdwarf.util;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
- * Provides a value for a key, but caches the value returned by the underlying service. It is not guaranteed,
- * that in a multithreaded environment the underlying service is called at most once per a key, but otherwise
- * this class is thread-safe. The cache is never emptied during the life-time of the cache instance.
+ * Provides a value for a key, but caches the value returned by the underlying service. The {@link #newInstance}
+ * method may be called more than once, but the {@link #get} method is guaranteed to return exactly one instance
+ * for a key. The cache is never emptied during the life-time of the cache instance.
+ * <p/>
+ * This class is thread-safe.
  *
  * @author Esko Luontola
  * @since 7.5.2008
  */
 public abstract class Cache<K, V> {
 
-    private final Map<K, V> cache = Collections.synchronizedMap(new HashMap<K, V>());
+    private final ConcurrentMap<K, V> cache = new ConcurrentHashMap<K, V>();
 
     public V get(K key) {
         V value = cache.get(key);
         if (value == null) {
-            value = newInstance(key);
-            cache.put(key, value);
+            cache.putIfAbsent(key, newInstance(key));
+            value = cache.get(key);
         }
         return value;
     }
