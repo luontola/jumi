@@ -31,7 +31,9 @@
 
 package net.orfjackal.dimdwarf.tref;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.orfjackal.dimdwarf.api.Entity;
 
 
@@ -39,9 +41,14 @@ import net.orfjackal.dimdwarf.api.Entity;
  * @author Esko Luontola
  * @since 1.2.2008
  */
-public class TestManagedIdentity {
+public class ManagedIdentityTest {
 
-    public static class ManagedIdentityContractsTest extends TestCase {
+    public static Test suite() {
+        return new TestSuite(ManagedIdentityContracts.class);
+    }
+
+
+    public static class ManagedIdentityContracts extends TestCase {
 
         protected TransparentReferenceFactory factory;
         private Entity man1;

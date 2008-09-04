@@ -131,11 +131,11 @@ public class BenchmarkTransparentReference {
 
     private static long deserializeReference(int iterations) throws IOException, ClassNotFoundException {
         Object reference = AppContext.getDataManager().createReference(new DummyManagedObject());
-        byte[] bytes = TestTransparentReference.serializeObject(reference);
+        byte[] bytes = TransparentReferenceTest.serializeObject(reference);
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            Object o = TestTransparentReference.deserializeObject(bytes);
+            Object o = TransparentReferenceTest.deserializeObject(bytes);
             junk += (o == null) ? 1 : 2;
         }
         long end = System.currentTimeMillis();
@@ -144,11 +144,11 @@ public class BenchmarkTransparentReference {
 
     private static long deserializeTransparentReference(int iterations) throws IOException, ClassNotFoundException {
         Object reference = factory.createTransparentReference(new DummyManagedObject());
-        byte[] bytes = TestTransparentReference.serializeObject(reference);
+        byte[] bytes = TransparentReferenceTest.serializeObject(reference);
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            Object o = TestTransparentReference.deserializeObject(bytes);
+            Object o = TransparentReferenceTest.deserializeObject(bytes);
             junk += (o == null) ? 1 : 2;
         }
         long end = System.currentTimeMillis();

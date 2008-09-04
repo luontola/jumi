@@ -31,7 +31,9 @@
 
 package net.orfjackal.dimdwarf.tref;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
@@ -43,7 +45,15 @@ import java.util.List;
  * @author Esko Luontola
  * @since 25.1.2008
  */
-public class TestTransparentReference {
+public class TransparentReferenceTest {
+
+    public static Test suite() {
+        return new TestSuite(
+                WhenCreatingATransparentReferenceTest.class,
+                WhenManagedObjectsAreConvertedToTransparentReferencesDuringSerializationTest.class,
+                MarkingTransparentReferencesForUpdateTest.class);
+    }
+
 
     public static byte[] serializeObject(Object object) throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();

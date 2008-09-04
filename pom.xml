@@ -187,6 +187,8 @@
                 <configuration>
                     <includes>
                         <include>**/*Spec.java</include>
+                        <!-- TODO: remove when transparent reference tests have been converted -->
+                        <include>**/*Test.java</include>
                     </includes>
                     <systemProperties>
                         <property>
