@@ -33,12 +33,6 @@ package net.orfjackal.dimdwarf.tref;
 
 import junit.framework.TestCase;
 import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.db.InMemoryDatabase;
-import net.orfjackal.dimdwarf.entities.DummyEntityIdFactory;
-import net.orfjackal.dimdwarf.entities.EntityManager;
-import net.orfjackal.dimdwarf.entities.EntityStorageImpl;
-import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
 
 
 /**
@@ -47,7 +41,7 @@ import net.orfjackal.dimdwarf.tx.TransactionImpl;
  */
 public class TestManagedIdentity {
 
-    public static class ManagedIdentityContracts extends TestCase {
+    public static class ManagedIdentityContractsTest extends TestCase {
 
         protected TransparentReferenceFactory factory;
         private Entity man1;
@@ -58,11 +52,7 @@ public class TestManagedIdentity {
 
         protected void setUp() throws Exception {
             factory = new TransparentReferenceCglibProxyFactory();
-            AppContext.setDataManager(new EntityManager(
-                    new DummyEntityIdFactory(),
-                    new EntityStorageImpl(
-                            new InMemoryDatabase().openConnection(new TransactionImpl()),
-                            new ObjectSerializerImpl())));
+            AppContext.setMockDataManager();
 
             man1 = new DummyManagedObject();
             man2 = new DummyManagedObject();

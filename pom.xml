@@ -118,7 +118,7 @@
                 <version>0.9.6_2</version>
             </dependency>
 
-            <!-- Other dependencies -->
+            <!-- Dependency injection -->
 
             <dependency>
                 <groupId>com.google.code.guice</groupId>
@@ -126,11 +126,23 @@
                 <version>1.0</version>
             </dependency>
 
+            <!-- Bytecode manipulation -->
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib-nodep</artifactId>
+                <version>2.1_3</version>
+            </dependency>
+
+            <!-- Networking -->
+
             <dependency>
                 <groupId>org.apache.mina</groupId>
                 <artifactId>mina-core</artifactId>
                 <version>1.1.7</version>
             </dependency>
+
+            <!-- Logging -->
 
             <dependency>
                 <groupId>org.slf4j</groupId>

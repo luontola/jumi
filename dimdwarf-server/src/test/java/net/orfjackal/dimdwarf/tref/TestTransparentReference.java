@@ -60,23 +60,23 @@ public class TestTransparentReference {
         return object;
     }
 
-    public static abstract class WhenCreatingATransparentReference extends TestCase {
+    public static class WhenCreatingATransparentReferenceTest extends TestCase {
 
         protected TransparentReferenceFactory factory;
         private DummyManagedObject object;
         private Object proxy;
 
         protected void setUp() throws Exception {
-            factory = new TransparentReferenceCglibProxyFactory();
-//            MockAppContext.install();
+            AppContext.setMockDataManager();
 
+            factory = new TransparentReferenceCglibProxyFactory();
             TransparentReferenceImpl.setFactory(factory);
             object = new DummyManagedObject();
             proxy = factory.createTransparentReference(object);
         }
 
         protected void tearDown() throws Exception {
-//            MockAppContext.uninstall();
+            AppContext.setDataManager(null);
         }
 
         public void testAProxyShouldBeCreated() {
@@ -176,7 +176,7 @@ public class TestTransparentReference {
     }
 
     @SuppressWarnings({"FieldCanBeLocal"})
-    public static abstract class WhenManagedObjectsAreConvertedToTransparentReferencesDuringSerialization extends TestCase {
+    public static class WhenManagedObjectsAreConvertedToTransparentReferencesDuringSerializationTest extends TestCase {
 
         protected TransparentReferenceFactory factory;
         private DummyManagedObject managedObject;
@@ -184,9 +184,9 @@ public class TestTransparentReference {
         private SerializationTestObject deserialized;
 
         protected void setUp() throws Exception {
-            factory = new TransparentReferenceCglibProxyFactory();
-//            MockAppContext.install();
+            AppContext.setMockDataManager();
 
+            factory = new TransparentReferenceCglibProxyFactory();
             TransparentReferenceImpl.setFactory(factory);
             managedObject = new DummyManagedObject();
             normalObject = new DummyNormalObject();
@@ -202,7 +202,7 @@ public class TestTransparentReference {
         }
 
         protected void tearDown() throws Exception {
-//            MockAppContext.uninstall();
+            AppContext.setDataManager(null);
         }
 
         public void testShouldReplaceManagedObjectsWithProxies() {
@@ -241,7 +241,7 @@ public class TestTransparentReference {
         }
     }
 
-    public static abstract class MarkingTransparentReferencesForUpdate extends TestCase {
+    public static class MarkingTransparentReferencesForUpdateTest extends TestCase {
 
         protected TransparentReferenceFactory factory;
         private DummyManagedObject managedObject;
@@ -249,9 +249,9 @@ public class TestTransparentReference {
         private Object normalObject;
 
         protected void setUp() throws Exception {
-            factory = new TransparentReferenceCglibProxyFactory();
-//            MockAppContext.install();
+            AppContext.setMockDataManager();
 
+            factory = new TransparentReferenceCglibProxyFactory();
             TransparentReferenceImpl.setFactory(factory);
             managedObject = new DummyManagedObject();
             proxy = (DummyInterface) factory.createTransparentReference(managedObject);
@@ -259,7 +259,7 @@ public class TestTransparentReference {
         }
 
         protected void tearDown() throws Exception {
-//            MockAppContext.uninstall();
+            AppContext.setDataManager(null);
         }
 
         public void testMarkForUpdateOnManagedObjectShouldUseMarkForUpdate() {

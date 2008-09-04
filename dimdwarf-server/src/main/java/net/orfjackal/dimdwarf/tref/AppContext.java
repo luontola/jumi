@@ -31,7 +31,14 @@
 
 package net.orfjackal.dimdwarf.tref;
 
+import net.orfjackal.dimdwarf.db.InMemoryDatabase;
+import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
 import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.EntityStorageImpl;
+import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
+
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -42,6 +49,14 @@ public class AppContext {
     //  TODO: remove this class, use dependency injection
 
     private static EntityManager dataManager;
+
+    public static void setMockDataManager() {
+        setDataManager(new EntityManager(
+                new EntityIdFactoryImpl(BigInteger.ONE),
+                new EntityStorageImpl(
+                        new InMemoryDatabase().openConnection(new TransactionImpl()),
+                        new ObjectSerializerImpl())));
+    }
 
     public static EntityManager getDataManager() {
         return dataManager;
