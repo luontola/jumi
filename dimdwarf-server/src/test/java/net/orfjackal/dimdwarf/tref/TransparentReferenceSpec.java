@@ -39,10 +39,14 @@ import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.DummyInterface;
 import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+import net.orfjackal.dimdwarf.serial.SerializationListener;
+import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 import net.orfjackal.dimdwarf.util.TestUtil;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -50,6 +54,7 @@ import org.junit.runner.RunWith;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,9 +78,12 @@ public class TransparentReferenceSpec extends Specification<Object> {
     }
 
     private Expectations referenceIsCreatedFor(final Entity entity, final BigInteger id) {
-        return new Expectations() {{
-            one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
-        }};
+        return new Expectations() {
+            {
+                one(entityManager).createReference(entity);
+                will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
+            }
+        };
     }
 
     public class WhenATransparentReferenceProxyIsCreated {
@@ -182,6 +190,61 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public void theEntityReferenceCanBeRetrievedFromTheProxy() {
             specify(((TransparentReference) proxy).getEntityReference().get(), should.equal(entity));
+        }
+    }
+
+    public class WhenEntitiesAreSerialized {
+
+        private SerializationTestEntity deserialized;
+
+        public Object create() {
+            ObjectSerializerImpl serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{
+                    new ReplaceDirectlyReferredEntityWithTransparentReference(factory)
+            });
+            checking(referenceIsCreatedFor(entity, BigInteger.ONE));
+            Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyNormalObject()));
+            deserialized = (SerializationTestEntity) serializer.deserialize(data);
+            return null;
+        }
+
+        public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {
+            specify(Entities.isTransparentReference(deserialized.entity));
+            specify(Entities.isEntity(deserialized.entity), should.equal(false));
+        }
+
+        public void theRootEntityIsNotReplaced() {
+            specify(Entities.isTransparentReference(deserialized), should.equal(false));
+            specify(Entities.isEntity(deserialized));
+        }
+
+        public void nonEntityObjectsAreNotReplaced() {
+            specify(Entities.isTransparentReference(deserialized.normalObject), should.equal(false));
+            specify(Entities.isEntity(deserialized.normalObject), should.equal(false));
+            specify(deserialized.normalObject.getClass(), should.equal(DummyNormalObject.class));
+        }
+    }
+
+
+    private static class SerializationTestEntity implements Entity, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private DummyInterface entity;
+        private DummyInterface normalObject;
+
+        public SerializationTestEntity(DummyEntity entity, DummyNormalObject normalObject) {
+            this.entity = entity;
+            this.normalObject = normalObject;
+        }
+    }
+
+    private static class DummyNormalObject implements DummyInterface, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public Object getOther() {
+            return null;
+        }
+
+        public void setOther(Object other) {
         }
     }
 }
