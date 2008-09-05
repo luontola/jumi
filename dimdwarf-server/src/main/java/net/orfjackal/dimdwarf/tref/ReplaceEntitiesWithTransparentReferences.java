@@ -36,6 +36,8 @@ import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 
 /**
+ * The thread-safeness of this class depends on the injected dependencies.
+ *
  * @author Esko Luontola
  * @since 5.9.2008
  */

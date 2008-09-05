@@ -39,6 +39,8 @@ import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import java.io.Serializable;
 
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
  * @since 31.1.2008
  */

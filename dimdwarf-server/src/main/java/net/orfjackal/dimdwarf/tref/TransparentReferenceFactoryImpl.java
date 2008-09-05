@@ -41,6 +41,8 @@ import net.sf.cglib.proxy.*;
 import java.lang.reflect.Method;
 
 /**
+ * The thread-safeness of this class depends on the injected dependencies.
+ *
  * @author Esko Luontola
  * @since 26.1.2008
  */
