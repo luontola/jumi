@@ -54,7 +54,7 @@ public class ManualTestTransparentReferenceSerialization {
 
     public static final File FILE = new File(ManualTestTransparentReferenceSerialization.class.getName() + ".ser.tmp");
 
-    public static final TransparentReferenceFactory FACTORY = new TransparentReferenceFactoryImpl(AppContext.getDataManager());
+    public static final TransparentReferenceFactory FACTORY = new TransparentReferenceFactoryImpl(null);
 //    public static final TransparentReferenceFactory FACTORY = new TransparentReferenceJdkProxyFactory();
 
     public static class Step1_Serialize {

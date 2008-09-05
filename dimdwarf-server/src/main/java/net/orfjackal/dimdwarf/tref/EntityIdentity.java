@@ -51,7 +51,7 @@ import net.orfjackal.dimdwarf.context.ThreadContext;
  * @author Esko Luontola
  * @since 1.2.2008
  */
-public final class EntityIdentity {
+public class EntityIdentity {
 
     private EntityIdentity() {
     }

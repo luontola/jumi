@@ -42,7 +42,7 @@ import java.io.Serializable;
  * @author Esko Luontola
  * @since 31.1.2008
  */
-public final class TransparentReferenceImpl implements TransparentReference, Serializable {
+public class TransparentReferenceImpl implements TransparentReference, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final EntityReference<?> reference;

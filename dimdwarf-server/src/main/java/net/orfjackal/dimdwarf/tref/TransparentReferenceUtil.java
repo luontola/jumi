@@ -44,7 +44,7 @@ import java.util.List;
  * @author Esko Luontola
  * @since 23.1.2008
  */
-public final class TransparentReferenceUtil {
+public class TransparentReferenceUtil {
 
     private TransparentReferenceUtil() {
     }

@@ -55,15 +55,15 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
 
     public TransparentReference createTransparentReference(Entity object) {
         Class<?> type = object.getClass();
-        EntityReference<?> reference = entityManager.createReference(object);
-        return newProxy(new TransparentReferenceImpl(type, reference));
+        EntityReference<?> ref = entityManager.createReference(object);
+        return newProxy(new TransparentReferenceImpl(type, ref));
     }
 
-    public TransparentReference newProxy(TransparentReferenceImpl ref) {
-        Factory factory = cache.get(ref.getType());
+    public TransparentReference newProxy(TransparentReferenceImpl tref) {
+        Factory factory = cache.get(tref.getType());
         return (TransparentReference) factory.newInstance(new Callback[]{
-                new EntityCallback(ref),
-                new TransparentReferenceCallback(ref)
+                new EntityCallback(tref),
+                new TransparentReferenceCallback(tref)
         });
     }
 
@@ -83,27 +83,27 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
 
     private static class EntityCallback implements LazyLoader {
 
-        private final TransparentReference ref;
+        private final TransparentReference tref;
 
-        private EntityCallback(TransparentReference ref) {
-            this.ref = ref;
+        private EntityCallback(TransparentReference tref) {
+            this.tref = tref;
         }
 
         public Object loadObject() throws Exception {
-            return ref.getEntity();
+            return tref.getEntity();
         }
     }
 
     private static class TransparentReferenceCallback implements Dispatcher {
 
-        private final TransparentReference ref;
+        private final TransparentReference tref;
 
-        public TransparentReferenceCallback(TransparentReference ref) {
-            this.ref = ref;
+        public TransparentReferenceCallback(TransparentReference tref) {
+            this.tref = tref;
         }
 
         public Object loadObject() throws Exception {
-            return ref;
+            return tref;
         }
     }
 
