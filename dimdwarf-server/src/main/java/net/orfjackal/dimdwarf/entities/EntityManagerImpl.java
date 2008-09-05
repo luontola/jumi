@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import java.math.BigInteger;
@@ -43,7 +44,7 @@ import java.util.*;
  * @author Esko Luontola
  * @since 25.8.2008
  */
-public class EntityManagerImpl implements EntityLoader, EntityManager {
+public class EntityManagerImpl implements EntityManager, EntityLoader {
 
     private final Map<Entity, EntityReference<?>> entities = new IdentityHashMap<Entity, EntityReference<?>>();
     private final Map<EntityReference<?>, Entity> cache = new HashMap<EntityReference<?>, Entity>();
@@ -61,12 +62,17 @@ public class EntityManagerImpl implements EntityLoader, EntityManager {
         return entities.size();
     }
 
-    public <T> EntityReference<T> createReference(T entity) {
+    public <T> EntityReference<T> createReference(T obj) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
-        EntityReference<T> ref = (EntityReference<T>) entities.get((Entity) entity);
+        if (!Entities.isEntity(obj)) {
+            // TODO: after transparent references support proxying concrete classes, write a test for this (pass a proxy to this method)
+            throw new IllegalArgumentException("Not an entity: " + obj);
+        }
+        Entity entity = (Entity) obj;
+        EntityReference<T> ref = (EntityReference<T>) entities.get(entity);
         if (ref == null) {
-            ref = new EntityReferenceImpl<T>(idFactory.newId(), entity);
-            register((Entity) entity, ref);
+            ref = new EntityReferenceImpl<T>(idFactory.newId(), obj);
+            register(entity, ref);
         }
         return ref;
     }
@@ -86,7 +92,7 @@ public class EntityManagerImpl implements EntityLoader, EntityManager {
             flushQueue.add(entity);
         }
         cache.put(ref, entity);
-        EntityReference<?> previous = entities.put((Entity) entity, ref);
+        EntityReference<?> previous = entities.put(entity, ref);
         assert previous == null : "Registered an entity twise: " + entity + ", " + ref;
     }
 

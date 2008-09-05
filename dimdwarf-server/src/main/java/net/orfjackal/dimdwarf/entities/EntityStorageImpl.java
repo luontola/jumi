@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseConnection;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
@@ -63,6 +64,7 @@ public class EntityStorageImpl implements EntityStorage {
     }
 
     public void update(BigInteger id, Entity entity) {
+        assert Entities.isEntity(entity);
         Blob serialized = serializer.serialize(entity);
         db.update(asBytes(id), serialized);
     }
