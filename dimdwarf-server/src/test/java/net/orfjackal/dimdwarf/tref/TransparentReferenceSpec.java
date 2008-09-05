@@ -63,23 +63,17 @@ public class TransparentReferenceSpec extends Specification<Object> {
     private EntityManager entityManager;
     private TransparentReferenceFactory factory;
     private DummyEntity entity;
-//    private EntityReferenceImpl<DummyEntity> entityRef;
 
     public void create() throws Exception {
         entityManager = mock(EntityManager.class);
         factory = new TransparentReferenceCglibProxyFactory(entityManager);
         entity = new DummyEntity();
-//        entityRef = new EntityReferenceImpl<DummyEntity>(BigInteger.ONE, entity);
     }
 
     private Expectations referenceIsCreatedFor(final Entity entity, final BigInteger id) {
-        return new Expectations() {
-            {
-                one(entityManager).createReference(entity);
-                will(returnValue(
-                        new EntityReferenceImpl<Entity>(id, entity)));
-            }
-        };
+        return new Expectations() {{
+            one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
+        }};
     }
 
 
@@ -88,9 +82,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
         private Object proxy;
 
         public Object create() {
-//            checking(new Expectations() {{
-//                one(entityManager).createReference(entity); will(returnValue(entityRef));
-//            }});
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
             proxy = factory.createTransparentReference(entity);
             return null;
@@ -109,12 +100,10 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void itIsNotAnEntity() {
-//            assertFalse(Entity.class.isAssignableFrom(proxy.getClass()));
             specify(proxy instanceof Entity, should.equal(false));
         }
 
         public void itImplementsTheSameInterfacesAsTheEntity() {
-//            assertTrue(DummyInterface1.class.isAssignableFrom(proxy.getClass()));
             specify(proxy instanceof DummyInterface);
         }
 
@@ -123,7 +112,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
             };
             checking(referenceIsCreatedFor(subclassEntity, BigInteger.TEN));
             TransparentReference subclassProxy = factory.createTransparentReference(subclassEntity);
-//            assertTrue(DummyInterface1.class.isAssignableFrom(subclassProxy.getClass()));
             specify(subclassProxy instanceof DummyInterface);
         }
 
@@ -153,7 +141,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
             boolean containsEntityReference = false;
             for (Object o : serializedObjects) {
                 specify(o instanceof Entity, should.equal(false));
-//                assertFalse("Entity instance not allowed: " + o.getClass(), (o instanceof Entity));
                 if (o instanceof EntityReference) {
                     containsEntityReference = true;
                 }
@@ -163,10 +150,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public void proxyMethodsDelegateTheEntityMethods() {
             DummyInterface proxy = (DummyInterface) this.proxy;
-//            assertEquals(1, proxy.dummyMethod());
-//            assertEquals(1, entity.lastValue);
-//            assertEquals(2, proxy.dummyMethod());
-//            assertEquals(2, entity.lastValue);
             proxy.setOther("set through proxy");
             specify(entity.other, should.equal("set through proxy"));
             entity.other = "set directly";
@@ -181,13 +164,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
             };
             checking(referenceIsCreatedFor(exceptionThrower, BigInteger.TEN));
             final DummyInterface proxy = (DummyInterface) factory.createTransparentReference(exceptionThrower);
-//            try {
-//                proxy.dummyMethod();
-//                fail();
-//            } catch (Exception e) {
-//                assertEquals(IllegalStateException.class, e.getClass());
-//                assertEquals("foo", e.getMessage());
-//            }
             specify(new Block() {
                 public void run() throws Throwable {
                     proxy.getOther();
@@ -195,26 +171,16 @@ public class TransparentReferenceSpec extends Specification<Object> {
             }, should.raise(IllegalArgumentException.class, "thrown by entity"));
         }
 
-//        public void testItShouldBePossibleToIdentifyAProxy() {
-//            assertTrue(proxy instanceof TransparentReference);
-//            assertFalse(entity instanceof TransparentReference);
-//        }
-
         public void theEntityCanBeRetrievedFromTheProxy() {
-//            assertSame(entity, ((TransparentReference) proxy).getManagedObject());
             specify(((TransparentReference) proxy).getEntity(), should.equal(entity));
         }
 
         public void theTypeOfTheEntityCanBeRetrievedFromTheProxy() {
-//            assertSame(DummyManagedObject.class, ((TransparentReference) proxy).getType());
             specify(((TransparentReference) proxy).getType(), should.equal(DummyEntity.class));
         }
 
         public void theEntityReferenceCanBeRetrievedFromTheProxy() {
-//            EntityReference<?> reference = ((TransparentReference) proxy).getManagedReference();
-//            assertSame(entity, reference.get());
             specify(((TransparentReference) proxy).getEntityReference().get(), should.equal(entity));
         }
     }
-
 }
