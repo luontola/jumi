@@ -79,6 +79,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }};
     }
 
+
     public class WhenATransparentReferenceProxyIsCreated {
 
         private Object proxy;
