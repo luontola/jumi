@@ -40,10 +40,7 @@ import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.DummyInterface;
-import net.orfjackal.dimdwarf.entities.EntityManager;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.serial.SerializationListener;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
@@ -202,7 +199,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
                     new ReplaceDirectlyReferredEntityWithTransparentReference(factory)
             });
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
-            Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyNormalObject()));
+            Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject()));
             deserialized = (SerializationTestEntity) serializer.deserialize(data);
             return null;
         }
@@ -220,7 +217,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
         public void nonEntityObjectsAreNotReplaced() {
             specify(Entities.isTransparentReference(deserialized.normalObject), should.equal(false));
             specify(Entities.isEntity(deserialized.normalObject), should.equal(false));
-            specify(deserialized.normalObject.getClass(), should.equal(DummyNormalObject.class));
+            specify(deserialized.normalObject.getClass(), should.equal(DummyObject.class));
         }
     }
 
@@ -231,20 +228,9 @@ public class TransparentReferenceSpec extends Specification<Object> {
         private DummyInterface entity;
         private DummyInterface normalObject;
 
-        public SerializationTestEntity(DummyEntity entity, DummyNormalObject normalObject) {
+        public SerializationTestEntity(DummyEntity entity, DummyObject normalObject) {
             this.entity = entity;
             this.normalObject = normalObject;
-        }
-    }
-
-    private static class DummyNormalObject implements DummyInterface, Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public Object getOther() {
-            return null;
-        }
-
-        public void setOther(Object other) {
         }
     }
 }

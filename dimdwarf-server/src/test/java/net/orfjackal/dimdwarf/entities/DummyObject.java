@@ -37,8 +37,16 @@ import java.io.Serializable;
  * @author Esko Luontola
  * @since 4.9.2008
  */
-public class DummyObject implements Serializable {
+public class DummyObject implements DummyInterface, Serializable {
     private static final long serialVersionUID = 1L;
 
     public Object other;
+
+    public Object getOther() {
+        return other;
+    }
+
+    public void setOther(Object other) {
+        this.other = other;
+    }
 }
