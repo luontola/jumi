@@ -29,32 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tref;
-
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+package net.orfjackal.dimdwarf.entities;
 
 /**
  * @author Esko Luontola
- * @since 31.1.2008
+ * @since 5.9.2008
  */
-public interface TransparentReference {
+public interface DummyInterface {
 
-    Entity getEntity();
+    Object getOther();
 
-    EntityReference<?> getEntityReference();
-
-    Class<?> getType();
-
-    /**
-     * @see ManagedIdentity#equals(Object, Object)
-     */
-    boolean equals(Object obj);
-
-    /**
-     * @see ManagedIdentity#hashCode(Object)
-     */
-    int hashCode();
-
-    Object writeReplace();
+    void setOther(Object other);
 }

@@ -66,7 +66,7 @@ public final class ManagedIdentity {
 
     private static Object getManagedIdentity(Object obj) {
         if (obj instanceof TransparentReference) {
-            return ((TransparentReference) obj).getManagedReference();
+            return ((TransparentReference) obj).getEntityReference();
         } else if (obj instanceof Entity) {
             return AppContext.getDataManager().createReference(obj);
         } else {

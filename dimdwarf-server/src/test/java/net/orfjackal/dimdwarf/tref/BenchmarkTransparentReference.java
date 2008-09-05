@@ -70,7 +70,7 @@ public class BenchmarkTransparentReference {
         if (current == JDK_PROXYING) {
 //            factory = new TransparentReferenceJdkProxyFactory();
         } else if (current == CGLIB_PROXYING) {
-            factory = new TransparentReferenceCglibProxyFactory();
+            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
         }
 
         for (int i = 0; i < REPEATS; i++) {
@@ -160,8 +160,8 @@ public class BenchmarkTransparentReference {
     // call
 
     private static long callMethod(int iterations) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        DummyInterface object = new DummyManagedObject();
-//        Method method = DummyInterface.class.getMethod("dummyMethod");
+        DummyInterface1 object = new DummyManagedObject();
+//        Method method = DummyInterface1.class.getMethod("dummyMethod");
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
@@ -177,7 +177,7 @@ public class BenchmarkTransparentReference {
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            DummyInterface object = reference.get();
+            DummyInterface1 object = reference.get();
             junk += object.dummyMethod();
         }
         long end = System.currentTimeMillis();
@@ -185,7 +185,7 @@ public class BenchmarkTransparentReference {
     }
 
     private static long callProxyMethod(int iterations) {
-        DummyInterface reference = (DummyInterface) factory.createTransparentReference(new DummyManagedObject());
+        DummyInterface1 reference = (DummyInterface1) factory.createTransparentReference(new DummyManagedObject());
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {

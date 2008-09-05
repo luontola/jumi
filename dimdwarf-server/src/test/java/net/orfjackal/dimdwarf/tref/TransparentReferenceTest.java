@@ -81,8 +81,8 @@ public class TransparentReferenceTest {
         protected void setUp() throws Exception {
             AppContext.setMockDataManager();
 
-            factory = new TransparentReferenceCglibProxyFactory();
-            TransparentReferenceImpl.setFactory(factory);
+            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
+            TransparentReferenceFactoryGlobal.setFactory(factory);
             object = new DummyManagedObject();
             proxy = factory.createTransparentReference(object);
         }
@@ -100,13 +100,13 @@ public class TransparentReferenceTest {
         }
 
         public void testTheProxyShouldImplementTheSameInterfacesAsTheObject() {
-            assertTrue(DummyInterface.class.isAssignableFrom(proxy.getClass()));
+            assertTrue(DummyInterface1.class.isAssignableFrom(proxy.getClass()));
         }
 
         public void testTheProxyShouldImplementTheSameInterfacesAsTheObjectsSuperclasses() {
             Object subclassProxy = factory.createTransparentReference(new DummyManagedObject() {
             });
-            assertTrue(DummyInterface.class.isAssignableFrom(subclassProxy.getClass()));
+            assertTrue(DummyInterface1.class.isAssignableFrom(subclassProxy.getClass()));
         }
 
         public void testTheProxyShouldNotImplementManagedObject() {
@@ -145,7 +145,7 @@ public class TransparentReferenceTest {
         }
 
         public void testCallingAMethodOnTheProxyShouldCallAMethodOnTheObject() {
-            DummyInterface proxy = (DummyInterface) this.proxy;
+            DummyInterface1 proxy = (DummyInterface1) this.proxy;
             assertEquals(1, proxy.dummyMethod());
             assertEquals(1, object.lastValue);
             assertEquals(2, proxy.dummyMethod());
@@ -158,7 +158,7 @@ public class TransparentReferenceTest {
                     throw new IllegalStateException("foo");
                 }
             };
-            DummyInterface proxy = (DummyInterface) factory.createTransparentReference(exceptionThrowing);
+            DummyInterface1 proxy = (DummyInterface1) factory.createTransparentReference(exceptionThrowing);
             try {
                 proxy.dummyMethod();
                 fail();
@@ -174,7 +174,7 @@ public class TransparentReferenceTest {
         }
 
         public void testItShouldBePossibleToGetTheObjectFromTheProxy() {
-            assertSame(object, ((TransparentReference) proxy).getManagedObject());
+            assertSame(object, ((TransparentReference) proxy).getEntity());
         }
 
         public void testItShouldBePossibleToGetTheObjectsTypeFromTheProxy() {
@@ -182,7 +182,7 @@ public class TransparentReferenceTest {
         }
 
         public void testItShouldBePossibleToGetTheManagedReferenceFromTheProxy() {
-            EntityReference<?> reference = ((TransparentReference) proxy).getManagedReference();
+            EntityReference<?> reference = ((TransparentReference) proxy).getEntityReference();
             assertSame(object, reference.get());
         }
     }
@@ -192,14 +192,14 @@ public class TransparentReferenceTest {
 
         protected TransparentReferenceFactory factory;
         private DummyManagedObject managedObject;
-        private DummyInterface normalObject;
+        private DummyInterface1 normalObject;
         private SerializationTestObject deserialized;
 
         protected void setUp() throws Exception {
             AppContext.setMockDataManager();
 
-            factory = new TransparentReferenceCglibProxyFactory();
-            TransparentReferenceImpl.setFactory(factory);
+            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
+            TransparentReferenceFactoryGlobal.setFactory(factory);
             managedObject = new DummyManagedObject();
             normalObject = new DummyNormalObject();
             SerializationTestObject object = new SerializationTestObject(managedObject, normalObject);
@@ -233,18 +233,18 @@ public class TransparentReferenceTest {
         private static class SerializationTestObject implements Serializable {
             private static final long serialVersionUID = 1L;
 
-            private DummyInterface aField;
-            private DummyInterface manField;
-            private DummyInterface[] aManArray;
+            private DummyInterface1 aField;
+            private DummyInterface1 manField;
+            private DummyInterface1[] aManArray;
 
-            public SerializationTestObject(DummyManagedObject managedObject, DummyInterface normalObject) {
+            public SerializationTestObject(DummyManagedObject managedObject, DummyInterface1 normalObject) {
                 aField = normalObject;
                 manField = managedObject;
-                aManArray = new DummyInterface[]{normalObject, managedObject};
+                aManArray = new DummyInterface1[]{normalObject, managedObject};
             }
         }
 
-        private static class DummyNormalObject implements DummyInterface, Serializable {
+        private static class DummyNormalObject implements DummyInterface1, Serializable {
             private static final long serialVersionUID = 1L;
 
             public int dummyMethod() {
@@ -257,16 +257,16 @@ public class TransparentReferenceTest {
 
         protected TransparentReferenceFactory factory;
         private DummyManagedObject managedObject;
-        private DummyInterface proxy;
+        private DummyInterface1 proxy;
         private Object normalObject;
 
         protected void setUp() throws Exception {
             AppContext.setMockDataManager();
 
-            factory = new TransparentReferenceCglibProxyFactory();
-            TransparentReferenceImpl.setFactory(factory);
+            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
+            TransparentReferenceFactoryGlobal.setFactory(factory);
             managedObject = new DummyManagedObject();
-            proxy = (DummyInterface) factory.createTransparentReference(managedObject);
+            proxy = (DummyInterface1) factory.createTransparentReference(managedObject);
             normalObject = new Object();
         }
 

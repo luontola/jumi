@@ -33,9 +33,16 @@ package net.orfjackal.dimdwarf.tref;
 
 /**
  * @author Esko Luontola
- * @since 25.1.2008
+ * @since 5.9.2008
  */
-public interface DummyInterface {
+public class TransparentReferenceFactoryGlobal {
+    private static TransparentReferenceFactory factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
 
-    int dummyMethod();
+    public static void setFactory(TransparentReferenceFactory factory) {
+        TransparentReferenceFactoryGlobal.factory = factory;
+    }
+
+    public static TransparentReferenceFactory getFactory() {
+        return factory;
+    }
 }

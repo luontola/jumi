@@ -60,9 +60,8 @@ public class ManagedIdentityTest {
         private Object obj;
 
         protected void setUp() throws Exception {
-            factory = new TransparentReferenceCglibProxyFactory();
             AppContext.setMockDataManager();
-
+            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
             man1 = new DummyManagedObject();
             man2 = new DummyManagedObject();
             ref1 = factory.createTransparentReference(man1);

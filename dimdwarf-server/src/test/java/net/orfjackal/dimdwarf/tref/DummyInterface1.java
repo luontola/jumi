@@ -31,30 +31,11 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-
 /**
  * @author Esko Luontola
- * @since 31.1.2008
+ * @since 25.1.2008
  */
-public interface TransparentReference {
+public interface DummyInterface1 {
 
-    Entity getEntity();
-
-    EntityReference<?> getEntityReference();
-
-    Class<?> getType();
-
-    /**
-     * @see ManagedIdentity#equals(Object, Object)
-     */
-    boolean equals(Object obj);
-
-    /**
-     * @see ManagedIdentity#hashCode(Object)
-     */
-    int hashCode();
-
-    Object writeReplace();
+    int dummyMethod();
 }

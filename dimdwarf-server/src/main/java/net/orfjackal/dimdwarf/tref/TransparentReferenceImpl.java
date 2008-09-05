@@ -44,16 +44,6 @@ import java.io.Serializable;
 public final class TransparentReferenceImpl implements TransparentReference, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static TransparentReferenceFactory factory = new TransparentReferenceCglibProxyFactory();
-
-    public static void setFactory(TransparentReferenceFactory factory) {
-        TransparentReferenceImpl.factory = factory;
-    }
-
-    public static TransparentReferenceFactory getFactory() {
-        return factory;
-    }
-
     private final EntityReference<?> reference;
     private final Class<?> type;
 
@@ -62,11 +52,11 @@ public final class TransparentReferenceImpl implements TransparentReference, Ser
         this.reference = reference;
     }
 
-    public Entity getManagedObject() {
+    public Entity getEntity() {
         return (Entity) reference.get();
     }
 
-    public EntityReference<?> getManagedReference() {
+    public EntityReference<?> getEntityReference() {
         return reference;
     }
 
@@ -95,6 +85,6 @@ public final class TransparentReferenceImpl implements TransparentReference, Ser
      * On deserialization, create a new proxy for this TransparentReferenceImpl.
      */
     protected Object readResolve() {
-        return getFactory().newProxy(this);
+        return TransparentReferenceFactoryGlobal.getFactory().newProxy(this);
     }
 }
