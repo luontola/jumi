@@ -45,10 +45,10 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class ThreadContextSpec extends Specification<Object> {
 
-    private Context taskContext;
+    private Context myContext;
 
     public void create() throws Exception {
-        taskContext = new DummyContext();
+        myContext = new DummyContext();
     }
 
     public void destroy() throws Exception {
@@ -60,6 +60,8 @@ public class ThreadContextSpec extends Specification<Object> {
 
     public class AThreadContext {
 
+        private boolean wasExecuted;
+
         public Object create() {
             return null;
         }
@@ -69,28 +71,28 @@ public class ThreadContextSpec extends Specification<Object> {
         }
 
         public void isActiveAfterSetup() {
-            ThreadContext.setUp(taskContext);
-            specify(ThreadContext.get(), should.equal(taskContext));
+            ThreadContext.setUp(myContext);
+            specify(ThreadContext.get(), should.equal(myContext));
         }
 
         public void isEmptyAfterTearingDown() {
-            ThreadContext.setUp(taskContext);
+            ThreadContext.setUp(myContext);
             ThreadContext.tearDown();
             specify(ThreadContext.get(), should.equal(null));
         }
 
         public void canNotBeSetUpTwise() {
-            ThreadContext.setUp(taskContext);
+            ThreadContext.setUp(myContext);
             specify(new Block() {
                 public void run() throws Throwable {
                     ThreadContext.setUp(new DummyContext());
                 }
             }, should.raise(IllegalStateException.class));
-            specify(ThreadContext.get(), should.equal(taskContext));
+            specify(ThreadContext.get(), should.equal(myContext));
         }
 
         public void canNotBeTornDownTwise() {
-            ThreadContext.setUp(taskContext);
+            ThreadContext.setUp(myContext);
             ThreadContext.tearDown();
             specify(new Block() {
                 public void run() throws Throwable {
@@ -99,7 +101,46 @@ public class ThreadContextSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
             specify(ThreadContext.get(), should.equal(null));
         }
+
+        public void isSpecificToTheCurrentThread() throws InterruptedException {
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    ThreadContext.setUp(myContext);
+                }
+            });
+            t.start();
+            t.join();
+            specify(ThreadContext.get(), should.equal(null));
+        }
+
+
+        public void providesAHelperMethodWithAutomaticSetUpAndTearDown() {
+            wasExecuted = false;
+            ThreadContext.runInContext(myContext, new Runnable() {
+                public void run() {
+                    wasExecuted = true;
+                    specify(ThreadContext.get(), should.equal(myContext));
+                }
+            });
+            specify(wasExecuted);
+            specify(ThreadContext.get(), should.equal(null));
+        }
+
+        public void theHelperMethodDoesTearDownEvenWhenExceptionsAreThrown() {
+            final Runnable maliciousTask = new Runnable() {
+                public void run() {
+                    throw new InternalError("dummy exception");
+                }
+            };
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.runInContext(myContext, maliciousTask);
+                }
+            }, should.raise(InternalError.class, "dummy exception"));
+            specify(ThreadContext.get(), should.equal(null));
+        }
     }
+
 
     private static class DummyContext implements Context {
     }

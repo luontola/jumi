@@ -37,23 +37,32 @@ package net.orfjackal.dimdwarf.context;
  */
 public class ThreadContext {
 
-    private static Context context;
+    private static final ThreadLocal<Context> threadLocal = new ThreadLocal<Context>();
 
     public static void setUp(Context context) {
-        if (ThreadContext.context != null) {
+        if (threadLocal.get() != null) {
             throw new IllegalStateException("Already set up");
         }
-        ThreadContext.context = context;
+        threadLocal.set(context);
     }
 
     public static Object get() {
-        return context;
+        return threadLocal.get();
     }
 
     public static void tearDown() {
-        if (ThreadContext.context == null) {
+        if (threadLocal.get() == null) {
             throw new IllegalStateException("Already torn down");
         }
-        context = null;
+        threadLocal.set(null);
+    }
+
+    public static void runInContext(Context context, Runnable runnable) {
+        setUp(context);
+        try {
+            runnable.run();
+        } finally {
+            tearDown();
+        }
     }
 }
