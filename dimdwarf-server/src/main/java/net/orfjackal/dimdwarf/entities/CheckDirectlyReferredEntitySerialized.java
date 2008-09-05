@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.serial.SerializationAdapter;
 
 /**
@@ -43,7 +43,7 @@ import net.orfjackal.dimdwarf.serial.SerializationAdapter;
 public class CheckDirectlyReferredEntitySerialized extends SerializationAdapter {
 
     public void beforeSerialize(Object rootObject, Object obj) {
-        if (obj instanceof Entity && obj != rootObject) {
+        if (obj != rootObject && Entities.isEntity(obj)) {
             throw new IllegalArgumentException("Entity referred directly without an entity reference: " + obj.getClass());
         }
     }
