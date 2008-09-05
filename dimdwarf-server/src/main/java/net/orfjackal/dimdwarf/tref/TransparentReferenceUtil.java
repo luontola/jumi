@@ -49,13 +49,10 @@ public final class TransparentReferenceUtil {
     private TransparentReferenceUtil() {
     }
 
-    /**
-     * Marks the object for update if it is a ManagedObject or a TransparentReference. Otherwise does nothing.
-     */
+    // TODO: marking for update not implemented by entity manager
     public static void markForUpdate(Object object) {
         if (object instanceof TransparentReference) {
-            TransparentReference ref = (TransparentReference) object;
-//            ref.getManagedReference().getForUpdate();
+//            ((TransparentReference) object).getEntityReference().getForUpdate();
         } else if (object instanceof Entity) {
 //            AppContext.getDataManager().markForUpdate(object);
         }
@@ -70,9 +67,6 @@ public final class TransparentReferenceUtil {
         return factory.createTransparentReference(object).writeReplace();
     }
 
-    /**
-     * Tells which interfaces of the provided class should be proxied by all transparent reference implementations.
-     */
     public static Class<?>[] proxiedInterfaces(Class<?> aClass) {
         List<Class<?>> results = new ArrayList<Class<?>>();
         for (Class<?> c = aClass; c != null; c = c.getSuperclass()) {
@@ -87,10 +81,7 @@ public final class TransparentReferenceUtil {
         return results.toArray(new Class<?>[results.size()]);
     }
 
-    /**
-     * Tests whether the proxy should delegate a method call to the transparent reference instance.
-     */
-    public static boolean delegateToTransparentReference(Method method) {
+    public static boolean shouldDelegateToTransparentReference(Method method) {
         return method.getDeclaringClass().equals(TransparentReference.class)
                 || (method.getDeclaringClass().equals(Object.class) && method.getName().equals("equals"))
                 || (method.getDeclaringClass().equals(Object.class) && method.getName().equals("hashCode"));

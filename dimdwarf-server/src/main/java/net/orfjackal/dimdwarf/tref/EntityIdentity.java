@@ -31,31 +31,52 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-
 import net.orfjackal.dimdwarf.api.Entity;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 
 /**
+ * For transparent references to work correctly, all subclasses of {@link Entity} should
+ * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
+ * <pre><code>
+ * public boolean equals(Object obj) {
+ *     return EntityIdentity.equals(this, obj);
+ * }
+ * public int hashCode() {
+ *     return EntityIdentity.hashCode(this);
+ * }
+ * </code></pre>
+ *
  * @author Esko Luontola
- * @since 27.1.2008
+ * @since 1.2.2008
  */
-public class TransparentReferenceConvertingObjectOutputStream extends ObjectOutputStream {
+public final class EntityIdentity {
 
-    private final TransparentReferenceFactory factory;
-
-    public TransparentReferenceConvertingObjectOutputStream(OutputStream out, TransparentReferenceFactory factory) throws IOException {
-        super(out);
-        this.factory = factory;
-        enableReplaceObject(true);
+    private EntityIdentity() {
     }
 
-    protected Object replaceObject(Object obj) throws IOException {
-        if (obj instanceof Entity) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((Entity) obj, factory);
+    public static boolean equals(Object obj1, Object obj2) {
+        Object id1 = getIdentity(obj1);
+        Object id2 = getIdentity(obj2);
+        return safeEquals(id1, id2);
+    }
+
+    public static int hashCode(Object obj) {
+        Object id = getIdentity(obj);
+        return id.hashCode();
+    }
+
+    private static Object getIdentity(Object obj) {
+        if (Entities.isTransparentReference(obj)) {
+            return ((TransparentReference) obj).getEntityReference();
+        } else if (Entities.isEntity(obj)) {
+            return AppContext.getDataManager().createReference(obj);
+        } else {
+            return obj;
         }
-        return obj;
+    }
+
+    private static boolean safeEquals(Object x, Object y) {
+        return x == y || (x != null && x.equals(y));
     }
 }

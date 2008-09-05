@@ -44,12 +44,12 @@ import java.lang.reflect.Method;
  * @author Esko Luontola
  * @since 26.1.2008
  */
-public class TransparentReferenceCglibProxyFactory implements TransparentReferenceFactory {
+public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
     private final Cache<Class<?>, Factory> cache = new CglibProxyFactoryCache();
     private final EntityManager entityManager;
 
-    public TransparentReferenceCglibProxyFactory(EntityManager entityManager) {
+    public TransparentReferenceFactoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -62,7 +62,7 @@ public class TransparentReferenceCglibProxyFactory implements TransparentReferen
     public TransparentReference newProxy(TransparentReferenceImpl ref) {
         Factory factory = cache.get(ref.getType());
         return (TransparentReference) factory.newInstance(new Callback[]{
-                new ManagedObjectCallback(ref),
+                new EntityCallback(ref),
                 new TransparentReferenceCallback(ref)
         });
     }
@@ -73,7 +73,7 @@ public class TransparentReferenceCglibProxyFactory implements TransparentReferen
             Enhancer e = new Enhancer();
             e.setInterfaces(TransparentReferenceUtil.proxiedInterfaces(type));
             e.setCallbacks(new Callback[]{
-                    new ManagedObjectCallback(null),
+                    new EntityCallback(null),
                     new TransparentReferenceCallback(null)
             });
             e.setCallbackFilter(new TransparentReferenceCallbackFilter());
@@ -81,11 +81,11 @@ public class TransparentReferenceCglibProxyFactory implements TransparentReferen
         }
     }
 
-    private static class ManagedObjectCallback implements LazyLoader {
+    private static class EntityCallback implements LazyLoader {
 
         private final TransparentReference ref;
 
-        private ManagedObjectCallback(TransparentReference ref) {
+        private EntityCallback(TransparentReference ref) {
             this.ref = ref;
         }
 
@@ -109,14 +109,14 @@ public class TransparentReferenceCglibProxyFactory implements TransparentReferen
 
     private static class TransparentReferenceCallbackFilter implements CallbackFilter {
 
-        private static final int MANAGED_OBJECT = 0;
+        private static final int ENTITY = 0;
         private static final int TRANSPARENT_REFERENCE = 1;
 
         public int accept(Method method) {
-            if (TransparentReferenceUtil.delegateToTransparentReference(method)) {
+            if (TransparentReferenceUtil.shouldDelegateToTransparentReference(method)) {
                 return TRANSPARENT_REFERENCE;
             } else {
-                return MANAGED_OBJECT;
+                return ENTITY;
             }
         }
     }

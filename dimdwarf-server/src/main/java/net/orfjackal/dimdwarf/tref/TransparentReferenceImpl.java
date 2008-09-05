@@ -65,13 +65,12 @@ public final class TransparentReferenceImpl implements TransparentReference, Ser
         return type;
     }
 
-    @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
     public boolean equals(Object obj) {
-        return ManagedIdentity.equals(this, obj);
+        return EntityIdentity.equals(this, obj);
     }
 
     public int hashCode() {
-        return ManagedIdentity.hashCode(this);
+        return EntityIdentity.hashCode(this);
     }
 
     /**
@@ -80,12 +79,5 @@ public final class TransparentReferenceImpl implements TransparentReference, Ser
      */
     public Object writeReplace() {
         return this;
-    }
-
-    /**
-     * On deserialization, create a new proxy for this TransparentReferenceImpl.
-     */
-    protected Object readResolve() {
-        return TransparentReferenceFactoryGlobal.getFactory().newProxy(this);
     }
 }

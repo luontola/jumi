@@ -44,7 +44,6 @@ import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.serial.SerializationListener;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
-import net.orfjackal.dimdwarf.util.TestUtil;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -70,7 +69,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
     public void create() throws Exception {
         entityManager = mock(EntityManager.class);
-        factory = new TransparentReferenceCglibProxyFactory(entityManager);
+        factory = new TransparentReferenceFactoryImpl(entityManager);
         entity = new DummyEntity();
     }
 
@@ -119,14 +118,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
             checking(referenceIsCreatedFor(subclassEntity, BigInteger.TEN));
             TransparentReference subclassProxy = factory.createTransparentReference(subclassEntity);
             specify(subclassProxy instanceof DummyInterface);
-        }
-
-
-        public void itIsSerializableAndDeserializable() throws IOException, ClassNotFoundException {
-            byte[] bytes = TestUtil.serialize(proxy);
-            Object deserialized = TestUtil.deserialize(bytes);
-            specify(Entities.isTransparentReference(deserialized));
-            specify(deserialized instanceof DummyInterface);
         }
 
         public void itRefersToTheEntityThroughtAnEntityReference() throws IOException {
@@ -196,7 +187,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public Object create() {
             ObjectSerializerImpl serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{
-                    new ReplaceDirectlyReferredEntityWithTransparentReference(factory)
+                    new ReplaceEntitiesWithTransparentReferences(factory)
             });
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
             Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject()));
@@ -205,19 +196,22 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {
+            specify(deserialized.entity instanceof DummyInterface);
             specify(Entities.isTransparentReference(deserialized.entity));
             specify(Entities.isEntity(deserialized.entity), should.equal(false));
         }
 
         public void theRootEntityIsNotReplaced() {
+            specify(deserialized.getClass(), should.equal(SerializationTestEntity.class));
             specify(Entities.isTransparentReference(deserialized), should.equal(false));
             specify(Entities.isEntity(deserialized));
         }
 
         public void nonEntityObjectsAreNotReplaced() {
+            specify(deserialized.normalObject instanceof DummyInterface);
+            specify(deserialized.normalObject.getClass(), should.equal(DummyObject.class));
             specify(Entities.isTransparentReference(deserialized.normalObject), should.equal(false));
             specify(Entities.isEntity(deserialized.normalObject), should.equal(false));
-            specify(deserialized.normalObject.getClass(), should.equal(DummyObject.class));
         }
     }
 
@@ -234,7 +228,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
         protected void setUp() throws Exception {
             AppContext.setMockDataManager();
 
-            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
+            factory = new TransparentReferenceFactoryImpl(AppContext.getDataManager());
             TransparentReferenceFactoryGlobal.setFactory(factory);
             managedObject = new DummyManagedObject();
             proxy = (DummyInterface1) factory.createTransparentReference(managedObject);

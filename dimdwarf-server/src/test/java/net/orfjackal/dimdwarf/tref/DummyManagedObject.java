@@ -50,10 +50,10 @@ public class DummyManagedObject implements Serializable, Entity {
 
     @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
     public boolean equals(Object obj) {
-        return ManagedIdentity.equals(this, obj);
+        return EntityIdentity.equals(this, obj);
     }
 
     public int hashCode() {
-        return ManagedIdentity.hashCode(this);
+        return EntityIdentity.hashCode(this);
     }
 }

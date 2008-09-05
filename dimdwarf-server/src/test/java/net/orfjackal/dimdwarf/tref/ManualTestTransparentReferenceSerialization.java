@@ -54,7 +54,7 @@ public class ManualTestTransparentReferenceSerialization {
 
     public static final File FILE = new File(ManualTestTransparentReferenceSerialization.class.getName() + ".ser.tmp");
 
-    public static final TransparentReferenceFactory FACTORY = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
+    public static final TransparentReferenceFactory FACTORY = new TransparentReferenceFactoryImpl(AppContext.getDataManager());
 //    public static final TransparentReferenceFactory FACTORY = new TransparentReferenceJdkProxyFactory();
 
     public static class Step1_Serialize {
@@ -62,7 +62,7 @@ public class ManualTestTransparentReferenceSerialization {
         public static void main(String[] args) throws IOException {
 //            MockAppContext.install();
 
-            TransparentReferenceFactoryGlobal.setFactory(FACTORY);
+//            TransparentReferenceFactoryGlobal.setFactory(FACTORY);
             DummyInterface proxy = (DummyInterface) FACTORY.createTransparentReference(new DummyManagedObject2());
             System.out.println("proxy = " + proxy);
 
@@ -79,7 +79,7 @@ public class ManualTestTransparentReferenceSerialization {
         public static void main(String[] args) throws IOException, ClassNotFoundException {
 //            MockAppContext.install();
 
-            TransparentReferenceFactoryGlobal.setFactory(FACTORY);
+//            TransparentReferenceFactoryGlobal.setFactory(FACTORY);
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE));
             Object o = in.readObject();
             in.close();
@@ -126,11 +126,11 @@ public class ManualTestTransparentReferenceSerialization {
 
         @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
         public boolean equals(Object obj) {
-            return ManagedIdentity.equals(this, obj);
+            return EntityIdentity.equals(this, obj);
         }
 
         public int hashCode() {
-            return ManagedIdentity.hashCode(this);
+            return EntityIdentity.hashCode(this);
         }
     }
 

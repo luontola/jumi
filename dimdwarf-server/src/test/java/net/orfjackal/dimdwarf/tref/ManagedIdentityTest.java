@@ -62,7 +62,7 @@ public class ManagedIdentityTest {
 
         protected void setUp() throws Exception {
             AppContext.setMockDataManager();
-            factory = new TransparentReferenceCglibProxyFactory(AppContext.getDataManager());
+            factory = new TransparentReferenceFactoryImpl(AppContext.getDataManager());
             man1 = new DummyManagedObject();
             man2 = new DummyManagedObject();
             ref1 = factory.createTransparentReference(man1);
@@ -75,66 +75,66 @@ public class ManagedIdentityTest {
         }
 
         public void testManagedObjectEqualsManagedObject() {
-            assertTrue(ManagedIdentity.equals(man1, man1));
-            assertFalse(ManagedIdentity.equals(man1, man2));
+            assertTrue(EntityIdentity.equals(man1, man1));
+            assertFalse(EntityIdentity.equals(man1, man2));
         }
 
         public void testTransparentReferenceEqualsTransparentReference() {
-            assertTrue(ManagedIdentity.equals(ref1, ref1));
-            assertFalse(ManagedIdentity.equals(ref1, ref2));
+            assertTrue(EntityIdentity.equals(ref1, ref1));
+            assertFalse(EntityIdentity.equals(ref1, ref2));
         }
 
         public void testManagedObjectEqualsTransparentReference() {
-            assertTrue(ManagedIdentity.equals(man1, ref1));
-            assertTrue(ManagedIdentity.equals(ref1, man1));
-            assertFalse(ManagedIdentity.equals(man1, ref2));
-            assertFalse(ManagedIdentity.equals(ref2, man1));
+            assertTrue(EntityIdentity.equals(man1, ref1));
+            assertTrue(EntityIdentity.equals(ref1, man1));
+            assertFalse(EntityIdentity.equals(man1, ref2));
+            assertFalse(EntityIdentity.equals(ref2, man1));
         }
 
         public void testManagedObjectEqualsNormalObject() {
-            assertFalse(ManagedIdentity.equals(man1, obj));
-            assertFalse(ManagedIdentity.equals(obj, man1));
+            assertFalse(EntityIdentity.equals(man1, obj));
+            assertFalse(EntityIdentity.equals(obj, man1));
         }
 
         public void testTransparentReferenceEqualsNormalObject() {
-            assertFalse(ManagedIdentity.equals(ref1, obj));
-            assertFalse(ManagedIdentity.equals(obj, ref1));
+            assertFalse(EntityIdentity.equals(ref1, obj));
+            assertFalse(EntityIdentity.equals(obj, ref1));
         }
 
         public void testManagedObjectEqualsNull() {
-            assertFalse(ManagedIdentity.equals(man1, null));
-            assertFalse(ManagedIdentity.equals(null, man1));
+            assertFalse(EntityIdentity.equals(man1, null));
+            assertFalse(EntityIdentity.equals(null, man1));
         }
 
         public void testTransparentReferenceEqualsNull() {
-            assertFalse(ManagedIdentity.equals(ref1, null));
-            assertFalse(ManagedIdentity.equals(null, ref1));
+            assertFalse(EntityIdentity.equals(ref1, null));
+            assertFalse(EntityIdentity.equals(null, ref1));
         }
 
         public void testNormalObjectEqualsNormalObject() {
-            assertTrue(ManagedIdentity.equals(obj, obj));
-            assertFalse(ManagedIdentity.equals(obj, new Object()));
+            assertTrue(EntityIdentity.equals(obj, obj));
+            assertFalse(EntityIdentity.equals(obj, new Object()));
         }
 
         public void testNullEqualsNull() {
-            assertTrue(ManagedIdentity.equals(null, null));
+            assertTrue(EntityIdentity.equals(null, null));
         }
 
         public void testDifferenceManagedObjectsHaveDifferenceHashCode() {
-            int hc1 = ManagedIdentity.hashCode(man1);
-            int hc2 = ManagedIdentity.hashCode(man2);
+            int hc1 = EntityIdentity.hashCode(man1);
+            int hc2 = EntityIdentity.hashCode(man2);
             assertFalse(hc1 == hc2);
         }
 
         public void testDifferenceTransparentReferencesHaveDifferenceHashCode() {
-            int hc1 = ManagedIdentity.hashCode(ref1);
-            int hc2 = ManagedIdentity.hashCode(ref2);
+            int hc1 = EntityIdentity.hashCode(ref1);
+            int hc2 = EntityIdentity.hashCode(ref2);
             assertFalse(hc1 == hc2);
         }
 
         public void testManagedObjectsAndTransparentReferencesHaveTheSameHashCode() {
-            assertEquals(ManagedIdentity.hashCode(man1), ManagedIdentity.hashCode(ref1));
-            assertEquals(ManagedIdentity.hashCode(man2), ManagedIdentity.hashCode(ref2));
+            assertEquals(EntityIdentity.hashCode(man1), EntityIdentity.hashCode(ref1));
+            assertEquals(EntityIdentity.hashCode(man2), EntityIdentity.hashCode(ref2));
         }
 
         public void testEqualsOnProxyShouldNotCallManagedObject() {

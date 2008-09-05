@@ -32,50 +32,32 @@
 package net.orfjackal.dimdwarf.tref;
 
 import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 
 /**
- * For transparent references to work correctly, all subclasses of {@link Entity} should
- * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
- * <pre><code>
- * public boolean equals(Object obj) {
- *     return ManagedIdentity.equals(this, obj);
- * }
- * public int hashCode() {
- *     return ManagedIdentity.hashCode(this);
- * }
- * </code></pre>
- *
  * @author Esko Luontola
- * @since 1.2.2008
+ * @since 5.9.2008
  */
-public final class ManagedIdentity {
+public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
 
-    private ManagedIdentity() {
+    private final TransparentReferenceFactory factory;
+
+    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
+        this.factory = factory;
     }
 
-    public static boolean equals(Object obj1, Object obj2) {
-        Object id1 = getManagedIdentity(obj1);
-        Object id2 = getManagedIdentity(obj2);
-        return safeEquals(id1, id2);
-    }
-
-    public static int hashCode(Object obj) {
-        Object id = getManagedIdentity(obj);
-        return id.hashCode();
-    }
-
-    private static Object getManagedIdentity(Object obj) {
-        if (obj instanceof TransparentReference) {
-            return ((TransparentReference) obj).getEntityReference();
-        } else if (obj instanceof Entity) {
-            return AppContext.getDataManager().createReference(obj);
-        } else {
-            return obj;
+    public Object replaceSerialized(Object rootObject, Object obj) {
+        if (obj != rootObject && Entities.isEntity(obj)) {
+            return TransparentReferenceUtil.createTransparentReferenceForSerialization((Entity) obj, factory);
         }
+        return obj;
     }
 
-    private static boolean safeEquals(Object x, Object y) {
-        return x == y || (x != null && x.equals(y));
+    public Object resolveDeserialized(Object obj) {
+        if (obj instanceof TransparentReferenceImpl) {
+            return factory.newProxy((TransparentReferenceImpl) obj);
+        }
+        return obj;
     }
 }
