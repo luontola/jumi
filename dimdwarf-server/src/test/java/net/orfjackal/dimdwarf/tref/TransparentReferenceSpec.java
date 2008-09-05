@@ -36,7 +36,9 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.DummyInterface;
 import net.orfjackal.dimdwarf.entities.EntityManager;
@@ -76,7 +78,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }};
     }
 
-
     public class WhenATransparentReferenceProxyIsCreated {
 
         private Object proxy;
@@ -96,11 +97,11 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void itIsATransparentReference() {
-            specify(proxy instanceof TransparentReference);
+            specify(Entities.isTransparentReference(proxy));
         }
 
         public void itIsNotAnEntity() {
-            specify(proxy instanceof Entity, should.equal(false));
+            specify(Entities.isEntity(proxy), should.equal(false));
         }
 
         public void itImplementsTheSameInterfacesAsTheEntity() {
@@ -119,7 +120,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
         public void itIsSerializableAndDeserializable() throws IOException, ClassNotFoundException {
             byte[] bytes = TestUtil.serialize(proxy);
             Object deserialized = TestUtil.deserialize(bytes);
-            specify(deserialized instanceof TransparentReference);
+            specify(Entities.isTransparentReference(deserialized));
             specify(deserialized instanceof DummyInterface);
         }
 
@@ -139,9 +140,9 @@ public class TransparentReferenceSpec extends Specification<Object> {
             out.close();
 
             boolean containsEntityReference = false;
-            for (Object o : serializedObjects) {
-                specify(o instanceof Entity, should.equal(false));
-                if (o instanceof EntityReference) {
+            for (Object obj : serializedObjects) {
+                specify(Entities.isEntity(obj), should.equal(false));
+                if (obj instanceof EntityReference) {
                     containsEntityReference = true;
                 }
             }

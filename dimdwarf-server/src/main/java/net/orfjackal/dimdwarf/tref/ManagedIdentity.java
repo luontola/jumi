@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.tref;
 
 import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 
 /**
  * For transparent references to work correctly, all subclasses of {@link Entity} should

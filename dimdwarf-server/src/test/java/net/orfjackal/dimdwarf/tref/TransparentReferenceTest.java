@@ -36,6 +36,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 
 import java.io.*;
 import java.util.ArrayList;
