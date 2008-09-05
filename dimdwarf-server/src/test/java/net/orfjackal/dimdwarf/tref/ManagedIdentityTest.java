@@ -36,6 +36,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.context.ContextImpl;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 
 
 /**
@@ -68,9 +70,11 @@ public class ManagedIdentityTest {
             ref1 = factory.createTransparentReference(man1);
             ref2 = factory.createTransparentReference(man2);
             obj = new Object();
+            ThreadContext.setUp(new ContextImpl(AppContext.getDataManager()));
         }
 
         protected void tearDown() throws Exception {
+            ThreadContext.tearDown();
             AppContext.setDataManager(null);
         }
 

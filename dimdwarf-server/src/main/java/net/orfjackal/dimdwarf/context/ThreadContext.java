@@ -46,7 +46,7 @@ public class ThreadContext {
         threadLocal.set(context);
     }
 
-    public static Object get() {
+    public static Context get() {
         return threadLocal.get();
     }
 

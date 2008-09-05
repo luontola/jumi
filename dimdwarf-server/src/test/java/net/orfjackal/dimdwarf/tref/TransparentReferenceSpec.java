@@ -74,12 +74,9 @@ public class TransparentReferenceSpec extends Specification<Object> {
     }
 
     private Expectations referenceIsCreatedFor(final Entity entity, final BigInteger id) {
-        return new Expectations() {
-            {
-                one(entityManager).createReference(entity);
-                will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
-            }
-        };
+        return new Expectations() {{
+            one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
+        }};
     }
 
     public class WhenATransparentReferenceProxyIsCreated {

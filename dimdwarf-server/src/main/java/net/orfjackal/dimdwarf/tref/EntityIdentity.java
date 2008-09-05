@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.tref;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 
 /**
  * For transparent references to work correctly, all subclasses of {@link Entity} should
@@ -70,7 +71,7 @@ public final class EntityIdentity {
         if (Entities.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference();
         } else if (Entities.isEntity(obj)) {
-            return AppContext.getDataManager().createReference(obj);
+            return ThreadContext.get().getEntityManager().createReference(obj);
         } else {
             return obj;
         }
