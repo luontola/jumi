@@ -40,7 +40,7 @@ import net.orfjackal.dimdwarf.serial.SerializationAdapter;
  * @author Esko Luontola
  * @since 4.9.2008
  */
-public class CheckEntityReferredDirectly extends SerializationAdapter {
+public class CheckDirectlyReferredEntitySerialized extends SerializationAdapter {
 
     public void beforeSerialize(Object rootObject, Object obj) {
         if (obj instanceof Entity && obj != rootObject) {
