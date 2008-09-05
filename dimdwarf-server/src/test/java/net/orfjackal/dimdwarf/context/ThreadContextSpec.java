@@ -35,6 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 import org.junit.runner.RunWith;
 
 /**
@@ -143,5 +144,8 @@ public class ThreadContextSpec extends Specification<Object> {
 
 
     private static class DummyContext implements Context {
+        public EntityManager getEntityManager() {
+            return null;
+        }
     }
 }

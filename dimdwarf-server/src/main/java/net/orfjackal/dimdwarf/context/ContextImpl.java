@@ -37,7 +37,16 @@ import net.orfjackal.dimdwarf.entities.EntityManager;
  * @author Esko Luontola
  * @since 5.9.2008
  */
-public interface Context {
+public class ContextImpl implements Context {
 
-    EntityManager getEntityManager();
+    private final EntityManager entityManager;
+
+    public ContextImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
 }
