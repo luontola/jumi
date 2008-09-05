@@ -46,12 +46,18 @@ public interface TransparentReference {
     Class<?> getType();
 
     /**
-     * @see ManagedIdentity#equals(Object, Object)
+     * Returns {@code true} when (1) the other object is a transparent reference to the same entity
+     * as this refers to, or (2) the other object is the same entity itself.
+     * <p/>
+     * This method and {@link Entity#equals} must follow the same contract.
      */
     boolean equals(Object obj);
 
     /**
-     * @see ManagedIdentity#hashCode(Object)
+     * Returns a hashCode which is remains the same through the whole lifecycle of the entity
+     * (i.e. from its creation until its removal from the database).
+     * <p/>
+     * This method and {@link Entity#hashCode} must follow the same contract.
      */
     int hashCode();
 
