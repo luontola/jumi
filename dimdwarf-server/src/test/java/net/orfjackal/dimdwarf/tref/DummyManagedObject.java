@@ -39,7 +39,7 @@ import java.io.Serializable;
  * @author Esko Luontola
  * @since 25.1.2008
  */
-public class DummyManagedObject implements Serializable, Entity, DummyInterface1 {
+public class DummyManagedObject implements Serializable, Entity {
     private static final long serialVersionUID = 1L;
 
     public int lastValue = 0;

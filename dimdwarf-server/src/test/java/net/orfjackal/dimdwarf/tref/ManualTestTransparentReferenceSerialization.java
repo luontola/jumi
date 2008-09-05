@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.tref;
 
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.entities.DummyInterface;
 
 import java.io.*;
 
@@ -62,7 +63,7 @@ public class ManualTestTransparentReferenceSerialization {
 //            MockAppContext.install();
 
             TransparentReferenceFactoryGlobal.setFactory(FACTORY);
-            DummyInterface1 proxy = (DummyInterface1) FACTORY.createTransparentReference(new DummyManagedObject2());
+            DummyInterface proxy = (DummyInterface) FACTORY.createTransparentReference(new DummyManagedObject2());
             System.out.println("proxy = " + proxy);
 
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE));
@@ -90,8 +91,8 @@ public class ManualTestTransparentReferenceSerialization {
                 System.out.println("managedObjectFromProxy     = " + ((TransparentReference) o).getEntity()
                         + "\t(expected: null when SGS is mocked)");
             }
-            System.out.println("instanceof DummyInterface1  = " + (o instanceof DummyInterface1)
-                    + "\t(expected: " + DummyInterface1.class.isAssignableFrom(DummyManagedObject2.class) + ")");
+            System.out.println("instanceof DummyInterface  = " + (o instanceof DummyInterface)
+                    + "\t(expected: " + DummyInterface.class.isAssignableFrom(DummyManagedObject2.class) + ")");
             System.out.println("instanceof DummyInterface2 = " + (o instanceof DummyInterface2)
                     + "\t(expected: " + DummyInterface2.class.isAssignableFrom(DummyManagedObject2.class) + ")");
 
@@ -107,13 +108,16 @@ public class ManualTestTransparentReferenceSerialization {
     }
 
     public static class DummyManagedObject2 implements
-            DummyInterface1,
+            DummyInterface,
 //            DummyInterface2,
             Serializable, Entity {
         private static final long serialVersionUID = 1L;
 
-        public int dummyMethod() {
-            return 0;
+        public Object getOther() {
+            return null;
+        }
+
+        public void setOther(Object other) {
         }
 
         public int dummyMethod2() {
