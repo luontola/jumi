@@ -61,7 +61,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     public void create() throws Exception {
         db = mock(DatabaseConnection.class);
         SerializationListener[] listeners = {
-                new CheckEntityReferredDirectly(),
+                new CheckDirectlyReferredEntitySerialized(),
                 new CheckInnerClassSerialized()
         };
         replacer = new DelegatingSerializationReplacer();
