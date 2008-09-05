@@ -41,6 +41,8 @@ import java.math.BigInteger;
  */
 public class EntityIdFactoryImpl implements EntityIdFactory {
 
+    // using java.util.concurrent.atomic.AtomicLong would also be an option
+
     private BigInteger next;
 
     public EntityIdFactoryImpl(BigInteger largestUsedId) {
