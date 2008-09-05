@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.tref;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import static net.orfjackal.dimdwarf.tref.BenchmarkTransparentReference.Strategy.CGLIB_PROXYING;
 import static net.orfjackal.dimdwarf.tref.BenchmarkTransparentReference.Strategy.JDK_PROXYING;
+import net.orfjackal.dimdwarf.util.TestUtil;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -133,11 +134,11 @@ public class BenchmarkTransparentReference {
 
     private static long deserializeReference(int iterations) throws IOException, ClassNotFoundException {
         Object reference = AppContext.getDataManager().createReference(new DummyManagedObject());
-        byte[] bytes = TransparentReferenceTest.serializeObject(reference);
+        byte[] bytes = TestUtil.serialize(reference);
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            Object o = TransparentReferenceTest.deserializeObject(bytes);
+            Object o = TestUtil.deserialize(bytes);
             junk += (o == null) ? 1 : 2;
         }
         long end = System.currentTimeMillis();
@@ -146,11 +147,11 @@ public class BenchmarkTransparentReference {
 
     private static long deserializeTransparentReference(int iterations) throws IOException, ClassNotFoundException {
         Object reference = factory.createTransparentReference(new DummyManagedObject());
-        byte[] bytes = TransparentReferenceTest.serializeObject(reference);
+        byte[] bytes = TestUtil.serialize(reference);
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            Object o = TransparentReferenceTest.deserializeObject(bytes);
+            Object o = TestUtil.deserialize(bytes);
             junk += (o == null) ? 1 : 2;
         }
         long end = System.currentTimeMillis();
