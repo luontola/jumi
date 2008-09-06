@@ -30,6 +30,16 @@
             <artifactId>cglib-nodep</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

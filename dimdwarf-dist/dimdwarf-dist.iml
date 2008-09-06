@@ -194,6 +194,19 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
+      <library name="asm:asm:3.1">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/asm/asm/3.1/asm-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/asm/asm/3.1/asm-3.1-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/asm/asm/3.1/asm-3.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
       <library name="org.slf4j:slf4j-simple:1.5.2">
         <CLASSES>
           <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.2/slf4j-simple-1.5.2.jar!/" />
