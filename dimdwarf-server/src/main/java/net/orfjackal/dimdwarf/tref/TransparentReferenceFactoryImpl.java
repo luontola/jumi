@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import net.orfjackal.dimdwarf.api.ProxyConcreteClass;
+import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
@@ -74,7 +74,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
 
         protected Factory newInstance(Class<?> type) {
             Enhancer e = new Enhancer();
-            if (type.getAnnotation(ProxyConcreteClass.class) != null) {
+            if (useConcreteSuperclass(type)) {
                 e.setSuperclass(type);
             }
             e.setInterfaces(TransparentReferenceUtil.proxiedInterfaces(type));
@@ -84,6 +84,11 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
             });
             e.setCallbackFilter(new TransparentReferenceCallbackFilter());
             return (Factory) e.create();
+        }
+
+        private static boolean useConcreteSuperclass(Class<?> type) {
+            net.orfjackal.dimdwarf.api.Entity ann = type.getAnnotation(net.orfjackal.dimdwarf.api.Entity.class);
+            return ann != null && ann.value().equals(ProxyType.CLASS);
         }
     }
 

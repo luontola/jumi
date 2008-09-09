@@ -29,13 +29,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api.internal;
+package net.orfjackal.dimdwarf.api;
 
 /**
- * Marker interface equivalent to Darkstar's ManagedObject.
+ * The kind of proxy to generate for given a target class.
  *
  * @author Esko Luontola
- * @since 15.8.2008
+ * @since 9.9.2008
  */
-public interface Entity {
+public enum ProxyType {
+
+    /**
+     * The proxy will extend {@link Object} and implement the same interfaces as the target class.
+     */
+    INTERFACE,
+
+    /**
+     * The proxy will extend the target class, which should have an accessible default constructor.
+     */
+    CLASS
 }

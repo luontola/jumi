@@ -35,7 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.ProxyConcreteClass;
+import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.entities.*;
@@ -106,7 +106,7 @@ public class TransparentReferenceProxyWithConcreteSuperclassSpec extends Specifi
     }
 
 
-    @ProxyConcreteClass
+    @net.orfjackal.dimdwarf.api.Entity(ProxyType.CLASS)
     public static class MyEntity implements Entity, Serializable {
         private static final long serialVersionUID = 1L;
 
