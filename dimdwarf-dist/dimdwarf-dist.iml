@@ -9,16 +9,16 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
-      <library name="com.intellij:annotations:7.0.3">
+    <orderEntry type="module-library">
+      <library name="org.slf4j:slf4j-jdk14:1.5.2">
         <CLASSES>
-          <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3.jar!/" />
+          <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3-sources.jar!/" />
+          <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -32,19 +32,6 @@
         </JAVADOC>
         <SOURCES>
           <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.2/slf4j-api-1.5.2-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="org.slf4j:slf4j-jdk14:1.5.2">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -204,6 +191,19 @@
         </JAVADOC>
         <SOURCES>
           <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="com.intellij:annotations:7.0.3">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
