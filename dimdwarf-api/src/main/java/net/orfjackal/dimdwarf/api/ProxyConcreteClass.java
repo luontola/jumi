@@ -29,24 +29,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api.internal;
+package net.orfjackal.dimdwarf.api;
 
-import net.orfjackal.dimdwarf.api.Entity;
+import java.lang.annotation.*;
 
 /**
+ * If an entity is annotated with this class, then its transparent reference proxy
+ * will extend that class. Otherwise the proxy will only implement the interfaces
+ * of that class. This annotation is required for entities which are not accessed
+ * through their interfaces.
+ *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 9.9.2008
  */
-public final class Entities {
-
-    private Entities() {
-    }
-
-    public static boolean isEntity(Object obj) {
-        return obj instanceof Entity && !isTransparentReference(obj);
-    }
-
-    public static boolean isTransparentReference(Object obj) {
-        return obj instanceof TransparentReference;
-    }
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ProxyConcreteClass {
 }
