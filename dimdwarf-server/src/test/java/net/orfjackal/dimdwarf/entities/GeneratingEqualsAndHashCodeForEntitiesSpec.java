@@ -90,12 +90,12 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
             return null;
         }
 
-        public void doesNotDelegateItsEqualsMethodToEntityIdentity() {
+        public void doesNotDelegateItsEqualsMethod() {
             target.equals(new Object());
             specify(referencesCreated, should.equal(0));
         }
 
-        public void doesNotDelegateItsHashCodeMethodToEntityIdentity() {
+        public void doesNotDelegateItsHashCodeMethod() {
             target.hashCode();
             specify(referencesCreated, should.equal(0));
         }
@@ -126,7 +126,7 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
             return null;
         }
 
-        public void doesNotDelegateItsEqualsMethodToEntityIdentity() {
+        public void doesNotDelegateItsEqualsMethod() {
             target.equals(new Object());
             specify(referencesCreated, should.equal(0));
         }
@@ -149,7 +149,7 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
             specify(referencesCreated, should.equal(1));
         }
 
-        public void doesNotDelegateItsHashCodeMethodToEntityIdentity() {
+        public void doesNotDelegateItsHashCodeMethod() {
             target.hashCode();
             specify(referencesCreated, should.equal(0));
         }
