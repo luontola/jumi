@@ -59,12 +59,10 @@ public class TransformationTestClassLoader extends ClassLoader {
 
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         if (name.equals(classToInstrument)) {
-            Class<?> cl = findClass(name);
-            if (cl != null) {
-                return cl;
-            }
+            return findClass(name);
+        } else {
+            return super.loadClass(name);
         }
-        return getParent().loadClass(name);
     }
 
     protected Class<?> findClass(String name) throws ClassNotFoundException {
@@ -78,7 +76,7 @@ public class TransformationTestClassLoader extends ClassLoader {
     }
 
     private byte[] readClassBytes(String name) throws ClassNotFoundException {
-        InputStream in = getParent().getResourceAsStream(name.replaceAll("\\.", "/") + ".class");
+        InputStream in = getResourceAsStream(name.replaceAll("\\.", "/") + ".class");
         if (in == null) {
             throw new ClassNotFoundException(name);
         }
