@@ -60,7 +60,7 @@ public class TransformationTestClassLoader extends ClassLoader {
         this.transformer = transformer;
     }
 
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
+    public synchronized Class<?> loadClass(String name) throws ClassNotFoundException {
         Class<?> c = findLoadedClass(name);
         if (c == null) {
             c = name.equals(classToInstrument) ? findClass(name) : super.loadClass(name);
