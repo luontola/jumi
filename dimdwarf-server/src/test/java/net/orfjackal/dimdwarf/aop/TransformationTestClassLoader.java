@@ -38,8 +38,6 @@ import java.io.InputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Esko Luontola
@@ -49,7 +47,6 @@ public class TransformationTestClassLoader extends ClassLoader {
 
     private final String classToInstrument;
     private final ClassFileTransformer transformer;
-    private final Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
 
     public TransformationTestClassLoader(String classToInstrument, ClassFileTransformer transformer) {
         super(TransformationTestClassLoader.class.getClassLoader());
