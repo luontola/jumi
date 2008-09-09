@@ -38,6 +38,8 @@ import java.io.InputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Esko Luontola
@@ -47,6 +49,7 @@ public class TransformationTestClassLoader extends ClassLoader {
 
     private final String classToInstrument;
     private final ClassFileTransformer transformer;
+    private final Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
 
     public TransformationTestClassLoader(String classToInstrument, ClassFileTransformer transformer) {
         super(TransformationTestClassLoader.class.getClassLoader());
@@ -58,14 +61,14 @@ public class TransformationTestClassLoader extends ClassLoader {
     }
 
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        if (name.equals(classToInstrument)) {
-            return findClass(name);
-        } else {
-            return super.loadClass(name);
+        Class<?> c = findLoadedClass(name);
+        if (c == null) {
+            c = name.equals(classToInstrument) ? findClass(name) : super.loadClass(name);
         }
+        return c;
     }
 
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
         try {
             byte[] b = transformer.transform(this, name, null, null, readClassBytes(name));
             return defineClass(name, b, 0, b.length);
