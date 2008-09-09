@@ -65,7 +65,6 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
     public <T> EntityReference<T> createReference(T obj) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
         if (!Entities.isEntity(obj)) {
-            // TODO: after transparent references support proxying concrete classes, write a test for this (pass a proxy to this method)
             throw new IllegalArgumentException("Not an entity: " + obj);
         }
         Entity entity = (Entity) obj;

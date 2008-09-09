@@ -31,14 +31,14 @@
 
 package net.orfjackal.dimdwarf.tref;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.ProxyConcreteClass;
 import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.entities.EntityManager;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -93,6 +93,15 @@ public class TransparentReferenceProxyWithConcreteSuperclassSpec extends Specifi
             MyEntity proxy = (MyEntity) this.proxy;
             specify(proxy.getValue(), should.equal(42));
             specify(proxy.value, should.equal(0));
+        }
+
+        public void entityReferencesCanNotBeCreatedForTheProxy() {
+            final EntityManager manager = new EntityManagerImpl(mock(EntityIdFactory.class), mock(EntityStorage.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.createReference(proxy);
+                }
+            }, should.raise(IllegalArgumentException.class));
         }
     }
 
