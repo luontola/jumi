@@ -33,9 +33,9 @@ package net.orfjackal.dimdwarf.tref;
 
 import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.internal.Entity;
+import net.orfjackal.dimdwarf.api.internal.EntityManager;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
-import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.util.Cache;
 import net.sf.cglib.proxy.*;
 

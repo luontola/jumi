@@ -29,9 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
-
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+package net.orfjackal.dimdwarf.api.internal;
 
 /**
  * @author Esko Luontola

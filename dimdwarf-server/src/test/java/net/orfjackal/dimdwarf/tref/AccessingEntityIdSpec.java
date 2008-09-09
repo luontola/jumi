@@ -35,18 +35,16 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityManager;
-import net.orfjackal.dimdwarf.entities.EntityIdFactory;
-import net.orfjackal.dimdwarf.entities.EntityManagerImpl;
+import net.orfjackal.dimdwarf.context.ContextImpl;
+import net.orfjackal.dimdwarf.context.ThreadContext;
+import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
-import net.orfjackal.dimdwarf.entities.EntityStorage;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -55,69 +53,50 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class TransparentReferenceProxyWithConcreteSuperclassSpec extends Specification<Object> {
+public class AccessingEntityIdSpec extends Specification<Object> {
 
-    private EntityManager entityManager;
-    private TransparentReferenceFactory factory;
-    private MyEntity entity;
+    private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
+
+    private EntityManager manager;
+    private Entity entity;
+    private Object proxy;
 
     public void create() throws Exception {
-        entityManager = mock(EntityManager.class);
-        factory = new TransparentReferenceFactoryImpl(entityManager);
-        entity = new MyEntity();
+        manager = mock(EntityManager.class);
+        TransparentReferenceFactory factory = new TransparentReferenceFactoryImpl(manager);
+        entity = new DummyEntity();
+        checking(new Expectations() {{
+            allowing(manager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(ENTITY_ID, entity)));
+        }});
+        proxy = factory.createTransparentReference(entity);
+        ThreadContext.setUp(new ContextImpl(manager));
+    }
+
+    public void destroy() throws Exception {
+        ThreadContext.tearDown();
     }
 
 
-    public class AProxyWithConcreteSuperclass {
-
-        private Object proxy;
+    public class TheEntityId {
 
         public Object create() {
-            checking(new Expectations() {{
-                one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(BigInteger.ONE, entity)));
-            }});
-            proxy = factory.createTransparentReference(entity);
             return null;
         }
 
-        public void isATransparentReference() {
-            specify(Entities.isTransparentReference(proxy));
+        public void canBeGetFromEntity() {
+            specify(Entities.getEntityId(entity), should.equal(ENTITY_ID));
         }
 
-        public void isNotAnEntity() {
-            specify(Entities.isEntity(proxy), should.equal(false));
+        public void canBeGetFromTransparentReferenceProxy() {
+            specify(Entities.getEntityId(proxy), should.equal(ENTITY_ID));
         }
 
-        public void isAnInstanceOfTheSameClassAsTheEntity() {
-            specify(proxy instanceof MyEntity);
-        }
-
-        public void delegatesItsMethodsToTheEntity() {
-            entity.value = 42;
-            MyEntity proxy = (MyEntity) this.proxy;
-            specify(proxy.getValue(), should.equal(42));
-            specify(proxy.value, should.equal(0));
-        }
-
-        public void entityReferencesCanNotBeCreatedForTheProxy() {
-            final EntityManager manager = new EntityManagerImpl(mock(EntityIdFactory.class), mock(EntityStorage.class));
+        public void normalObjectsDoNotHaveAnEntityId() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.createReference(proxy);
+                    Entities.getEntityId(new Object());
                 }
             }, should.raise(IllegalArgumentException.class));
-        }
-    }
-
-
-    @net.orfjackal.dimdwarf.api.Entity(ProxyType.CLASS)
-    public static class MyEntity implements Entity, Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public int value = 0;
-
-        public int getValue() {
-            return value;
         }
     }
 }

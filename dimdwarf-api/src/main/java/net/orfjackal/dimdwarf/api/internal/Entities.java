@@ -31,6 +31,10 @@
 
 package net.orfjackal.dimdwarf.api.internal;
 
+import net.orfjackal.dimdwarf.context.ThreadContext;
+
+import java.math.BigInteger;
+
 /**
  * @author Esko Luontola
  * @since 5.9.2008
@@ -46,5 +50,17 @@ public final class Entities {
 
     public static boolean isTransparentReference(Object obj) {
         return obj instanceof TransparentReference;
+    }
+
+    public static BigInteger getEntityId(Object obj) {
+        if (isEntity(obj)) {
+            EntityReference<Object> ref = ThreadContext.get().getEntityManager().createReference(obj);
+            return ref.getId();
+        }
+        if (isTransparentReference(obj)) {
+            TransparentReference tref = (TransparentReference) obj;
+            return tref.getEntityReference().getId();
+        }
+        throw new IllegalArgumentException("Not an entity: " + obj);
     }
 }

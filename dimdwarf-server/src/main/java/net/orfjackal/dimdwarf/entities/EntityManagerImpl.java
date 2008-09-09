@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.Entity;
+import net.orfjackal.dimdwarf.api.internal.EntityManager;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import java.math.BigInteger;
