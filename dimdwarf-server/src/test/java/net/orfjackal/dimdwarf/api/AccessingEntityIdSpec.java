@@ -29,12 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tref;
+package net.orfjackal.dimdwarf.api;
 
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.context.ContextImpl;
 import net.orfjackal.dimdwarf.context.ThreadContext;
@@ -42,6 +41,8 @@ import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import net.orfjackal.dimdwarf.server.DefaultEntityImplementation;
+import net.orfjackal.dimdwarf.tref.TransparentReferenceFactory;
+import net.orfjackal.dimdwarf.tref.TransparentReferenceFactoryImpl;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

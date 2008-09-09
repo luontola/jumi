@@ -118,6 +118,10 @@ public class TransparentReferenceSpec extends Specification<Object> {
             specify(subclassProxy instanceof DummyInterface);
         }
 
+        public void byDefaultItDoesNotExtendTheEntity() {
+            specify(proxy instanceof DummyEntity, should.equal(false));
+        }
+
         public void itRefersToTheEntityThroughtAnEntityReference() throws IOException {
             final List<Object> serializedObjects = new ArrayList<Object>();
             ObjectOutputStream out = new ObjectOutputStream(new ByteArrayOutputStream()) {

@@ -52,7 +52,7 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class TransparentReferenceProxyWithConcreteSuperclassSpec extends Specification<Object> {
+public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
     private EntityManager entityManager;
     private TransparentReferenceFactory factory;
