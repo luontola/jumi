@@ -48,7 +48,7 @@ import org.objectweb.asm.Opcodes;
 @Group({"fast"})
 public class ClassFileTransformerSpec extends Specification<Object> {
 
-    private static final String TARGET_CLASS = "net.orfjackal.dimdwarf.aop.ClassFileTransformerSpec$ClassToInstrument";
+    private static final String TARGET_CLASS = ClassToInstrument.class.getName();
 
     private ClassLoader loader;
     private Object target;
