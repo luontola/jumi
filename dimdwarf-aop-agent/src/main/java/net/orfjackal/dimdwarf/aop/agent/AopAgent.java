@@ -51,6 +51,6 @@ public class AopAgent {
     }
 
     private static void installTransformations(Instrumentation inst) {
-        inst.addTransformer(new DimdwarfClassFileTransformer());
+        inst.addTransformer(new DimdwarfTransformationChain());
     }
 }

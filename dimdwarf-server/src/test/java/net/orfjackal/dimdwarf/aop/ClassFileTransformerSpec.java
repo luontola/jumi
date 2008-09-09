@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.aop;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.aop.agent.AsmClassFileTransformer;
+import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
@@ -76,7 +76,7 @@ public class ClassFileTransformerSpec extends Specification<Object> {
     public class WhenATransformerIsInstalled {
 
         public Object create() throws Exception {
-            loader = new TestClassLoader(TARGET_CLASS, new AsmClassFileTransformer() {
+            loader = new TestClassLoader(TARGET_CLASS, new AbstractTransformationChain() {
                 protected ClassVisitor getAdapters(ClassVisitor cv) {
                     return new AddEqualsMethodWhichReturnsTrue(cv);
                 }
