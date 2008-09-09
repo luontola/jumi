@@ -29,33 +29,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.server;
-
-import net.orfjackal.dimdwarf.api.Entities;
-import net.orfjackal.dimdwarf.util.MavenUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
+package net.orfjackal.dimdwarf.api.impl;
 
 /**
  * @author Esko Luontola
- * @since 15.8.2008
+ * @since 31.1.2008
  */
-public class Startup {
-    private static final Logger logger = LoggerFactory.getLogger(Startup.class);
+public interface TransparentReference {
 
-    public static void main(String[] args) throws IOException {
-        logger.info("Dimdwarf {} starting up", getVersion());
+    IEntity getEntity();
 
-        Entities.setImplementation(new DefaultEntityImplementation());
-        // start up server etc.
+    EntityReference<?> getEntityReference();
 
-        logger.info("Shutting down");
-    }
+    Class<?> getType();
 
-    private static String getVersion() throws IOException {
-        String version = MavenUtil.getPom("net.orfjackal.dimdwarf", "dimdwarf-server").getProperty("version");
-        return version != null ? version : "<unknown version>";
-    }
+    /**
+     * Returns {@code true} when (1) the other object is a transparent reference to the same entity
+     * as this refers to, or (2) the other object is the same entity itself.
+     * <p/>
+     * This method and {@link net.orfjackal.dimdwarf.api.impl.IEntity#equals} must follow the same contract.
+     */
+    boolean equals(Object obj);
+
+    /**
+     * Returns a hashCode which is remains the same through the whole lifecycle of the entity
+     * (i.e. from its creation until its removal from the database).
+     * <p/>
+     * This method and {@link net.orfjackal.dimdwarf.api.impl.IEntity#hashCode} must follow the same contract.
+     */
+    int hashCode();
+
+    Object writeReplace();
 }

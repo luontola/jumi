@@ -31,31 +31,29 @@
 
 package net.orfjackal.dimdwarf.server;
 
-import net.orfjackal.dimdwarf.api.Entities;
-import net.orfjackal.dimdwarf.util.MavenUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.orfjackal.dimdwarf.api.EntityImplementation;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 
-import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 15.8.2008
+ * @since 10.9.2008
  */
-public class Startup {
-    private static final Logger logger = LoggerFactory.getLogger(Startup.class);
+public class DefaultEntityImplementation implements EntityImplementation {
 
-    public static void main(String[] args) throws IOException {
-        logger.info("Dimdwarf {} starting up", getVersion());
-
-        Entities.setImplementation(new DefaultEntityImplementation());
-        // start up server etc.
-
-        logger.info("Shutting down");
-    }
-
-    private static String getVersion() throws IOException {
-        String version = MavenUtil.getPom("net.orfjackal.dimdwarf", "dimdwarf-server").getProperty("version");
-        return version != null ? version : "<unknown version>";
+    public BigInteger getId(Object obj) {
+        if (EntityUtil.isEntity(obj)) {
+            EntityReference<Object> ref = ThreadContext.get().getEntityManager().createReference(obj);
+            return ref.getId();
+        }
+        if (EntityUtil.isTransparentReference(obj)) {
+            TransparentReference tref = (TransparentReference) obj;
+            return tref.getEntityReference().getId();
+        }
+        return null;
     }
 }

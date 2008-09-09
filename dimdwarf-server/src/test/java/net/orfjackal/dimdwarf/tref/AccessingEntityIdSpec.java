@@ -41,7 +41,7 @@ import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
-import net.orfjackal.dimdwarf.modules.DefaultEntityImplementation;
+import net.orfjackal.dimdwarf.server.DefaultEntityImplementation;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

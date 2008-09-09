@@ -29,33 +29,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.server;
+package net.orfjackal.dimdwarf.api.impl;
 
-import net.orfjackal.dimdwarf.api.Entities;
-import net.orfjackal.dimdwarf.util.MavenUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
+import java.math.BigInteger;
 
 /**
+ * Reference to an entity, equivalent to Darkstar's ManagedReference.
+ *
  * @author Esko Luontola
  * @since 15.8.2008
  */
-public class Startup {
-    private static final Logger logger = LoggerFactory.getLogger(Startup.class);
+public interface EntityReference<T> {
 
-    public static void main(String[] args) throws IOException {
-        logger.info("Dimdwarf {} starting up", getVersion());
+    T get();
 
-        Entities.setImplementation(new DefaultEntityImplementation());
-        // start up server etc.
-
-        logger.info("Shutting down");
-    }
-
-    private static String getVersion() throws IOException {
-        String version = MavenUtil.getPom("net.orfjackal.dimdwarf", "dimdwarf-server").getProperty("version");
-        return version != null ? version : "<unknown version>";
-    }
+    BigInteger getId();
 }

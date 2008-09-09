@@ -29,31 +29,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
-
-import net.orfjackal.dimdwarf.api.EntityImplementation;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
-import net.orfjackal.dimdwarf.context.ThreadContext;
-
-import java.math.BigInteger;
+package net.orfjackal.dimdwarf.api.impl;
 
 /**
+ * Marker interface equivalent to Darkstar's ManagedObject.
+ * <p/>
+ * Internally the system uses only this interface, and not the {@link IEntity} annotation.
+ * Classes annotated with {@code @Entity} will be automatically transformed to implement this interface.
+ *
  * @author Esko Luontola
- * @since 10.9.2008
+ * @since 15.8.2008
  */
-public class DefaultEntityImplementation implements EntityImplementation {
-
-    public BigInteger getId(Object obj) {
-        if (EntityUtil.isEntity(obj)) {
-            EntityReference<Object> ref = ThreadContext.get().getEntityManager().createReference(obj);
-            return ref.getId();
-        }
-        if (EntityUtil.isTransparentReference(obj)) {
-            TransparentReference tref = (TransparentReference) obj;
-            return tref.getEntityReference().getId();
-        }
-        return null;
-    }
+public interface IEntity {
 }
