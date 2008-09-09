@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;

@@ -31,8 +31,6 @@
 
 package net.orfjackal.dimdwarf.api.internal;
 
-import net.orfjackal.dimdwarf.api.Entity;
-
 /**
  * @author Esko Luontola
  * @since 31.1.2008

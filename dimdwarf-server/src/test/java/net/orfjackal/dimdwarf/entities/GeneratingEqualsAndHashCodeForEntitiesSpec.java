@@ -37,7 +37,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.aop.AddEqualsAndHashCodeMethodsForEntities;
 import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
 import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
-import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.context.ContextImpl;
 import net.orfjackal.dimdwarf.context.ThreadContext;

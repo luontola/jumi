@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.tref;
 
 
-import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 

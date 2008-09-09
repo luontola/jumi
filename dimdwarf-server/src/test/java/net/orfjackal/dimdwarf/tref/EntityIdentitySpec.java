@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.tref;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.context.ContextImpl;
 import net.orfjackal.dimdwarf.context.ThreadContext;

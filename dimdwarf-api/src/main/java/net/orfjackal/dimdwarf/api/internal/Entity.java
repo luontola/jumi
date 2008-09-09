@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api;
+package net.orfjackal.dimdwarf.api.internal;
 
 /**
  * Marker interface equivalent to Darkstar's ManagedObject. Objects which implement

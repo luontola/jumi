@@ -31,8 +31,8 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.Entity;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 
