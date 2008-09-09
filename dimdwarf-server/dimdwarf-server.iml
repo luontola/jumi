@@ -212,28 +212,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="asm:asm-util:3.1">
+      <library name="asm:asm-all:3.1">
         <CLASSES>
-          <root url="jar://$M2_REPO$/asm/asm-util/3.1/asm-util-3.1.jar!/" />
+          <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/asm/asm-util/3.1/asm-util-3.1-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/asm/asm-util/3.1/asm-util-3.1-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="asm:asm-tree:3.1">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/asm/asm-tree/3.1/asm-tree-3.1.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/asm/asm-tree/3.1/asm-tree-3.1-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/asm/asm-tree/3.1/asm-tree-3.1-sources.jar!/" />
+          <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
