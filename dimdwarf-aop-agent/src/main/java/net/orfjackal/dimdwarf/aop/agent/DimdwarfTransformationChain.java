@@ -32,6 +32,8 @@
 package net.orfjackal.dimdwarf.aop.agent;
 
 import net.orfjackal.dimdwarf.aop.AddEqualsAndHashCodeMethodsForEntities;
+import net.orfjackal.dimdwarf.aop.DimdwarfApi;
+import net.orfjackal.dimdwarf.aop.MarkAsEntitiesAllClassesAnnotatedWith;
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -42,6 +44,7 @@ public class DimdwarfTransformationChain extends AbstractTransformationChain {
 
     protected ClassVisitor getAdapters(ClassVisitor cv) {
         cv = new AddEqualsAndHashCodeMethodsForEntities(cv);
+        cv = new MarkAsEntitiesAllClassesAnnotatedWith(DimdwarfApi.ENTITY_ANNOTATION, cv);
         return cv;
     }
 }
