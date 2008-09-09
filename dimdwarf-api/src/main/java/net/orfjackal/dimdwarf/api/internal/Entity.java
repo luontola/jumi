@@ -33,6 +33,9 @@ package net.orfjackal.dimdwarf.api.internal;
 
 /**
  * Marker interface equivalent to Darkstar's ManagedObject.
+ * <p/>
+ * Internally the system uses only this interface, and not the {@link net.orfjackal.dimdwarf.api.Entity} annotation.
+ * Classes annotated with {@code @Entity} will be automatically transformed to implement this interface.
  *
  * @author Esko Luontola
  * @since 15.8.2008
