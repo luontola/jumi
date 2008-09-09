@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
 
 /**
  * @author Esko Luontola

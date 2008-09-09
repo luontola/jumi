@@ -35,7 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.EntityManager;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 import org.junit.runner.RunWith;
 
 /**

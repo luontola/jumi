@@ -35,14 +35,11 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.ProxyType;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityManager;
-import net.orfjackal.dimdwarf.entities.EntityIdFactory;
-import net.orfjackal.dimdwarf.entities.EntityManagerImpl;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
-import net.orfjackal.dimdwarf.entities.EntityStorage;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.entities.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -74,18 +71,18 @@ public class TransparentReferenceProxyWithConcreteSuperclassSpec extends Specifi
 
         public Object create() {
             checking(new Expectations() {{
-                one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(BigInteger.ONE, entity)));
+                one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(BigInteger.ONE, entity)));
             }});
             proxy = factory.createTransparentReference(entity);
             return null;
         }
 
         public void isATransparentReference() {
-            specify(Entities.isTransparentReference(proxy));
+            specify(EntityUtil.isTransparentReference(proxy));
         }
 
         public void isNotAnEntity() {
-            specify(Entities.isEntity(proxy), should.equal(false));
+            specify(EntityUtil.isEntity(proxy), should.equal(false));
         }
 
         public void isAnInstanceOfTheSameClassAsTheEntity() {
@@ -110,8 +107,8 @@ public class TransparentReferenceProxyWithConcreteSuperclassSpec extends Specifi
     }
 
 
-    @net.orfjackal.dimdwarf.api.Entity(ProxyType.CLASS)
-    public static class MyEntity implements Entity, Serializable {
+    @Entity(ProxyType.CLASS)
+    public static class MyEntity implements IEntity, Serializable {
         private static final long serialVersionUID = 1L;
 
         public int value = 0;

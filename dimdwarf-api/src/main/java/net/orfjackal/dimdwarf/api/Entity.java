@@ -52,5 +52,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Entity {
+
     ProxyType value() default ProxyType.INTERFACE;
 }

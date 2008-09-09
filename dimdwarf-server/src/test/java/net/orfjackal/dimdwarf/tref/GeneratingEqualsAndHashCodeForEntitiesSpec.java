@@ -37,13 +37,13 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.aop.AddEqualsAndHashCodeMethodsForEntities;
 import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
 import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityManager;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.context.ContextImpl;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.DummyObject;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
@@ -161,13 +161,13 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
     }
 
 
-    public static class EntityWithEquals implements Entity {
+    public static class EntityWithEquals implements IEntity {
         public boolean equals(Object obj) {
             return super.equals(obj);
         }
     }
 
-    public static class EntityWithHashCode implements Entity {
+    public static class EntityWithHashCode implements IEntity {
         public int hashCode() {
             return super.hashCode();
         }

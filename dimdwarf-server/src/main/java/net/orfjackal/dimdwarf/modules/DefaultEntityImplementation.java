@@ -29,35 +29,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api.internal;
+package net.orfjackal.dimdwarf.modules;
+
+import net.orfjackal.dimdwarf.api.EntityImplementation;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.context.ThreadContext;
+
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 31.1.2008
+ * @since 10.9.2008
  */
-public interface TransparentReference {
+public class DefaultEntityImplementation implements EntityImplementation {
 
-    Entity getEntity();
-
-    EntityReference<?> getEntityReference();
-
-    Class<?> getType();
-
-    /**
-     * Returns {@code true} when (1) the other object is a transparent reference to the same entity
-     * as this refers to, or (2) the other object is the same entity itself.
-     * <p/>
-     * This method and {@link Entity#equals} must follow the same contract.
-     */
-    boolean equals(Object obj);
-
-    /**
-     * Returns a hashCode which is remains the same through the whole lifecycle of the entity
-     * (i.e. from its creation until its removal from the database).
-     * <p/>
-     * This method and {@link Entity#hashCode} must follow the same contract.
-     */
-    int hashCode();
-
-    Object writeReplace();
+    public BigInteger getId(Object obj) {
+        if (EntityUtil.isEntity(obj)) {
+            EntityReference<Object> ref = ThreadContext.get().getEntityManager().createReference(obj);
+            return ref.getId();
+        }
+        if (EntityUtil.isTransparentReference(obj)) {
+            TransparentReference tref = (TransparentReference) obj;
+            return tref.getEntityReference().getId();
+        }
+        return null;
+    }
 }

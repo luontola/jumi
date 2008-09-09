@@ -34,12 +34,12 @@ package net.orfjackal.dimdwarf.tref;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityManager;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.context.ContextImpl;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -56,8 +56,8 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     private EntityManager entityManager;
     protected TransparentReferenceFactory factory;
-    private Entity ent1;
-    private Entity ent2;
+    private IEntity ent1;
+    private IEntity ent2;
     private TransparentReference tref1;
     private TransparentReference tref1b;
     private TransparentReference tref2;
@@ -81,9 +81,9 @@ public class EntityIdentitySpec extends Specification<Object> {
         ThreadContext.tearDown();
     }
 
-    private Expectations referencesMayBeCreatedFor(final Entity entity, final BigInteger id) {
+    private Expectations referencesMayBeCreatedFor(final IEntity entity, final BigInteger id) {
         return new Expectations() {{
-            allowing(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
+            allowing(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
         }};
     }
 
@@ -91,77 +91,77 @@ public class EntityIdentitySpec extends Specification<Object> {
     public class EntityIdentityContractsWhenUsingTransparentReferences {
 
         public void entityEqualsTheSameEntity() {
-            specify(EntityIdentity.equals(ent1, ent1));
-            specify(EntityIdentity.equals(ent1, ent2), should.equal(false));
+            specify(EntityHelper.equals(ent1, ent1));
+            specify(EntityHelper.equals(ent1, ent2), should.equal(false));
         }
 
         public void entityEqualsTransparentReferenceForTheSameEntity() {
-            specify(EntityIdentity.equals(ent1, tref1));
-            specify(EntityIdentity.equals(tref1, ent1));
-            specify(EntityIdentity.equals(ent1, tref2), should.equal(false));
-            specify(EntityIdentity.equals(tref2, ent1), should.equal(false));
+            specify(EntityHelper.equals(ent1, tref1));
+            specify(EntityHelper.equals(tref1, ent1));
+            specify(EntityHelper.equals(ent1, tref2), should.equal(false));
+            specify(EntityHelper.equals(tref2, ent1), should.equal(false));
         }
 
         public void transparentReferenceEqualsTransparentReferenceForTheSameEntity() {
             specify(tref1 != tref1b);
-            specify(EntityIdentity.equals(tref1, tref1));
-            specify(EntityIdentity.equals(tref1, tref1b));
-            specify(EntityIdentity.equals(tref1b, tref1));
-            specify(EntityIdentity.equals(tref1, tref2), should.equal(false));
+            specify(EntityHelper.equals(tref1, tref1));
+            specify(EntityHelper.equals(tref1, tref1b));
+            specify(EntityHelper.equals(tref1b, tref1));
+            specify(EntityHelper.equals(tref1, tref2), should.equal(false));
         }
 
         public void entityDoesNotEqualOtherObjects() {
-            specify(EntityIdentity.equals(ent1, obj), should.equal(false));
-            specify(EntityIdentity.equals(obj, ent1), should.equal(false));
+            specify(EntityHelper.equals(ent1, obj), should.equal(false));
+            specify(EntityHelper.equals(obj, ent1), should.equal(false));
         }
 
         public void transparentReferenceDoesNotEqualOtherObjects() {
-            specify(EntityIdentity.equals(tref1, obj), should.equal(false));
-            specify(EntityIdentity.equals(obj, tref1), should.equal(false));
+            specify(EntityHelper.equals(tref1, obj), should.equal(false));
+            specify(EntityHelper.equals(obj, tref1), should.equal(false));
         }
 
         public void entityDoesNotEqualNull() {
-            specify(EntityIdentity.equals(ent1, null), should.equal(false));
-            specify(EntityIdentity.equals(null, ent1), should.equal(false));
+            specify(EntityHelper.equals(ent1, null), should.equal(false));
+            specify(EntityHelper.equals(null, ent1), should.equal(false));
         }
 
         public void transparentReferenceDoesNotEqualNull() {
-            specify(EntityIdentity.equals(tref1, null), should.equal(false));
-            specify(EntityIdentity.equals(null, tref1), should.equal(false));
+            specify(EntityHelper.equals(tref1, null), should.equal(false));
+            specify(EntityHelper.equals(null, tref1), should.equal(false));
         }
 
         public void differentEntitiesHaveDifferentHashCodes() {
-            int hc1 = EntityIdentity.hashCode(ent1);
-            int hc2 = EntityIdentity.hashCode(ent2);
+            int hc1 = EntityHelper.hashCode(ent1);
+            int hc2 = EntityHelper.hashCode(ent2);
             specify(hc1, should.not().equal(hc2));
         }
 
         public void transparentReferencesForDifferentEntitiesHaveDifferentHashCodes() {
-            int hc1 = EntityIdentity.hashCode(tref1);
-            int hc2 = EntityIdentity.hashCode(tref2);
+            int hc1 = EntityHelper.hashCode(tref1);
+            int hc2 = EntityHelper.hashCode(tref2);
             specify(hc1, should.not().equal(hc2));
         }
 
         public void transparentReferencesForTheSameEntityHaveTheSameHashCode() {
-            int hc1 = EntityIdentity.hashCode(tref1);
-            int hc1b = EntityIdentity.hashCode(tref1b);
+            int hc1 = EntityHelper.hashCode(tref1);
+            int hc1b = EntityHelper.hashCode(tref1b);
             specify(hc1, should.equal(hc1b));
         }
 
         public void entitiesAndTheirTransparentReferencesHaveTheSameHashCode() {
-            specify(EntityIdentity.hashCode(ent1), EntityIdentity.hashCode(tref1));
-            specify(EntityIdentity.hashCode(ent2), EntityIdentity.hashCode(tref2));
+            specify(EntityHelper.hashCode(ent1), EntityHelper.hashCode(tref1));
+            specify(EntityHelper.hashCode(ent2), EntityHelper.hashCode(tref2));
         }
 
         public void equalsMethodOnProxyWillNotDelegateToEntity() {
-            final Entity entity = mock(Entity.class);
+            final IEntity entity = mock(IEntity.class);
             checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
             TransparentReference proxy = factory.createTransparentReference(entity);
             proxy.equals(entity);
         }
 
         public void hashCodeMethodOnProxyWillNotDelegateToEntity() {
-            final Entity entity = mock(Entity.class);
+            final IEntity entity = mock(IEntity.class);
             checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
             TransparentReference proxy = factory.createTransparentReference(entity);
             proxy.hashCode();

@@ -29,13 +29,54 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api.internal;
+package net.orfjackal.dimdwarf.tref;
+
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 
 /**
+ * For transparent references to work correctly, all subclasses of {@link net.orfjackal.dimdwarf.api.impl.IEntity} should
+ * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
+ * <pre><code>
+ * public boolean equals(Object obj) {
+ *     return EntityHelper.equals(this, obj);
+ * }
+ * public int hashCode() {
+ *     return EntityHelper.hashCode(this);
+ * }
+ * </code></pre>
+ *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 1.2.2008
  */
-public interface EntityManager {
+public class EntityHelper {
 
-    <T> EntityReference<T> createReference(T entity);
+    private EntityHelper() {
+    }
+
+    public static boolean equals(Object obj1, Object obj2) {
+        Object id1 = getIdentity(obj1);
+        Object id2 = getIdentity(obj2);
+        return safeEquals(id1, id2);
+    }
+
+    public static int hashCode(Object obj) {
+        Object id = getIdentity(obj);
+        return id.hashCode();
+    }
+
+    private static Object getIdentity(Object obj) {
+        if (EntityUtil.isTransparentReference(obj)) {
+            return ((TransparentReference) obj).getEntityReference();
+        } else if (EntityUtil.isEntity(obj)) {
+            return ThreadContext.get().getEntityManager().createReference(obj);
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean safeEquals(Object x, Object y) {
+        return x == y || (x != null && x.equals(y));
+    }
 }

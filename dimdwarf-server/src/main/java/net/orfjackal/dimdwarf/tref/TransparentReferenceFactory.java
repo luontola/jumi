@@ -31,8 +31,8 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 
 
 /**
@@ -48,7 +48,7 @@ public interface TransparentReferenceFactory {
      * objects returned by this method will behave the same as any domain objects, except that
      * you will not need to wrap them in a ManagedReference.
      */
-    TransparentReference createTransparentReference(Entity object);
+    TransparentReference createTransparentReference(IEntity object);
 
     /**
      * Creates a proxy for a TransparentReference instance which is not yet proxied. This is

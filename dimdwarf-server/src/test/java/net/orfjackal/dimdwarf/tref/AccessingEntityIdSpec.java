@@ -31,17 +31,17 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityManager;
+import net.orfjackal.dimdwarf.api.Entities;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.context.ContextImpl;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.modules.DefaultEntityImplementation;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -58,7 +58,7 @@ public class AccessingEntityIdSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private EntityManager manager;
-    private Entity entity;
+    private IEntity entity;
     private Object proxy;
 
     public void create() throws Exception {
@@ -66,13 +66,15 @@ public class AccessingEntityIdSpec extends Specification<Object> {
         TransparentReferenceFactory factory = new TransparentReferenceFactoryImpl(manager);
         entity = new DummyEntity();
         checking(new Expectations() {{
-            allowing(manager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(ENTITY_ID, entity)));
+            allowing(manager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(ENTITY_ID, entity)));
         }});
         proxy = factory.createTransparentReference(entity);
         ThreadContext.setUp(new ContextImpl(manager));
+        Entities.setImplementation(new DefaultEntityImplementation());
     }
 
     public void destroy() throws Exception {
+        Entities.setImplementation(null);
         ThreadContext.tearDown();
     }
 
@@ -84,19 +86,15 @@ public class AccessingEntityIdSpec extends Specification<Object> {
         }
 
         public void canBeGetFromEntity() {
-            specify(Entities.getEntityId(entity), should.equal(ENTITY_ID));
+            specify(Entities.getId(entity), should.equal(ENTITY_ID));
         }
 
         public void canBeGetFromTransparentReferenceProxy() {
-            specify(Entities.getEntityId(proxy), should.equal(ENTITY_ID));
+            specify(Entities.getId(proxy), should.equal(ENTITY_ID));
         }
 
         public void normalObjectsDoNotHaveAnEntityId() {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    Entities.getEntityId(new Object());
-                }
-            }, should.raise(IllegalArgumentException.class));
+            specify(Entities.getId(new Object()), should.equal(null));
         }
     }
 }

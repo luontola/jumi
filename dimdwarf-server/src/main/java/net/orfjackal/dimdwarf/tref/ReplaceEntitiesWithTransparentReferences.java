@@ -31,8 +31,8 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.Entity;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 
 /**
@@ -50,8 +50,8 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationRe
     }
 
     public Object replaceSerialized(Object rootObject, Object obj) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((Entity) obj, factory);
+        if (obj != rootObject && EntityUtil.isEntity(obj)) {
+            return TransparentReferenceUtil.createTransparentReferenceForSerialization((IEntity) obj, factory);
         }
         return obj;
     }

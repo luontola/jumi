@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
 
 import java.io.Externalizable;
 import java.io.IOException;

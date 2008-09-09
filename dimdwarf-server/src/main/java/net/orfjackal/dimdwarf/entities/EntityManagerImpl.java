@@ -31,10 +31,9 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityManager;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -47,9 +46,9 @@ import java.util.*;
  */
 public class EntityManagerImpl implements EntityManager, EntityLoader {
 
-    private final Map<Entity, EntityReference<?>> entities = new IdentityHashMap<Entity, EntityReference<?>>();
-    private final Map<EntityReference<?>, Entity> cache = new HashMap<EntityReference<?>, Entity>();
-    private final Queue<Entity> flushQueue = new ArrayDeque<Entity>();
+    private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
+    private final Map<EntityReference<?>, IEntity> cache = new HashMap<EntityReference<?>, IEntity>();
+    private final Queue<IEntity> flushQueue = new ArrayDeque<IEntity>();
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
     private State state = State.ACTIVE;
@@ -65,10 +64,10 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
 
     public <T> EntityReference<T> createReference(T obj) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
-        if (!Entities.isEntity(obj)) {
+        if (!EntityUtil.isEntity(obj)) {
             throw new IllegalArgumentException("Not an entity: " + obj);
         }
-        Entity entity = (Entity) obj;
+        IEntity entity = (IEntity) obj;
         EntityReference<T> ref = (EntityReference<T>) entities.get(entity);
         if (ref == null) {
             ref = new EntityReferenceImpl<T>(idFactory.newId(), obj);
@@ -79,7 +78,7 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
 
     public <T> T loadEntity(EntityReference<T> ref) {
         checkStateIs(State.ACTIVE);
-        Entity entity = cache.get(ref);
+        IEntity entity = cache.get(ref);
         if (entity == null) {
             entity = storage.read(ref.getId());
             register(entity, ref);
@@ -87,7 +86,7 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
         return (T) entity;
     }
 
-    private void register(Entity entity, EntityReference<?> ref) {
+    private void register(IEntity entity, EntityReference<?> ref) {
         if (state == State.FLUSHING) {
             flushQueue.add(entity);
         }
@@ -110,7 +109,7 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
     }
 
     private void flush() {
-        Entity entity;
+        IEntity entity;
         while ((entity = flushQueue.poll()) != null) {
             BigInteger id = entities.get(entity).getId();
             storage.update(id, entity);

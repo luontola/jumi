@@ -35,12 +35,12 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.*;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.DummyInterface;
-import net.orfjackal.dimdwarf.entities.DummyObject;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.serial.SerializationListener;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
@@ -73,9 +73,9 @@ public class TransparentReferenceSpec extends Specification<Object> {
         entity = new DummyEntity();
     }
 
-    private Expectations referenceIsCreatedFor(final Entity entity, final BigInteger id) {
+    private Expectations referenceIsCreatedFor(final IEntity entity, final BigInteger id) {
         return new Expectations() {{
-            one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<Entity>(id, entity)));
+            one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
         }};
     }
 
@@ -99,11 +99,11 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void itIsATransparentReference() {
-            specify(Entities.isTransparentReference(proxy));
+            specify(EntityUtil.isTransparentReference(proxy));
         }
 
         public void itIsNotAnEntity() {
-            specify(Entities.isEntity(proxy), should.equal(false));
+            specify(EntityUtil.isEntity(proxy), should.equal(false));
         }
 
         public void itImplementsTheSameInterfacesAsTheEntity() {
@@ -135,7 +135,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
             boolean containsEntityReference = false;
             for (Object obj : serializedObjects) {
-                specify(Entities.isEntity(obj), should.equal(false));
+                specify(EntityUtil.isEntity(obj), should.equal(false));
                 if (obj instanceof EntityReference) {
                     containsEntityReference = true;
                 }
@@ -195,21 +195,21 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {
             specify(deserialized.entity instanceof DummyInterface);
-            specify(Entities.isTransparentReference(deserialized.entity));
-            specify(Entities.isEntity(deserialized.entity), should.equal(false));
+            specify(EntityUtil.isTransparentReference(deserialized.entity));
+            specify(EntityUtil.isEntity(deserialized.entity), should.equal(false));
         }
 
         public void theRootEntityIsNotReplaced() {
             specify(deserialized.getClass(), should.equal(SerializationTestEntity.class));
-            specify(Entities.isTransparentReference(deserialized), should.equal(false));
-            specify(Entities.isEntity(deserialized));
+            specify(EntityUtil.isTransparentReference(deserialized), should.equal(false));
+            specify(EntityUtil.isEntity(deserialized));
         }
 
         public void nonEntityObjectsAreNotReplaced() {
             specify(deserialized.normalObject instanceof DummyInterface);
             specify(deserialized.normalObject.getClass(), should.equal(DummyObject.class));
-            specify(Entities.isTransparentReference(deserialized.normalObject), should.equal(false));
-            specify(Entities.isEntity(deserialized.normalObject), should.equal(false));
+            specify(EntityUtil.isTransparentReference(deserialized.normalObject), should.equal(false));
+            specify(EntityUtil.isEntity(deserialized.normalObject), should.equal(false));
         }
     }
 
@@ -258,7 +258,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 */
 
 
-    private static class SerializationTestEntity implements Entity, Serializable {
+    private static class SerializationTestEntity implements IEntity, Serializable {
         private static final long serialVersionUID = 1L;
 
         private DummyInterface entity;

@@ -37,6 +37,6 @@ package net.orfjackal.dimdwarf.aop;
  */
 public class DimdwarfApi {
 
-    public static final String ENTITY_INTERFACE = "net/orfjackal/dimdwarf/api/internal/Entity";
     public static final String ENTITY_ANNOTATION = "net/orfjackal/dimdwarf/api/Entity";
+    public static final String ENTITY_INTERFACE = "net/orfjackal/dimdwarf/api/impl/IEntity";
 }

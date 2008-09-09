@@ -31,9 +31,9 @@
 
 package net.orfjackal.dimdwarf.tref;
 
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.Entity;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
@@ -52,19 +52,19 @@ public class TransparentReferenceUtil {
 
     // TODO: marking for update not implemented by entity manager
     public static void markForUpdate(Object object) {
-        if (Entities.isTransparentReference(object)) {
+        if (EntityUtil.isTransparentReference(object)) {
 //            ((TransparentReference) object).getEntityReference().getForUpdate();
-        } else if (Entities.isEntity(object)) {
+        } else if (EntityUtil.isEntity(object)) {
 //            AppContext.getDataManager().markForUpdate(object);
         }
     }
 
     /**
-     * Used when converting {@link Entity} instances to transparent references during serialization.
+     * Used when converting {@link net.orfjackal.dimdwarf.api.impl.IEntity} instances to transparent references during serialization.
      * Needed because {@link ObjectOutputStream#replaceObject} does not check whether the returned objects
      * have a {@code writeReplace()} method.
      */
-    public static Object createTransparentReferenceForSerialization(Entity object, TransparentReferenceFactory factory) {
+    public static Object createTransparentReferenceForSerialization(IEntity object, TransparentReferenceFactory factory) {
         return factory.createTransparentReference(object).writeReplace();
     }
 
@@ -73,7 +73,7 @@ public class TransparentReferenceUtil {
         for (Class<?> c = aClass; c != null; c = c.getSuperclass()) {
             for (Class<?> anInterface : c.getInterfaces()) {
                 assert !TransparentReference.class.equals(anInterface);
-                if (!Entity.class.isAssignableFrom(anInterface)) {
+                if (!IEntity.class.isAssignableFrom(anInterface)) {
                     results.add(anInterface);
                 }
             }
