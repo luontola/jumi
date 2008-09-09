@@ -52,7 +52,7 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
 
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         for (String s : interfaces) {
-            if (s.equals("net/orfjackal/dimdwarf/api/internal/Entity")) {
+            if (s.equals(DimdwarfApi.ENTITY_INTERFACE)) {
                 isEntity = true;
             }
         }

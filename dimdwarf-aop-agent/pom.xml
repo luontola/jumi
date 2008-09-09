@@ -19,6 +19,10 @@
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
         </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-tree</artifactId>
+        </dependency>
 
     </dependencies>
 

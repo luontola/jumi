@@ -187,6 +187,19 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
+      <library name="asm:asm-tree:3.1">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/asm/asm-tree/3.1/asm-tree-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/asm/asm-tree/3.1/asm-tree-3.1-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/asm/asm-tree/3.1/asm-tree-3.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
       <library name="com.google.code.guice:guice:1.0">
         <CLASSES>
           <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0.jar!/" />
