@@ -73,7 +73,7 @@ public class EntityIdentity {
         } else if (Entities.isEntity(obj)) {
             return ThreadContext.get().getEntityManager().createReference(obj);
         } else {
-            return obj;
+            return null;
         }
     }
 

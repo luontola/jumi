@@ -55,7 +55,7 @@ import java.math.BigInteger;
 public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Object> {
 
     private int referencesCreated = 0;
-    private Entity entity;
+    private Object target;
 
     public void create() throws Exception {
         EntityManager manager = new EntityManager() {
@@ -83,20 +83,20 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
     }
 
 
-    public class ANonInstrumentedEntity {
+    public class AnInstrumentedNormalObject {
 
-        public Object create() {
-            entity = new DummyEntity();
+        public Object create() throws Exception {
+            target = newInstrumentedInstance(DummyObject.class);
             return null;
         }
 
         public void doesNotDelegateItsEqualsMethodToEntityIdentity() {
-            entity.equals(new Object());
+            target.equals(new Object());
             specify(referencesCreated, should.equal(0));
         }
 
         public void doesNotDelegateItsHashCodeMethodToEntityIdentity() {
-            entity.hashCode();
+            target.hashCode();
             specify(referencesCreated, should.equal(0));
         }
     }
@@ -104,19 +104,67 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
     public class AnInstrumentedEntityWithNoEqualsAndHashCodeMethods {
 
         public Object create() throws Exception {
-            entity = (Entity) newInstrumentedInstance(DummyEntity.class);
+            target = newInstrumentedInstance(DummyEntity.class);
             return null;
         }
 
         public void delegatesItsEqualsMethodToEntityIdentity() {
-            entity.equals(new Object());
+            target.equals(new Object());
             specify(referencesCreated, should.equal(1));
         }
 
         public void delegatesItsHashCodeMethodToEntityIdentity() {
-            int hashCode = entity.hashCode();
+            target.hashCode();
             specify(referencesCreated, should.equal(1));
-            specify(hashCode, should.equal(BigInteger.ONE.hashCode()));
+        }
+    }
+
+    public class AnInstrumentedEntityWithACustomEqualsMethod {
+
+        public Object create() throws Exception {
+            target = newInstrumentedInstance(EntityWithEquals.class);
+            return null;
+        }
+
+        public void doesNotDelegateItsEqualsMethodToEntityIdentity() {
+            target.equals(new Object());
+            specify(referencesCreated, should.equal(0));
+        }
+
+        public void delegatesItsHashCodeMethodToEntityIdentity() {
+            target.hashCode();
+            specify(referencesCreated, should.equal(1));
+        }
+    }
+
+    public class AnInstrumentedEntityWithACustomHashCodeMethod {
+
+        public Object create() throws Exception {
+            target = newInstrumentedInstance(EntityWithHashCode.class);
+            return null;
+        }
+
+        public void delegatesItsEqualsMethodToEntityIdentity() {
+            target.equals(new Object());
+            specify(referencesCreated, should.equal(1));
+        }
+
+        public void doesNotDelegateItsHashCodeMethodToEntityIdentity() {
+            target.hashCode();
+            specify(referencesCreated, should.equal(0));
+        }
+    }
+
+
+    public static class EntityWithEquals implements Entity {
+        public boolean equals(Object obj) {
+            return super.equals(obj);
+        }
+    }
+
+    public static class EntityWithHashCode implements Entity {
+        public int hashCode() {
+            return super.hashCode();
         }
     }
 }

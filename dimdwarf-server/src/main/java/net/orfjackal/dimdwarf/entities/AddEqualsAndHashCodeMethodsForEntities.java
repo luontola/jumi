@@ -42,14 +42,43 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
 
+    private boolean isEntity = false;
+    private boolean hasEqualsMethod = false;
+    private boolean hasHashCodeMethod = false;
+
     public AddEqualsAndHashCodeMethodsForEntities(ClassVisitor cv) {
         super(cv);
     }
 
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        for (String s : interfaces) {
+            if (s.equals("net/orfjackal/dimdwarf/api/Entity")) {
+                isEntity = true;
+            }
+        }
+        super.visit(version, access, name, signature, superName, interfaces);
+    }
+
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        if (name.equals("equals") && desc.equals("(Ljava/lang/Object;)Z")) {
+            hasEqualsMethod = true;
+        }
+        if (name.equals("hashCode") && desc.equals("()I")) {
+            hasHashCodeMethod = true;
+        }
+        return super.visitMethod(access, name, desc, signature, exceptions);
+    }
+
     public void visitEnd() {
-        addEqualsMethod();
-        addHashCodeMethod();
-        cv.visitEnd();
+        if (isEntity) {
+            if (!hasEqualsMethod) {
+                addEqualsMethod();
+            }
+            if (!hasHashCodeMethod) {
+                addHashCodeMethod();
+            }
+        }
+        super.visitEnd();
     }
 
     private void addEqualsMethod() {
