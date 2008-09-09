@@ -19,6 +19,10 @@
             <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.orfjackal.dimdwarf</groupId>
+            <artifactId>dimdwarf-aop-agent</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.google.code.guice</groupId>
@@ -30,10 +34,6 @@
             <artifactId>cglib-nodep</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-        </dependency>
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm-all</artifactId>

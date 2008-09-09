@@ -29,30 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop;
+package net.orfjackal.dimdwarf.aop.agent;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
-import java.security.ProtectionDomain;
+import java.lang.instrument.Instrumentation;
 
 /**
  * @author Esko Luontola
  * @since 9.9.2008
  */
-public abstract class AsmClassFileTransformer implements ClassFileTransformer {
+public class AopAgent {
 
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        ClassReader cr = new ClassReader(classfileBuffer);
-        ClassWriter cw = new ClassWriter(cr, 0);
-        ClassVisitor cv = getAdapters(cw);
-        cr.accept(cv, 0);
-        return cw.toByteArray();
+    public static void premain(String agentArgs, Instrumentation inst) {
+        installTransformations(inst);
     }
 
-    protected abstract ClassVisitor getAdapters(ClassVisitor cv);
+    public static void agentmain(String agentArgs, Instrumentation inst) {
+        installTransformations(inst);
+    }
+
+    private static void installTransformations(Instrumentation inst) {
+        inst.addTransformer(new DimdwarfClassFileTransformer());
+    }
 }

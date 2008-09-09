@@ -180,19 +180,7 @@
     </orderEntry>
     <orderEntry type="module" module-name="dimdwarf-server" exported="" />
     <orderEntry type="module" module-name="dimdwarf-api" exported="" />
-    <orderEntry type="module-library" exported="">
-      <library name="com.google.code.guice:guice:1.0">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
+    <orderEntry type="module" module-name="dimdwarf-aop-agent" exported="" />
     <orderEntry type="module-library" exported="">
       <library name="asm:asm:3.1">
         <CLASSES>
@@ -203,6 +191,19 @@
         </JAVADOC>
         <SOURCES>
           <root url="jar://$M2_REPO$/asm/asm/3.1/asm-3.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="com.google.code.guice:guice:1.0">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

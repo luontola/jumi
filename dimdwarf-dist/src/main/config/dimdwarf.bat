@@ -59,7 +59,7 @@ for /f %%G in ('dir /b "%APP_LIBRARY_DIR%\*.jar"')   do (call :add_to_classpath 
 
 
 :: Start up Dimdwarf
-"%JAVA%" %VMOPTIONS% -cp %CP% ^
+"%JAVA%" %VMOPTIONS% -cp %CP% -javaagent:lib/dimdwarf-aop-agent.jar ^
     net.orfjackal.dimdwarf.server.Startup "%DIMDWARF_HOME%\dimdwarf.properties" "%APP_CONFIG_FILE%"
 goto :eof
 

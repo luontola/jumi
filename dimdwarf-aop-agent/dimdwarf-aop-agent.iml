@@ -7,11 +7,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/target/jdave" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
-      <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
-      <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -145,7 +142,7 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library name="cglib:cglib-nodep:2.1_3">
         <CLASSES>
           <root url="jar://$M2_REPO$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3.jar!/" />
@@ -184,8 +181,6 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="dimdwarf-api" exported="" />
-    <orderEntry type="module" module-name="dimdwarf-aop-agent" exported="" />
     <orderEntry type="module-library" exported="">
       <library name="asm:asm:3.1">
         <CLASSES>
@@ -196,32 +191,6 @@
         </JAVADOC>
         <SOURCES>
           <root url="jar://$M2_REPO$/asm/asm/3.1/asm-3.1-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library name="com.google.code.guice:guice:1.0">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/com/google/code/guice/guice/1.0/guice-1.0-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="asm:asm-all:3.1">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
