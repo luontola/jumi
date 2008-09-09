@@ -47,6 +47,12 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
     }
 
     public void visitEnd() {
+        addEqualsMethod();
+        addHashCodeMethod();
+        cv.visitEnd();
+    }
+
+    private void addEqualsMethod() {
         MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, "equals", "(Ljava/lang/Object;)Z", null, null);
         mv.visitCode();
         mv.visitVarInsn(ALOAD, 0);
@@ -54,6 +60,16 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
         mv.visitMethodInsn(INVOKESTATIC, "net/orfjackal/dimdwarf/tref/EntityIdentity", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z");
         mv.visitInsn(IRETURN);
         mv.visitMaxs(2, 2);
+        mv.visitEnd();
+    }
+
+    private void addHashCodeMethod() {
+        MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, "hashCode", "()I", null, null);
+        mv.visitCode();
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitMethodInsn(INVOKESTATIC, "net/orfjackal/dimdwarf/tref/EntityIdentity", "hashCode", "(Ljava/lang/Object;)I");
+        mv.visitInsn(IRETURN);
+        mv.visitMaxs(1, 1);
         mv.visitEnd();
     }
 }

@@ -112,5 +112,11 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
             entity.equals(new Object());
             specify(referencesCreated, should.equal(1));
         }
+
+        public void delegatesItsHashCodeMethodToEntityIdentity() {
+            int hashCode = entity.hashCode();
+            specify(referencesCreated, should.equal(1));
+            specify(hashCode, should.equal(BigInteger.ONE.hashCode()));
+        }
     }
 }
