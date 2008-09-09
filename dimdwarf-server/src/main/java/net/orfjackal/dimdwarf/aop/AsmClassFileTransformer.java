@@ -31,19 +31,28 @@
 
 package net.orfjackal.dimdwarf.aop;
 
-import jdave.Group;
-import jdave.Specification;
-import jdave.junit4.JDaveRunner;
-import org.junit.runner.RunWith;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
+import java.security.ProtectionDomain;
 
 /**
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 9.9.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class ByteCodeInstrumentationSpec extends Specification<Object> {
+public abstract class AsmClassFileTransformer implements ClassFileTransformer {
 
-    // TODO: infrastructure for add/modify methods at runtime
-    // TODO: autogenerate hashCode and equals methods for entities (delegate to EntityIdentity)
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+        ClassReader cr = new ClassReader(classfileBuffer);
+        ClassWriter cw = new ClassWriter(cr, 0);
+        ClassVisitor cv = getAdapters(cw);
+        cr.accept(cv, 0);
+        return cw.toByteArray();
+    }
+
+    protected abstract ClassVisitor getAdapters(ClassVisitor cv);
 }
