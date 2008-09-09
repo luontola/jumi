@@ -43,13 +43,13 @@ import java.security.ProtectionDomain;
  * @author Esko Luontola
  * @since 9.9.2008
  */
-public class TestClassLoader extends ClassLoader {
+public class TransformationTestClassLoader extends ClassLoader {
 
     private final String classToInstrument;
     private final ClassFileTransformer transformer;
 
-    public TestClassLoader(String classToInstrument, ClassFileTransformer transformer) {
-        super(TestClassLoader.class.getClassLoader());
+    public TransformationTestClassLoader(String classToInstrument, ClassFileTransformer transformer) {
+        super(TransformationTestClassLoader.class.getClassLoader());
         if (transformer == null) {
             transformer = new NullClassFileTransformer();
         }

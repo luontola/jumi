@@ -35,7 +35,7 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.aop.AddEqualsAndHashCodeMethodsForEntities;
-import net.orfjackal.dimdwarf.aop.TestClassLoader;
+import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
 import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
@@ -73,7 +73,7 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
     }
 
     private static Object newInstrumentedInstance(Class<?> cls) throws Exception {
-        ClassLoader loader = new TestClassLoader(cls.getName(), new AbstractTransformationChain() {
+        ClassLoader loader = new TransformationTestClassLoader(cls.getName(), new AbstractTransformationChain() {
             protected ClassVisitor getAdapters(ClassVisitor cv) {
                 cv = new CheckClassAdapter(cv);
                 cv = new AddEqualsAndHashCodeMethodsForEntities(cv);
