@@ -68,7 +68,7 @@ public class TransformationTestClassLoader extends ClassLoader {
         return c;
     }
 
-    protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         try {
             byte[] b = transformer.transform(this, name, null, null, readClassBytes(name));
             return defineClass(name, b, 0, b.length);
