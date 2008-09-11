@@ -54,11 +54,11 @@ public class InMemoryDatabase {
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
     private volatile long committedRevision = revisions.getCurrentRevision();
 
-    public DatabaseConnection openConnection(Transaction tx) {
+    public DatabaseTable openConnection(Transaction tx) {
         if (openConnections.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
-        DatabaseConnection con = new TransactionalDatabaseConnection(tx, committedRevision);
+        DatabaseTable con = new TransactionalDatabaseConnection(tx, committedRevision);
         openConnections.put(tx, committedRevision);
         return con;
     }
@@ -142,7 +142,7 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private class TransactionalDatabaseConnection implements DatabaseConnection, TransactionParticipant {
+    private class TransactionalDatabaseConnection implements DatabaseTable, TransactionParticipant {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
         private final long visibleRevision;

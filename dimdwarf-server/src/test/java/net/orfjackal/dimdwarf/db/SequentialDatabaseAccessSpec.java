@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
 public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     private InMemoryDatabase dbService;
-    private DatabaseConnection db;
+    private DatabaseTable db;
     private TransactionCoordinator tx;
 
     private Blob key;
@@ -109,7 +109,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
             canNotBeUsed(db);
         }
 
-        private void canNotBeUsed(final DatabaseConnection db) {
+        private void canNotBeUsed(final DatabaseTable db) {
             specify(new Block() {
                 public void run() throws Throwable {
                     db.read(key);

@@ -31,15 +31,16 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import jdave.Group;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
+import org.junit.runner.RunWith;
+
 /**
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 11.9.2008
  */
-public interface DatabaseConnection {
-
-    Blob read(Blob key);
-
-    void update(Blob key, Blob value);
-
-    void delete(Blob key);
+@RunWith(JDaveRunner.class)
+@Group({"fast"})
+public class MultipleDatabaseTablesSpec extends Specification<Object> {
 }

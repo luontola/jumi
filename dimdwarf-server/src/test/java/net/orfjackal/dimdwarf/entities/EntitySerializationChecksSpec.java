@@ -36,7 +36,7 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.DatabaseConnection;
+import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.serial.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -53,13 +53,13 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
-    private DatabaseConnection db;
+    private DatabaseTable db;
     private EntityStorageImpl storage;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
     public void create() throws Exception {
-        db = mock(DatabaseConnection.class);
+        db = mock(DatabaseTable.class);
         SerializationListener[] listeners = {
                 new CheckDirectlyReferredEntitySerialized(),
                 new CheckInnerClassSerialized()

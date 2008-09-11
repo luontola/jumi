@@ -29,51 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
-
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
-
-import java.math.BigInteger;
+package net.orfjackal.dimdwarf.db;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 18.8.2008
  */
-public class EntityStorageImpl implements EntityStorage {
+public interface DatabaseTable {
 
-    private final DatabaseTable db;
-    private final ObjectSerializer serializer;
+    Blob read(Blob key);
 
-    public EntityStorageImpl(DatabaseTable db, ObjectSerializer serializer) {
-        this.db = db;
-        this.serializer = serializer;
-    }
+    void update(Blob key, Blob value);
 
-    public IEntity read(BigInteger id) throws EntityNotFoundException {
-        Blob serialized = db.read(asBytes(id));
-        if (serialized.equals(Blob.EMPTY_BLOB)) {
-            throw new EntityNotFoundException("id=" + id);
-        }
-        return (IEntity) serializer.deserialize(serialized);
-    }
-
-    public void update(BigInteger id, IEntity entity) {
-        assert EntityUtil.isEntity(entity);
-        Blob serialized = serializer.serialize(entity);
-        db.update(asBytes(id), serialized);
-    }
-
-    public void delete(BigInteger id) {
-        db.delete(asBytes(id));
-    }
-
-    private static Blob asBytes(BigInteger id) {
-        return Blob.fromBytes(id.toByteArray());
-    }
+    void delete(Blob key);
 }
