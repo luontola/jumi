@@ -102,6 +102,10 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
             return null;
         }
 
+        public void eachTableHasAName() {
+            specify(db.tables(), should.containExactly(TABLE1, TABLE2));
+        }
+
         public void theSameNamesWillCorrespondTheSameTable() {
             specify(db.openTable(TABLE1), should.equal(table1));
         }

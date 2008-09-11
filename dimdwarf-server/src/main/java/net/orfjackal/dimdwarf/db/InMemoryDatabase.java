@@ -36,10 +36,7 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -163,6 +160,10 @@ public class InMemoryDatabase {
             this.visibleRevision = visibleRevision;
             this.tx = tx;
             tx.join(this);
+        }
+
+        public Set<String> tables() {
+            return tables.keySet();
         }
 
         public DatabaseTable openTable(String name) {
