@@ -67,6 +67,14 @@ public class ThreadContextSpec extends Specification<Object> {
         }
     }
 
+    private void specifyContextIsDisabled() {
+        specify(new Block() {
+            public void run() throws Throwable {
+                ThreadContext.get(MyService.class);
+            }
+        }, should.raise(IllegalStateException.class));
+    }
+
 
     public class AThreadContext {
 
@@ -76,20 +84,12 @@ public class ThreadContextSpec extends Specification<Object> {
             return null;
         }
 
-        public void isDisabledBeforeSetup() {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    ThreadContext.get(MyService.class);
-                }
-            }, should.raise(IllegalStateException.class));
-        }
-
         public void givesAccessToTheInstalledServices() {
             ThreadContext.setUp(myContext);
             specify(ThreadContext.get(MyService.class), should.equal(myService));
         }
 
-        public void failsWhenTryingToAccessNotInstalledServices() {
+        public void failsWhenTryingToAccessUnavailableServices() {
             ThreadContext.setUp(myContext);
             specify(new Block() {
                 public void run() throws Throwable {
@@ -98,14 +98,14 @@ public class ThreadContextSpec extends Specification<Object> {
             }, should.raise(IllegalArgumentException.class));
         }
 
+        public void isDisabledBeforeSetup() {
+            specifyContextIsDisabled();
+        }
+
         public void isDiabledAfterTearingDown() {
             ThreadContext.setUp(myContext);
             ThreadContext.tearDown();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    ThreadContext.get(MyService.class);
-                }
-            }, should.raise(IllegalStateException.class));
+            specifyContextIsDisabled();
         }
 
         public void canNotBeSetUpTwise() {
@@ -126,11 +126,7 @@ public class ThreadContextSpec extends Specification<Object> {
                     ThreadContext.tearDown();
                 }
             }, should.raise(IllegalStateException.class));
-            specify(new Block() {
-                public void run() throws Throwable {
-                    ThreadContext.get(MyService.class);
-                }
-            }, should.raise(IllegalStateException.class));
+            specifyContextIsDisabled();
         }
 
         public void isSpecificToTheCurrentThread() throws InterruptedException {
@@ -141,11 +137,7 @@ public class ThreadContextSpec extends Specification<Object> {
             });
             t.start();
             t.join();
-            specify(new Block() {
-                public void run() throws Throwable {
-                    ThreadContext.get(MyService.class);
-                }
-            }, should.raise(IllegalStateException.class));
+            specifyContextIsDisabled();
         }
 
 
@@ -158,11 +150,7 @@ public class ThreadContextSpec extends Specification<Object> {
                 }
             });
             specify(wasExecuted);
-            specify(new Block() {
-                public void run() throws Throwable {
-                    ThreadContext.get(MyService.class);
-                }
-            }, should.raise(IllegalStateException.class));
+            specifyContextIsDisabled();
         }
 
         public void theHelperMethodDoesTearDownEvenWhenExceptionsAreThrown() {
@@ -176,17 +164,14 @@ public class ThreadContextSpec extends Specification<Object> {
                     ThreadContext.runInContext(myContext, maliciousTask);
                 }
             }, should.raise(InternalError.class, "dummy exception"));
-            specify(new Block() {
-                public void run() throws Throwable {
-                    ThreadContext.get(MyService.class);
-                }
-            }, should.raise(IllegalStateException.class));
+            specifyContextIsDisabled();
         }
     }
+
 
     public interface MyService {
     }
 
-    public class MyServiceImpl implements MyService {
+    public static class MyServiceImpl implements MyService {
     }
 }
