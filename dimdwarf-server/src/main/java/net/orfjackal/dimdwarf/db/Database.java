@@ -37,5 +37,5 @@ package net.orfjackal.dimdwarf.db;
  */
 public interface Database {
 
-    DatabaseTable table(String name);
+    DatabaseTable openTable(String name);
 }

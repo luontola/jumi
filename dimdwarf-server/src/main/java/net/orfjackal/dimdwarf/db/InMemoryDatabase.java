@@ -36,8 +36,7 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -49,16 +48,21 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class InMemoryDatabase {
 
+    private final Set<String> tables;
     private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
     private volatile long committedRevision = revisions.getCurrentRevision();
 
+    public InMemoryDatabase(String... tables) {
+        this.tables = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(tables)));
+    }
+
     public Database openConnection(Transaction tx) {
         if (openConnections.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
-        Database db = new TransactionalDatabaseConnection(tx, committedRevision);
+        Database db = new TransactionalDatabase(committedRevision, tx);
         openConnections.put(tx, committedRevision);
         return db;
     }
@@ -142,21 +146,29 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private class TransactionalDatabaseConnection implements Database, TransactionParticipant {
+    private class TransactionalDatabase implements Database, TransactionParticipant {
 
-        private final TransactionalDatabaseTableConnection table;
+        private final ConcurrentMap<String, TransactionalDatabaseTable> openTables = new ConcurrentHashMap<String, TransactionalDatabaseTable>();
         private final long visibleRevision;
         private final Transaction tx;
 
-        public TransactionalDatabaseConnection(Transaction tx, long visibleRevision) {
-            this.tx = tx;
+        public TransactionalDatabase(long visibleRevision, Transaction tx) {
             this.visibleRevision = visibleRevision;
-            this.table = new TransactionalDatabaseTableConnection(tx, visibleRevision);
+            this.tx = tx;
             tx.join(this);
         }
 
-        public DatabaseTable table(String name) {
-            return table;
+        public DatabaseTable openTable(String name) {
+            tx.mustBeActive();
+            TransactionalDatabaseTable table = openTables.get(name);
+            if (table != null) {
+                return table;
+            }
+            if (!tables.contains(name)) {
+                throw new IllegalArgumentException("No such table: " + name);
+            }
+            openTables.putIfAbsent(name, new TransactionalDatabaseTable(visibleRevision, tx));
+            return openTables.get(name);
         }
 
         public void joinedTransaction(Transaction tx) {
@@ -164,12 +176,16 @@ public class InMemoryDatabase {
         }
 
         public void prepare(Transaction tx) throws Throwable {
-            prepareTransaction(tx, table.updates, visibleRevision);
+            for (TransactionalDatabaseTable table : openTables.values()) {
+                prepareTransaction(tx, table.updates, visibleRevision);
+            }
         }
 
         public void commit(Transaction tx) {
             try {
-                commitTransaction(tx, table.updates);
+                for (TransactionalDatabaseTable table : openTables.values()) {
+                    commitTransaction(tx, table.updates);
+                }
             } finally {
                 closeConnection(tx);
             }
@@ -177,7 +193,9 @@ public class InMemoryDatabase {
 
         public void rollback(Transaction tx) {
             try {
-                rollbackTransaction(tx, table.updates);
+                for (TransactionalDatabaseTable table : openTables.values()) {
+                    rollbackTransaction(tx, table.updates);
+                }
             } finally {
                 closeConnection(tx);
             }
@@ -187,15 +205,15 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private class TransactionalDatabaseTableConnection implements DatabaseTable {
+    private class TransactionalDatabaseTable implements DatabaseTable {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
         private final long visibleRevision;
         private final Transaction tx;
 
-        public TransactionalDatabaseTableConnection(Transaction tx, long visibleRevision) {
-            this.tx = tx;
+        public TransactionalDatabaseTable(long visibleRevision, Transaction tx) {
             this.visibleRevision = visibleRevision;
+            this.tx = tx;
         }
 
         public Blob read(Blob key) {

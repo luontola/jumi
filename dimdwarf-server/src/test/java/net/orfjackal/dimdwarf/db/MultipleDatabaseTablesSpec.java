@@ -31,9 +31,12 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
 /**
@@ -43,4 +46,52 @@ import org.junit.runner.RunWith;
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class MultipleDatabaseTablesSpec extends Specification<Object> {
+
+    private static final String TABLE1 = "table1";
+    private static final String TABLE2 = "table2";
+
+    private TransactionCoordinator tx;
+    private Database db;
+    private DatabaseTable table1;
+    private DatabaseTable table2;
+
+    private Blob key;
+    private Blob value1;
+    private Blob value2;
+
+    public void create() throws Exception {
+        InMemoryDatabase db = new InMemoryDatabase(TABLE1, TABLE2);
+        tx = new TransactionImpl();
+        this.db = db.openConnection(tx.getTransaction());
+        table1 = this.db.openTable(TABLE1);
+        table2 = this.db.openTable(TABLE2);
+
+        key = Blob.fromBytes(new byte[]{0});
+        value1 = Blob.fromBytes(new byte[]{1});
+        value2 = Blob.fromBytes(new byte[]{2});
+    }
+
+
+    public class OpeningDatabaseTables {
+
+        public Object create() {
+            return null;
+        }
+
+        public void theSameNamesWillCorrespondTheSameTable() {
+            specify(db.openTable(TABLE1), should.equal(table1));
+        }
+
+        public void differentNamesWillCorrespondDifferentTables() {
+            specify(table1, should.not().equal(table2));
+        }
+
+        public void nonexistantTablesCanNotBeOpened() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    db.openTable("doesNotExist");
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+    }
 }

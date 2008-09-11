@@ -51,8 +51,9 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     private static final String TABLE = "test";
 
-    private InMemoryDatabase dbService;
-    private DatabaseTable db;
+    private InMemoryDatabase dbms;
+    private Database db;
+    private DatabaseTable table;
     private TransactionCoordinator tx;
 
     private Blob key;
@@ -60,9 +61,10 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     private Blob otherValue;
 
     public void create() throws Exception {
-        dbService = new InMemoryDatabase();
+        dbms = new InMemoryDatabase(TABLE);
         tx = new TransactionImpl();
-        db = dbService.openConnection(tx.getTransaction()).table(TABLE);
+        db = dbms.openConnection(tx.getTransaction());
+        table = db.openTable(TABLE);
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});
@@ -77,54 +79,60 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
         public void theConnectionIsOpen() {
             specify(db, should.not().equal(null));
-            specify(dbService.getOpenConnections(), should.equal(1));
+            specify(table, should.not().equal(null));
+            specify(dbms.getOpenConnections(), should.equal(1));
         }
 
         public void onlyOneConnectionExistsPerTransaction() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    dbService.openConnection(tx.getTransaction());
+                    dbms.openConnection(tx.getTransaction());
                 }
             }, should.raise(IllegalArgumentException.class));
-            specify(dbService.getOpenConnections(), should.equal(1));
+            specify(dbms.getOpenConnections(), should.equal(1));
         }
 
         public void connectionCanNotBeUsedAfterPrepare() {
             tx.prepare();
-            canNotBeUsed(db);
+            canNotBeUsed(db, table);
         }
 
         public void connectionCanNotBeUsedAfterCommit() {
             tx.prepare();
             tx.commit();
-            canNotBeUsed(db);
+            canNotBeUsed(db, table);
         }
 
         public void connectionCanNotBeUsedAfterRollback() {
             tx.rollback();
-            canNotBeUsed(db);
+            canNotBeUsed(db, table);
         }
 
         public void connectionCanNotBeUsedAfterPrepareAndRollback() {
             tx.prepare();
             tx.rollback();
-            canNotBeUsed(db);
+            canNotBeUsed(db, table);
         }
 
-        private void canNotBeUsed(final DatabaseTable db) {
+        private void canNotBeUsed(final Database db, final DatabaseTable table) {
             specify(new Block() {
                 public void run() throws Throwable {
-                    db.read(key);
+                    db.openTable(TABLE);
                 }
             }, should.raise(TransactionRequiredException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    db.update(key, value);
+                    table.read(key);
                 }
             }, should.raise(TransactionRequiredException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    db.delete(key);
+                    table.update(key, value);
+                }
+            }, should.raise(TransactionRequiredException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    table.delete(key);
                 }
             }, should.raise(TransactionRequiredException.class));
         }
@@ -137,45 +145,45 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void itDoesNotExist() {
-            specify(db.read(key), should.equal(EMPTY_BLOB));
+            specify(table.read(key), should.equal(EMPTY_BLOB));
         }
     }
 
     public class WhenEntryIsCreated {
 
         public Object create() {
-            db.update(key, value);
+            table.update(key, value);
             return null;
         }
 
         public void theValueCanBeRead() {
-            specify(db.read(key), should.equal(value));
+            specify(table.read(key), should.equal(value));
         }
     }
 
     public class WhenEntryIsUpdated {
 
         public Object create() {
-            db.update(key, value);
-            db.update(key, otherValue);
+            table.update(key, value);
+            table.update(key, otherValue);
             return null;
         }
 
         public void theLatestValueCanBeRead() {
-            specify(db.read(key), should.equal(otherValue));
+            specify(table.read(key), should.equal(otherValue));
         }
     }
 
     public class WhenEntryIsDeleted {
 
         public Object create() {
-            db.update(key, value);
-            db.delete(key);
+            table.update(key, value);
+            table.delete(key);
             return null;
         }
 
         public void itDoesNotExistAnymore() {
-            specify(db.read(key), should.equal(EMPTY_BLOB));
+            specify(table.read(key), should.equal(EMPTY_BLOB));
         }
     }
 }
