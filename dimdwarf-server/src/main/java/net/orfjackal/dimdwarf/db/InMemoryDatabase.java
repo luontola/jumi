@@ -77,7 +77,7 @@ public class InMemoryDatabase {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
         long revision = committedRevision;
-        Database db = new TransactionalDatabase(revision, tx);
+        Database db = new TxDatabase(revision, tx);
         revisionsInUse.put(tx, revision);
         return db;
     }
@@ -117,33 +117,33 @@ public class InMemoryDatabase {
         return oldest;
     }
 
-    private void prepareUpdates(Collection<TransactionalDatabaseTable> updates) {
+    private void prepareUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
-            for (TransactionalDatabaseTable update : updates) {
+            for (TxDatabaseTable update : updates) {
                 update.prepare();
             }
         }
     }
 
-    private void commitUpdates(Collection<TransactionalDatabaseTable> updates) {
+    private void commitUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
             try {
                 revisionCounter.incrementRevision();
-                for (TransactionalDatabaseTable update : updates) {
+                for (TxDatabaseTable update : updates) {
                     update.commit();
                 }
             } finally {
                 committedRevision = revisionCounter.getCurrentRevision();
-                for (TransactionalDatabaseTable update : updates) {
+                for (TxDatabaseTable update : updates) {
                     update.releaseLocks();
                 }
             }
         }
     }
 
-    private void rollbackUpdates(Collection<TransactionalDatabaseTable> updates) {
+    private void rollbackUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
-            for (TransactionalDatabaseTable update : updates) {
+            for (TxDatabaseTable update : updates) {
                 update.releaseLocks();
             }
         }
@@ -153,13 +153,13 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private class TransactionalDatabase implements Database, TransactionParticipant {
+    private class TxDatabase implements Database, TransactionParticipant {
 
-        private final ConcurrentMap<String, TransactionalDatabaseTable> openTables = new ConcurrentHashMap<String, TransactionalDatabaseTable>();
+        private final ConcurrentMap<String, TxDatabaseTable> openTables = new ConcurrentHashMap<String, TxDatabaseTable>();
         private final long visibleRevision;
         private final Transaction tx;
 
-        public TransactionalDatabase(long visibleRevision, Transaction tx) {
+        public TxDatabase(long visibleRevision, Transaction tx) {
             this.visibleRevision = visibleRevision;
             this.tx = tx;
             tx.join(this);
@@ -167,7 +167,7 @@ public class InMemoryDatabase {
 
         public DatabaseTable openTable(String name) {
             tx.mustBeActive();
-            TransactionalDatabaseTable table = openTables.get(name);
+            TxDatabaseTable table = openTables.get(name);
             if (table != null) {
                 return table;
             }
@@ -179,7 +179,7 @@ public class InMemoryDatabase {
             if (table == null) {
                 throw new IllegalArgumentException("No such table: " + name);
             }
-            openTables.putIfAbsent(name, new TransactionalDatabaseTable(table, visibleRevision, tx));
+            openTables.putIfAbsent(name, new TxDatabaseTable(table, visibleRevision, tx));
             return openTables.get(name);
         }
 
@@ -211,14 +211,14 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private static class TransactionalDatabaseTable implements DatabaseTable {
+    private static class TxDatabaseTable implements DatabaseTable {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
         private final InMemoryDatabaseTable table;
         private final long visibleRevision;
         private final Transaction tx;
 
-        public TransactionalDatabaseTable(InMemoryDatabaseTable table, long visibleRevision, Transaction tx) {
+        public TxDatabaseTable(InMemoryDatabaseTable table, long visibleRevision, Transaction tx) {
             this.table = table;
             this.visibleRevision = visibleRevision;
             this.tx = tx;
