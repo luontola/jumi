@@ -39,7 +39,7 @@ import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
 import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.context.ContextImpl;
+import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.DummyObject;
@@ -69,7 +69,7 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
                 return new EntityReferenceImpl<T>(BigInteger.ONE, entity);
             }
         };
-        ThreadContext.setUp(new ContextImpl(manager));
+        ThreadContext.setUp(new Context(EntityManager.class, manager));
     }
 
     public void destroy() throws Exception {

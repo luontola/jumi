@@ -35,8 +35,11 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.DummyInterface;
 import org.junit.runner.RunWith;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Esko Luontola
@@ -47,14 +50,20 @@ import org.junit.runner.RunWith;
 public class ThreadContextSpec extends Specification<Object> {
 
     private Context myContext;
+    private MyServiceImpl myService;
 
     public void create() throws Exception {
-        myContext = new DummyContext();
+        myService = new MyServiceImpl();
+        Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
+        services.put(MyService.class, myService);
+        myContext = new Context(services);
     }
 
     public void destroy() throws Exception {
-        if (ThreadContext.get() != null) {
+        try {
             ThreadContext.tearDown();
+        } catch (RuntimeException e) {
+            // ignore; the test did already tear it down
         }
     }
 
@@ -67,29 +76,46 @@ public class ThreadContextSpec extends Specification<Object> {
             return null;
         }
 
-        public void isEmptyBeforeSetup() {
-            specify(ThreadContext.get(), should.equal(null));
+        public void isDisabledBeforeSetup() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(MyService.class);
+                }
+            }, should.raise(IllegalStateException.class));
         }
 
-        public void isActiveAfterSetup() {
+        public void givesAccessToTheInstalledServices() {
             ThreadContext.setUp(myContext);
-            specify(ThreadContext.get(), should.equal(myContext));
+            specify(ThreadContext.get(MyService.class), should.equal(myService));
         }
 
-        public void isEmptyAfterTearingDown() {
+        public void failsWhenTryingToAccessNotInstalledServices() {
+            ThreadContext.setUp(myContext);
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(DummyInterface.class);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+
+        public void isDiabledAfterTearingDown() {
             ThreadContext.setUp(myContext);
             ThreadContext.tearDown();
-            specify(ThreadContext.get(), should.equal(null));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(MyService.class);
+                }
+            }, should.raise(IllegalStateException.class));
         }
 
         public void canNotBeSetUpTwise() {
             ThreadContext.setUp(myContext);
             specify(new Block() {
                 public void run() throws Throwable {
-                    ThreadContext.setUp(new DummyContext());
+                    ThreadContext.setUp(new Context(new HashMap<Class<?>, Object>()));
                 }
             }, should.raise(IllegalStateException.class));
-            specify(ThreadContext.get(), should.equal(myContext));
+            specify(ThreadContext.get(MyService.class), should.equal(myService));
         }
 
         public void canNotBeTornDownTwise() {
@@ -100,7 +126,11 @@ public class ThreadContextSpec extends Specification<Object> {
                     ThreadContext.tearDown();
                 }
             }, should.raise(IllegalStateException.class));
-            specify(ThreadContext.get(), should.equal(null));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(MyService.class);
+                }
+            }, should.raise(IllegalStateException.class));
         }
 
         public void isSpecificToTheCurrentThread() throws InterruptedException {
@@ -111,7 +141,11 @@ public class ThreadContextSpec extends Specification<Object> {
             });
             t.start();
             t.join();
-            specify(ThreadContext.get(), should.equal(null));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(MyService.class);
+                }
+            }, should.raise(IllegalStateException.class));
         }
 
 
@@ -120,11 +154,15 @@ public class ThreadContextSpec extends Specification<Object> {
             ThreadContext.runInContext(myContext, new Runnable() {
                 public void run() {
                     wasExecuted = true;
-                    specify(ThreadContext.get(), should.equal(myContext));
+                    specify(ThreadContext.get(MyService.class), should.equal(myService));
                 }
             });
             specify(wasExecuted);
-            specify(ThreadContext.get(), should.equal(null));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(MyService.class);
+                }
+            }, should.raise(IllegalStateException.class));
         }
 
         public void theHelperMethodDoesTearDownEvenWhenExceptionsAreThrown() {
@@ -138,14 +176,17 @@ public class ThreadContextSpec extends Specification<Object> {
                     ThreadContext.runInContext(myContext, maliciousTask);
                 }
             }, should.raise(InternalError.class, "dummy exception"));
-            specify(ThreadContext.get(), should.equal(null));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    ThreadContext.get(MyService.class);
+                }
+            }, should.raise(IllegalStateException.class));
         }
     }
 
+    public interface MyService {
+    }
 
-    private static class DummyContext implements Context {
-        public EntityManager getEntityManager() {
-            return null;
-        }
+    public class MyServiceImpl implements MyService {
     }
 }

@@ -36,7 +36,7 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.context.ContextImpl;
+import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityManager;
@@ -68,7 +68,7 @@ public class AccessingEntityIdSpec extends Specification<Object> {
             allowing(manager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(ENTITY_ID, entity)));
         }});
         proxy = factory.createTransparentReference(entity);
-        ThreadContext.setUp(new ContextImpl(manager));
+        ThreadContext.setUp(new Context(EntityManager.class, manager));
     }
 
     public void destroy() throws Exception {

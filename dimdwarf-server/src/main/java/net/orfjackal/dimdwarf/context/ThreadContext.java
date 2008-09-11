@@ -32,6 +32,8 @@
 package net.orfjackal.dimdwarf.context;
 
 /**
+ * This class is thread-safe.
+ *
  * @author Esko Luontola
  * @since 5.9.2008
  */
@@ -46,8 +48,12 @@ public class ThreadContext {
         threadLocal.set(context);
     }
 
-    public static Context get() {
-        return threadLocal.get();
+    public static <T> T get(Class<T> service) {
+        Context context = threadLocal.get();
+        if (context == null) {
+            throw new IllegalStateException("Not set up");
+        }
+        return context.get(service);
     }
 
     public static void tearDown() {
