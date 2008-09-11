@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tref;
+package net.orfjackal.dimdwarf.entities.tref;
 
 import jdave.Group;
 import jdave.Specification;

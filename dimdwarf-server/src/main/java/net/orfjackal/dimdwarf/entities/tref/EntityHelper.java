@@ -29,57 +29,65 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tref;
-
+package net.orfjackal.dimdwarf.entities.tref;
 
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.impl.EntityUtil;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 
-import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
- * This class is immutable.
+ * For transparent references to work correctly, all subclasses of {@link net.orfjackal.dimdwarf.api.impl.IEntity} should
+ * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
+ * <pre><code>
+ * public boolean equals(Object obj) {
+ *     return EntityHelper.equals(this, obj);
+ * }
+ * public int hashCode() {
+ *     return EntityHelper.hashCode(this);
+ * }
+ * </code></pre>
  *
  * @author Esko Luontola
- * @since 31.1.2008
+ * @since 1.2.2008
  */
-public class TransparentReferenceImpl implements TransparentReference, Serializable {
-    private static final long serialVersionUID = 1L;
+public class EntityHelper {
 
-    private final EntityReference<?> reference;
-    private final Class<?> type;
-
-    public TransparentReferenceImpl(Class<?> type, EntityReference<?> reference) {
-        this.type = type;
-        this.reference = reference;
+    private EntityHelper() {
     }
 
-    public IEntity getEntity() {
-        return (IEntity) reference.get();
+    public static BigInteger getId(Object obj) {
+        EntityReference<?> ref = getReference(obj);
+        if (ref == null) {
+            throw new IllegalArgumentException("Not an entity: " + obj);
+        }
+        return ref.getId();
     }
 
-    public EntityReference<?> getEntityReference() {
-        return reference;
+    public static boolean equals(Object obj1, Object obj2) {
+        Object id1 = getReference(obj1);
+        Object id2 = getReference(obj2);
+        return safeEquals(id1, id2);
     }
 
-    public Class<?> getType() {
-        return type;
+    public static int hashCode(Object obj) {
+        Object id = getReference(obj);
+        return id.hashCode();
     }
 
-    public boolean equals(Object obj) {
-        return EntityHelper.equals(this, obj);
+    private static EntityReference<?> getReference(Object obj) {
+        if (EntityUtil.isTransparentReference(obj)) {
+            return ((TransparentReference) obj).getEntityReference();
+        } else if (EntityUtil.isEntity(obj)) {
+            return ThreadContext.get().getEntityManager().createReference(obj);
+        } else {
+            return null;
+        }
     }
 
-    public int hashCode() {
-        return EntityHelper.hashCode(this);
-    }
-
-    /**
-     * Proxy will delegate to this method, so that the TransparentReferenceImpl instead
-     * of the proxy will be serialized.
-     */
-    public Object writeReplace() {
-        return this;
+    private static boolean safeEquals(Object x, Object y) {
+        return x == y || (x != null && x.equals(y));
     }
 }

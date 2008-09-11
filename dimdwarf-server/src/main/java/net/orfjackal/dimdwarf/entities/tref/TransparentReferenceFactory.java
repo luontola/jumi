@@ -29,65 +29,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tref;
+package net.orfjackal.dimdwarf.entities.tref;
 
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
-import net.orfjackal.dimdwarf.context.ThreadContext;
 
-import java.math.BigInteger;
 
 /**
- * For transparent references to work correctly, all subclasses of {@link net.orfjackal.dimdwarf.api.impl.IEntity} should
- * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
- * <pre><code>
- * public boolean equals(Object obj) {
- *     return EntityHelper.equals(this, obj);
- * }
- * public int hashCode() {
- *     return EntityHelper.hashCode(this);
- * }
- * </code></pre>
- *
  * @author Esko Luontola
- * @since 1.2.2008
+ * @since 26.1.2008
  */
-public class EntityHelper {
+public interface TransparentReferenceFactory {
 
-    private EntityHelper() {
-    }
+    /**
+     * Creates a proxy for the specified ManagedObject instance, so that the ManagedObject will
+     * be referenced by a ManagedReference but the proxy implements all the same interfaces as
+     * the specified ManagedObject, excluding the ManagedObject interface. In other words, the
+     * objects returned by this method will behave the same as any domain objects, except that
+     * you will not need to wrap them in a ManagedReference.
+     */
+    TransparentReference createTransparentReference(IEntity object);
 
-    public static BigInteger getId(Object obj) {
-        EntityReference<?> ref = getReference(obj);
-        if (ref == null) {
-            throw new IllegalArgumentException("Not an entity: " + obj);
-        }
-        return ref.getId();
-    }
-
-    public static boolean equals(Object obj1, Object obj2) {
-        Object id1 = getReference(obj1);
-        Object id2 = getReference(obj2);
-        return safeEquals(id1, id2);
-    }
-
-    public static int hashCode(Object obj) {
-        Object id = getReference(obj);
-        return id.hashCode();
-    }
-
-    private static EntityReference<?> getReference(Object obj) {
-        if (EntityUtil.isTransparentReference(obj)) {
-            return ((TransparentReference) obj).getEntityReference();
-        } else if (EntityUtil.isEntity(obj)) {
-            return ThreadContext.get().getEntityManager().createReference(obj);
-        } else {
-            return null;
-        }
-    }
-
-    private static boolean safeEquals(Object x, Object y) {
-        return x == y || (x != null && x.equals(y));
-    }
+    /**
+     * Creates a proxy for a TransparentReference instance which is not yet proxied. This is
+     * needed only during deserialization and should not be called elsewhere.
+     */
+    TransparentReference newProxy(TransparentReferenceImpl reference);
 }

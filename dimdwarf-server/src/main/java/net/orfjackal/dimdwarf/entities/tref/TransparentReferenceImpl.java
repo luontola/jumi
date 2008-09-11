@@ -29,30 +29,57 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tref;
+package net.orfjackal.dimdwarf.entities.tref;
 
+
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 
+import java.io.Serializable;
 
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
- * @since 26.1.2008
+ * @since 31.1.2008
  */
-public interface TransparentReferenceFactory {
+public class TransparentReferenceImpl implements TransparentReference, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private final EntityReference<?> reference;
+    private final Class<?> type;
+
+    public TransparentReferenceImpl(Class<?> type, EntityReference<?> reference) {
+        this.type = type;
+        this.reference = reference;
+    }
+
+    public IEntity getEntity() {
+        return (IEntity) reference.get();
+    }
+
+    public EntityReference<?> getEntityReference() {
+        return reference;
+    }
+
+    public Class<?> getType() {
+        return type;
+    }
+
+    public boolean equals(Object obj) {
+        return EntityHelper.equals(this, obj);
+    }
+
+    public int hashCode() {
+        return EntityHelper.hashCode(this);
+    }
 
     /**
-     * Creates a proxy for the specified ManagedObject instance, so that the ManagedObject will
-     * be referenced by a ManagedReference but the proxy implements all the same interfaces as
-     * the specified ManagedObject, excluding the ManagedObject interface. In other words, the
-     * objects returned by this method will behave the same as any domain objects, except that
-     * you will not need to wrap them in a ManagedReference.
+     * Proxy will delegate to this method, so that the TransparentReferenceImpl instead
+     * of the proxy will be serialized.
      */
-    TransparentReference createTransparentReference(IEntity object);
-
-    /**
-     * Creates a proxy for a TransparentReference instance which is not yet proxied. This is
-     * needed only during deserialization and should not be called elsewhere.
-     */
-    TransparentReference newProxy(TransparentReferenceImpl reference);
+    public Object writeReplace() {
+        return this;
+    }
 }
