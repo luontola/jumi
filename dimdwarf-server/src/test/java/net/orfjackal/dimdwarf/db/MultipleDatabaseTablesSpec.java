@@ -59,6 +59,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private Blob key;
     private Blob value1;
     private Blob value2;
+    private Blob value3;
 
     public void create() throws Exception {
         dbms = new InMemoryDatabase(TABLE1, TABLE2);
@@ -71,12 +72,23 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
         value2 = Blob.fromBytes(new byte[]{2});
+        value3 = Blob.fromBytes(new byte[]{3});
     }
 
     private Blob readInNewTransaction(String table, Blob key) {
         TransactionCoordinator tx = new TransactionImpl();
         try {
             return dbms.openConnection(tx.getTransaction()).openTable(table).read(key);
+        } finally {
+            tx.prepare();
+            tx.commit();
+        }
+    }
+
+    private void updateInNewTransaction(String table, Blob key, Blob value) {
+        TransactionCoordinator tx = new TransactionImpl();
+        try {
+            dbms.openConnection(tx.getTransaction()).openTable(table).update(key, value);
         } finally {
             tx.prepare();
             tx.commit();
@@ -145,7 +157,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         }
     }
 
-    public class UpdatingTheSameKeyInDifferentTables {
+    public class WhenTheSameKeyIsUpdatedInDifferentTables {
 
         public Object create() {
             table1.update(key, value1);
@@ -153,11 +165,47 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
             return null;
         }
 
-        public void doesNotConflictTheTransaction() {
+        public void itDoesNotConflict() {
             tx.prepare();
             tx.commit();
             specify(readInNewTransaction(TABLE1, key), should.equal(value1));
             specify(readInNewTransaction(TABLE2, key), should.equal(value2));
         }
     }
+
+//    public class WhenOnlyOneTableIsUpdated {
+//
+//        private long revision;
+//
+//        public Object create() {
+//            table1.update(key, value1);
+//            table2.update(key, value2);
+//            tx.prepare();
+//            tx.commit();
+//            revision = dbms.getCurrentRevision();
+//            return null;
+//        }
+//
+//        public void tableRevisionsAreInSync1() {
+//            updateInNewTransaction(TABLE1, key, value3);
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 1));
+//            updateInNewTransaction(TABLE1, key, value3);
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 2));
+//            specify(readInNewTransaction(TABLE1, key), should.equal(value3));
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 3));
+//            specify(readInNewTransaction(TABLE2, key), should.equal(value2));
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 4));
+//        }
+//
+//        public void tableRevisionsAreInSync2() {
+//            updateInNewTransaction(TABLE2, key, value3);
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 1));
+//            updateInNewTransaction(TABLE2, key, value3);
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 2));
+//            specify(readInNewTransaction(TABLE1, key), should.equal(value1));
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 3));
+//            specify(readInNewTransaction(TABLE2, key), should.equal(value3));
+//            specify(dbms.getCurrentRevision(), should.equal(revision + 4));
+//        }
+//    }
 }
