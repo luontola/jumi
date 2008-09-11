@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
+package net.orfjackal.dimdwarf.db.inmemory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;

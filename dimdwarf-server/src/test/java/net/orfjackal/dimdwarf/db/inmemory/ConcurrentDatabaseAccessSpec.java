@@ -29,13 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
+package net.orfjackal.dimdwarf.db.inmemory;
 
 import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.db.Blob;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
+import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionException;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;

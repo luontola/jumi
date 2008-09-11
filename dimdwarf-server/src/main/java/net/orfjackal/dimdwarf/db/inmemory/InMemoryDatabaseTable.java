@@ -29,8 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
+package net.orfjackal.dimdwarf.db.inmemory;
 
+import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.OptimisticLockException;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
 import java.util.Map;

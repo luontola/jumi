@@ -29,15 +29,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api;
-
-import java.math.BigInteger;
+package net.orfjackal.dimdwarf.db.inmemory;
 
 /**
+ * This class is thread-safe. The latest revision of the list is immutable
+ * (i.e. the only possible modification is that old revisions are purged).
+ *
  * @author Esko Luontola
- * @since 10.9.2008
+ * @since 19.8.2008
  */
-public interface EntityImplementation {
+public class RevisionList<T> {
 
-    BigInteger getId(Object entity);
+    private final long revision;
+    private final T value;
+    private volatile RevisionList<T> previous;
+
+    public RevisionList(long revision, T value) {
+        this(revision, value, null);
+    }
+
+    public RevisionList(long revision, T value, RevisionList<T> previous) {
+        this.revision = revision;
+        this.value = value;
+        this.previous = previous;
+    }
+
+    public T get(long revision) {
+        for (RevisionList<T> node = this; node != null; node = node.previous) {
+            if (node.revision <= revision) {
+                return node.value;
+            }
+        }
+        return null;
+    }
+
+    public void purgeRevisionsOlderThan(long revisionToKeep) {
+        for (RevisionList<T> node = this; node != null; node = node.previous) {
+            if (node.revision <= revisionToKeep) {
+                node.previous = null;
+                return;
+            }
+        }
+    }
+
+    public long latestRevision() {
+        return revision;
+    }
+
+    public boolean isEmpty() {
+        return value == null && !hasOldRevisions();
+    }
+
+    public boolean hasOldRevisions() {
+        return previous != null;
+    }
 }

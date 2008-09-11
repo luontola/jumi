@@ -31,7 +31,6 @@
 
 package net.orfjackal.dimdwarf.server;
 
-import net.orfjackal.dimdwarf.api.Entities;
 import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,6 @@ public class Startup {
     public static void main(String[] args) throws IOException {
         logger.info("Dimdwarf {} starting up", getVersion());
 
-        Entities.setImplementation(new DefaultEntityImplementation());
         // start up server etc.
 
         logger.info("Shutting down");

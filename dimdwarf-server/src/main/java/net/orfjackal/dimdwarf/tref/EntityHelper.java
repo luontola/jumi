@@ -31,9 +31,12 @@
 
 package net.orfjackal.dimdwarf.tref;
 
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.EntityUtil;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
+
+import java.math.BigInteger;
 
 /**
  * For transparent references to work correctly, all subclasses of {@link net.orfjackal.dimdwarf.api.impl.IEntity} should
@@ -55,18 +58,26 @@ public class EntityHelper {
     private EntityHelper() {
     }
 
+    public static BigInteger getId(Object obj) {
+        EntityReference<?> ref = getReference(obj);
+        if (ref == null) {
+            throw new IllegalArgumentException("Not an entity: " + obj);
+        }
+        return ref.getId();
+    }
+
     public static boolean equals(Object obj1, Object obj2) {
-        Object id1 = getIdentity(obj1);
-        Object id2 = getIdentity(obj2);
+        Object id1 = getReference(obj1);
+        Object id2 = getReference(obj2);
         return safeEquals(id1, id2);
     }
 
     public static int hashCode(Object obj) {
-        Object id = getIdentity(obj);
+        Object id = getReference(obj);
         return id.hashCode();
     }
 
-    private static Object getIdentity(Object obj) {
+    private static EntityReference<?> getReference(Object obj) {
         if (EntityUtil.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference();
         } else if (EntityUtil.isEntity(obj)) {

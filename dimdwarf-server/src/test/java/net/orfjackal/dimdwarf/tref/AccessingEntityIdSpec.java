@@ -29,8 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api;
+package net.orfjackal.dimdwarf.tref;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
@@ -40,9 +41,6 @@ import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
-import net.orfjackal.dimdwarf.server.DefaultEntityImplementation;
-import net.orfjackal.dimdwarf.tref.TransparentReferenceFactory;
-import net.orfjackal.dimdwarf.tref.TransparentReferenceFactoryImpl;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -71,11 +69,9 @@ public class AccessingEntityIdSpec extends Specification<Object> {
         }});
         proxy = factory.createTransparentReference(entity);
         ThreadContext.setUp(new ContextImpl(manager));
-        Entities.setImplementation(new DefaultEntityImplementation());
     }
 
     public void destroy() throws Exception {
-        Entities.setImplementation(null);
         ThreadContext.tearDown();
     }
 
@@ -87,15 +83,19 @@ public class AccessingEntityIdSpec extends Specification<Object> {
         }
 
         public void canBeGetFromEntity() {
-            specify(Entities.getId(entity), should.equal(ENTITY_ID));
+            specify(EntityHelper.getId(entity), should.equal(ENTITY_ID));
         }
 
         public void canBeGetFromTransparentReferenceProxy() {
-            specify(Entities.getId(proxy), should.equal(ENTITY_ID));
+            specify(EntityHelper.getId(proxy), should.equal(ENTITY_ID));
         }
 
         public void normalObjectsDoNotHaveAnEntityId() {
-            specify(Entities.getId(new Object()), should.equal(null));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    EntityHelper.getId(new Object());
+                }
+            }, should.raise(IllegalArgumentException.class));
         }
     }
 }

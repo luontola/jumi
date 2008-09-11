@@ -29,9 +29,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
+package net.orfjackal.dimdwarf.db.inmemory;
 
+import net.orfjackal.dimdwarf.db.Blob;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
+import net.orfjackal.dimdwarf.db.Database;
+import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
