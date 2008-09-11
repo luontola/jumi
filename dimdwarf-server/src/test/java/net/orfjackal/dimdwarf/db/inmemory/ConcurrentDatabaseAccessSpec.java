@@ -352,11 +352,10 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
     }
 
-    // TODO: allow only one transaction to prepare at a time (?), no conflicts are allowed on commit
-    // TODO: multiple tables per database
     // TODO: iterator (for tables and entries), used for writing all entries to disk
 
     // TODO: String and BigInteger wrappers for keys
     // TODO: auto-increment keys (BigInteger), create should not conflict when using them
     // TODO: find all keys (String) starting with a string
+    // TODO: provide a SortedMap interface to the database?
 }
