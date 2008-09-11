@@ -52,23 +52,21 @@ import java.util.concurrent.ConcurrentMap;
 public class InMemoryDatabase {
 
     private final Map<String, RevisionMap<Blob, Blob>> tables;
-    //    private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
-    //    private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final Map<String, ConcurrentMap<Blob, Transaction>> lockedForCommit;
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
-    //    private volatile long committedRevision = revisions.getCurrentRevision();
+    private final RevisionCounter revisionCounter = new RevisionCounter();
     private volatile long committedRevision;
 
     public InMemoryDatabase(String... tableNames) {
         HashMap<String, RevisionMap<Blob, Blob>> tables = new HashMap<String, RevisionMap<Blob, Blob>>();
         HashMap<String, ConcurrentMap<Blob, Transaction>> lockedForCommit = new HashMap<String, ConcurrentMap<Blob, Transaction>>();
         for (String name : tableNames) {
-            tables.put(name, new RevisionMap<Blob, Blob>());
+            tables.put(name, new RevisionMap<Blob, Blob>(revisionCounter));
             lockedForCommit.put(name, new ConcurrentHashMap<Blob, Transaction>());
         }
         this.tables = Collections.unmodifiableMap(tables);
         this.lockedForCommit = Collections.unmodifiableMap(lockedForCommit);
-        committedRevision = tables.values().iterator().next().getCurrentRevision();
+        committedRevision = revisionCounter.getCurrentRevision();
     }
 
     public Database openConnection(Transaction tx) {
@@ -107,7 +105,11 @@ public class InMemoryDatabase {
 
     @TestOnly
     protected long getOldestStoredRevision() {
-        return tables.values().iterator().next().getOldestRevision();
+        long oldest = revisionCounter.getCurrentRevision();
+        for (RevisionMap<Blob, Blob> table : tables.values()) {
+            oldest = Math.min(oldest, table.getOldestRevision());
+        }
+        return oldest;
     }
 
     private void prepareTransaction(Transaction tx, String table, Map<Blob, Blob> modified, long revision) throws Exception {
@@ -123,18 +125,26 @@ public class InMemoryDatabase {
         }
     }
 
-    private void commitTransaction(Transaction tx, String table, Map<Blob, Blob> modified) {
+    private void commitTransaction(Transaction tx, Map<String, TransactionalDatabaseTable> updates) {
         synchronized (lockedForCommit) {
-            RevisionMap<Blob, Blob> revisions = tables.get(table);
             try {
-                revisions.incrementRevision();
-                for (Map.Entry<Blob, Blob> e : modified.entrySet()) {
-                    revisions.put(e.getKey(), e.getValue());
+                revisionCounter.incrementRevision();
+                for (Map.Entry<String, TransactionalDatabaseTable> e : updates.entrySet()) {
+                    commitTable(tx, e.getKey(), e.getValue().updates);
                 }
             } finally {
-                committedRevision = revisions.getCurrentRevision();
-                unlockKeysForCommit(tx, table, modified.keySet());
+                committedRevision = revisionCounter.getCurrentRevision();
+                for (Map.Entry<String, TransactionalDatabaseTable> e : updates.entrySet()) {
+                    unlockKeysForCommit(tx, e.getKey(), e.getValue().updates.keySet());
+                }
             }
+        }
+    }
+
+    private void commitTable(Transaction tx, String table, Map<Blob, Blob> modified) {
+        RevisionMap<Blob, Blob> revisions = tables.get(table);
+        for (Map.Entry<Blob, Blob> e : modified.entrySet()) {
+            revisions.put(e.getKey(), e.getValue());
         }
     }
 
@@ -206,11 +216,7 @@ public class InMemoryDatabase {
 
         public void commit(Transaction tx) {
             try {
-                for (Map.Entry<String, TransactionalDatabaseTable> e : openTables.entrySet()) {
-                    String name = e.getKey();
-                    TransactionalDatabaseTable table = e.getValue();
-                    commitTransaction(tx, name, table.updates);
-                }
+                commitTransaction(tx, openTables);
             } finally {
                 closeConnection(tx);
             }

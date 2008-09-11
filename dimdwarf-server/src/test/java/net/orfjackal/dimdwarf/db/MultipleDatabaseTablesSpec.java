@@ -173,39 +173,45 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         }
     }
 
-//    public class WhenOnlyOneTableIsUpdated {
-//
-//        private long revision;
-//
-//        public Object create() {
-//            table1.update(key, value1);
-//            table2.update(key, value2);
-//            tx.prepare();
-//            tx.commit();
-//            revision = dbms.getCurrentRevision();
-//            return null;
-//        }
-//
-//        public void tableRevisionsAreInSync1() {
-//            updateInNewTransaction(TABLE1, key, value3);
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 1));
-//            updateInNewTransaction(TABLE1, key, value3);
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 2));
-//            specify(readInNewTransaction(TABLE1, key), should.equal(value3));
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 3));
-//            specify(readInNewTransaction(TABLE2, key), should.equal(value2));
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 4));
-//        }
-//
-//        public void tableRevisionsAreInSync2() {
-//            updateInNewTransaction(TABLE2, key, value3);
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 1));
-//            updateInNewTransaction(TABLE2, key, value3);
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 2));
-//            specify(readInNewTransaction(TABLE1, key), should.equal(value1));
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 3));
-//            specify(readInNewTransaction(TABLE2, key), should.equal(value3));
-//            specify(dbms.getCurrentRevision(), should.equal(revision + 4));
-//        }
-//    }
+    public class WhenOnlyOneTableIsUpdated {
+
+        private long firstRevision;
+        private long revision;
+
+        public Object create() {
+            firstRevision = dbms.getCurrentRevision();
+            table1.update(key, value1);
+            table2.update(key, value2);
+            tx.prepare();
+            tx.commit();
+            revision = dbms.getCurrentRevision();
+            return null;
+        }
+
+        public void revisionIsIncrementedExactlyOncePerCommit() {
+            specify(revision, should.equal(firstRevision + 1));
+        }
+
+        public void tableRevisionsAreInSyncA() {
+            updateInNewTransaction(TABLE1, key, value3);
+            specify(dbms.getCurrentRevision(), should.equal(revision + 1));
+            updateInNewTransaction(TABLE1, key, value3);
+            specify(dbms.getCurrentRevision(), should.equal(revision + 2));
+            specify(readInNewTransaction(TABLE1, key), should.equal(value3));
+            specify(dbms.getCurrentRevision(), should.equal(revision + 3));
+            specify(readInNewTransaction(TABLE2, key), should.equal(value2));
+            specify(dbms.getCurrentRevision(), should.equal(revision + 4));
+        }
+
+        public void tableRevisionsAreInSyncB() {
+            updateInNewTransaction(TABLE2, key, value3);
+            specify(dbms.getCurrentRevision(), should.equal(revision + 1));
+            updateInNewTransaction(TABLE2, key, value3);
+            specify(dbms.getCurrentRevision(), should.equal(revision + 2));
+            specify(readInNewTransaction(TABLE1, key), should.equal(value1));
+            specify(dbms.getCurrentRevision(), should.equal(revision + 3));
+            specify(readInNewTransaction(TABLE2, key), should.equal(value3));
+            specify(dbms.getCurrentRevision(), should.equal(revision + 4));
+        }
+    }
 }

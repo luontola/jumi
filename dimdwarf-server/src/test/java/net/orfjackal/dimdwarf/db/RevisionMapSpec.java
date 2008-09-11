@@ -47,7 +47,13 @@ import java.util.*;
 @Group({"fast"})
 public class RevisionMapSpec extends Specification<Object> {
 
-    private RevisionMap<String, String> map = new RevisionMap<String, String>();
+    private RevisionMap<String, String> map;
+    private RevisionCounter counter;
+
+    public void create() throws Exception {
+        counter = new RevisionCounter();
+        map = new RevisionMap<String, String>(counter);
+    }
 
     public class RevisionsOfARevisionMap {
 
@@ -56,27 +62,27 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void startsFromFirstRevision() {
-            specify(map.getCurrentRevision(), should.equal(0));
+            specify(counter.getCurrentRevision(), should.equal(0));
             specify(map.getOldestRevision(), should.equal(0));
         }
 
         public void increasesCurrentRevisionOnIncrement() {
-            map.incrementRevision();
-            specify(map.getCurrentRevision(), should.equal(1));
+            counter.incrementRevision();
+            specify(counter.getCurrentRevision(), should.equal(1));
             specify(map.getOldestRevision(), should.equal(0));
         }
 
         public void increasesOldestRevisionOnPurge() {
-            map.incrementRevision();
+            counter.incrementRevision();
             map.purgeRevisionsOlderThan(1);
-            specify(map.getCurrentRevision(), should.equal(1));
+            specify(counter.getCurrentRevision(), should.equal(1));
             specify(map.getOldestRevision(), should.equal(1));
         }
 
         public void oldestRevisionIsAtMostTheCurrentRevision() {
-            map.incrementRevision();
+            counter.incrementRevision();
             map.purgeRevisionsOlderThan(2);
-            specify(map.getCurrentRevision(), should.equal(1));
+            specify(counter.getCurrentRevision(), should.equal(1));
             specify(map.getOldestRevision(), should.equal(1));
         }
     }
@@ -92,7 +98,7 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void doesNotContainAnyValues() {
-            specify(map.get("key", map.getCurrentRevision()), should.equal(null));
+            specify(map.get("key", counter.getCurrentRevision()), should.equal(null));
         }
     }
 
@@ -101,9 +107,9 @@ public class RevisionMapSpec extends Specification<Object> {
         private long revision;
 
         public Object create() {
-            map.incrementRevision();
+            counter.incrementRevision();
             map.put("key", "value");
-            revision = map.getCurrentRevision();
+            revision = counter.getCurrentRevision();
             return null;
         }
 
@@ -136,13 +142,13 @@ public class RevisionMapSpec extends Specification<Object> {
         private long afterUpdate;
 
         public Object create() {
-            map.incrementRevision();
+            counter.incrementRevision();
             map.put("key", "old");
-            beforeUpdate = map.getCurrentRevision();
+            beforeUpdate = counter.getCurrentRevision();
 
-            map.incrementRevision();
+            counter.incrementRevision();
             map.put("key", "new");
-            afterUpdate = map.getCurrentRevision();
+            afterUpdate = counter.getCurrentRevision();
             return null;
         }
 
@@ -180,12 +186,12 @@ public class RevisionMapSpec extends Specification<Object> {
         private long afterRemove;
 
         public Object create() {
-            map.incrementRevision();
+            counter.incrementRevision();
             map.put("key", "value");
-            beforeRemove = map.getCurrentRevision();
-            map.incrementRevision();
+            beforeRemove = counter.getCurrentRevision();
+            counter.incrementRevision();
             map.remove("key");
-            afterRemove = map.getCurrentRevision();
+            afterRemove = counter.getCurrentRevision();
             return null;
         }
 
@@ -215,14 +221,14 @@ public class RevisionMapSpec extends Specification<Object> {
         private long revision;
 
         public Object create() {
-            map.incrementRevision();
+            counter.incrementRevision();
             map.put("a", "AA");
             map.put("b", "BB");
             map.put("c", "X");
-            map.incrementRevision();
+            counter.incrementRevision();
             map.remove("c");
-            revision = map.getCurrentRevision();
-            map.incrementRevision();
+            revision = counter.getCurrentRevision();
+            counter.incrementRevision();
             map.put("b", "Y");
             return null;
         }

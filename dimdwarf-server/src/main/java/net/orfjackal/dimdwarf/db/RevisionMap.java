@@ -36,10 +36,11 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Map which keeps track of its modification history. Within one revision, each key may be modified only once.
- * The {@link #incrementRevision()} method must be called between every group of modifications. Once the revision
- * is incremented, the values in older revisions can not be changed. The old revisions can be only purged with
- * {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure that those revisions will not be
- * accessed. The revision system used by this class was inspired by Subversion.
+ * The {@link RevisionCounter#incrementRevision()} method of the injected counter must be called between every
+ * group of modifications. Once the revision is incremented, the values in older revisions can not be changed.
+ * <p/>
+ * The old revisions can be purged with {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure
+ * that those revisions will not be accessed. The revision system used by this class was inspired by Subversion.
  * <p/>
  * This class is thread-safe.
  *
@@ -51,8 +52,12 @@ public class RevisionMap<K, V> {
     private final SortedMap<K, RevisionList<V>> map = new ConcurrentSkipListMap<K, RevisionList<V>>();
     private final Set<K> hasOldRevisions = new HashSet<K>();
     private final Object writeLock = new Object();
-    private volatile long currentRevision = 0;
+    private final RevisionCounter counter;
     private volatile long oldestRevision = 0;
+
+    public RevisionMap(RevisionCounter counter) {
+        this.counter = counter;
+    }
 
     public V get(K key, long revision) {
         RevisionList<V> revs = map.get(key);
@@ -61,16 +66,16 @@ public class RevisionMap<K, V> {
 
     public long getLatestRevisionForKey(K key) {
         RevisionList<V> revs = map.get(key);
-        return revs != null ? revs.latestRevision() : currentRevision;
+        return revs != null ? revs.latestRevision() : counter.getCurrentRevision();
     }
 
     public void put(K key, V value) {
         synchronized (writeLock) {
             RevisionList<V> previous = map.get(key);
-            if (previous != null && previous.latestRevision() == currentRevision) {
+            if (previous != null && previous.latestRevision() == counter.getCurrentRevision()) {
                 throw new IllegalArgumentException("Key already set in this revision: " + key);
             }
-            RevisionList<V> updated = new RevisionList<V>(currentRevision, value, previous);
+            RevisionList<V> updated = new RevisionList<V>(counter.getCurrentRevision(), value, previous);
             map.put(key, updated);
             if (previous != null) {
                 hasOldRevisions.add(key);
@@ -87,7 +92,7 @@ public class RevisionMap<K, V> {
 
     public void purgeRevisionsOlderThan(long revisionToKeep) {
         synchronized (writeLock) {
-            revisionToKeep = Math.min(revisionToKeep, currentRevision);
+            revisionToKeep = Math.min(revisionToKeep, counter.getCurrentRevision());
             oldestRevision = Math.max(revisionToKeep, oldestRevision);
 
             for (Iterator<K> purgeQueueIter = hasOldRevisions.iterator(); purgeQueueIter.hasNext();) {
@@ -109,22 +114,8 @@ public class RevisionMap<K, V> {
         return map.size();
     }
 
-    public long getCurrentRevision() {
-        return currentRevision;
-    }
-
     public long getOldestRevision() {
         return oldestRevision;
-    }
-
-    public void incrementRevision() {
-        if (currentRevision == Long.MAX_VALUE) {
-            // TODO: any good ideas on how to allow the revisions to loop freely?
-            throw new Error("Numeric overflow: tried to increment past Long.MAX_VALUE");
-        }
-        synchronized (writeLock) {
-            currentRevision++;
-        }
     }
 
     /**
