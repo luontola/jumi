@@ -31,8 +31,8 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 
 import java.math.BigInteger;
@@ -64,7 +64,7 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
 
     public <T> EntityReference<T> createReference(T obj) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
-        if (!EntityUtil.isEntity(obj)) {
+        if (!Entities.isEntity(obj)) {
             throw new IllegalArgumentException("Not an entity: " + obj);
         }
         IEntity entity = (IEntity) obj;

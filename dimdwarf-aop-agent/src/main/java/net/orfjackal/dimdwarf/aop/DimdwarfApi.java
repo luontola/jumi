@@ -39,4 +39,5 @@ public class DimdwarfApi {
 
     public static final String ENTITY_ANNOTATION = "net/orfjackal/dimdwarf/api/Entity";
     public static final String ENTITY_INTERFACE = "net/orfjackal/dimdwarf/api/impl/IEntity";
+    public static final String ENTITY_HELPER_CLASS = "net/orfjackal/dimdwarf/entities/tref/EntityHelper";
 }

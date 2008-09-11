@@ -35,8 +35,8 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.db.Blob;
@@ -99,11 +99,11 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void itIsATransparentReference() {
-            specify(EntityUtil.isTransparentReference(proxy));
+            specify(Entities.isTransparentReference(proxy));
         }
 
         public void itIsNotAnEntity() {
-            specify(EntityUtil.isEntity(proxy), should.equal(false));
+            specify(Entities.isEntity(proxy), should.equal(false));
         }
 
         public void itImplementsTheSameInterfacesAsTheEntity() {
@@ -139,7 +139,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
             boolean containsEntityReference = false;
             for (Object obj : serializedObjects) {
-                specify(EntityUtil.isEntity(obj), should.equal(false));
+                specify(Entities.isEntity(obj), should.equal(false));
                 if (obj instanceof EntityReference) {
                     containsEntityReference = true;
                 }
@@ -199,21 +199,21 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {
             specify(deserialized.entity instanceof DummyInterface);
-            specify(EntityUtil.isTransparentReference(deserialized.entity));
-            specify(EntityUtil.isEntity(deserialized.entity), should.equal(false));
+            specify(Entities.isTransparentReference(deserialized.entity));
+            specify(Entities.isEntity(deserialized.entity), should.equal(false));
         }
 
         public void theRootEntityIsNotReplaced() {
             specify(deserialized.getClass(), should.equal(SerializationTestEntity.class));
-            specify(EntityUtil.isTransparentReference(deserialized), should.equal(false));
-            specify(EntityUtil.isEntity(deserialized));
+            specify(Entities.isTransparentReference(deserialized), should.equal(false));
+            specify(Entities.isEntity(deserialized));
         }
 
         public void nonEntityObjectsAreNotReplaced() {
             specify(deserialized.normalObject instanceof DummyInterface);
             specify(deserialized.normalObject.getClass(), should.equal(DummyObject.class));
-            specify(EntityUtil.isTransparentReference(deserialized.normalObject), should.equal(false));
-            specify(EntityUtil.isEntity(deserialized.normalObject), should.equal(false));
+            specify(Entities.isTransparentReference(deserialized.normalObject), should.equal(false));
+            specify(Entities.isEntity(deserialized.normalObject), should.equal(false));
         }
     }
 

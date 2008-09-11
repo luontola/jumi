@@ -39,7 +39,7 @@ import net.orfjackal.dimdwarf.aop.MarkAsEntitiesAllClassesAnnotatedWith;
 import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
 import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
 import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
@@ -74,7 +74,7 @@ public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object
         }
 
         public void isNotTransformed() {
-            specify(EntityUtil.isEntity(target), should.equal(false));
+            specify(Entities.isEntity(target), should.equal(false));
         }
     }
 
@@ -86,7 +86,7 @@ public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object
         }
 
         public void isTransformedToAnEntity() {
-            specify(EntityUtil.isEntity(target));
+            specify(Entities.isEntity(target));
         }
     }
 

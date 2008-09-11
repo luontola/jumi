@@ -31,8 +31,8 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 
@@ -78,9 +78,9 @@ public class EntityHelper {
     }
 
     private static EntityReference<?> getReference(Object obj) {
-        if (EntityUtil.isTransparentReference(obj)) {
+        if (Entities.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference();
-        } else if (EntityUtil.isEntity(obj)) {
+        } else if (Entities.isEntity(obj)) {
             return ThreadContext.get().getEntityManager().createReference(obj);
         } else {
             return null;

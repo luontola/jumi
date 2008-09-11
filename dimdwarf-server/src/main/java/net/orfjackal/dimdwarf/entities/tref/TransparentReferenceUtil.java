@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 
@@ -52,9 +52,9 @@ public class TransparentReferenceUtil {
 
     // TODO: marking for update not implemented by entity manager
     public static void markForUpdate(Object object) {
-        if (EntityUtil.isTransparentReference(object)) {
+        if (Entities.isTransparentReference(object)) {
 //            ((TransparentReference) object).getEntityReference().getForUpdate();
-        } else if (EntityUtil.isEntity(object)) {
+        } else if (Entities.isEntity(object)) {
 //            AppContext.getDataManager().markForUpdate(object);
         }
     }

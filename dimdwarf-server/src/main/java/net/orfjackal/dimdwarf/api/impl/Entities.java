@@ -35,9 +35,9 @@ package net.orfjackal.dimdwarf.api.impl;
  * @author Esko Luontola
  * @since 10.9.2008
  */
-public class EntityUtil {
+public class Entities {
 
-    private EntityUtil() {
+    private Entities() {
     }
 
     public static boolean isEntity(Object obj) {

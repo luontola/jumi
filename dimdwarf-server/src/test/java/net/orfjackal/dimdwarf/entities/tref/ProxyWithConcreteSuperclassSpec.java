@@ -37,7 +37,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.ProxyType;
-import net.orfjackal.dimdwarf.api.impl.EntityUtil;
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.entities.*;
 import org.jmock.Expectations;
@@ -78,11 +78,11 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
         }
 
         public void isATransparentReference() {
-            specify(EntityUtil.isTransparentReference(proxy));
+            specify(Entities.isTransparentReference(proxy));
         }
 
         public void isNotAnEntity() {
-            specify(EntityUtil.isEntity(proxy), should.equal(false));
+            specify(Entities.isEntity(proxy), should.equal(false));
         }
 
         public void isAnInstanceOfTheSameClassAsTheEntity() {
