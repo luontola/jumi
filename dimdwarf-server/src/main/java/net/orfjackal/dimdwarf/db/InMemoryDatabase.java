@@ -36,7 +36,10 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -48,40 +51,48 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class InMemoryDatabase {
 
-    private final Map<String, InMemoryDatabaseTable> tables;
+    private final ConcurrentMap<Transaction, Long> revisionsInUse = new ConcurrentHashMap<Transaction, Long>();
     private final Object commitLock = new Object();
-    private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
-    private final RevisionCounter revisionCounter = new RevisionCounter();
+
+    private final Map<String, InMemoryDatabaseTable> tables;
+    private final RevisionCounter revisionCounter;
     private volatile long committedRevision;
 
     public InMemoryDatabase(String... tableNames) {
-        Map<String, InMemoryDatabaseTable> tables = new HashMap<String, InMemoryDatabaseTable>();
-        for (String name : tableNames) {
-            tables.put(name, new InMemoryDatabaseTable(revisionCounter));
-        }
-        this.tables = Collections.unmodifiableMap(tables);
+        revisionCounter = new RevisionCounter();
+        tables = Collections.unmodifiableMap(createTables(tableNames, revisionCounter));
         committedRevision = revisionCounter.getCurrentRevision();
     }
 
+    private static Map<String, InMemoryDatabaseTable> createTables(String[] names, RevisionCounter counter) {
+        Map<String, InMemoryDatabaseTable> tables = new HashMap<String, InMemoryDatabaseTable>();
+        for (String name : names) {
+            tables.put(name, new InMemoryDatabaseTable(counter));
+        }
+        return tables;
+    }
+
     public Database openConnection(Transaction tx) {
-        if (openConnections.containsKey(tx)) {
+        if (revisionsInUse.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
-        Database db = new TransactionalDatabase(committedRevision, tx);
-        openConnections.put(tx, committedRevision);
+        long revision = committedRevision;
+        Database db = new TransactionalDatabase(revision, tx);
+        revisionsInUse.put(tx, revision);
         return db;
     }
 
     private void closeConnection(Transaction tx) {
-        openConnections.remove(tx);
+        revisionsInUse.remove(tx);
+        long oldestUncommitted = getOldestUncommittedRevision();
         for (InMemoryDatabaseTable table : tables.values()) {
-            table.purgeRevisionsOlderThan(getOldestUncommittedRevision());
+            table.purgeRevisionsOlderThan(oldestUncommitted);
         }
     }
 
     protected long getOldestUncommittedRevision() {
         long oldest = committedRevision;
-        for (long revision : openConnections.values()) {
+        for (long revision : revisionsInUse.values()) {
             oldest = Math.min(oldest, revision);
         }
         return oldest;
@@ -89,7 +100,7 @@ public class InMemoryDatabase {
 
     @TestOnly
     protected int getOpenConnections() {
-        return openConnections.size();
+        return revisionsInUse.size();
     }
 
     @TestOnly
@@ -124,7 +135,7 @@ public class InMemoryDatabase {
             } finally {
                 committedRevision = revisionCounter.getCurrentRevision();
                 for (TransactionalDatabaseTable update : updates) {
-                    update.unlockAfterCommit();
+                    update.releaseLocks();
                 }
             }
         }
@@ -133,68 +144,11 @@ public class InMemoryDatabase {
     private void rollbackUpdates(Collection<TransactionalDatabaseTable> updates) {
         synchronized (commitLock) {
             for (TransactionalDatabaseTable update : updates) {
-                update.unlockAfterCommit();
+                update.releaseLocks();
             }
         }
     }
 
-
-    private static class InMemoryDatabaseTable {
-
-        private final RevisionMap<Blob, Blob> revisions;
-        private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
-
-        public InMemoryDatabaseTable(RevisionCounter revisionCounter) {
-            revisions = new RevisionMap<Blob, Blob>(revisionCounter);
-        }
-
-        public Blob get(Blob key, long revision) {
-            return revisions.get(key, revision);
-        }
-
-        public void purgeRevisionsOlderThan(long revisionToKeep) {
-            revisions.purgeRevisionsOlderThan(revisionToKeep);
-        }
-
-        public long getOldestRevision() {
-            return revisions.getOldestRevision();
-        }
-
-        private void checkForConflicts(Set<Blob> keys, long visibleRevision) {
-            for (Blob key : keys) {
-                long lastWrite = revisions.getLatestRevisionForKey(key);
-                if (lastWrite > visibleRevision) {
-                    throw new OptimisticLockException("Key " + key + " already modified in revision " + lastWrite);
-                }
-            }
-        }
-
-        public void lock(Transaction tx, Set<Blob> keys) {
-            for (Blob key : keys) {
-                Transaction alreadyLocked = lockedForCommit.putIfAbsent(key, tx);
-                if (alreadyLocked != null) {
-                    throw new OptimisticLockException("Key " + key + " already locked by transaction " + alreadyLocked);
-                }
-            }
-        }
-
-        public void commit(Transaction tx, Map<Blob, Blob> updates) {
-            for (Map.Entry<Blob, Blob> update : updates.entrySet()) {
-                assert lockedForCommit.get(update.getKey()).equals(tx);
-                revisions.put(update.getKey(), update.getValue());
-            }
-        }
-
-        private void unlock(Transaction tx, Set<Blob> keys) {
-            for (Blob key : keys) {
-                ConcurrentMap<Blob, Transaction> locks = lockedForCommit;
-                if (locks.containsKey(key)) {
-                    boolean wasLockedByMe = locks.remove(key, tx);
-                    assert wasLockedByMe : "key = " + key;
-                }
-            }
-        }
-    }
 
     /**
      * This class is thread-safe.
@@ -213,10 +167,14 @@ public class InMemoryDatabase {
 
         public DatabaseTable openTable(String name) {
             tx.mustBeActive();
-            TransactionalDatabaseTable openTable = openTables.get(name);
-            if (openTable != null) {
-                return openTable;
+            TransactionalDatabaseTable table = openTables.get(name);
+            if (table != null) {
+                return table;
             }
+            return openNewTable(name);
+        }
+
+        private DatabaseTable openNewTable(String name) {
             InMemoryDatabaseTable table = tables.get(name);
             if (table == null) {
                 throw new IllegalArgumentException("No such table: " + name);
@@ -288,16 +246,16 @@ public class InMemoryDatabase {
             updates.put(key, EMPTY_BLOB);
         }
 
-        protected void prepare() {
+        private void prepare() {
             table.checkForConflicts(updates.keySet(), visibleRevision);
             table.lock(tx, updates.keySet());
         }
 
-        protected void commit() {
-            table.commit(tx, updates);
+        private void commit() {
+            table.putAll(tx, updates);
         }
 
-        protected void unlockAfterCommit() {
+        private void releaseLocks() {
             table.unlock(tx, updates.keySet());
         }
     }
