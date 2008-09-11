@@ -77,8 +77,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private Blob readInNewTransaction(Blob key) {
         TransactionCoordinator tx = new TransactionImpl();
         try {
-            return dbms.openConnection(tx.getTransaction()).openTable(TABLE)
-                    .read(key);
+            return dbms.openConnection(tx.getTransaction()).openTable(TABLE).read(key);
         } finally {
             tx.prepare();
             tx.commit();
@@ -87,8 +86,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     private void updateInNewTransaction(Blob key, Blob value) {
         TransactionCoordinator tx = new TransactionImpl();
-        dbms.openConnection(tx.getTransaction()).openTable(TABLE)
-                .update(key, value);
+        dbms.openConnection(tx.getTransaction()).openTable(TABLE).update(key, value);
         tx.prepare();
         tx.commit();
     }

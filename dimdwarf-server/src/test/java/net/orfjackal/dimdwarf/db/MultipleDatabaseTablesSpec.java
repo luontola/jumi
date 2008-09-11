@@ -50,6 +50,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private static final String TABLE1 = "table1";
     private static final String TABLE2 = "table2";
 
+    private InMemoryDatabase dbms;
     private TransactionCoordinator tx;
     private Database db;
     private DatabaseTable table1;
@@ -60,15 +61,26 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private Blob value2;
 
     public void create() throws Exception {
-        InMemoryDatabase db = new InMemoryDatabase(TABLE1, TABLE2);
+        dbms = new InMemoryDatabase(TABLE1, TABLE2);
+
         tx = new TransactionImpl();
-        this.db = db.openConnection(tx.getTransaction());
+        db = dbms.openConnection(tx.getTransaction());
         table1 = this.db.openTable(TABLE1);
         table2 = this.db.openTable(TABLE2);
 
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
         value2 = Blob.fromBytes(new byte[]{2});
+    }
+
+    private Blob readInNewTransaction(String table, Blob key) {
+        TransactionCoordinator tx = new TransactionImpl();
+        try {
+            return dbms.openConnection(tx.getTransaction()).openTable(table).read(key);
+        } finally {
+            tx.prepare();
+            tx.commit();
+        }
     }
 
 
@@ -92,6 +104,44 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
                     db.openTable("doesNotExist");
                 }
             }, should.raise(IllegalArgumentException.class));
+        }
+    }
+
+    public class DuringTransaction {
+
+        public Object create() {
+            table1.update(key, value1);
+            return null;
+        }
+
+        public void updatesAreSeenInTheUpdatedTable() {
+            specify(table1.read(key), should.equal(value1));
+        }
+
+        public void updatesAreNotSeenInOtherTables() {
+            specify(table2.read(key), should.equal(Blob.EMPTY_BLOB));
+        }
+
+        public void updatesAreNotSeenInOtherTransactions() {
+            specify(readInNewTransaction(TABLE1, key), should.equal(Blob.EMPTY_BLOB));
+        }
+    }
+
+    public class AfterTransactionIsCommitted {
+
+        public Object create() {
+            table1.update(key, value1);
+            tx.prepare();
+            tx.commit();
+            return null;
+        }
+
+        public void updatesAreSeenInTheUpdatedTable() {
+            specify(readInNewTransaction(TABLE1, key), should.equal(value1));
+        }
+
+        public void updatesAreNotSeenInOtherTables() {
+            specify(readInNewTransaction(TABLE2, key), should.equal(Blob.EMPTY_BLOB));
         }
     }
 }

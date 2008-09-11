@@ -36,7 +36,10 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -48,14 +51,20 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class InMemoryDatabase {
 
-    private final Set<String> tables;
-    private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
+    private final Map<String, RevisionMap<Blob, Blob>> tables;
+    //    private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
-    private volatile long committedRevision = revisions.getCurrentRevision();
+    //    private volatile long committedRevision = revisions.getCurrentRevision();
+    private volatile long committedRevision;
 
-    public InMemoryDatabase(String... tables) {
-        this.tables = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(tables)));
+    public InMemoryDatabase(String... tableNames) {
+        HashMap<String, RevisionMap<Blob, Blob>> tables = new HashMap<String, RevisionMap<Blob, Blob>>();
+        for (String name : tableNames) {
+            tables.put(name, new RevisionMap<Blob, Blob>());
+        }
+        this.tables = Collections.unmodifiableMap(tables);
+        committedRevision = tables.values().iterator().next().getCurrentRevision();
     }
 
     public Database openConnection(Transaction tx) {
@@ -69,7 +78,9 @@ public class InMemoryDatabase {
 
     private void closeConnection(Transaction tx) {
         openConnections.remove(tx);
-        revisions.purgeRevisionsOlderThan(getOldestUncommittedRevision());
+        for (RevisionMap<Blob, Blob> table : tables.values()) {
+            table.purgeRevisionsOlderThan(getOldestUncommittedRevision());
+        }
     }
 
     protected long getOldestUncommittedRevision() {
@@ -92,11 +103,12 @@ public class InMemoryDatabase {
 
     @TestOnly
     protected long getOldestStoredRevision() {
-        return revisions.getOldestRevision();
+        return tables.values().iterator().next().getOldestRevision();
     }
 
-    private void prepareTransaction(Transaction tx, Map<Blob, Blob> modified, long revision) throws Exception {
+    private void prepareTransaction(Transaction tx, String table, Map<Blob, Blob> modified, long revision) throws Exception {
         synchronized (lockedForCommit) {
+            RevisionMap<Blob, Blob> revisions = tables.get(table);
             for (Map.Entry<Blob, Blob> e : modified.entrySet()) {
                 long lastWrite = revisions.getLatestRevisionForKey(e.getKey());
                 if (lastWrite > revision) {
@@ -107,8 +119,9 @@ public class InMemoryDatabase {
         }
     }
 
-    private void commitTransaction(Transaction tx, Map<Blob, Blob> modified) {
+    private void commitTransaction(Transaction tx, String table, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
+            RevisionMap<Blob, Blob> revisions = tables.get(table);
             try {
                 revisions.incrementRevision();
                 for (Map.Entry<Blob, Blob> e : modified.entrySet()) {
@@ -121,8 +134,9 @@ public class InMemoryDatabase {
         }
     }
 
-    private void rollbackTransaction(Transaction tx, Map<Blob, Blob> modified) {
+    private void rollbackTransaction(Transaction tx, String table, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
+            // TODO: separate keys between multiple tables
             unlockKeysForCommit(tx, modified.keySet());
         }
     }
@@ -164,10 +178,11 @@ public class InMemoryDatabase {
             if (table != null) {
                 return table;
             }
-            if (!tables.contains(name)) {
+            RevisionMap<Blob, Blob> revisions = tables.get(name);
+            if (revisions == null) {
                 throw new IllegalArgumentException("No such table: " + name);
             }
-            openTables.putIfAbsent(name, new TransactionalDatabaseTable(visibleRevision, tx));
+            openTables.putIfAbsent(name, new TransactionalDatabaseTable(revisions, visibleRevision, tx));
             return openTables.get(name);
         }
 
@@ -176,15 +191,19 @@ public class InMemoryDatabase {
         }
 
         public void prepare(Transaction tx) throws Throwable {
-            for (TransactionalDatabaseTable table : openTables.values()) {
-                prepareTransaction(tx, table.updates, visibleRevision);
+            for (Map.Entry<String, TransactionalDatabaseTable> e : openTables.entrySet()) {
+                String name = e.getKey();
+                TransactionalDatabaseTable table = e.getValue();
+                prepareTransaction(tx, name, table.updates, visibleRevision);
             }
         }
 
         public void commit(Transaction tx) {
             try {
-                for (TransactionalDatabaseTable table : openTables.values()) {
-                    commitTransaction(tx, table.updates);
+                for (Map.Entry<String, TransactionalDatabaseTable> e : openTables.entrySet()) {
+                    String name = e.getKey();
+                    TransactionalDatabaseTable table = e.getValue();
+                    commitTransaction(tx, name, table.updates);
                 }
             } finally {
                 closeConnection(tx);
@@ -193,8 +212,10 @@ public class InMemoryDatabase {
 
         public void rollback(Transaction tx) {
             try {
-                for (TransactionalDatabaseTable table : openTables.values()) {
-                    rollbackTransaction(tx, table.updates);
+                for (Map.Entry<String, TransactionalDatabaseTable> e : openTables.entrySet()) {
+                    String name = e.getKey();
+                    TransactionalDatabaseTable table = e.getValue();
+                    rollbackTransaction(tx, name, table.updates);
                 }
             } finally {
                 closeConnection(tx);
@@ -208,10 +229,12 @@ public class InMemoryDatabase {
     private class TransactionalDatabaseTable implements DatabaseTable {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
+        private final RevisionMap<Blob, Blob> revisions;
         private final long visibleRevision;
         private final Transaction tx;
 
-        public TransactionalDatabaseTable(long visibleRevision, Transaction tx) {
+        public TransactionalDatabaseTable(RevisionMap<Blob, Blob> revisions, long visibleRevision, Transaction tx) {
+            this.revisions = revisions;
             this.visibleRevision = visibleRevision;
             this.tx = tx;
         }
