@@ -53,17 +53,21 @@ public class InMemoryDatabase {
 
     private final Map<String, RevisionMap<Blob, Blob>> tables;
     //    private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
-    private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
+    //    private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
+    private final Map<String, ConcurrentMap<Blob, Transaction>> lockedForCommit;
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
     //    private volatile long committedRevision = revisions.getCurrentRevision();
     private volatile long committedRevision;
 
     public InMemoryDatabase(String... tableNames) {
         HashMap<String, RevisionMap<Blob, Blob>> tables = new HashMap<String, RevisionMap<Blob, Blob>>();
+        HashMap<String, ConcurrentMap<Blob, Transaction>> lockedForCommit = new HashMap<String, ConcurrentMap<Blob, Transaction>>();
         for (String name : tableNames) {
             tables.put(name, new RevisionMap<Blob, Blob>());
+            lockedForCommit.put(name, new ConcurrentHashMap<Blob, Transaction>());
         }
         this.tables = Collections.unmodifiableMap(tables);
+        this.lockedForCommit = Collections.unmodifiableMap(lockedForCommit);
         committedRevision = tables.values().iterator().next().getCurrentRevision();
     }
 
@@ -115,7 +119,7 @@ public class InMemoryDatabase {
                     throw new OptimisticLockException("Key " + e.getKey() + " already modified in revision " + lastWrite);
                 }
             }
-            lockKeysForCommit(tx, modified.keySet());
+            lockKeysForCommit(tx, table, modified.keySet());
         }
     }
 
@@ -129,29 +133,31 @@ public class InMemoryDatabase {
                 }
             } finally {
                 committedRevision = revisions.getCurrentRevision();
-                unlockKeysForCommit(tx, modified.keySet());
+                unlockKeysForCommit(tx, table, modified.keySet());
             }
         }
     }
 
     private void rollbackTransaction(Transaction tx, String table, Map<Blob, Blob> modified) {
         synchronized (lockedForCommit) {
-            // TODO: separate keys between multiple tables
-            unlockKeysForCommit(tx, modified.keySet());
+            unlockKeysForCommit(tx, table, modified.keySet());
         }
     }
 
-    private void lockKeysForCommit(Transaction tx, Set<Blob> keys) {
+    private void lockKeysForCommit(Transaction tx, String table, Set<Blob> keys) {
         for (Blob key : keys) {
-            Transaction alreadyLockedBy = lockedForCommit.putIfAbsent(key, tx);
-            assert alreadyLockedBy == null : "key = " + key;
+            Transaction alreadyLocked = lockedForCommit.get(table).putIfAbsent(key, tx);
+            if (alreadyLocked != null) {
+                throw new OptimisticLockException("Key " + key + " already locked by transaction " + alreadyLocked);
+            }
         }
     }
 
-    private void unlockKeysForCommit(Transaction tx, Set<Blob> keys) {
+    private void unlockKeysForCommit(Transaction tx, String table, Set<Blob> keys) {
         for (Blob key : keys) {
-            if (lockedForCommit.containsKey(key)) {
-                boolean wasLockedByMe = lockedForCommit.remove(key, tx);
+            ConcurrentMap<Blob, Transaction> locks = lockedForCommit.get(table);
+            if (locks.containsKey(key)) {
+                boolean wasLockedByMe = locks.remove(key, tx);
                 assert wasLockedByMe : "key = " + key;
             }
         }

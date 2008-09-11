@@ -144,4 +144,20 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
             specify(readInNewTransaction(TABLE2, key), should.equal(Blob.EMPTY_BLOB));
         }
     }
+
+    public class UpdatingTheSameKeyInDifferentTables {
+
+        public Object create() {
+            table1.update(key, value1);
+            table2.update(key, value2);
+            return null;
+        }
+
+        public void doesNotConflictTheTransaction() {
+            tx.prepare();
+            tx.commit();
+            specify(readInNewTransaction(TABLE1, key), should.equal(value1));
+            specify(readInNewTransaction(TABLE2, key), should.equal(value2));
+        }
+    }
 }
