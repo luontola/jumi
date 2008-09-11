@@ -54,13 +54,13 @@ public class InMemoryDatabase {
     private final ConcurrentMap<Transaction, Long> openConnections = new ConcurrentHashMap<Transaction, Long>();
     private volatile long committedRevision = revisions.getCurrentRevision();
 
-    public DatabaseTable openConnection(Transaction tx) {
+    public Database openConnection(Transaction tx) {
         if (openConnections.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
-        DatabaseTable con = new TransactionalDatabaseConnection(tx, committedRevision);
+        Database db = new TransactionalDatabaseConnection(tx, committedRevision);
         openConnections.put(tx, committedRevision);
-        return con;
+        return db;
     }
 
     private void closeConnection(Transaction tx) {
@@ -142,16 +142,21 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private class TransactionalDatabaseConnection implements DatabaseTable, TransactionParticipant {
+    private class TransactionalDatabaseConnection implements Database, TransactionParticipant {
 
-        private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
+        private final TransactionalDatabaseTableConnection table;
         private final long visibleRevision;
         private final Transaction tx;
 
         public TransactionalDatabaseConnection(Transaction tx, long visibleRevision) {
             this.tx = tx;
             this.visibleRevision = visibleRevision;
+            this.table = new TransactionalDatabaseTableConnection(tx, visibleRevision);
             tx.join(this);
+        }
+
+        public DatabaseTable table(String name) {
+            return table;
         }
 
         public void joinedTransaction(Transaction tx) {
@@ -159,12 +164,12 @@ public class InMemoryDatabase {
         }
 
         public void prepare(Transaction tx) throws Throwable {
-            prepareTransaction(tx, updates, visibleRevision);
+            prepareTransaction(tx, table.updates, visibleRevision);
         }
 
         public void commit(Transaction tx) {
             try {
-                commitTransaction(tx, updates);
+                commitTransaction(tx, table.updates);
             } finally {
                 closeConnection(tx);
             }
@@ -172,10 +177,25 @@ public class InMemoryDatabase {
 
         public void rollback(Transaction tx) {
             try {
-                rollbackTransaction(tx, updates);
+                rollbackTransaction(tx, table.updates);
             } finally {
                 closeConnection(tx);
             }
+        }
+    }
+
+    /**
+     * This class is thread-safe.
+     */
+    private class TransactionalDatabaseTableConnection implements DatabaseTable {
+
+        private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
+        private final long visibleRevision;
+        private final Transaction tx;
+
+        public TransactionalDatabaseTableConnection(Transaction tx, long visibleRevision) {
+            this.tx = tx;
+            this.visibleRevision = visibleRevision;
         }
 
         public Blob read(Blob key) {

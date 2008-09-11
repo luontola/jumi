@@ -49,6 +49,8 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
+    private static final String TABLE = "test";
+
     private InMemoryDatabase db;
     private TransactionCoordinator tx1;
     private TransactionCoordinator tx2;
@@ -75,7 +77,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private Blob readInNewTransaction(Blob key) {
         TransactionCoordinator tx = new TransactionImpl();
         try {
-            return db.openConnection(tx.getTransaction())
+            return db.openConnection(tx.getTransaction()).table(TABLE)
                     .read(key);
         } finally {
             tx.prepare();
@@ -85,7 +87,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     private void updateInNewTransaction(Blob key, Blob value) {
         TransactionCoordinator tx = new TransactionImpl();
-        db.openConnection(tx.getTransaction())
+        db.openConnection(tx.getTransaction()).table(TABLE)
                 .update(key, value);
         tx.prepare();
         tx.commit();
@@ -116,8 +118,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     public class WhenMultipleDatabaseConnectionsAreOpen {
 
         public Object create() {
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             return null;
         }
 
@@ -165,8 +167,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     public class WhenEntryIsCreatedInATransaction {
 
         public Object create() {
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             db1.update(key, value1);
             specify(db.getOpenConnections(), should.equal(2));
             return null;
@@ -206,8 +208,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
         public Object create() {
             updateInNewTransaction(key, value1);
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             db1.update(key, value2);
             specify(db.getOpenConnections(), should.equal(2));
             return null;
@@ -247,8 +249,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
         public Object create() {
             updateInNewTransaction(key, value1);
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             db1.delete(key);
             specify(db.getOpenConnections(), should.equal(2));
             return null;
@@ -288,8 +290,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     public class IfTwoTransactionsCreateAnEntryWithTheSameKey {
 
         public Object create() {
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             db1.update(key, value1);
             db2.update(key, value2);
             return null;
@@ -310,8 +312,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
         public Object create() {
             updateInNewTransaction(key, value3);
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             db1.update(key, value1);
             db2.update(key, value2);
             return null;
@@ -332,8 +334,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
         public Object create() {
             updateInNewTransaction(key, value3);
-            db1 = db.openConnection(tx1.getTransaction());
-            db2 = db.openConnection(tx2.getTransaction());
+            db1 = db.openConnection(tx1.getTransaction()).table(TABLE);
+            db2 = db.openConnection(tx2.getTransaction()).table(TABLE);
             db1.delete(key);
             db2.delete(key);
             return null;

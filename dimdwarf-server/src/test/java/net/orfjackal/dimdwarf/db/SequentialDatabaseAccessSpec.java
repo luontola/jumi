@@ -49,6 +49,8 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
+    private static final String TABLE = "test";
+
     private InMemoryDatabase dbService;
     private DatabaseTable db;
     private TransactionCoordinator tx;
@@ -60,7 +62,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     public void create() throws Exception {
         dbService = new InMemoryDatabase();
         tx = new TransactionImpl();
-        db = dbService.openConnection(tx.getTransaction());
+        db = dbService.openConnection(tx.getTransaction()).table(TABLE);
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});
