@@ -126,7 +126,7 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
      * being iterated is not purged - in which case the behaviour is unspecified).
      */
     public Iterator<Map.Entry<K, V>> iterator(long revision) {
-        return new MyIterator<K, V>(map, revision);
+        return new MyIterator<K, V>(this, revision);
     }
 
     public K firstKey() {
@@ -146,13 +146,15 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
      * This class is NOT thread-safe.
      */
     private static class MyIterator<K, V> implements Iterator<Map.Entry<K, V>> {
+        private final RevisionMap<K, V> map;
         private final long revision;
-        private final Iterator<Map.Entry<K, RevisionList<V>>> it;
         private Map.Entry<K, V> fetchedNext;
+        private K nextKey;
 
-        public MyIterator(SortedMap<K, RevisionList<V>> map, long revision) {
+        public MyIterator(RevisionMap<K, V> map, long revision) {
+            this.map = map;
             this.revision = revision;
-            it = map.entrySet().iterator();
+            nextKey = map.firstKey();
         }
 
         public boolean hasNext() {
@@ -170,11 +172,12 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
         }
 
         private void fetchNext() {
-            while (fetchedNext == null && it.hasNext()) {
-                Map.Entry<K, RevisionList<V>> e = it.next();
-                V value = e.getValue().get(revision);
+            while (fetchedNext == null && nextKey != null) {
+                K key = nextKey;
+                V value = map.get(key, revision);
+                nextKey = map.nextKeyAfter(key);
                 if (value != null) {
-                    fetchedNext = new MyEntry<K, V>(e.getKey(), value);
+                    fetchedNext = new MyEntry<K, V>(key, value);
                 }
             }
         }

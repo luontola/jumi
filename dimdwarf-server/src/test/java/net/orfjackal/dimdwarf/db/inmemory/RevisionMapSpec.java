@@ -279,8 +279,8 @@ public class RevisionMapSpec extends Specification<Object> {
 
         public void iteratesOverAllValuesInTheRevision() {
             readFully(revision);
-            specify(keys, should.containInOrder("a", "b"));
-            specify(values, should.containInOrder("AA", "BB"));
+            specify(keys, should.containInPartialOrder("a", "b"));
+            specify(values, should.containInPartialOrder("AA", "BB"));
         }
 
         public void doesNotIterateOverValuesOfOtherRevisions() {
