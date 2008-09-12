@@ -29,30 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.bindings;
+package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
-import net.orfjackal.dimdwarf.db.NullConverter;
-import net.orfjackal.dimdwarf.entities.EntityIdConverter;
-import net.orfjackal.dimdwarf.entities.EntityLoader;
-import net.orfjackal.dimdwarf.entities.EntityManager;
-
-import java.math.BigInteger;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class BindingManagerImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingManager {
-
-    // TODO: remove this class, write tests directly for EntityIdConverter (?)
-
-    public BindingManagerImpl(DatabaseTable<String, BigInteger> bindings,
-                              EntityManager entityManager,
-                              EntityLoader entityLoader) {
-        super(bindings, new NullConverter<String>(), new EntityIdConverter(entityManager, entityLoader));
-    }
+public interface BindingManager extends DatabaseTable<String, Object> {
 }

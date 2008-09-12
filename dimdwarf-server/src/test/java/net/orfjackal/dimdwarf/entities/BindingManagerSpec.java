@@ -29,16 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.bindings;
+package net.orfjackal.dimdwarf.entities;
 
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.EntityLoader;
-import net.orfjackal.dimdwarf.entities.EntityManager;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.db.NullConverter;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -67,7 +64,7 @@ public class BindingManagerSpec extends Specification<Object> {
         entityManager = mock(EntityManager.class);
         entityLoader = mock(EntityLoader.class);
         bindingTable = mock(DatabaseTable.class);
-        bindingManager = new BindingManagerImpl(bindingTable, entityManager, entityLoader);
+        bindingManager = new BindingManagerImpl(bindingTable, new NullConverter<String>(), new EntityIdConverter(entityManager, entityLoader));
 
         checking(new Expectations() {{
             allowing(entityManager).createReference((Object) entity); will(returnValue(new EntityReferenceImpl<Object>(id, entity)));
