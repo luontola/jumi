@@ -33,7 +33,10 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.IterableKeys;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -120,15 +123,6 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
         return oldestRevision;
     }
 
-    /**
-     * The iterator returned by this method is NOT thread-safe, but it allows
-     * concurrent modifications of the map in other threads (as long as the revision
-     * being iterated is not purged - in which case the behaviour is unspecified).
-     */
-    public Iterator<Map.Entry<K, V>> iterator(long revision) {
-        return new MyIterator<K, V>(this, revision);
-    }
-
     public K firstKey() {
         return map.isEmpty() ? null : map.firstKey();
     }
@@ -140,80 +134,5 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
             next = it.hasNext() ? it.next() : null;
         } while (next != null && next.equals(currentKey));
         return next;
-    }
-
-    /**
-     * This class is NOT thread-safe.
-     */
-    private static class MyIterator<K, V> implements Iterator<Map.Entry<K, V>> {
-        private final RevisionMap<K, V> map;
-        private final long revision;
-        private Map.Entry<K, V> fetchedNext;
-        private K nextKey;
-
-        public MyIterator(RevisionMap<K, V> map, long revision) {
-            this.map = map;
-            this.revision = revision;
-            nextKey = map.firstKey();
-        }
-
-        public boolean hasNext() {
-            fetchNext();
-            return fetchedNext != null;
-        }
-
-        public Map.Entry<K, V> next() {
-            fetchNext();
-            return returnNext();
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        private void fetchNext() {
-            while (fetchedNext == null && nextKey != null) {
-                K key = nextKey;
-                V value = map.get(key, revision);
-                nextKey = map.nextKeyAfter(key);
-                if (value != null) {
-                    fetchedNext = new MyEntry<K, V>(key, value);
-                }
-            }
-        }
-
-        private Map.Entry<K, V> returnNext() {
-            Map.Entry<K, V> next = fetchedNext;
-            if (next == null) {
-                throw new NoSuchElementException();
-            }
-            fetchedNext = null;
-            return next;
-        }
-    }
-
-    /**
-     * This class is immutable.
-     */
-    private static class MyEntry<K, V> implements Map.Entry<K, V> {
-        private final K key;
-        private final V value;
-
-        public MyEntry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public V setValue(V value) {
-            throw new UnsupportedOperationException();
-        }
     }
 }

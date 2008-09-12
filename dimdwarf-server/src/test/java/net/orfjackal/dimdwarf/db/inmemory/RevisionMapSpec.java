@@ -37,8 +37,6 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
-import java.util.*;
-
 /**
  * @author Esko Luontola
  * @since 20.8.2008
@@ -246,69 +244,6 @@ public class RevisionMapSpec extends Specification<Object> {
 
         public void nextKeyAfterNonexistentKeyAfterLastKey() {
             specify(map.nextKeyAfter("d"), should.equal(null));
-        }
-    }
-
-    public class IteratingOverARevision {
-
-        private List<String> keys = new ArrayList<String>();
-        private List<String> values = new ArrayList<String>();
-        private long revision;
-
-        public Object create() {
-            counter.incrementRevision();
-            map.put("a", "AA");
-            map.put("b", "BB");
-            map.put("c", "X");
-            counter.incrementRevision();
-            map.remove("c");
-            revision = counter.getCurrentRevision();
-            counter.incrementRevision();
-            map.put("b", "Y");
-            return null;
-        }
-
-        private void readFully(long revision) {
-            Iterator<Map.Entry<String, String>> it = map.iterator(revision);
-            while (it.hasNext()) {
-                Map.Entry<String, String> e = it.next();
-                keys.add(e.getKey());
-                values.add(e.getValue());
-            }
-        }
-
-        public void iteratesOverAllValuesInTheRevision() {
-            readFully(revision);
-            specify(keys, should.containInPartialOrder("a", "b"));
-            specify(values, should.containInPartialOrder("AA", "BB"));
-        }
-
-        public void doesNotIterateOverValuesOfOtherRevisions() {
-            readFully(revision);
-            specify(keys, should.not().contain("c"));
-            specify(values, should.not().contain("X"));
-            specify(values, should.not().contain("Y"));
-        }
-
-        public void concurrentModificationInOtherTransactionsIsAllowed() {
-            Iterator<Map.Entry<String, String>> it = map.iterator(revision);
-            map.put("newkey", "Z");
-            specify(it.hasNext()); // should not throw ConcurrentModificationException
-            specify(it.next(), should.not().equal(null));
-        }
-
-        public void iteratorStopsWhenAllValuesHaveBeenIterated() {
-            final Iterator<Map.Entry<String, String>> it = map.iterator(revision);
-            specify(it.hasNext());
-            it.next();
-            specify(it.hasNext());
-            it.next();
-            specify(!it.hasNext());
-            specify(new Block() {
-                public void run() throws Throwable {
-                    it.next();
-                }
-            }, should.raise(NoSuchElementException.class));
         }
     }
 }
