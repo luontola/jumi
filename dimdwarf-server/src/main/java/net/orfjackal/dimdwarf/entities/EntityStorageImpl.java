@@ -33,8 +33,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
 import java.math.BigInteger;
@@ -47,33 +46,53 @@ import java.math.BigInteger;
  */
 public class EntityStorageImpl implements EntityStorage {
 
-    private final DatabaseTable<Blob, Blob> db;
-    private final ObjectSerializer serializer;
+    private final DatabaseTable<BigInteger, IEntity> adapter;
 
-    public EntityStorageImpl(DatabaseTable<Blob, Blob> db, ObjectSerializer serializer) {
-        this.db = db;
-        this.serializer = serializer;
+    public EntityStorageImpl(DatabaseTable<Blob, Blob> entityTable, ObjectSerializer serializer) {
+        adapter = new DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob>(
+                entityTable, new BigIntegerConverter(), new EntityConverter(serializer));
     }
 
     public IEntity read(BigInteger id) throws EntityNotFoundException {
-        Blob serialized = db.read(asBytes(id));
-        if (serialized.equals(Blob.EMPTY_BLOB)) {
-            throw new EntityNotFoundException("id=" + id);
-        }
-        return (IEntity) serializer.deserialize(serialized);
+        return adapter.read(id);
     }
 
     public void update(BigInteger id, IEntity entity) {
-        assert Entities.isEntity(entity);
-        Blob serialized = serializer.serialize(entity);
-        db.update(asBytes(id), serialized);
+        adapter.update(id, entity);
     }
 
     public void delete(BigInteger id) {
-        db.delete(asBytes(id));
+        adapter.delete(id);
     }
 
-    private static Blob asBytes(BigInteger id) {
-        return Blob.fromBytes(id.toByteArray());
+    public BigInteger firstKey() {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    public BigInteger nextKeyAfter(BigInteger currentKey) {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    private static class EntityConverter implements Converter<IEntity, Blob> {
+
+        private final ObjectSerializer serializer;
+
+        public EntityConverter(ObjectSerializer serializer) {
+            this.serializer = serializer;
+        }
+
+        public IEntity back(Blob value) {
+            if (value.equals(Blob.EMPTY_BLOB)) {
+                throw new EntityNotFoundException();
+            }
+            return (IEntity) serializer.deserialize(value);
+        }
+
+        public Blob forth(IEntity value) {
+            if (!Entities.isEntity(value)) {
+                throw new IllegalArgumentException("Not an entity");
+            }
+            return serializer.serialize(value);
+        }
     }
 }
