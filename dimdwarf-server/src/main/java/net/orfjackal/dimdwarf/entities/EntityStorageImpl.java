@@ -36,44 +36,18 @@ import net.orfjackal.dimdwarf.db.BigIntegerConverter;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
 import java.math.BigInteger;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
+ * This class is immutable.
  *
  * @author Esko Luontola
  * @since 1.9.2008
  */
-public class EntityStorageImpl implements EntityStorage {
+public class EntityStorageImpl extends DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob> implements EntityStorage {
 
-    // TODO: remove this class, write tests directly for EntityConveter
-
-    private final DatabaseTable<BigInteger, IEntity> adapter;
-
-    public EntityStorageImpl(DatabaseTable<Blob, Blob> entityTable, ObjectSerializer serializer) {
-        adapter = new DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob>(
-                entityTable, new BigIntegerConverter(), new EntityConverter(serializer));
-    }
-
-    public IEntity read(BigInteger id) throws EntityNotFoundException {
-        return adapter.read(id);
-    }
-
-    public void update(BigInteger id, IEntity entity) {
-        adapter.update(id, entity);
-    }
-
-    public void delete(BigInteger id) {
-        adapter.delete(id);
-    }
-
-    public BigInteger firstKey() {
-        return adapter.firstKey();
-    }
-
-    public BigInteger nextKeyAfter(BigInteger currentKey) {
-        return adapter.nextKeyAfter(currentKey);
+    public EntityStorageImpl(DatabaseTable<Blob, Blob> entities, BigIntegerConverter keys, EntityConverter values) {
+        super(entities, keys, values);
     }
 }

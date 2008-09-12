@@ -35,6 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.db.BigIntegerConverter;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.serial.*;
@@ -67,7 +68,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         };
         replacer = new DelegatingSerializationReplacer();
         ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
-        storage = new EntityStorageImpl(db, serializer);
+        storage = new EntityStorageImpl(db, new BigIntegerConverter(), new EntityConverter(serializer));
         entity = new DummyEntity();
     }
 

@@ -73,7 +73,8 @@ public class BindingManagerSpec extends Specification<Object> {
         EntityManagerImpl entityManager =
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
-                        new EntityStorageImpl(entities, new ObjectSerializerImpl()));
+                        new EntityStorageImpl(
+                                entities, new BigIntegerConverter(), new EntityConverter(new ObjectSerializerImpl())));
 
         DatabaseTableAdapter<String, BigInteger, Blob, Blob> bindingsTable =
                 new DatabaseTableAdapter<String, BigInteger, Blob, Blob>(
