@@ -29,51 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.entities.bindings;
 
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.db.BigIntegerConverter;
-import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
-
-import java.math.BigInteger;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 12.9.2008
  */
-public class EntityStorageImpl implements EntityStorage {
-
-    // TODO: remove this class, write tests directly for EntityConveter
-
-    private final DatabaseTable<BigInteger, IEntity> adapter;
-
-    public EntityStorageImpl(DatabaseTable<Blob, Blob> entityTable, ObjectSerializer serializer) {
-        adapter = new DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob>(
-                entityTable, new BigIntegerConverter(), new EntityConverter(serializer));
-    }
-
-    public IEntity read(BigInteger id) throws EntityNotFoundException {
-        return adapter.read(id);
-    }
-
-    public void update(BigInteger id, IEntity entity) {
-        adapter.update(id, entity);
-    }
-
-    public void delete(BigInteger id) {
-        adapter.delete(id);
-    }
-
-    public BigInteger firstKey() {
-        return adapter.firstKey();
-    }
-
-    public BigInteger nextKeyAfter(BigInteger currentKey) {
-        return adapter.nextKeyAfter(currentKey);
-    }
+public interface BindingManager extends DatabaseTable<String, Object> {
 }

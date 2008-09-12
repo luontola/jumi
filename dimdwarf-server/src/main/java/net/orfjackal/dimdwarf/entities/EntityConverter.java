@@ -31,49 +31,35 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.db.BigIntegerConverter;
 import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
+import net.orfjackal.dimdwarf.db.Converter;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
-import java.math.BigInteger;
-
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 12.9.2008
  */
-public class EntityStorageImpl implements EntityStorage {
+public class EntityConverter implements Converter<IEntity, Blob> {
 
-    // TODO: remove this class, write tests directly for EntityConveter
+    private final ObjectSerializer serializer;
 
-    private final DatabaseTable<BigInteger, IEntity> adapter;
-
-    public EntityStorageImpl(DatabaseTable<Blob, Blob> entityTable, ObjectSerializer serializer) {
-        adapter = new DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob>(
-                entityTable, new BigIntegerConverter(), new EntityConverter(serializer));
+    public EntityConverter(ObjectSerializer serializer) {
+        this.serializer = serializer;
     }
 
-    public IEntity read(BigInteger id) throws EntityNotFoundException {
-        return adapter.read(id);
+    public IEntity back(Blob value) {
+        if (value.equals(Blob.EMPTY_BLOB)) {
+            throw new EntityNotFoundException();
+        }
+        return (IEntity) serializer.deserialize(value);
     }
 
-    public void update(BigInteger id, IEntity entity) {
-        adapter.update(id, entity);
-    }
-
-    public void delete(BigInteger id) {
-        adapter.delete(id);
-    }
-
-    public BigInteger firstKey() {
-        return adapter.firstKey();
-    }
-
-    public BigInteger nextKeyAfter(BigInteger currentKey) {
-        return adapter.nextKeyAfter(currentKey);
+    public Blob forth(IEntity value) {
+        if (!Entities.isEntity(value)) {
+            throw new IllegalArgumentException("Not an entity");
+        }
+        return serializer.serialize(value);
     }
 }

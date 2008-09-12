@@ -29,51 +29,54 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.entities.bindings;
 
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.db.BigIntegerConverter;
-import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.entities.EntityLoader;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 
 import java.math.BigInteger;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
+ * This class is immutable.
  *
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 12.9.2008
  */
-public class EntityStorageImpl implements EntityStorage {
+public class BindingManagerImpl implements BindingManager {
 
-    // TODO: remove this class, write tests directly for EntityConveter
+    private final DatabaseTable<String, BigInteger> bindings;
+    private final EntityManager entityManager;
+    private final EntityLoader entityLoader;
 
-    private final DatabaseTable<BigInteger, IEntity> adapter;
-
-    public EntityStorageImpl(DatabaseTable<Blob, Blob> entityTable, ObjectSerializer serializer) {
-        adapter = new DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob>(
-                entityTable, new BigIntegerConverter(), new EntityConverter(serializer));
+    public BindingManagerImpl(DatabaseTable<String, BigInteger> bindings,
+                              EntityManager entityManager,
+                              EntityLoader entityLoader) {
+        this.bindings = bindings;
+        this.entityManager = entityManager;
+        this.entityLoader = entityLoader;
     }
 
-    public IEntity read(BigInteger id) throws EntityNotFoundException {
-        return adapter.read(id);
+    public Object read(String key) {
+        BigInteger id = bindings.read(key);
+        return entityLoader.loadEntity(id);
     }
 
-    public void update(BigInteger id, IEntity entity) {
-        adapter.update(id, entity);
+    public void update(String key, Object value) {
+        EntityReference<Object> ref = entityManager.createReference(value);
+        bindings.update(key, ref.getId());
     }
 
-    public void delete(BigInteger id) {
-        adapter.delete(id);
+    public void delete(String key) {
+        bindings.delete(key);
     }
 
-    public BigInteger firstKey() {
-        return adapter.firstKey();
+    public String firstKey() {
+        return bindings.firstKey();
     }
 
-    public BigInteger nextKeyAfter(BigInteger currentKey) {
-        return adapter.nextKeyAfter(currentKey);
+    public String nextKeyAfter(String currentKey) {
+        return bindings.nextKeyAfter(currentKey);
     }
 }

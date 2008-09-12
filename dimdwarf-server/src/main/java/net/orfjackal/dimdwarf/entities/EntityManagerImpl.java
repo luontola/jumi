@@ -76,6 +76,10 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
         return ref;
     }
 
+    public Object loadEntity(BigInteger id) {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
     public <T> T loadEntity(EntityReference<T> ref) {
         checkStateIs(State.ACTIVE);
         IEntity entity = cache.get(ref);
