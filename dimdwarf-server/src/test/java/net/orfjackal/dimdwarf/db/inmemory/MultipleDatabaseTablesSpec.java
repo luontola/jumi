@@ -55,9 +55,9 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
     private InMemoryDatabase dbms;
     private TransactionCoordinator tx;
-    private Database db;
-    private DatabaseTable table1;
-    private DatabaseTable table2;
+    private Database<Blob, Blob> db;
+    private DatabaseTable<Blob, Blob> table1;
+    private DatabaseTable<Blob, Blob> table2;
 
     private Blob key;
     private Blob value1;

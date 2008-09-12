@@ -54,12 +54,13 @@ public class EntityStorageSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
-    private DatabaseTable db;
+    private DatabaseTable<Blob, Blob> db;
     private ObjectSerializer serializer;
     private EntityStorageImpl storage;
     private IEntity entity;
     private Blob serialized;
 
+    @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
         db = mock(DatabaseTable.class);
         serializer = mock(ObjectSerializer.class);

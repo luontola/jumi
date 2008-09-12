@@ -37,9 +37,9 @@ import java.util.Set;
  * @author Esko Luontola
  * @since 11.9.2008
  */
-public interface Database {
+public interface Database<K, V> {
 
     Set<String> tables();
 
-    DatabaseTable openTable(String name);
+    DatabaseTable<K, V> openTable(String name);
 }

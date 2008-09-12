@@ -47,10 +47,10 @@ import java.math.BigInteger;
  */
 public class EntityStorageImpl implements EntityStorage {
 
-    private final DatabaseTable db;
+    private final DatabaseTable<Blob, Blob> db;
     private final ObjectSerializer serializer;
 
-    public EntityStorageImpl(DatabaseTable db, ObjectSerializer serializer) {
+    public EntityStorageImpl(DatabaseTable<Blob, Blob> db, ObjectSerializer serializer) {
         this.db = db;
         this.serializer = serializer;
     }

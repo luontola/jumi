@@ -55,8 +55,8 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     private static final String TABLE = "test";
 
     private InMemoryDatabase dbms;
-    private Database db;
-    private DatabaseTable table;
+    private Database<Blob, Blob> db;
+    private DatabaseTable<Blob, Blob> table;
     private TransactionCoordinator tx;
 
     private Blob key;
@@ -73,7 +73,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         otherValue = Blob.fromBytes(new byte[]{3});
     }
 
-    private void canNotBeUsed(final Database db, final DatabaseTable table) {
+    private void canNotBeUsed(final Database<Blob, Blob> db, final DatabaseTable<Blob, Blob> table) {
         specify(new Block() {
             public void run() throws Throwable {
                 db.openTable(TABLE);

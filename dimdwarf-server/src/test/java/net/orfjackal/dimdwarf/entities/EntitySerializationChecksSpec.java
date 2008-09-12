@@ -53,11 +53,12 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
-    private DatabaseTable db;
+    private DatabaseTable<Blob, Blob> db;
     private EntityStorageImpl storage;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
+    @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
         db = mock(DatabaseTable.class);
         SerializationListener[] listeners = {

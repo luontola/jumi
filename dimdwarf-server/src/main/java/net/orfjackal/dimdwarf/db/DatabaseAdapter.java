@@ -31,15 +31,31 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.util.Set;
+
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 12.9.2008
  */
-public interface DatabaseTable<K, V> extends IterableKeys<K> {
+public class DatabaseAdapter<K1, V1, K2, V2> implements Database<K1, V1> {
 
-    V read(K key);
+    private final Database<K2, V2> parent;
+    private final Converter<K1, K2> keys;
+    private final Converter<V1, V2> values;
 
-    void update(K key, V value);
+    public DatabaseAdapter(Database<K2, V2> parent, Converter<K1, K2> keys, Converter<V1, V2> values) {
+        this.parent = parent;
+        this.keys = keys;
+        this.values = values;
+    }
 
-    void delete(K key);
+    public Set<String> tables() {
+        return parent.tables();
+    }
+
+    public DatabaseTable<K1, V1> openTable(String name) {
+        return new DatabaseTableAdapter<K1, V1, K2, V2>(parent.openTable(name), keys, values);
+    }
 }

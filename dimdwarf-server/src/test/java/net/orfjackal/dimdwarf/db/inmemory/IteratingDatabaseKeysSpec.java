@@ -52,7 +52,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
 
     private TransactionCoordinator tx;
     private InMemoryDatabase dbms;
-    private DatabaseTable table;
+    private DatabaseTable<Blob, Blob> table;
 
     private Blob key1;
     private Blob key2;

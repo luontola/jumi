@@ -31,15 +31,21 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.nio.charset.Charset;
+
 /**
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 12.9.2008
  */
-public interface DatabaseTable<K, V> extends IterableKeys<K> {
+public class StringConverter implements Converter<String, Blob> {
 
-    V read(K key);
+    private static final Charset CHARSET = Charset.forName("UTF-8");
 
-    void update(K key, V value);
+    public String back(Blob value) {
+        return new String(value.getByteArray(), CHARSET);
+    }
 
-    void delete(K key);
+    public Blob forth(String value) {
+        return Blob.fromBytes(value.getBytes(CHARSET));
+    }
 }

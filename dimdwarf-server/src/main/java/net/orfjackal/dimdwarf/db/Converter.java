@@ -33,13 +33,11 @@ package net.orfjackal.dimdwarf.db;
 
 /**
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 12.9.2008
  */
-public interface DatabaseTable<K, V> extends IterableKeys<K> {
+public interface Converter<T, U> {
 
-    V read(K key);
+    T back(U value);
 
-    void update(K key, V value);
-
-    void delete(K key);
+    U forth(T value);
 }

@@ -31,15 +31,19 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import java.math.BigInteger;
+
 /**
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 12.9.2008
  */
-public interface DatabaseTable<K, V> extends IterableKeys<K> {
+public class BigIntegerConverter implements Converter<BigInteger, Blob> {
 
-    V read(K key);
+    public BigInteger back(Blob value) {
+        return new BigInteger(value.getByteArray());
+    }
 
-    void update(K key, V value);
-
-    void delete(K key);
+    public Blob forth(BigInteger value) {
+        return Blob.fromBytes(value.toByteArray());
+    }
 }

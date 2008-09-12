@@ -72,12 +72,12 @@ public class InMemoryDatabase {
         return tables;
     }
 
-    public Database openConnection(Transaction tx) {
+    public Database<Blob, Blob> openConnection(Transaction tx) {
         if (revisionsInUse.containsKey(tx)) {
             throw new IllegalArgumentException("Connection already open in this transaction");
         }
         long revision = committedRevision;
-        Database db = new TxDatabase(revision, tx);
+        Database<Blob, Blob> db = new TxDatabase(revision, tx);
         revisionsInUse.put(tx, revision);
         return db;
     }
@@ -153,7 +153,7 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private class TxDatabase implements Database, TransactionParticipant {
+    private class TxDatabase implements Database<Blob, Blob>, TransactionParticipant {
 
         private final ConcurrentMap<String, TxDatabaseTable> openTables = new ConcurrentHashMap<String, TxDatabaseTable>();
         private final long visibleRevision;
@@ -169,7 +169,7 @@ public class InMemoryDatabase {
             return tables.keySet();
         }
 
-        public DatabaseTable openTable(String name) {
+        public DatabaseTable<Blob, Blob> openTable(String name) {
             tx.mustBeActive();
             TxDatabaseTable table = openTables.get(name);
             if (table != null) {
@@ -178,7 +178,7 @@ public class InMemoryDatabase {
             return openNewTable(name);
         }
 
-        private DatabaseTable openNewTable(String name) {
+        private DatabaseTable<Blob, Blob> openNewTable(String name) {
             InMemoryDatabaseTable table = tables.get(name);
             if (table == null) {
                 throw new IllegalArgumentException("No such table: " + name);
@@ -215,7 +215,7 @@ public class InMemoryDatabase {
     /**
      * This class is thread-safe.
      */
-    private static class TxDatabaseTable implements DatabaseTable {
+    private static class TxDatabaseTable implements DatabaseTable<Blob, Blob> {
 
         private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
         private final InMemoryDatabaseTable table;

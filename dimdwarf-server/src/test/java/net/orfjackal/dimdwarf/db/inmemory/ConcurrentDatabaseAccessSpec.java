@@ -56,8 +56,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private InMemoryDatabase dbms;
     private TransactionCoordinator tx1;
     private TransactionCoordinator tx2;
-    private DatabaseTable table1;
-    private DatabaseTable table2;
+    private DatabaseTable<Blob, Blob> table1;
+    private DatabaseTable<Blob, Blob> table2;
 
     private Blob key;
     private Blob value1;
