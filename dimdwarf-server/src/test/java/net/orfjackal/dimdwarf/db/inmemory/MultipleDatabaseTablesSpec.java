@@ -83,8 +83,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         try {
             return dbms.openConnection(tx.getTransaction()).openTable(table).read(key);
         } finally {
-            tx.prepare();
-            tx.commit();
+            tx.prepareAndCommit();
         }
     }
 
@@ -93,8 +92,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         try {
             dbms.openConnection(tx.getTransaction()).openTable(table).update(key, value);
         } finally {
-            tx.prepare();
-            tx.commit();
+            tx.prepareAndCommit();
         }
     }
 
@@ -150,8 +148,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
         public Object create() {
             table1.update(key, value1);
-            tx.prepare();
-            tx.commit();
+            tx.prepareAndCommit();
             return null;
         }
 
@@ -173,8 +170,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         }
 
         public void itDoesNotConflict() {
-            tx.prepare();
-            tx.commit();
+            tx.prepareAndCommit();
             specify(readInNewTransaction(TABLE1, key), should.equal(value1));
             specify(readInNewTransaction(TABLE2, key), should.equal(value2));
         }
@@ -189,8 +185,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
             firstRevision = dbms.getCurrentRevision();
             table1.update(key, value1);
             table2.update(key, value2);
-            tx.prepare();
-            tx.commit();
+            tx.prepareAndCommit();
             revision = dbms.getCurrentRevision();
             return null;
         }

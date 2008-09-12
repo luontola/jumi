@@ -39,6 +39,8 @@ public interface TransactionCoordinator {
 
     Transaction getTransaction();
 
+    void prepareAndCommit() throws TransactionException;
+
     void prepare() throws TransactionException;
 
     void commit();

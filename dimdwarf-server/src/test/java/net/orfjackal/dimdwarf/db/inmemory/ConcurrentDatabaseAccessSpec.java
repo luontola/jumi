@@ -81,16 +81,14 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         try {
             return dbms.openConnection(tx.getTransaction()).openTable(TABLE).read(key);
         } finally {
-            tx.prepare();
-            tx.commit();
+            tx.prepareAndCommit();
         }
     }
 
     private void updateInNewTransaction(Blob key, Blob value) {
         TransactionCoordinator tx = new TransactionImpl();
         dbms.openConnection(tx.getTransaction()).openTable(TABLE).update(key, value);
-        tx.prepare();
-        tx.commit();
+        tx.prepareAndCommit();
     }
 
     private void tx1PreparesBeforeTx2() {
@@ -125,41 +123,33 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
         public void databaseKeepsTrackOfTheNumberOfOpenConnections() {
             specify(dbms.getOpenConnections(), should.equal(2));
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(dbms.getOpenConnections(), should.equal(1));
-            tx2.prepare();
-            tx2.commit();
+            tx2.prepareAndCommit();
             specify(dbms.getOpenConnections(), should.equal(0));
         }
 
         public void databaseKeepsTrackOfTheCurrentRevision() {
             specify(dbms.getCurrentRevision(), should.equal(0));
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(dbms.getCurrentRevision(), should.equal(1));
-            tx2.prepare();
-            tx2.commit();
+            tx2.prepareAndCommit();
             specify(dbms.getCurrentRevision(), should.equal(2));
         }
 
         public void databaseKeepsTrackOfTheOldestUncommittedRevision() {
             specify(dbms.getOldestUncommittedRevision(), should.equal(0));
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(dbms.getOldestUncommittedRevision(), should.equal(0));
-            tx2.prepare();
-            tx2.commit();
+            tx2.prepareAndCommit();
             specify(dbms.getOldestUncommittedRevision(), should.equal(2));
         }
 
         public void databasePurgesOldRevisionsRegularly() {
             specify(dbms.getOldestStoredRevision(), should.equal(0));
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(dbms.getOldestStoredRevision(), should.equal(0));
-            tx2.prepare();
-            tx2.commit();
+            tx2.prepareAndCommit();
             specify(dbms.getOldestStoredRevision(), should.equal(2));
         }
     }
@@ -179,14 +169,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void afterCommitNewTransactionsCanSeeIt() {
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(readInNewTransaction(key), should.equal(value1));
         }
 
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(table2.read(key), should.equal(EMPTY_BLOB));
         }
 
@@ -220,14 +208,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void afterCommitNewTransactionsCanSeeIt() {
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(readInNewTransaction(key), should.equal(value2));
         }
 
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(table2.read(key), should.equal(value1));
         }
 
@@ -262,14 +248,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void afterCommitNewTransactionsCanSeeIt() {
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(readInNewTransaction(key), should.equal(EMPTY_BLOB));
         }
 
         public void afterCommitOldTransactionsStillCanNotSeeIt() {
-            tx1.prepare();
-            tx1.commit();
+            tx1.prepareAndCommit();
             specify(table2.read(key), should.equal(value1));
         }
 

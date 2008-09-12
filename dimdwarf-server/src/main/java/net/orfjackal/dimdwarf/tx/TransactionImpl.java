@@ -65,6 +65,11 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
         }
     }
 
+    public void prepareAndCommit() throws TransactionException {
+        prepare();
+        commit();
+    }
+
     public void prepare() throws TransactionException {
         changeStatus(ACTIVE, PREPARING);
         try {
