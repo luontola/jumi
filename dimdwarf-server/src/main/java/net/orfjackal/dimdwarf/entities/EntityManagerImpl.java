@@ -47,7 +47,7 @@ import java.util.*;
 public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
 
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
-    private final Map<BigInteger, IEntity> cache = new HashMap<BigInteger, IEntity>();
+    private final Map<BigInteger, IEntity> entitiesById = new HashMap<BigInteger, IEntity>();
     private final Queue<IEntity> flushQueue = new ArrayDeque<IEntity>();
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
@@ -79,24 +79,35 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
 
     public Object loadEntity(BigInteger id) {
         checkStateIs(State.ACTIVE);
-        IEntity entity = cache.get(id);
-        if (entity == null) {
-            entity = storage.read(id);
-            register(entity, new EntityReferenceImpl<Object>(id, entity));
-        }
-        return entity;
+        return loadAndRegister(id, null);
     }
 
     @SuppressWarnings({"unchecked"})
     public <T> T loadEntity(EntityReference<T> ref) {
         checkStateIs(State.ACTIVE);
-        BigInteger id = ref.getId();
-        IEntity entity = cache.get(id);
+        return (T) loadAndRegister(ref.getId(), ref);
+    }
+
+    private IEntity loadAndRegister(BigInteger id, EntityReference<?> ref) {
+        IEntity entity = entitiesById.get(id);
         if (entity == null) {
             entity = storage.read(id);
+            if (ref == null) {
+                ref = new EntityReferenceImpl<Object>(id, entity);
+            }
             register(entity, ref);
         }
-        return (T) entity;
+        return entity;
+    }
+
+    private void register(IEntity entity, EntityReference<?> ref) {
+        if (state == State.FLUSHING) {
+            flushQueue.add(entity);
+        }
+        entitiesById.put(ref.getId(), entity);
+        EntityReference<?> previous =
+                entities.put(entity, ref);
+        assert previous == null : "Registered an entity twise: " + entity + ", " + ref;
     }
 
     public BigInteger firstKey() {
@@ -107,15 +118,6 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
     public BigInteger nextKeyAfter(BigInteger currentKey) {
         checkStateIs(State.ACTIVE);
         return storage.nextKeyAfter(currentKey);
-    }
-
-    private void register(IEntity entity, EntityReference<?> ref) {
-        if (state == State.FLUSHING) {
-            flushQueue.add(entity);
-        }
-        cache.put(ref.getId(), entity);
-        EntityReference<?> previous = entities.put(entity, ref);
-        assert previous == null : "Registered an entity twise: " + entity + ", " + ref;
     }
 
     public void flushAllEntities() {
