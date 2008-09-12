@@ -31,13 +31,17 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author Esko Luontola
  * @since 12.9.2008
  */
 public interface Converter<T, U> {
 
-    T back(U value);
+    @Nullable
+    T back(@Nullable U value);
 
-    U forth(T value);
+    @Nullable
+    U forth(@Nullable T value);
 }

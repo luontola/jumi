@@ -52,10 +52,16 @@ public class EntityIdConverter implements Converter<Object, BigInteger> {
     }
 
     public Object back(BigInteger id) {
+        if (id == null) {
+            return null;
+        }
         return entityLoader.loadEntity(id);
     }
 
     public BigInteger forth(Object entity) {
+        if (entity == null) {
+            return null;
+        }
         return entityManager.createReference(entity).getId();
     }
 }

@@ -42,10 +42,16 @@ import java.math.BigInteger;
 public class BigIntegerConverter implements Converter<BigInteger, Blob> {
 
     public BigInteger back(Blob value) {
+        if (value == null) {
+            return null;
+        }
         return new BigInteger(value.getByteArray());
     }
 
     public Blob forth(BigInteger value) {
+        if (value == null) {
+            return null;
+        }
         return Blob.fromBytes(value.toByteArray());
     }
 }

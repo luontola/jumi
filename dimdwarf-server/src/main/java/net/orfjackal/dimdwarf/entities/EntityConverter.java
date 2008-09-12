@@ -52,6 +52,9 @@ public class EntityConverter implements Converter<IEntity, Blob> {
     }
 
     public IEntity back(Blob value) {
+        if (value == null) {
+            return null;
+        }
         if (value.equals(Blob.EMPTY_BLOB)) {
             throw new EntityNotFoundException();
         }
@@ -59,6 +62,9 @@ public class EntityConverter implements Converter<IEntity, Blob> {
     }
 
     public Blob forth(IEntity value) {
+        if (value == null) {
+            return null;
+        }
         if (!Entities.isEntity(value)) {
             throw new IllegalArgumentException("Not an entity");
         }

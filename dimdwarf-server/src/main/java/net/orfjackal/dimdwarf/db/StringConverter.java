@@ -44,10 +44,16 @@ public class StringConverter implements Converter<String, Blob> {
     private static final Charset CHARSET = Charset.forName("UTF-8");
 
     public String back(Blob value) {
+        if (value == null) {
+            return null;
+        }
         return new String(value.getByteArray(), CHARSET);
     }
 
     public Blob forth(String value) {
+        if (value == null) {
+            return null;
+        }
         return Blob.fromBytes(value.getBytes(CHARSET));
     }
 }

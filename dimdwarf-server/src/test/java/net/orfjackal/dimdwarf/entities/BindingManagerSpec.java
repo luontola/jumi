@@ -34,12 +34,13 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.NullConverter;
-import org.jmock.Expectations;
+import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabase;
+import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 /**
@@ -50,67 +51,68 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class BindingManagerSpec extends Specification<Object> {
 
-    private EntityManager entityManager;
-    private EntityLoader entityLoader;
-    private DatabaseTable<String, BigInteger> bindingTable;
-    private BindingManagerImpl bindingManager;
-
-    private DummyEntity entity = new DummyEntity();
-    private String binding = "binding";
-    private BigInteger id = BigInteger.ONE;
+    private BindingManager bindingManager;
+    private InMemoryDatabase dbms;
+    private TransactionCoordinator tx;
 
     @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
-        entityManager = mock(EntityManager.class);
-        entityLoader = mock(EntityLoader.class);
-        bindingTable = mock(DatabaseTable.class);
-        bindingManager = new BindingManagerImpl(bindingTable, new NullConverter<String>(), new EntityIdConverter(entityManager, entityLoader));
-
-        checking(new Expectations() {{
-            allowing(entityManager).createReference((Object) entity); will(returnValue(new EntityReferenceImpl<Object>(id, entity)));
-            allowing(entityLoader).loadEntity(id); will(returnValue(entity));
-        }});
+        dbms = new InMemoryDatabase("bindings", "entities");
+        bindingManager = createBindingManager(newDatabaseConnection());
     }
 
-    public class ABindingManager {
+    private Database<Blob, Blob> newDatabaseConnection() {
+        tx = new TransactionImpl();
+        return dbms.openConnection(tx.getTransaction());
+    }
+
+    private BindingManagerImpl createBindingManager(Database<Blob, Blob> db) {
+        DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
+        DatabaseTable<Blob, Blob> entities = db.openTable("entities");
+
+        EntityManagerImpl entityManager =
+                new EntityManagerImpl(
+                        new EntityIdFactoryImpl(BigInteger.ZERO),
+                        new EntityStorageImpl(entities, new ObjectSerializerImpl()));
+
+        DatabaseTableAdapter<String, BigInteger, Blob, Blob> bindingsTable =
+                new DatabaseTableAdapter<String, BigInteger, Blob, Blob>(
+                        bindings, new StringConverter(), new BigIntegerConverter());
+
+        return new BindingManagerImpl(
+                bindingsTable, new NullConverter<String>(), new EntityIdConverter(entityManager, entityManager));
+    }
+
+
+    public class BrowsingBindings {
 
         public Object create() {
+            DummyEntity foo = new DummyEntity();
+            foo.setOther("foo");
+            bindingManager.update("foo", foo);
+            bindingManager.update("foo.2", new DummyEntity());
+            bindingManager.update("foo.1", new DummyEntity());
+            bindingManager.update("bar.x", new DummyEntity());
+            bindingManager.update("bar.y", new DummyEntity());
+            tx.prepareAndCommit();
+            bindingManager = createBindingManager(newDatabaseConnection());
             return null;
         }
 
-        public void createsBindingsForEntities() throws UnsupportedEncodingException {
-            checking(new Expectations() {{
-                one(bindingTable).update(binding, id);
-            }});
-            bindingManager.update(binding, entity);
+        public void bindingsAreInAlphabeticalOrder() {
+            specify(bindingManager.firstKey(), should.equal("bar.x"));
         }
 
-        public void readsEntitiesFromBindings() {
-            checking(new Expectations() {{
-                one(bindingTable).read(binding); will(returnValue(id));
-            }});
-            specify(bindingManager.read(binding), should.equal(entity));
+        public void whenBindingsHaveTheSamePrefixTheShortestBindingIsFirst() {
+            specify(bindingManager.nextKeyAfter("foo"), should.equal("foo.1"));
+            specify(bindingManager.nextKeyAfter("foo.1"), should.equal("foo.2"));
+            specify(bindingManager.nextKeyAfter("foo.2"), should.equal(null));
         }
 
-        public void deletesBindings() {
-            checking(new Expectations() {{
-                one(bindingTable).delete(binding);
-            }});
-            bindingManager.delete(binding);
-        }
-
-        public void findsTheFirstBinding() {
-            checking(new Expectations() {{
-                one(bindingTable).firstKey(); will(returnValue(binding));
-            }});
-            specify(bindingManager.firstKey(), should.equal(binding));
-        }
-
-        public void findsTheNextBinding() {
-            checking(new Expectations() {{
-                one(bindingTable).nextKeyAfter(binding); will(returnValue("binding2"));
-            }});
-            specify(bindingManager.nextKeyAfter(binding), should.equal("binding2"));
-        }
+        // TODO
+//        public void entitiesCanBeAccessedByTheBindingName() {
+//            DummyEntity entity = (DummyEntity) bindingManager.read("foo");
+//            specify(entity.getOther(), should.equal("foo"));
+//        }
     }
 }

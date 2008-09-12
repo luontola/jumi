@@ -45,8 +45,6 @@ import java.math.BigInteger;
  */
 public class BindingManagerImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingManager {
 
-    // TODO: remove this class, write tests directly for EntityIdConverter (?)
-
     public BindingManagerImpl(DatabaseTable<String, BigInteger> bindings, NullConverter<String> keys, EntityIdConverter values) {
         super(bindings, keys, values);
     }
