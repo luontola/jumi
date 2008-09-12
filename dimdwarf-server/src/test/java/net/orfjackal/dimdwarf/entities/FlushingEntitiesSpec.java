@@ -57,7 +57,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
     public void create() throws Exception {
         storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(new DummyEntityIdFactory(), storage);
+        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage);
         entity = new DummyEntity();
         newEntity = new DummyEntity();
         manager.createReference(entity);
