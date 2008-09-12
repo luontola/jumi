@@ -38,4 +38,10 @@ import net.orfjackal.dimdwarf.db.DatabaseTable;
  * @since 12.9.2008
  */
 public interface BindingManager extends DatabaseTable<String, Object> {
+
+    Object read(String binding);
+
+    void update(String binding, Object entity);
+
+    void delete(String binding);
 }
