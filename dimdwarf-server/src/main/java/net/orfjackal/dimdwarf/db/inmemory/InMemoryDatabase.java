@@ -60,6 +60,7 @@ public class InMemoryDatabase {
 
     public InMemoryDatabase(String... tableNames) {
         revisionCounter = new RevisionCounter();
+        // TODO: create tables when Database.openTable() is called with a new parameter, to allow creating new tables at runtime
         tables = Collections.unmodifiableMap(createTables(tableNames, revisionCounter));
         committedRevision = revisionCounter.getCurrentRevision();
     }
