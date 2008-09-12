@@ -73,6 +73,39 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         otherValue = Blob.fromBytes(new byte[]{3});
     }
 
+    private void canNotBeUsed(final Database db, final DatabaseTable table) {
+        specify(new Block() {
+            public void run() throws Throwable {
+                db.openTable(TABLE);
+            }
+        }, should.raise(TransactionRequiredException.class));
+        specify(new Block() {
+            public void run() throws Throwable {
+                table.read(key);
+            }
+        }, should.raise(TransactionRequiredException.class));
+        specify(new Block() {
+            public void run() throws Throwable {
+                table.update(key, value);
+            }
+        }, should.raise(TransactionRequiredException.class));
+        specify(new Block() {
+            public void run() throws Throwable {
+                table.delete(key);
+            }
+        }, should.raise(TransactionRequiredException.class));
+        specify(new Block() {
+            public void run() throws Throwable {
+                table.firstKey();
+            }
+        }, should.raise(TransactionRequiredException.class));
+        specify(new Block() {
+            public void run() throws Throwable {
+                table.nextKeyAfter(key);
+            }
+        }, should.raise(TransactionRequiredException.class));
+    }
+
 
     public class WhenDatabaseConnectionIsOpened {
 
@@ -115,29 +148,6 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
             tx.prepare();
             tx.rollback();
             canNotBeUsed(db, table);
-        }
-
-        private void canNotBeUsed(final Database db, final DatabaseTable table) {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    db.openTable(TABLE);
-                }
-            }, should.raise(TransactionRequiredException.class));
-            specify(new Block() {
-                public void run() throws Throwable {
-                    table.read(key);
-                }
-            }, should.raise(TransactionRequiredException.class));
-            specify(new Block() {
-                public void run() throws Throwable {
-                    table.update(key, value);
-                }
-            }, should.raise(TransactionRequiredException.class));
-            specify(new Block() {
-                public void run() throws Throwable {
-                    table.delete(key);
-                }
-            }, should.raise(TransactionRequiredException.class));
         }
     }
 

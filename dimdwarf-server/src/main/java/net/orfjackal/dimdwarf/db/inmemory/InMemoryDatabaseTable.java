@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.IterableKeys;
 import net.orfjackal.dimdwarf.db.OptimisticLockException;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
@@ -46,7 +47,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author Esko Luontola
  * @since 11.9.2008
  */
-public class InMemoryDatabaseTable {
+class InMemoryDatabaseTable implements IterableKeys<Blob> {
 
     private final RevisionMap<Blob, Blob> revisions;
     private final ConcurrentMap<Blob, Transaction> lockedForCommit = new ConcurrentHashMap<Blob, Transaction>();
@@ -100,5 +101,13 @@ public class InMemoryDatabaseTable {
                 assert wasLockedByMe : "key = " + key;
             }
         }
+    }
+
+    public Blob firstKey() {
+        return revisions.firstKey();
+    }
+
+    public Blob nextKeyAfter(Blob currentKey) {
+        return revisions.nextKeyAfter(currentKey);
     }
 }

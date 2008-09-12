@@ -250,6 +250,16 @@ public class InMemoryDatabase {
             updates.put(key, EMPTY_BLOB);
         }
 
+        public Blob firstKey() {
+            tx.mustBeActive();
+            return table.firstKey();
+        }
+
+        public Blob nextKeyAfter(Blob currentKey) {
+            tx.mustBeActive();
+            return table.nextKeyAfter(currentKey);
+        }
+
         private void prepare() {
             table.checkForConflicts(updates.keySet(), visibleRevision);
             table.lock(tx, updates.keySet());

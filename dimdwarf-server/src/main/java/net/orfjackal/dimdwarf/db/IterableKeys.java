@@ -31,15 +31,24 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author Esko Luontola
- * @since 18.8.2008
+ * @since 12.9.2008
  */
-public interface DatabaseTable extends IterableKeys<Blob> {
+public interface IterableKeys<K> {
 
-    Blob read(Blob key);
+    /**
+     * Returns the first key in the map, or null if it is empty.
+     */
+    @Nullable
+    K firstKey();
 
-    void update(Blob key, Blob value);
-
-    void delete(Blob key);
+    /**
+     * Returns the next key after {@code currentKey} in the map, or null if the end of the map is reached.
+     * The key given as a parameter does not need to exist.
+     */
+    @Nullable
+    K nextKeyAfter(K currentKey);
 }

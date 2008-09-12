@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import net.orfjackal.dimdwarf.db.IterableKeys;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -47,7 +49,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * @author Esko Luontola
  * @since 20.8.2008
  */
-public class RevisionMap<K, V> {
+public class RevisionMap<K, V> implements IterableKeys<K> {
 
     private final SortedMap<K, RevisionList<V>> map = new ConcurrentSkipListMap<K, RevisionList<V>>();
     private final Set<K> hasOldRevisions = new HashSet<K>();
@@ -131,12 +133,12 @@ public class RevisionMap<K, V> {
         return map.isEmpty() ? null : map.firstKey();
     }
 
-    public K nextKeyAfter(K current) {
-        Iterator<K> it = map.tailMap(current).keySet().iterator();
+    public K nextKeyAfter(K currentKey) {
+        Iterator<K> it = map.tailMap(currentKey).keySet().iterator();
         K next;
         do {
             next = it.hasNext() ? it.next() : null;
-        } while (next != null && next.equals(current));
+        } while (next != null && next.equals(currentKey));
         return next;
     }
 
