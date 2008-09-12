@@ -214,6 +214,41 @@ public class RevisionMapSpec extends Specification<Object> {
         }
     }
 
+    public class FindingTheNextKey {
+
+        public Object create() {
+            counter.incrementRevision();
+            map.put("a", "A");
+            map.put("c", "C");
+            return null;
+        }
+
+        public void firstKey() {
+            specify(map.firstKey(), should.equal("a"));
+        }
+
+        public void firstKeyOfEmptySet() {
+            map = new RevisionMap<String, String>(counter);
+            specify(map.firstKey(), should.equal(null));
+        }
+
+        public void nextKeyAfterExistingKey() {
+            specify(map.nextKeyAfter("a"), should.equal("c"));
+        }
+
+        public void nextKeyAfterNonexistentKey() {
+            specify(map.nextKeyAfter("b"), should.equal("c"));
+        }
+
+        public void nextKeyAfterLastKey() {
+            specify(map.nextKeyAfter("c"), should.equal(null));
+        }
+
+        public void nextKeyAfterNonexistentKeyAfterLastKey() {
+            specify(map.nextKeyAfter("d"), should.equal(null));
+        }
+    }
+
     public class IteratingOverARevision {
 
         private List<String> keys = new ArrayList<String>();

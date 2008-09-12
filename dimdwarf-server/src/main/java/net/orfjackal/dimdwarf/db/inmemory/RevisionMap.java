@@ -127,6 +127,19 @@ public class RevisionMap<K, V> {
         return new MyIterator<K, V>(map, revision);
     }
 
+    public K firstKey() {
+        return map.isEmpty() ? null : map.firstKey();
+    }
+
+    public K nextKeyAfter(K current) {
+        Iterator<K> it = map.tailMap(current).keySet().iterator();
+        K next;
+        do {
+            next = it.hasNext() ? it.next() : null;
+        } while (next != null && next.equals(current));
+        return next;
+    }
+
     /**
      * This class is NOT thread-safe.
      */
