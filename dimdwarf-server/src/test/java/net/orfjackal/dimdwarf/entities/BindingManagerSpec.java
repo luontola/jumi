@@ -54,6 +54,7 @@ public class BindingManagerSpec extends Specification<Object> {
     private BindingManager bindingManager;
     private InMemoryDatabase dbms;
     private TransactionCoordinator tx;
+    private EntityManagerImpl entityManager;
 
     @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
@@ -70,7 +71,7 @@ public class BindingManagerSpec extends Specification<Object> {
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
         DatabaseTable<Blob, Blob> entities = db.openTable("entities");
 
-        EntityManagerImpl entityManager =
+        entityManager =
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
                         new EntityStorageImpl(
@@ -95,6 +96,7 @@ public class BindingManagerSpec extends Specification<Object> {
             bindingManager.update("foo.1", new DummyEntity());
             bindingManager.update("bar.x", new DummyEntity());
             bindingManager.update("bar.y", new DummyEntity());
+            entityManager.flushAllEntities(); // TODO: flush automatically before transaction is deactivated
             tx.prepareAndCommit();
             bindingManager = createBindingManager(newDatabaseConnection());
             return null;
@@ -110,10 +112,9 @@ public class BindingManagerSpec extends Specification<Object> {
             specify(bindingManager.nextKeyAfter("foo.2"), should.equal(null));
         }
 
-        // TODO
-//        public void entitiesCanBeAccessedByTheBindingName() {
-//            DummyEntity entity = (DummyEntity) bindingManager.read("foo");
-//            specify(entity.getOther(), should.equal("foo"));
-//        }
+        public void entitiesCanBeAccessedByTheBindingName() {
+            DummyEntity entity = (DummyEntity) bindingManager.read("foo");
+            specify(entity.getOther(), should.equal("foo"));
+        }
     }
 }
