@@ -47,7 +47,7 @@ import java.util.*;
 public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
 
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
-    private final Map<EntityReference<?>, IEntity> cache = new HashMap<EntityReference<?>, IEntity>();
+    private final Map<BigInteger, IEntity> cache = new HashMap<BigInteger, IEntity>();
     private final Queue<IEntity> flushQueue = new ArrayDeque<IEntity>();
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
@@ -62,6 +62,7 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
         return entities.size();
     }
 
+    @SuppressWarnings({"unchecked"})
     public <T> EntityReference<T> createReference(T obj) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
         if (!Entities.isEntity(obj)) {
@@ -77,32 +78,42 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
     }
 
     public Object loadEntity(BigInteger id) {
-        throw new UnsupportedOperationException(); // TODO
+        checkStateIs(State.ACTIVE);
+        IEntity entity = cache.get(id);
+        if (entity == null) {
+            entity = storage.read(id);
+            register(entity, new EntityReferenceImpl<Object>(id, entity));
+        }
+        return entity;
     }
 
+    @SuppressWarnings({"unchecked"})
     public <T> T loadEntity(EntityReference<T> ref) {
         checkStateIs(State.ACTIVE);
-        IEntity entity = cache.get(ref);
+        BigInteger id = ref.getId();
+        IEntity entity = cache.get(id);
         if (entity == null) {
-            entity = storage.read(ref.getId());
+            entity = storage.read(id);
             register(entity, ref);
         }
         return (T) entity;
     }
 
     public BigInteger firstKey() {
-        throw new UnsupportedOperationException(); // TODO
+        checkStateIs(State.ACTIVE);
+        return storage.firstKey();
     }
 
     public BigInteger nextKeyAfter(BigInteger currentKey) {
-        throw new UnsupportedOperationException(); // TODO
+        checkStateIs(State.ACTIVE);
+        return storage.nextKeyAfter(currentKey);
     }
 
     private void register(IEntity entity, EntityReference<?> ref) {
         if (state == State.FLUSHING) {
             flushQueue.add(entity);
         }
-        cache.put(ref, entity);
+        cache.put(ref.getId(), entity);
         EntityReference<?> previous = entities.put(entity, ref);
         assert previous == null : "Registered an entity twise: " + entity + ", " + ref;
     }
