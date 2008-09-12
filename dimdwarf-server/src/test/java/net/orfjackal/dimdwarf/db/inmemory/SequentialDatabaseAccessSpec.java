@@ -64,7 +64,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     private Blob otherValue;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase(TABLE);
+        dbms = new InMemoryDatabase();
         tx = new TransactionImpl();
         db = dbms.openConnection(tx.getTransaction());
         table = db.openTable(TABLE);

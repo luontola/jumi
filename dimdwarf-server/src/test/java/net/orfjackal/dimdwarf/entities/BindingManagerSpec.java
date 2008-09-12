@@ -58,7 +58,7 @@ public class BindingManagerSpec extends Specification<Object> {
 
     @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
-        dbms = new InMemoryDatabase("bindings", "entities");
+        dbms = new InMemoryDatabase();
         bindingManager = createBindingManager(newDatabaseConnection());
     }
 

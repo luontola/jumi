@@ -61,7 +61,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
     private Blob value;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase(TABLE);
+        dbms = new InMemoryDatabase();
         beginNewTransaction();
 
         key1 = Blob.fromBytes(new byte[]{1});

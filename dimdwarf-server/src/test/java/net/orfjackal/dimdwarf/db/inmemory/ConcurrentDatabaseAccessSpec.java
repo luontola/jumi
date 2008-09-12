@@ -65,7 +65,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private Blob value3;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase(TABLE);
+        dbms = new InMemoryDatabase();
         tx1 = new TransactionImpl();
         tx2 = new TransactionImpl();
 
@@ -336,10 +336,5 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         }
     }
 
-    // TODO: iterator (for tables and entries), used for writing all entries to disk
-
-    // TODO: String and BigInteger wrappers for keys
-    // TODO: auto-increment keys (BigInteger), create should not conflict when using them
-    // TODO: find all keys (String) starting with a string
     // TODO: provide a SortedMap interface to the database?
 }

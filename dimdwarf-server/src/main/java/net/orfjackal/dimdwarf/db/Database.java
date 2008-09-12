@@ -39,7 +39,13 @@ import java.util.Set;
  */
 public interface Database<K, V> {
 
+    /**
+     * Existing tables.
+     */
     Set<String> tables();
 
+    /**
+     * Opens an existing table or creates a new table.
+     */
     DatabaseTable<K, V> openTable(String name);
 }

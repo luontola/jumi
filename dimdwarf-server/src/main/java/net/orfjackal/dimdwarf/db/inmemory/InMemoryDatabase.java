@@ -39,7 +39,9 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -54,23 +56,22 @@ public class InMemoryDatabase {
     private final ConcurrentMap<Transaction, Long> revisionsInUse = new ConcurrentHashMap<Transaction, Long>();
     private final Object commitLock = new Object();
 
-    private final Map<String, InMemoryDatabaseTable> tables;
+    private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
     private final RevisionCounter revisionCounter;
     private volatile long committedRevision;
 
-    public InMemoryDatabase(String... tableNames) {
+    public InMemoryDatabase() {
         revisionCounter = new RevisionCounter();
-        // TODO: create tables when Database.openTable() is called with a new parameter, to allow creating new tables at runtime
-        tables = Collections.unmodifiableMap(createTables(tableNames, revisionCounter));
         committedRevision = revisionCounter.getCurrentRevision();
     }
 
-    private static Map<String, InMemoryDatabaseTable> createTables(String[] names, RevisionCounter counter) {
-        Map<String, InMemoryDatabaseTable> tables = new HashMap<String, InMemoryDatabaseTable>();
-        for (String name : names) {
-            tables.put(name, new InMemoryDatabaseTable(counter));
+    private InMemoryDatabaseTable openOrCreate(String tableName) {
+        InMemoryDatabaseTable table = tables.get(tableName);
+        if (table == null) {
+            tables.putIfAbsent(tableName, new InMemoryDatabaseTable(revisionCounter));
+            table = tables.get(tableName);
         }
-        return tables;
+        return table;
     }
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
@@ -173,19 +174,11 @@ public class InMemoryDatabase {
         public DatabaseTable<Blob, Blob> openTable(String name) {
             tx.mustBeActive();
             TxDatabaseTable table = openTables.get(name);
-            if (table != null) {
-                return table;
-            }
-            return openNewTable(name);
-        }
-
-        private DatabaseTable<Blob, Blob> openNewTable(String name) {
-            InMemoryDatabaseTable table = tables.get(name);
             if (table == null) {
-                throw new IllegalArgumentException("No such table: " + name);
+                openTables.putIfAbsent(name, new TxDatabaseTable(openOrCreate(name), visibleRevision, tx));
+                table = openTables.get(name);
             }
-            openTables.putIfAbsent(name, new TxDatabaseTable(table, visibleRevision, tx));
-            return openTables.get(name);
+            return table;
         }
 
         public void joinedTransaction(Transaction tx) {
@@ -250,6 +243,8 @@ public class InMemoryDatabase {
             tx.mustBeActive();
             updates.put(key, EMPTY_BLOB);
         }
+
+        // TODO: 'firstKey' and 'nextKeyAfter' do not see keys which were created during this transaction
 
         public Blob firstKey() {
             tx.mustBeActive();

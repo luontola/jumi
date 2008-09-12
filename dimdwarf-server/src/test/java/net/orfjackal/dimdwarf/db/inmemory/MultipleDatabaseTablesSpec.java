@@ -31,7 +31,6 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
@@ -65,12 +64,12 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private Blob value3;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase(TABLE1, TABLE2);
+        dbms = new InMemoryDatabase();
 
         tx = new TransactionImpl();
         db = dbms.openConnection(tx.getTransaction());
-        table1 = this.db.openTable(TABLE1);
-        table2 = this.db.openTable(TABLE2);
+        table1 = db.openTable(TABLE1);
+        table2 = db.openTable(TABLE2);
 
         key = Blob.fromBytes(new byte[]{0});
         value1 = Blob.fromBytes(new byte[]{1});
@@ -115,12 +114,9 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
             specify(table1, should.not().equal(table2));
         }
 
-        public void nonexistantTablesCanNotBeOpened() {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    db.openTable("doesNotExist");
-                }
-            }, should.raise(IllegalArgumentException.class));
+        public void openingATableWhichDoesNotExistWillCreateThatTable() {
+            specify(db.openTable("newTable"), should.not().equal(null));
+            specify(db.tables(), should.containExactly(TABLE1, TABLE2, "newTable"));
         }
     }
 
