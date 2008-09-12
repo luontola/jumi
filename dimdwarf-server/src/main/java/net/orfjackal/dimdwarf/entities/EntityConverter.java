@@ -38,6 +38,8 @@ import net.orfjackal.dimdwarf.db.Converter;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
  * @since 12.9.2008
  */

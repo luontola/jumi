@@ -31,21 +31,19 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import java.math.BigInteger;
-
 /**
  * This class is immutable.
  *
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class BigIntegerConverter implements Converter<BigInteger, Blob> {
+public class NullConverter<T> implements Converter<T, T> {
 
-    public BigInteger back(Blob value) {
-        return new BigInteger(value.getByteArray());
+    public T back(T value) {
+        return value;
     }
 
-    public Blob forth(BigInteger value) {
-        return Blob.fromBytes(value.toByteArray());
+    public T forth(T value) {
+        return value;
     }
 }

@@ -34,6 +34,8 @@ package net.orfjackal.dimdwarf.db;
 import java.nio.charset.Charset;
 
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
  * @since 12.9.2008
  */

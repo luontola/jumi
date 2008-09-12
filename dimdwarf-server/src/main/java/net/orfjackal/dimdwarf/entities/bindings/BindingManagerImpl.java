@@ -31,8 +31,10 @@
 
 package net.orfjackal.dimdwarf.entities.bindings;
 
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
+import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
+import net.orfjackal.dimdwarf.db.NullConverter;
+import net.orfjackal.dimdwarf.entities.EntityIdConverter;
 import net.orfjackal.dimdwarf.entities.EntityLoader;
 import net.orfjackal.dimdwarf.entities.EntityManager;
 
@@ -44,39 +46,13 @@ import java.math.BigInteger;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class BindingManagerImpl implements BindingManager {
+public class BindingManagerImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingManager {
 
-    private final DatabaseTable<String, BigInteger> bindings;
-    private final EntityManager entityManager;
-    private final EntityLoader entityLoader;
+    // TODO: remove this class, write tests directly for EntityIdConverter (?)
 
     public BindingManagerImpl(DatabaseTable<String, BigInteger> bindings,
                               EntityManager entityManager,
                               EntityLoader entityLoader) {
-        this.bindings = bindings;
-        this.entityManager = entityManager;
-        this.entityLoader = entityLoader;
-    }
-
-    public Object read(String key) {
-        BigInteger id = bindings.read(key);
-        return entityLoader.loadEntity(id);
-    }
-
-    public void update(String key, Object value) {
-        EntityReference<Object> ref = entityManager.createReference(value);
-        bindings.update(key, ref.getId());
-    }
-
-    public void delete(String key) {
-        bindings.delete(key);
-    }
-
-    public String firstKey() {
-        return bindings.firstKey();
-    }
-
-    public String nextKeyAfter(String currentKey) {
-        return bindings.nextKeyAfter(currentKey);
+        super(bindings, new NullConverter<String>(), new EntityIdConverter(entityManager, entityLoader));
     }
 }

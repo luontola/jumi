@@ -29,7 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db;
+package net.orfjackal.dimdwarf.entities;
+
+import net.orfjackal.dimdwarf.db.Converter;
 
 import java.math.BigInteger;
 
@@ -39,13 +41,21 @@ import java.math.BigInteger;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class BigIntegerConverter implements Converter<BigInteger, Blob> {
+public class EntityIdConverter implements Converter<Object, BigInteger> {
 
-    public BigInteger back(Blob value) {
-        return new BigInteger(value.getByteArray());
+    private final EntityManager entityManager;
+    private final EntityLoader entityLoader;
+
+    public EntityIdConverter(EntityManager entityManager, EntityLoader entityLoader) {
+        this.entityManager = entityManager;
+        this.entityLoader = entityLoader;
     }
 
-    public Blob forth(BigInteger value) {
-        return Blob.fromBytes(value.toByteArray());
+    public Object back(BigInteger id) {
+        return entityLoader.loadEntity(id);
+    }
+
+    public BigInteger forth(Object entity) {
+        return entityManager.createReference(entity).getId();
     }
 }
