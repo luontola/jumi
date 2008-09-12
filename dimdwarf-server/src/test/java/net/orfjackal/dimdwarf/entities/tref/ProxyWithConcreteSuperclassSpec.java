@@ -54,13 +54,13 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
-    private EntityManager entityManager;
-    private TransparentReferenceFactory factory;
+    private ReferenceFactory referenceFactory;
+    private TransparentReferenceFactory proxyFactory;
     private MyEntity entity;
 
     public void create() throws Exception {
-        entityManager = mock(EntityManager.class);
-        factory = new TransparentReferenceFactoryImpl(entityManager);
+        referenceFactory = mock(ReferenceFactory.class);
+        proxyFactory = new TransparentReferenceFactoryImpl(referenceFactory);
         entity = new MyEntity();
     }
 
@@ -71,9 +71,9 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
         public Object create() {
             checking(new Expectations() {{
-                one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(BigInteger.ONE, entity)));
+                one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(BigInteger.ONE, entity)));
             }});
-            proxy = factory.createTransparentReference(entity);
+            proxy = proxyFactory.createTransparentReference(entity);
             return null;
         }
 
@@ -97,10 +97,10 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
         }
 
         public void entityReferencesCanNotBeCreatedForTheProxy() {
-            final EntityManager manager = new EntityManagerImpl(mock(EntityIdFactory.class), mock(EntityStorage.class));
+            final ReferenceFactory factory = new EntityManagerImpl(mock(EntityIdFactory.class), mock(EntityStorage.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.createReference(proxy);
+                    factory.createReference(proxy);
                 }
             }, should.raise(IllegalArgumentException.class));
         }

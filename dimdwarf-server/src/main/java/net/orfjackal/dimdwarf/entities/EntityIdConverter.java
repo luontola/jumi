@@ -43,11 +43,11 @@ import java.math.BigInteger;
  */
 public class EntityIdConverter implements Converter<Object, BigInteger> {
 
-    private final EntityManager entityManager;
+    private final ReferenceFactory referenceFactory;
     private final EntityLoader entityLoader;
 
-    public EntityIdConverter(EntityManager entityManager, EntityLoader entityLoader) {
-        this.entityManager = entityManager;
+    public EntityIdConverter(ReferenceFactory referenceFactory, EntityLoader entityLoader) {
+        this.referenceFactory = referenceFactory;
         this.entityLoader = entityLoader;
     }
 
@@ -62,6 +62,6 @@ public class EntityIdConverter implements Converter<Object, BigInteger> {
         if (entity == null) {
             return null;
         }
-        return entityManager.createReference(entity).getId();
+        return referenceFactory.createReference(entity).getId();
     }
 }

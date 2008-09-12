@@ -39,8 +39,8 @@ import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -54,8 +54,8 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class EntityIdentitySpec extends Specification<Object> {
 
-    private EntityManager entityManager;
-    protected TransparentReferenceFactory factory;
+    private ReferenceFactory referenceFactory;
+    protected TransparentReferenceFactory proxyFactory;
     private IEntity ent1;
     private IEntity ent2;
     private TransparentReference tref1;
@@ -64,17 +64,17 @@ public class EntityIdentitySpec extends Specification<Object> {
     private Object obj;
 
     public void create() throws Exception {
-        entityManager = mock(EntityManager.class);
-        factory = new TransparentReferenceFactoryImpl(entityManager);
+        referenceFactory = mock(ReferenceFactory.class);
+        proxyFactory = new TransparentReferenceFactoryImpl(referenceFactory);
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
         checking(referencesMayBeCreatedFor(ent1, BigInteger.valueOf(1)));
         checking(referencesMayBeCreatedFor(ent2, BigInteger.valueOf(2)));
-        tref1 = factory.createTransparentReference(ent1);
-        tref1b = factory.createTransparentReference(ent1);
-        tref2 = factory.createTransparentReference(ent2);
+        tref1 = proxyFactory.createTransparentReference(ent1);
+        tref1b = proxyFactory.createTransparentReference(ent1);
+        tref2 = proxyFactory.createTransparentReference(ent2);
         obj = new Object();
-        ThreadContext.setUp(new Context(EntityManager.class, entityManager));
+        ThreadContext.setUp(new Context(ReferenceFactory.class, referenceFactory));
     }
 
     public void destroy() throws Exception {
@@ -83,7 +83,7 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     private Expectations referencesMayBeCreatedFor(final IEntity entity, final BigInteger id) {
         return new Expectations() {{
-            allowing(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
+            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
         }};
     }
 
@@ -156,14 +156,14 @@ public class EntityIdentitySpec extends Specification<Object> {
         public void equalsMethodOnProxyWillNotDelegateToEntity() {
             final IEntity entity = mock(IEntity.class);
             checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
-            TransparentReference proxy = factory.createTransparentReference(entity);
+            TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.equals(entity);
         }
 
         public void hashCodeMethodOnProxyWillNotDelegateToEntity() {
             final IEntity entity = mock(IEntity.class);
             checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
-            TransparentReference proxy = factory.createTransparentReference(entity);
+            TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.hashCode();
         }
     }

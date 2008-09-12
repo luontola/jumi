@@ -37,7 +37,7 @@ import net.orfjackal.dimdwarf.api.impl.EntityReference;
  * @author Esko Luontola
  * @since 5.9.2008
  */
-public interface EntityManager {
+public interface ReferenceFactory {
 
     <T> EntityReference<T> createReference(T entity);
 }

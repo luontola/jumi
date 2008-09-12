@@ -36,7 +36,7 @@ import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
-import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.util.Cache;
 import net.sf.cglib.proxy.*;
 
@@ -51,15 +51,15 @@ import java.lang.reflect.Method;
 public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
     private final Cache<Class<?>, Factory> cache = new CglibProxyFactoryCache();
-    private final EntityManager entityManager;
+    private final ReferenceFactory referenceFactory;
 
-    public TransparentReferenceFactoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public TransparentReferenceFactoryImpl(ReferenceFactory referenceFactory) {
+        this.referenceFactory = referenceFactory;
     }
 
     public TransparentReference createTransparentReference(IEntity object) {
         Class<?> type = object.getClass();
-        EntityReference<?> ref = entityManager.createReference(object);
+        EntityReference<?> ref = referenceFactory.createReference(object);
         return newProxy(new TransparentReferenceImpl(type, ref));
     }
 

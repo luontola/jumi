@@ -63,19 +63,19 @@ import java.util.List;
 @Group({"fast"})
 public class TransparentReferenceSpec extends Specification<Object> {
 
-    private EntityManager entityManager;
-    private TransparentReferenceFactory factory;
+    private ReferenceFactory referenceFactory;
+    private TransparentReferenceFactory proxyFactory;
     private DummyEntity entity;
 
     public void create() throws Exception {
-        entityManager = mock(EntityManager.class);
-        factory = new TransparentReferenceFactoryImpl(entityManager);
+        referenceFactory = mock(ReferenceFactory.class);
+        proxyFactory = new TransparentReferenceFactoryImpl(referenceFactory);
         entity = new DummyEntity();
     }
 
     private Expectations referenceIsCreatedFor(final IEntity entity, final BigInteger id) {
         return new Expectations() {{
-            one(entityManager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
+            one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
         }};
     }
 
@@ -86,7 +86,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public Object create() {
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
-            proxy = factory.createTransparentReference(entity);
+            proxy = proxyFactory.createTransparentReference(entity);
             return null;
         }
 
@@ -114,7 +114,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
             final DummyEntity subclassEntity = new DummyEntity() {
             };
             checking(referenceIsCreatedFor(subclassEntity, BigInteger.TEN));
-            TransparentReference subclassProxy = factory.createTransparentReference(subclassEntity);
+            TransparentReference subclassProxy = proxyFactory.createTransparentReference(subclassEntity);
             specify(subclassProxy instanceof DummyInterface);
         }
 
@@ -162,7 +162,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
                 }
             };
             checking(referenceIsCreatedFor(exceptionThrower, BigInteger.TEN));
-            final DummyInterface proxy = (DummyInterface) factory.createTransparentReference(exceptionThrower);
+            final DummyInterface proxy = (DummyInterface) proxyFactory.createTransparentReference(exceptionThrower);
             specify(new Block() {
                 public void run() throws Throwable {
                     proxy.getOther();
@@ -189,7 +189,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public Object create() {
             ObjectSerializerImpl serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{
-                    new ReplaceEntitiesWithTransparentReferences(factory)
+                    new ReplaceEntitiesWithTransparentReferences(proxyFactory)
             });
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
             Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject()));

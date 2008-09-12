@@ -35,7 +35,7 @@ import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 
 import java.math.BigInteger;
 
@@ -82,7 +82,7 @@ public class EntityHelper {
         if (Entities.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference();
         } else if (Entities.isEntity(obj)) {
-            return ThreadContext.get(EntityManager.class).createReference(obj);
+            return ThreadContext.get(ReferenceFactory.class).createReference(obj);
         } else {
             return null;
         }

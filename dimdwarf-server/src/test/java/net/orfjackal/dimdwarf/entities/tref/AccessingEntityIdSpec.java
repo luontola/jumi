@@ -39,8 +39,8 @@ import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -56,19 +56,19 @@ public class AccessingEntityIdSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
-    private EntityManager manager;
+    private ReferenceFactory referenceFactory;
     private IEntity entity;
     private Object proxy;
 
     public void create() throws Exception {
-        manager = mock(EntityManager.class);
-        TransparentReferenceFactory factory = new TransparentReferenceFactoryImpl(manager);
+        referenceFactory = mock(ReferenceFactory.class);
+        TransparentReferenceFactory proxyFactory = new TransparentReferenceFactoryImpl(referenceFactory);
         entity = new DummyEntity();
         checking(new Expectations() {{
-            allowing(manager).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(ENTITY_ID, entity)));
+            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(ENTITY_ID, entity)));
         }});
-        proxy = factory.createTransparentReference(entity);
-        ThreadContext.setUp(new Context(EntityManager.class, manager));
+        proxy = proxyFactory.createTransparentReference(entity);
+        ThreadContext.setUp(new Context(ReferenceFactory.class, referenceFactory));
     }
 
     public void destroy() throws Exception {

@@ -43,8 +43,8 @@ import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.DummyObject;
-import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
@@ -63,13 +63,13 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
     private Object target;
 
     public void create() throws Exception {
-        EntityManager manager = new EntityManager() {
+        ReferenceFactory factory = new ReferenceFactory() {
             public <T> EntityReference<T> createReference(T entity) {
                 referencesCreated++;
                 return new EntityReferenceImpl<T>(BigInteger.ONE, entity);
             }
         };
-        ThreadContext.setUp(new Context(EntityManager.class, manager));
+        ThreadContext.setUp(new Context(ReferenceFactory.class, factory));
     }
 
     public void destroy() throws Exception {

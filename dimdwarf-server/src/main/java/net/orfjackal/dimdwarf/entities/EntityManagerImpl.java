@@ -44,7 +44,7 @@ import java.util.*;
  * @author Esko Luontola
  * @since 25.8.2008
  */
-public class EntityManagerImpl implements EntityManager, EntityLoader {
+public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
 
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
     private final Map<EntityReference<?>, IEntity> cache = new HashMap<EntityReference<?>, IEntity>();
@@ -88,6 +88,14 @@ public class EntityManagerImpl implements EntityManager, EntityLoader {
             register(entity, ref);
         }
         return (T) entity;
+    }
+
+    public BigInteger firstKey() {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    public BigInteger nextKeyAfter(BigInteger currentKey) {
+        throw new UnsupportedOperationException(); // TODO
     }
 
     private void register(IEntity entity, EntityReference<?> ref) {
