@@ -68,13 +68,13 @@ public class TaskExecutor implements Executor {
                 } catch (Throwable t) {
                     logger.warn("Task failed, rolling back its transaction", t);
                     tx.rollback();
-                    rethrow(t);
+                    throw throwAsUnchecked(t);
                 }
             }
         });
     }
 
-    private static void rethrow(Throwable t) {
+    private static RuntimeException throwAsUnchecked(Throwable t) {
         if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
         }
