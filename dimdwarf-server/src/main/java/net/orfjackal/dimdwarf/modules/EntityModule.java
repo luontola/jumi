@@ -34,17 +34,12 @@ package net.orfjackal.dimdwarf.modules;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.tref.ReplaceEntitiesWithTransparentReferences;
 import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactory;
 import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactoryImpl;
 import net.orfjackal.dimdwarf.serial.*;
 
-import java.lang.annotation.Annotation;
 import java.math.BigInteger;
 
 /**
@@ -66,26 +61,14 @@ public class EntityModule extends AbstractModule {
                 });
 
         bind(EntityStorage.class).to(EntityStorageImpl.class);
-        bindDatabaseTable("entities", EntitiesTable.class);
+        DatabaseModule.bindDatabaseTable("entities", EntitiesTable.class, binder());
 
         bind(BindingManager.class).to(BindingManagerImpl.class);
-        bindDatabaseTable("bindings", BindingsTable.class);
+        DatabaseModule.bindDatabaseTable("bindings", BindingsTable.class, binder());
 
         bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
         bind(SerializationListener[].class).toProvider(new SerializationListenerListProvider());
         bind(SerializationReplacer[].class).toProvider(new SerializationReplacerListProvider());
-    }
-
-    private void bindDatabaseTable(final String tableName, Class<? extends Annotation> annotation) {
-        bind(new TypeLiteral<DatabaseTable<Blob, Blob>>() {})
-                .annotatedWith(annotation)
-                .toProvider(new Provider<DatabaseTable<Blob, Blob>>() {
-                    @Inject Provider<Database<Blob, Blob>> db;
-
-                    public DatabaseTable<Blob, Blob> get() {
-                        return db.get().openTable(tableName);
-                    }
-                });
     }
 
     private static class SerializationListenerListProvider implements Provider<SerializationListener[]> {
