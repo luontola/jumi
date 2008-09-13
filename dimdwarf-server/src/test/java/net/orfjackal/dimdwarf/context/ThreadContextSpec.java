@@ -56,18 +56,17 @@ public class ThreadContextSpec extends Specification<Object> {
         myService = new MyServiceImpl();
         Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
         services.put(MyService.class, myService);
-        myContext = new Context(services);
+        myContext = new SimpleContext(services);
     }
 
     public void destroy() throws Exception {
-        try {
+        if (ThreadContext.currentContext() != null) {
             ThreadContext.tearDown();
-        } catch (RuntimeException e) {
-            // ignore; the test did already tear it down
         }
     }
 
     private void specifyContextIsDisabled() {
+        specify(ThreadContext.currentContext(), should.equal(null));
         specify(new Block() {
             public void run() throws Throwable {
                 ThreadContext.get(MyService.class);
@@ -86,6 +85,7 @@ public class ThreadContextSpec extends Specification<Object> {
 
         public void givesAccessToTheInstalledServices() {
             ThreadContext.setUp(myContext);
+            specify(ThreadContext.currentContext(), should.equal(myContext));
             specify(ThreadContext.get(MyService.class), should.equal(myService));
         }
 
@@ -112,7 +112,7 @@ public class ThreadContextSpec extends Specification<Object> {
             ThreadContext.setUp(myContext);
             specify(new Block() {
                 public void run() throws Throwable {
-                    ThreadContext.setUp(new Context(new HashMap<Class<?>, Object>()));
+                    ThreadContext.setUp(new SimpleContext(new HashMap<Class<?>, Object>()));
                 }
             }, should.raise(IllegalStateException.class));
             specify(ThreadContext.get(MyService.class), should.equal(myService));

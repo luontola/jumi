@@ -31,11 +31,35 @@
 
 package net.orfjackal.dimdwarf.context;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
+ * This class is immutable.
+ *
  * @author Esko Luontola
  * @since 5.9.2008
  */
-public interface Context {
+public class SimpleContext implements Context {
 
-    <T> T get(Class<T> service);
+    private final Map<Class<?>, Object> services;
+
+    public <T> SimpleContext(Class<T> type, T instance) {
+        Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+        map.put(type, instance);
+        this.services = Collections.unmodifiableMap(map);
+    }
+
+    public SimpleContext(Map<Class<?>, Object> services) {
+        this.services = Collections.unmodifiableMap(new HashMap<Class<?>, Object>(services));
+    }
+
+    public <T> T get(Class<T> service) {
+        Object instance = services.get(service);
+        if (instance == null) {
+            throw new IllegalArgumentException("Not found: " + service);
+        }
+        return service.cast(instance);
+    }
 }
