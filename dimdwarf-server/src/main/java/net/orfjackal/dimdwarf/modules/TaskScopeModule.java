@@ -48,15 +48,18 @@ import net.orfjackal.dimdwarf.tx.TransactionImpl;
  */
 public class TaskScopeModule extends AbstractModule {
     protected void configure() {
+
         bindScope(TaskScoped.class, DimdwarfScopes.TASK);
 
         bind(Context.class)
                 .to(TaskScopedContext.class);
 
         bind(TransactionCoordinator.class)
-                .to(TransactionImpl.class);
+                .to(TransactionImpl.class)
+                .in(DimdwarfScopes.TASK);
         bind(Transaction.class)
-                .toProvider(new TransactionProvider());
+                .toProvider(new TransactionProvider())
+                .in(DimdwarfScopes.TASK);
     }
 
     private static class TransactionProvider implements Provider<Transaction> {
