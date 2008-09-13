@@ -58,8 +58,13 @@ public class TaskExecutor implements Executor {
         ThreadContext.runInContext(contextProvider.get(), new Runnable() {
             public void run() {
                 TransactionCoordinator tx = txProvider.get();
-                command.run();
-                tx.prepareAndCommit();
+                try {
+                    command.run();
+                    tx.prepareAndCommit();
+                } catch (Throwable t) {
+                    tx.rollback();
+                    throw new RuntimeException("Task failed and the transaction was rolled back", t);
+                }
             }
         });
     }
