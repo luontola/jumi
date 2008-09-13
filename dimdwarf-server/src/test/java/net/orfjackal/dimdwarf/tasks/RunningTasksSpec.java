@@ -100,6 +100,7 @@ public class RunningTasksSpec extends Specification<Object> {
                     }
                 }
             });
+            // TODO: flush entities before prepare
 //            ThreadContext.runInContext(contextProvider.get(), new Runnable() {
 //                public void run() {
 //                    TransactionCoordinator tx = transactionCoordinator.get();

@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.Blob;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.db.Database;
@@ -51,6 +52,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author Esko Luontola
  * @since 18.8.2008
  */
+@Singleton
 public class InMemoryDatabase {
 
     private final ConcurrentMap<Transaction, Long> revisionsInUse = new ConcurrentHashMap<Transaction, Long>();
