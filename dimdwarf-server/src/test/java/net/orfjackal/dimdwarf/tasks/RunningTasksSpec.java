@@ -37,7 +37,6 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.modules.TaskScopeModule;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionException;
@@ -70,9 +69,6 @@ public class RunningTasksSpec extends Specification<Object> {
 
     public void destroy() throws Exception {
         logger.setLevel(Level.ALL);
-        if (ThreadContext.currentContext() != null) {
-            ThreadContext.tearDown();
-        }
     }
 
     private Transaction getTransaction() {
@@ -140,7 +136,7 @@ public class RunningTasksSpec extends Specification<Object> {
                     final Transaction tx = getTransaction();
                     try {
                         checking(new Expectations() {{
-                            one(participant).prepare(tx); will(throwException(new RuntimeException("dummy exception")));
+                            one(participant).prepare(tx); will(throwException(new IllegalArgumentException("dummy exception")));
                             one(participant).rollback(tx);
                         }});
                     } catch (Throwable t) {
