@@ -31,40 +31,21 @@
 
 package net.orfjackal.dimdwarf.scopes;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.Scope;
-import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.ThreadContext;
+import com.google.inject.ScopeAnnotation;
 
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * This class is stateless.
+ * Indicates that an object needs to be {@link DimdwarfScopes#TASK} scoped.
  *
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class TaskScope implements Scope {
-
-    public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
-        return new Provider<T>() {
-            public T get() {
-                Context context = ThreadContext.currentContext();
-                if (!(context instanceof TaskScopedContext)) {
-                    throw new IllegalStateException("Not inside task scope");
-                }
-                return getCached(((TaskScopedContext) context).cache());
-            }
-
-            private T getCached(Map<Key<?>, Object> cache) {
-                T value = (T) cache.get(key);
-                if (value == null) {
-                    value = unscoped.get();
-                    cache.put(key, value);
-                }
-                return value;
-            }
-        };
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@ScopeAnnotation
+public @interface TaskScoped {
 }

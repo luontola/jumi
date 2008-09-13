@@ -29,42 +29,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.scopes;
+package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.Scope;
+import com.google.inject.AbstractModule;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.ThreadContext;
-
-import java.util.Map;
+import net.orfjackal.dimdwarf.scopes.DimdwarfScopes;
+import net.orfjackal.dimdwarf.scopes.TaskScoped;
+import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
 
 /**
- * This class is stateless.
- *
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class TaskScope implements Scope {
-
-    public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
-        return new Provider<T>() {
-            public T get() {
-                Context context = ThreadContext.currentContext();
-                if (!(context instanceof TaskScopedContext)) {
-                    throw new IllegalStateException("Not inside task scope");
-                }
-                return getCached(((TaskScopedContext) context).cache());
-            }
-
-            private T getCached(Map<Key<?>, Object> cache) {
-                T value = (T) cache.get(key);
-                if (value == null) {
-                    value = unscoped.get();
-                    cache.put(key, value);
-                }
-                return value;
-            }
-        };
+public class ScopeModule extends AbstractModule {
+    protected void configure() {
+        bindScope(TaskScoped.class, DimdwarfScopes.TASK);
+        bind(Context.class)
+                .to(TaskScopedContext.class);
     }
 }
