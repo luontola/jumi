@@ -39,8 +39,7 @@ import com.google.inject.AbstractModule;
  */
 public class DimdwarfModules extends AbstractModule {
     protected void configure() {
-        install(new ContextModule());
-        install(new TransactionModule());
+        install(new TaskScopeModule());
         install(new DatabaseModule());
         install(new EntityModule());
     }

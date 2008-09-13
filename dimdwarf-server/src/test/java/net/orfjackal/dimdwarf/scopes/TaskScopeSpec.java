@@ -42,7 +42,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.SimpleContext;
 import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.modules.ContextModule;
+import net.orfjackal.dimdwarf.modules.TaskScopeModule;
 import org.junit.runner.RunWith;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class TaskScopeSpec extends Specification<Object> {
     private Provider<Context> contextProvider;
 
     public void create() throws Exception {
-        injector = Guice.createInjector(new MyModule(), new ContextModule());
+        injector = Guice.createInjector(new MyModule(), new TaskScopeModule());
         contextProvider = injector.getProvider(Context.class);
     }
 
