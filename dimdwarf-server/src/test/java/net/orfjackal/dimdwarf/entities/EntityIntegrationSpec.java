@@ -98,6 +98,15 @@ public class EntityIntegrationSpec extends Specification<Object> {
                     bindings.update("bar", new DummyEntity("foo"));
                 }
             });
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    BindingManager bindings = injector.getInstance(BindingManager.class);
+                    specify(bindings.firstKey(), should.equal("bar"));
+                    specify(bindings.nextKeyAfter("bar"), should.equal(null));
+                    DummyEntity entity = (DummyEntity) bindings.read("bar");
+                    specify(entity.getOther(), should.equal("foo"));
+                }
+            });
         }
 
         public void referenceFactoryAndEntityLoaderAreInSync() {
