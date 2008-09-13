@@ -47,6 +47,7 @@ import net.orfjackal.dimdwarf.tx.TransactionImpl;
  * @since 13.9.2008
  */
 public class TaskScopeModule extends AbstractModule {
+
     protected void configure() {
 
         bindScope(TaskScoped.class, DimdwarfScopes.TASK);

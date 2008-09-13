@@ -52,16 +52,18 @@ import java.math.BigInteger;
  * @since 13.9.2008
  */
 public class EntityModule extends AbstractModule {
+
     protected void configure() {
 
-        bind(ReferenceFactory.class).to(EntityManagerImpl.class);
         bind(EntityLoader.class).to(EntityManagerImpl.class);
-        bind(EntityIdFactory.class).toProvider(new Provider<EntityIdFactory>() {
-            public EntityIdFactory get() {
-                return new EntityIdFactoryImpl(BigInteger.ZERO); // TODO: import from database
-            }
-        });
+        bind(ReferenceFactory.class).to(EntityManagerImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
+        bind(EntityIdFactory.class)
+                .toProvider(new Provider<EntityIdFactory>() {
+                    public EntityIdFactory get() {
+                        return new EntityIdFactoryImpl(BigInteger.ZERO); // TODO: import from database
+                    }
+                });
 
         bind(EntityStorage.class).to(EntityStorageImpl.class);
         bindDatabaseTable("entities", EntitiesTable.class);

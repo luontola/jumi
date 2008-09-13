@@ -46,6 +46,7 @@ import net.orfjackal.dimdwarf.tx.Transaction;
  * @since 13.9.2008
  */
 public class DatabaseModule extends AbstractModule {
+
     protected void configure() {
 
         bind(DatabaseManager.class)
