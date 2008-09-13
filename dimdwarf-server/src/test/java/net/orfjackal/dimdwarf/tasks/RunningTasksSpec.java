@@ -100,19 +100,18 @@ public class RunningTasksSpec extends Specification<Object> {
                     }
                 }
             });
-            // TODO: flush entities before prepare
-//            ThreadContext.runInContext(contextProvider.get(), new Runnable() {
-//                public void run() {
-//                    TransactionCoordinator tx = transactionCoordinator.get();
-//                    try {
-//                        EntityLoader loader = entityLoader.get();
-//                        DummyEntity entity = (DummyEntity) loader.loadEntity(id.get());
-//                        specify(entity.getOther(), should.equal("foo"));
-//                    } finally {
-//                        tx.prepareAndCommit();
-//                    }
-//                }
-//            });
+            ThreadContext.runInContext(contextProvider.get(), new Runnable() {
+                public void run() {
+                    TransactionCoordinator tx = transactionCoordinator.get();
+                    try {
+                        EntityLoader loader = entityLoader.get();
+                        DummyEntity entity = (DummyEntity) loader.loadEntity(id.get());
+                        specify(entity.getOther(), should.equal("foo"));
+                    } finally {
+                        tx.prepareAndCommit();
+                    }
+                }
+            });
         }
     }
 }
