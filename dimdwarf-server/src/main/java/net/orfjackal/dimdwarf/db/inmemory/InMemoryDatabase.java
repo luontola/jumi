@@ -183,10 +183,6 @@ public class InMemoryDatabase implements DatabaseManager {
             return table;
         }
 
-        public void joinedTransaction(Transaction tx) {
-            assert this.tx == tx;
-        }
-
         public void prepare(Transaction tx) throws Throwable {
             prepareUpdates(openTables.values());
         }

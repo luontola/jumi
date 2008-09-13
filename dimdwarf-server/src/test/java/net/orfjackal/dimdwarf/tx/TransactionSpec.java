@@ -73,12 +73,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         txLogger.setFilter(null);
     }
 
-    private Expectations isNotifiedOnJoin(final TransactionParticipant participant) {
-        return new Expectations() {{
-            one(participant).joinedTransaction(tx);
-        }};
-    }
-
     private Expectations allParticipantsArePrepared() {
         try {
             return new Expectations() {{
@@ -137,7 +131,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     public class WhenParticipantJoinsTransaction {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1));
             tx.join(participant1);
             return null;
         }
@@ -147,7 +140,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         }
 
         public void otherParticipantsMayJoinTheSameTransaction() {
-            checking(isNotifiedOnJoin(participant2));
             tx.join(participant2);
             specify(tx.getParticipants(), should.equal(2));
         }
@@ -161,8 +153,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     public class WhenTransactionPreparesToCommit {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1));
-            checking(isNotifiedOnJoin(participant2));
             tx.join(participant1);
             tx.join(participant2);
             return null;
@@ -283,8 +273,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     public class WhenTransactionCommits {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1));
-            checking(isNotifiedOnJoin(participant2));
             tx.join(participant1);
             tx.join(participant2);
             checking(allParticipantsArePrepared());
@@ -355,8 +343,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     public class RollingBackATransaction {
 
         public Object create() {
-            checking(isNotifiedOnJoin(participant1));
-            checking(isNotifiedOnJoin(participant2));
             tx.join(participant1);
             tx.join(participant2);
             return null;
@@ -536,9 +522,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     }
 
     private static class DummyTransactionParticipant implements TransactionParticipant {
-
-        public void joinedTransaction(Transaction tx) {
-        }
 
         public void prepare(Transaction tx) throws Throwable {
         }

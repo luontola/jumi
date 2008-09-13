@@ -62,7 +62,6 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
     public void join(TransactionParticipant p) {
         mustBeActive();
         if (!participants.contains(p)) {
-            p.joinedTransaction(getTransaction());
             participants.add(p);
         }
     }

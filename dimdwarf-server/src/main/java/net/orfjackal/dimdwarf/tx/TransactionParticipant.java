@@ -37,12 +37,6 @@ package net.orfjackal.dimdwarf.tx;
  */
 public interface TransactionParticipant {
 
-    // TODO: is this ever needed? the participant iniciates the join, so it will already know that it has joined the transaction
-    /**
-     * Called by the transaction coordinator when this participant joins a transaction.
-     */
-    void joinedTransaction(Transaction tx);
-
     /**
      * Called by the transaction coordinator to signify that this participant should prepare for commit.
      * If the participant is unable to prepare (for example because of a transaction conflict), it may
