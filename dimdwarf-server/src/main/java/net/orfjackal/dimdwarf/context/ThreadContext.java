@@ -41,6 +41,9 @@ public class ThreadContext {
 
     private static final ThreadLocal<Context> THREAD_LOCAL = new ThreadLocal<Context>();
 
+    private ThreadContext() {
+    }
+
     public static Context currentContext() {
         return THREAD_LOCAL.get();
     }
