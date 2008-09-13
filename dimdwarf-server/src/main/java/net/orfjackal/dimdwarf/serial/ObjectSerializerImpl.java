@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.serial;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.Blob;
 
 import java.io.*;
@@ -50,6 +51,7 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         this(new SerializationListener[0], new SerializationReplacer[0]);
     }
 
+    @Inject
     public ObjectSerializerImpl(SerializationListener[] listeners, SerializationReplacer[] replacers) {
         this.listeners = listeners;
         this.replacers = replacers;

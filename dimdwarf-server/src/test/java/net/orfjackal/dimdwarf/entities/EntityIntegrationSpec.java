@@ -36,8 +36,8 @@ import com.google.inject.Injector;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.modules.DimdwarfModules;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -61,11 +61,6 @@ public class EntityIntegrationSpec extends Specification<Object> {
         taskExecutor = injector.getInstance(TaskExecutor.class);
     }
 
-    public void destroy() throws Exception {
-        if (ThreadContext.currentContext() != null) {
-            ThreadContext.tearDown();
-        }
-    }
 
     public class WhenTasksAreRun {
 
@@ -94,17 +89,36 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void entityBindingsCreatedInOneTaskCanBeReadInTheNextTask() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingManager bindings = injector.getInstance(BindingManager.class);
-                    bindings.update("bar", new DummyEntity("foo"));
+                    BindingManager binder = injector.getInstance(BindingManager.class);
+                    binder.update("bar", new DummyEntity("foo"));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingManager bindings = injector.getInstance(BindingManager.class);
-                    specify(bindings.firstKey(), should.equal("bar"));
-                    specify(bindings.nextKeyAfter("bar"), should.equal(null));
-                    DummyEntity entity = (DummyEntity) bindings.read("bar");
+                    BindingManager binder = injector.getInstance(BindingManager.class);
+                    specify(binder.firstKey(), should.equal("bar"));
+                    specify(binder.nextKeyAfter("bar"), should.equal(null));
+                    DummyEntity entity = (DummyEntity) binder.read("bar");
                     specify(entity.getOther(), should.equal("foo"));
+                }
+            });
+        }
+
+        public void transparentReferencesAreCreatedAutomatically() {
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    BindingManager binder = injector.getInstance(BindingManager.class);
+                    binder.update("foo", new DummyEntity(new DummyEntity("other")));
+                }
+            });
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    BindingManager binder = injector.getInstance(BindingManager.class);
+                    DummyEntity entity = (DummyEntity) binder.read("foo");
+                    DummyInterface other = (DummyInterface) entity.getOther();
+                    specify(other.getOther(), should.equal("other"));
+                    specify(Entities.isEntity(entity));
+                    specify(Entities.isTransparentReference(other));
                 }
             });
         }

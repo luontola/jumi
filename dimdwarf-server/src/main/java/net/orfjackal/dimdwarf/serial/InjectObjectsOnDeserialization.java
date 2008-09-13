@@ -31,17 +31,23 @@
 
 package net.orfjackal.dimdwarf.serial;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 /**
  * @author Esko Luontola
- * @since 4.9.2008
+ * @since 14.9.2008
  */
-public abstract class SerializationReplacerAdapter implements SerializationReplacer {
+public class InjectObjectsOnDeserialization extends SerializationAdapter {
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        return obj;
+    private final Injector injector;
+
+    @Inject
+    public InjectObjectsOnDeserialization(Injector injector) {
+        this.injector = injector;
     }
 
-    public Object resolveDeserialized(Object obj) {
-        return obj;
+    public void afterResolve(Object obj) {
+        injector.injectMembers(obj);
     }
 }

@@ -39,8 +39,10 @@ import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.Database;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
-import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+import net.orfjackal.dimdwarf.entities.tref.ReplaceEntitiesWithTransparentReferences;
+import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactory;
+import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactoryImpl;
+import net.orfjackal.dimdwarf.serial.*;
 
 import java.lang.annotation.Annotation;
 import java.math.BigInteger;
@@ -59,6 +61,7 @@ public class EntityModule extends AbstractModule {
                 return new EntityIdFactoryImpl(BigInteger.ZERO); // TODO: import from database
             }
         });
+        bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
 
         bind(EntityStorage.class).to(EntityStorageImpl.class);
         bindDatabaseTable("entities", EntitiesTable.class);
@@ -67,17 +70,37 @@ public class EntityModule extends AbstractModule {
         bindDatabaseTable("bindings", BindingsTable.class);
 
         bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
+        bind(SerializationListener[].class).toProvider(new SerializationListenerListProvider());
+        bind(SerializationReplacer[].class).toProvider(new SerializationReplacerListProvider());
     }
 
-    private void bindDatabaseTable(final String databaseName, Class<? extends Annotation> databaseAnno) {
+    private void bindDatabaseTable(final String tableName, Class<? extends Annotation> annotation) {
         bind(new TypeLiteral<DatabaseTable<Blob, Blob>>() {})
-                .annotatedWith(databaseAnno)
+                .annotatedWith(annotation)
                 .toProvider(new Provider<DatabaseTable<Blob, Blob>>() {
                     @Inject Provider<Database<Blob, Blob>> db;
 
                     public DatabaseTable<Blob, Blob> get() {
-                        return db.get().openTable(databaseName);
+                        return db.get().openTable(tableName);
                     }
                 });
+    }
+
+    private static class SerializationListenerListProvider implements Provider<SerializationListener[]> {
+        @Inject Provider<CheckInnerClassSerialized> listeneter1;
+        @Inject Provider<CheckDirectlyReferredEntitySerialized> listeneter2;
+        @Inject Provider<InjectObjectsOnDeserialization> listener3;
+
+        public SerializationListener[] get() {
+            return new SerializationListener[]{listeneter1.get(), listeneter2.get(), listener3.get()};
+        }
+    }
+
+    private static class SerializationReplacerListProvider implements Provider<SerializationReplacer[]> {
+        @Inject Provider<ReplaceEntitiesWithTransparentReferences> replacer1;
+
+        public SerializationReplacer[] get() {
+            return new SerializationReplacer[]{replacer1.get()};
+        }
     }
 }
