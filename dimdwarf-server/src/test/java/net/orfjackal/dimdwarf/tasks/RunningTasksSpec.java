@@ -40,10 +40,14 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.modules.TaskScopeModule;
 import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionException;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import net.orfjackal.dimdwarf.tx.TransactionStatus;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -55,13 +59,17 @@ public class RunningTasksSpec extends Specification<Object> {
 
     private Injector injector;
     private TaskExecutor taskExecutor;
+    private Logger logger;
 
     public void create() throws Exception {
         injector = Guice.createInjector(new TaskScopeModule());
         taskExecutor = injector.getInstance(TaskExecutor.class);
+        logger = Logger.getLogger(TaskExecutor.class.getName());
+        logger.setLevel(Level.OFF);
     }
 
     public void destroy() throws Exception {
+        logger.setLevel(Level.ALL);
         if (ThreadContext.currentContext() != null) {
             ThreadContext.tearDown();
         }
@@ -114,14 +122,14 @@ public class RunningTasksSpec extends Specification<Object> {
                         one(participant).rollback(tx);
                     }});
                     tx.join(participant);
-                    throw new Error("dummy exception");
+                    throw new IllegalArgumentException("dummy exception");
                 }
             };
             specify(new Block() {
                 public void run() throws Throwable {
                     taskExecutor.execute(exceptionInTask);
                 }
-            }, should.raise(RuntimeException.class));
+            }, should.raise(IllegalArgumentException.class));
         }
 
         public void theTransactionIsRolledBackIfAnExceptionIsRaisedDuringPrepare() {
@@ -145,7 +153,7 @@ public class RunningTasksSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     taskExecutor.execute(exceptionInPrepare);
                 }
-            }, should.raise(RuntimeException.class));
+            }, should.raise(TransactionException.class));
         }
     }
 }

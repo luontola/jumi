@@ -36,6 +36,8 @@ import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
 
@@ -44,6 +46,8 @@ import java.util.concurrent.Executor;
  * @since 13.9.2008
  */
 public class TaskExecutor implements Executor {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecutor.class);
 
     private final Provider<Context> contextProvider;
     private final Provider<TransactionCoordinator> txProvider;
@@ -62,10 +66,21 @@ public class TaskExecutor implements Executor {
                     command.run();
                     tx.prepareAndCommit();
                 } catch (Throwable t) {
+                    logger.warn("Task failed, rolling back its transaction", t);
                     tx.rollback();
-                    throw new RuntimeException("Task failed and the transaction was rolled back", t);
+                    rethrow(t);
                 }
             }
         });
+    }
+
+    private static void rethrow(Throwable t) {
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
+        }
+        if (t instanceof Error) {
+            throw (Error) t;
+        }
+        throw new RuntimeException(t);
     }
 }
