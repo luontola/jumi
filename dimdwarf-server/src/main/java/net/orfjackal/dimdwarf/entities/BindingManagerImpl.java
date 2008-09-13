@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
 import net.orfjackal.dimdwarf.db.NullConverter;
@@ -45,7 +46,8 @@ import java.math.BigInteger;
  */
 public class BindingManagerImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingManager {
 
-    public BindingManagerImpl(DatabaseTable<String, BigInteger> bindings, NullConverter<String> keys, EntityIdConverter values) {
+    @Inject
+    public BindingManagerImpl(@BindingsTable DatabaseTable<String, BigInteger> bindings, NullConverter<String> keys, EntityIdConverter values) {
         super(bindings, keys, values);
     }
 }

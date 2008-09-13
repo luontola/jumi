@@ -31,6 +31,9 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
@@ -48,18 +51,20 @@ import java.lang.reflect.Method;
  * @author Esko Luontola
  * @since 26.1.2008
  */
+@Singleton
 public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
     private final Cache<Class<?>, Factory> cache = new CglibProxyFactoryCache();
-    private final ReferenceFactory referenceFactory;
+    private final Provider<ReferenceFactory> referenceFactory;
 
-    public TransparentReferenceFactoryImpl(ReferenceFactory referenceFactory) {
+    @Inject
+    public TransparentReferenceFactoryImpl(Provider<ReferenceFactory> referenceFactory) {
         this.referenceFactory = referenceFactory;
     }
 
     public TransparentReference createTransparentReference(IEntity object) {
         Class<?> type = object.getClass();
-        EntityReference<?> ref = referenceFactory.createReference(object);
+        EntityReference<?> ref = referenceFactory.get().createReference(object);
         return newProxy(new TransparentReferenceImpl(type, ref));
     }
 

@@ -31,9 +31,11 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.scopes.TaskScoped;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -44,6 +46,7 @@ import java.util.*;
  * @author Esko Luontola
  * @since 25.8.2008
  */
+@TaskScoped
 public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
 
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
@@ -53,6 +56,7 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
     private final EntityStorage storage;
     private State state = State.ACTIVE;
 
+    @Inject
     public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage) {
         this.idFactory = idFactory;
         this.storage = storage;

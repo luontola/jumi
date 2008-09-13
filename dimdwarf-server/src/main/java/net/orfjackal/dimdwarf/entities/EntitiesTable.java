@@ -29,22 +29,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
+package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.AbstractModule;
-import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.scopes.DimdwarfScopes;
-import net.orfjackal.dimdwarf.scopes.TaskScoped;
-import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
+import com.google.inject.BindingAnnotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class ScopeModule extends AbstractModule {
-    protected void configure() {
-        bindScope(TaskScoped.class, DimdwarfScopes.TASK);
-        bind(Context.class)
-                .to(TaskScopedContext.class);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@BindingAnnotation
+public @interface EntitiesTable {
 }

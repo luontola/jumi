@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.tx;
 
+import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Esko Luontola
  * @since 15.8.2008
  */
+@TaskScoped
 public class TransactionImpl implements Transaction, TransactionCoordinator {
     private static final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 

@@ -41,6 +41,7 @@ import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
+import net.orfjackal.dimdwarf.util.DummyProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -65,7 +66,7 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactoryImpl(referenceFactory);
+        proxyFactory = new TransparentReferenceFactoryImpl(DummyProvider.with(referenceFactory));
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
         checking(referencesMayBeCreatedFor(ent1, BigInteger.valueOf(1)));

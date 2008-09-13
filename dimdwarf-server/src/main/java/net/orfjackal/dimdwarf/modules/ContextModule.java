@@ -29,39 +29,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.tref;
+package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import com.google.inject.AbstractModule;
+import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.scopes.DimdwarfScopes;
+import net.orfjackal.dimdwarf.scopes.TaskScoped;
+import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 13.9.2008
  */
-public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
-
-    private final TransparentReferenceFactory factory;
-
-    @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
-        this.factory = factory;
-    }
-
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((IEntity) obj, factory);
-        }
-        return obj;
-    }
-
-    public Object resolveDeserialized(Object obj) {
-        if (obj instanceof TransparentReferenceImpl) {
-            return factory.newProxy((TransparentReferenceImpl) obj);
-        }
-        return obj;
+public class ContextModule extends AbstractModule {
+    protected void configure() {
+        bindScope(TaskScoped.class, DimdwarfScopes.TASK);
+        bind(Context.class)
+                .to(TaskScopedContext.class);
     }
 }

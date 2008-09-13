@@ -29,39 +29,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.tref;
+package net.orfjackal.dimdwarf.modules;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
+import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.Database;
+import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabase;
+import net.orfjackal.dimdwarf.tx.Transaction;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 13.9.2008
  */
-public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
+public class DatabaseModule extends AbstractModule {
+    protected void configure() {
+        
+        bind(new TypeLiteral<Database<Blob, Blob>>() {
+        }).toProvider(new Provider<Database<Blob, Blob>>() {
+            @Inject Provider<InMemoryDatabase> dbms;
+            @Inject Provider<Transaction> tx;
 
-    private final TransparentReferenceFactory factory;
-
-    @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
-        this.factory = factory;
-    }
-
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((IEntity) obj, factory);
-        }
-        return obj;
-    }
-
-    public Object resolveDeserialized(Object obj) {
-        if (obj instanceof TransparentReferenceImpl) {
-            return factory.newProxy((TransparentReferenceImpl) obj);
-        }
-        return obj;
+            public Database<Blob, Blob> get() {
+                return dbms.get().openConnection(tx.get());
+            }
+        });
     }
 }

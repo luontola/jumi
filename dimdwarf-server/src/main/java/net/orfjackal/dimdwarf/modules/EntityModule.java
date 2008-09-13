@@ -29,39 +29,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.tref;
+package net.orfjackal.dimdwarf.modules;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
+import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.Database;
+import net.orfjackal.dimdwarf.db.DatabaseTable;
+import net.orfjackal.dimdwarf.entities.*;
+import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
+
+import java.lang.annotation.Annotation;
+import java.math.BigInteger;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 13.9.2008
  */
-public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
+public class EntityModule extends AbstractModule {
+    protected void configure() {
+        bind(ReferenceFactory.class).to(EntityManagerImpl.class);
+        bind(EntityLoader.class).to(EntityManagerImpl.class);
+        bind(EntityIdFactory.class).toProvider(new Provider<EntityIdFactory>() {
+            public EntityIdFactory get() {
+                return new EntityIdFactoryImpl(BigInteger.ZERO); // TODO: import from database
+            }
+        });
+        bind(EntityStorage.class).to(EntityStorageImpl.class);
 
-    private final TransparentReferenceFactory factory;
+        bindDatabaseTable("bindings", BindingsTable.class);
+        bindDatabaseTable("entities", EntitiesTable.class);
 
-    @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
-        this.factory = factory;
+        bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
     }
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((IEntity) obj, factory);
-        }
-        return obj;
-    }
+    private void bindDatabaseTable(final String databaseName, Class<? extends Annotation> databaseAnno) {
+        bind(new TypeLiteral<DatabaseTable<Blob, Blob>>() {})
+                .annotatedWith(databaseAnno)
+                .toProvider(new Provider<DatabaseTable<Blob, Blob>>() {
+                    @Inject Provider<Database<Blob, Blob>> db;
 
-    public Object resolveDeserialized(Object obj) {
-        if (obj instanceof TransparentReferenceImpl) {
-            return factory.newProxy((TransparentReferenceImpl) obj);
-        }
-        return obj;
+                    public DatabaseTable<Blob, Blob> get() {
+                        return db.get().openTable(databaseName);
+                    }
+                });
     }
 }

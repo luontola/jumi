@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.Converter;
 
 import java.math.BigInteger;
@@ -46,6 +47,7 @@ public class EntityIdConverter implements Converter<Object, BigInteger> {
     private final ReferenceFactory referenceFactory;
     private final EntityLoader entityLoader;
 
+    @Inject
     public EntityIdConverter(ReferenceFactory referenceFactory, EntityLoader entityLoader) {
         this.referenceFactory = referenceFactory;
         this.entityLoader = entityLoader;

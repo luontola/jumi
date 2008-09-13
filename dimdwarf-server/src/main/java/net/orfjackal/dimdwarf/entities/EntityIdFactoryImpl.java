@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Singleton;
+
 import java.math.BigInteger;
 
 /**
@@ -39,6 +41,7 @@ import java.math.BigInteger;
  * @author Esko Luontola
  * @since 4.9.2008
  */
+@Singleton
 public class EntityIdFactoryImpl implements EntityIdFactory {
 
     // using java.util.concurrent.atomic.AtomicLong would also be an option

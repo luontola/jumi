@@ -31,7 +31,10 @@
 
 package net.orfjackal.dimdwarf.api;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Classes annotated with {@link Entity} will maintain their identity when stored in the database.
@@ -48,7 +51,6 @@ import java.lang.annotation.*;
  * @author Esko Luontola
  * @since 9.9.2008
  */
-@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Entity {

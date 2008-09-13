@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.db.BigIntegerConverter;
 import net.orfjackal.dimdwarf.db.Blob;
@@ -47,7 +48,8 @@ import java.math.BigInteger;
  */
 public class EntityStorageImpl extends DatabaseTableAdapter<BigInteger, IEntity, Blob, Blob> implements EntityStorage {
 
-    public EntityStorageImpl(DatabaseTable<Blob, Blob> entities, BigIntegerConverter keys, EntityConverter values) {
+    @Inject
+    public EntityStorageImpl(@EntitiesTable DatabaseTable<Blob, Blob> entities, BigIntegerConverter keys, EntityConverter values) {
         super(entities, keys, values);
     }
 }

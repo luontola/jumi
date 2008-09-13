@@ -29,39 +29,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.tref;
+package net.orfjackal.dimdwarf.util;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import com.google.inject.Provider;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 13.9.2008
  */
-public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
+public class DummyProvider<T> implements Provider<T> {
 
-    private final TransparentReferenceFactory factory;
+    private final T instance;
 
-    @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
-        this.factory = factory;
+    public DummyProvider(T instance) {
+        this.instance = instance;
     }
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((IEntity) obj, factory);
-        }
-        return obj;
+    public T get() {
+        return instance;
     }
 
-    public Object resolveDeserialized(Object obj) {
-        if (obj instanceof TransparentReferenceImpl) {
-            return factory.newProxy((TransparentReferenceImpl) obj);
-        }
-        return obj;
+    public static <T> Provider<T> with(T instance) {
+        return new DummyProvider<T>(instance);
     }
 }

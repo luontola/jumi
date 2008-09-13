@@ -29,39 +29,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities.tref;
+package net.orfjackal.dimdwarf.modules;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import com.google.inject.Provider;
+import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import net.orfjackal.dimdwarf.tx.TransactionImpl;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 13.9.2008
  */
-public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
+public class TransactionModule extends AbstractModule {
+    protected void configure() {
 
-    private final TransparentReferenceFactory factory;
-
-    @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
-        this.factory = factory;
+        bind(TransactionCoordinator.class)
+                .to(TransactionImpl.class);
+        bind(Transaction.class)
+                .toProvider(new TransactionProvider());
     }
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
-            return TransparentReferenceUtil.createTransparentReferenceForSerialization((IEntity) obj, factory);
-        }
-        return obj;
-    }
+    private static class TransactionProvider implements Provider<Transaction> {
+        @Inject Provider<TransactionCoordinator> coordinator;
 
-    public Object resolveDeserialized(Object obj) {
-        if (obj instanceof TransparentReferenceImpl) {
-            return factory.newProxy((TransparentReferenceImpl) obj);
+        public Transaction get() {
+            return coordinator.get().getTransaction();
         }
-        return obj;
     }
 }

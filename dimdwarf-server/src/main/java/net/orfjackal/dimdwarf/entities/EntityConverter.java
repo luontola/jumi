@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.db.Blob;
@@ -47,6 +48,7 @@ public class EntityConverter implements Converter<IEntity, Blob> {
 
     private final ObjectSerializer serializer;
 
+    @Inject
     public EntityConverter(ObjectSerializer serializer) {
         this.serializer = serializer;
     }
