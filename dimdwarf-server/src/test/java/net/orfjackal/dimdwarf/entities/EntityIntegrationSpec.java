@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tasks;
+package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -38,11 +38,8 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.entities.BindingManager;
-import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.EntityLoader;
-import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.modules.DimdwarfModules;
+import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
@@ -54,7 +51,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class RunningTasksSpec extends Specification<Object> {
+public class EntityIntegrationSpec extends Specification<Object> {
 
     private Injector injector;
     private TaskExecutor taskExecutor;
