@@ -35,6 +35,9 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionListener;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -54,15 +57,34 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     private EntityManagerImpl manager;
     private DummyEntity entity;
     private DummyEntity newEntity;
+    private Transaction tx;
 
     public void create() throws Exception {
+        tx = mock(Transaction.class);
+        checking(new Expectations() {{
+            one(tx).addTransactionListener(with(aNonNull(EntityManagerImpl.class)));
+        }});
         storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage);
+        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage, tx);
         entity = new DummyEntity();
         newEntity = new DummyEntity();
         manager.createReference(entity);
     }
 
+    public class BeforeTransactionIsDeactivated {
+
+        public Object create() {
+            return null;
+        }
+
+        public void entitiesAreFlushed() {
+            checking(new Expectations() {{
+                one(storage).update(with(any(BigInteger.class)), with(any(IEntity.class)));
+            }});
+            TransactionListener l = manager;
+            l.transactionWillDeactivate(tx);
+        }
+    }
 
     public class WhenRegisteredEntitiesAreFlushed {
 

@@ -31,23 +31,16 @@
 
 package net.orfjackal.dimdwarf.tx;
 
+import java.util.EventListener;
+
 /**
  * @author Esko Luontola
- * @since 17.8.2008
+ * @since 13.9.2008
  */
-public interface Transaction {
+public interface TransactionListener extends EventListener {
 
-    void join(TransactionParticipant p);
-
-    void addTransactionListener(TransactionListener l);
-
-    TransactionStatus getStatus();
-
-    boolean isActive();
-
-    void mustBeActive() throws IllegalStateException;
-
-    boolean isRollbackOnly();
-
-    void setRollbackOnly();
+    /**
+     * Called before the transaction deactives at the beginning of the prepare stage.
+     */
+    void transactionWillDeactivate(Transaction tx);
 }

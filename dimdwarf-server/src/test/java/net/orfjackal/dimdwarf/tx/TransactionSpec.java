@@ -168,6 +168,16 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             return null;
         }
 
+        public void listenersAreNotifiedBeforeTransactionIsDeactivated() {
+            final TransactionListener listener = mock(TransactionListener.class);
+            tx.addTransactionListener(listener);
+            checking(new Expectations() {{
+                one(listener).transactionWillDeactivate(tx);
+            }});
+            checking(allParticipantsArePrepared());
+            tx.prepare();
+        }
+
         public void transactionIsDeactivatedBeforeParticipantsArePrepared() {
             tx.join(new DummyTransactionParticipant() {
                 public void prepare(final Transaction tx) throws Throwable {

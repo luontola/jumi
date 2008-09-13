@@ -37,6 +37,7 @@ package net.orfjackal.dimdwarf.tx;
  */
 public interface TransactionParticipant {
 
+    // TODO: is this ever needed? the participant iniciates the join, so it will already know that it has joined the transaction
     /**
      * Called by the transaction coordinator when this participant joins a transaction.
      */

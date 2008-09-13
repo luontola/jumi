@@ -36,6 +36,8 @@ import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
+import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.TransactionListener;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -47,7 +49,7 @@ import java.util.*;
  * @since 25.8.2008
  */
 @TaskScoped
-public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
+public class EntityManagerImpl implements ReferenceFactory, EntityLoader, TransactionListener {
 
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
     private final Map<BigInteger, IEntity> entitiesById = new HashMap<BigInteger, IEntity>();
@@ -57,9 +59,10 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage) {
+    public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage, Transaction tx) {
         this.idFactory = idFactory;
         this.storage = storage;
+        tx.addTransactionListener(this);
     }
 
     public int getRegisteredEntities() {
@@ -122,6 +125,10 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader {
     public BigInteger nextKeyAfter(BigInteger currentKey) {
         checkStateIs(State.ACTIVE);
         return storage.nextKeyAfter(currentKey);
+    }
+
+    public void transactionWillDeactivate(Transaction tx) {
+        flushAllEntities();
     }
 
     public void flushAllEntities() {
