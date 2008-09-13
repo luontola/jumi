@@ -52,7 +52,7 @@ import java.math.BigInteger;
 public class BindingManagerSpec extends Specification<Object> {
 
     private BindingManager bindingManager;
-    private InMemoryDatabase dbms;
+    private DatabaseManager dbms;
     private TransactionCoordinator tx;
 
     @SuppressWarnings({"unchecked"})
@@ -70,20 +70,21 @@ public class BindingManagerSpec extends Specification<Object> {
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
         DatabaseTable<Blob, Blob> entities = db.openTable("entities");
 
-        EntityManagerImpl entityManager = new EntityManagerImpl(
-                new EntityIdFactoryImpl(BigInteger.ZERO),
-                new EntityStorageImpl(
-                        entities,
-                        new BigIntegerConverter(),
-                        new EntityConverter(new ObjectSerializerImpl())),
-                tx.getTransaction());
-
-        DatabaseTableAdapter<String, BigInteger, Blob, Blob> bindingsTable =
-                new DatabaseTableAdapter<String, BigInteger, Blob, Blob>(
-                        bindings, new StringConverter(), new BigIntegerConverter());
+        EntityManagerImpl entityManager =
+                new EntityManagerImpl(
+                        new EntityIdFactoryImpl(BigInteger.ZERO),
+                        new EntityStorageImpl(
+                                entities,
+                                new BigIntegerConverter(),
+                                new EntityConverter(new ObjectSerializerImpl())),
+                        tx.getTransaction());
 
         return new BindingManagerImpl(
-                bindingsTable, new NullConverter<String>(), new EntityIdConverter(entityManager, entityManager));
+                bindings,
+                new StringConverter(),
+                new BigIntegerConverter(),
+                new NullConverter<String>(),
+                new EntityIdConverter(entityManager, entityManager));
     }
 
 

@@ -120,11 +120,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void onlyOneConnectionExistsPerTransaction() {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    dbms.openConnection(tx.getTransaction());
-                }
-            }, should.raise(IllegalArgumentException.class));
+            specify(dbms.openConnection(tx.getTransaction()), should.equal(db));
             specify(dbms.getOpenConnections(), should.equal(1));
         }
 

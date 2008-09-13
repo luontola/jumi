@@ -46,6 +46,14 @@ public class DummyEntity implements DummyInterface, IEntity, Serializable {
 
     public Object other;
 
+    public DummyEntity() {
+        this(null);
+    }
+
+    public DummyEntity(Object other) {
+        this.other = other;
+    }
+
     public Object getOther() {
         return other;
     }

@@ -35,6 +35,7 @@ import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.Blob;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.db.Database;
+import net.orfjackal.dimdwarf.db.DatabaseManager;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
@@ -53,9 +54,9 @@ import java.util.concurrent.ConcurrentMap;
  * @since 18.8.2008
  */
 @Singleton
-public class InMemoryDatabase {
+public class InMemoryDatabase implements DatabaseManager {
 
-    private final ConcurrentMap<Transaction, Long> revisionsInUse = new ConcurrentHashMap<Transaction, Long>();
+    private final ConcurrentMap<Transaction, TxDatabase> openConnections = new ConcurrentHashMap<Transaction, TxDatabase>();
     private final Object commitLock = new Object();
 
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
@@ -77,17 +78,16 @@ public class InMemoryDatabase {
     }
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        if (revisionsInUse.containsKey(tx)) {
-            throw new IllegalArgumentException("Connection already open in this transaction");
+        TxDatabase db = openConnections.get(tx);
+        if (db == null) {
+            openConnections.putIfAbsent(tx, new TxDatabase(committedRevision, tx));
+            db = openConnections.get(tx);
         }
-        long revision = committedRevision;
-        Database<Blob, Blob> db = new TxDatabase(revision, tx);
-        revisionsInUse.put(tx, revision);
         return db;
     }
 
     private void closeConnection(Transaction tx) {
-        revisionsInUse.remove(tx);
+        openConnections.remove(tx);
         long oldestUncommitted = getOldestUncommittedRevision();
         for (InMemoryDatabaseTable table : tables.values()) {
             table.purgeRevisionsOlderThan(oldestUncommitted);
@@ -96,15 +96,15 @@ public class InMemoryDatabase {
 
     protected long getOldestUncommittedRevision() {
         long oldest = committedRevision;
-        for (long revision : revisionsInUse.values()) {
-            oldest = Math.min(oldest, revision);
+        for (TxDatabase db : openConnections.values()) {
+            oldest = Math.min(oldest, db.visibleRevision);
         }
         return oldest;
     }
 
     @TestOnly
     protected int getOpenConnections() {
-        return revisionsInUse.size();
+        return openConnections.size();
     }
 
     @TestOnly

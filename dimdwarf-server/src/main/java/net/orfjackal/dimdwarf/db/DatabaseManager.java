@@ -29,38 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
+package net.orfjackal.dimdwarf.db;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseManager;
-import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabase;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
 /**
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class DatabaseModule extends AbstractModule {
-    protected void configure() {
+public interface DatabaseManager {
 
-        bind(DatabaseManager.class)
-                .to(InMemoryDatabase.class);
-
-        bind(new TypeLiteral<Database<Blob, Blob>>() {})
-                .toProvider(new DatabaseConnectionProvider());
-    }
-
-    private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
-        @Inject Provider<DatabaseManager> dbms;
-        @Inject Provider<Transaction> tx;
-
-        public Database<Blob, Blob> get() {
-            return dbms.get().openConnection(tx.get());
-        }
-    }
+    Database<Blob, Blob> openConnection(Transaction tx);
 }

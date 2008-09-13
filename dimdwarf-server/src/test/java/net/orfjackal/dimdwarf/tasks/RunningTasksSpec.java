@@ -33,18 +33,16 @@ package net.orfjackal.dimdwarf.tasks;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
+import net.orfjackal.dimdwarf.entities.BindingManager;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityLoader;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.modules.DimdwarfModules;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
@@ -59,13 +57,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class RunningTasksSpec extends Specification<Object> {
 
     private Injector injector;
-    private Provider<Context> newContext;
-    private Provider<TransactionCoordinator> currentTx;
+    private TaskExecutor taskExecutor;
 
     public void create() throws Exception {
         injector = Guice.createInjector(new DimdwarfModules());
-        newContext = injector.getProvider(Context.class);
-        currentTx = injector.getProvider(TransactionCoordinator.class);
+        taskExecutor = injector.getInstance(TaskExecutor.class);
     }
 
     public void destroy() throws Exception {
@@ -82,40 +78,34 @@ public class RunningTasksSpec extends Specification<Object> {
 
         public void entitiesCreatedInOneTaskCanBeReadInTheNextTask() {
             final AtomicReference<BigInteger> id = new AtomicReference<BigInteger>();
-
-            ThreadContext.runInContext(newContext.get(), new Runnable() {
+            taskExecutor.execute(new Runnable() {
                 public void run() {
-                    TransactionCoordinator tx = currentTx.get();
-//                    try {
-                    DummyEntity entity = new DummyEntity();
-                    entity.setOther("foo");
                     ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
-                    EntityReference<DummyEntity> ref = factory.createReference(entity);
+                    EntityReference<DummyEntity> ref = factory.createReference(new DummyEntity("foo"));
                     id.set(ref.getId());
-//                    } finally {
-                    tx.prepareAndCommit();
-//                    }
                 }
             });
-            ThreadContext.runInContext(newContext.get(), new Runnable() {
+            taskExecutor.execute(new Runnable() {
                 public void run() {
-                    TransactionCoordinator tx = currentTx.get();
-//                    try {
                     EntityLoader loader = injector.getInstance(EntityLoader.class);
                     DummyEntity entity = (DummyEntity) loader.loadEntity(id.get());
                     specify(entity.getOther(), should.equal("foo"));
-//                    } finally {
-                    tx.prepareAndCommit();
-//                    }
+                }
+            });
+        }
+
+        public void entityBindingsCreatedInOneTaskCanBeReadInTheNextTask() {
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    BindingManager bindings = injector.getInstance(BindingManager.class);
+                    bindings.update("bar", new DummyEntity("foo"));
                 }
             });
         }
 
         public void referenceFactoryAndEntityLoaderAreInSync() {
-            ThreadContext.runInContext(newContext.get(), new Runnable() {
+            taskExecutor.execute(new Runnable() {
                 public void run() {
-                    TransactionCoordinator tx = currentTx.get();
-
                     ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
                     EntityLoader loader = injector.getInstance(EntityLoader.class);
 
@@ -125,8 +115,6 @@ public class RunningTasksSpec extends Specification<Object> {
                     DummyEntity loaded = (DummyEntity) loader.loadEntity(ref.getId());
                     specify(loaded, should.equal(entity));
                     specify(factory, should.equal(loader));
-
-                    tx.prepareAndCommit();
                 }
             });
         }

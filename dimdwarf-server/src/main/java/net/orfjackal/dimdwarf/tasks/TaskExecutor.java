@@ -29,38 +29,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
+package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseManager;
-import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabase;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.context.ThreadContext;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+
+import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class DatabaseModule extends AbstractModule {
-    protected void configure() {
+public class TaskExecutor implements Executor {
 
-        bind(DatabaseManager.class)
-                .to(InMemoryDatabase.class);
+    private final Provider<Context> contextProvider;
+    private final Provider<TransactionCoordinator> txProvider;
 
-        bind(new TypeLiteral<Database<Blob, Blob>>() {})
-                .toProvider(new DatabaseConnectionProvider());
+    @Inject
+    public TaskExecutor(Provider<Context> contextProvider, Provider<TransactionCoordinator> txProvider) {
+        this.contextProvider = contextProvider;
+        this.txProvider = txProvider;
     }
 
-    private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
-        @Inject Provider<DatabaseManager> dbms;
-        @Inject Provider<Transaction> tx;
-
-        public Database<Blob, Blob> get() {
-            return dbms.get().openConnection(tx.get());
-        }
+    public void execute(final Runnable command) {
+        ThreadContext.runInContext(contextProvider.get(), new Runnable() {
+            public void run() {
+                TransactionCoordinator tx = txProvider.get();
+                command.run();
+                tx.prepareAndCommit();
+            }
+        });
     }
 }
