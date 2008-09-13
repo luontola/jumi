@@ -58,17 +58,14 @@ import java.util.concurrent.atomic.AtomicReference;
 @Group({"fast"})
 public class RunningTasksSpec extends Specification<Object> {
 
-    private Provider<ReferenceFactory> referenceFactory;
-    private Provider<EntityLoader> entityLoader;
-    private Provider<Context> contextProvider;
-    private Provider<TransactionCoordinator> transactionCoordinator;
+    private Injector injector;
+    private Provider<Context> newContext;
+    private Provider<TransactionCoordinator> currentTx;
 
     public void create() throws Exception {
-        Injector injector = Guice.createInjector(new DimdwarfModules());
-        referenceFactory = injector.getProvider(ReferenceFactory.class);
-        entityLoader = injector.getProvider(EntityLoader.class);
-        contextProvider = injector.getProvider(Context.class);
-        transactionCoordinator = injector.getProvider(TransactionCoordinator.class);
+        injector = Guice.createInjector(new DimdwarfModules());
+        newContext = injector.getProvider(Context.class);
+        currentTx = injector.getProvider(TransactionCoordinator.class);
     }
 
     public void destroy() throws Exception {
@@ -86,30 +83,50 @@ public class RunningTasksSpec extends Specification<Object> {
         public void entitiesCreatedInOneTaskCanBeReadInTheNextTask() {
             final AtomicReference<BigInteger> id = new AtomicReference<BigInteger>();
 
-            ThreadContext.runInContext(contextProvider.get(), new Runnable() {
+            ThreadContext.runInContext(newContext.get(), new Runnable() {
                 public void run() {
-                    TransactionCoordinator tx = transactionCoordinator.get();
-                    try {
-                        DummyEntity entity = new DummyEntity();
-                        entity.setOther("foo");
-                        ReferenceFactory factory = referenceFactory.get();
-                        EntityReference<DummyEntity> ref = factory.createReference(entity);
-                        id.set(ref.getId());
-                    } finally {
-                        tx.prepareAndCommit();
-                    }
+                    TransactionCoordinator tx = currentTx.get();
+//                    try {
+                    DummyEntity entity = new DummyEntity();
+                    entity.setOther("foo");
+                    ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
+                    EntityReference<DummyEntity> ref = factory.createReference(entity);
+                    id.set(ref.getId());
+//                    } finally {
+                    tx.prepareAndCommit();
+//                    }
                 }
             });
-            ThreadContext.runInContext(contextProvider.get(), new Runnable() {
+            ThreadContext.runInContext(newContext.get(), new Runnable() {
                 public void run() {
-                    TransactionCoordinator tx = transactionCoordinator.get();
-                    try {
-                        EntityLoader loader = entityLoader.get();
-                        DummyEntity entity = (DummyEntity) loader.loadEntity(id.get());
-                        specify(entity.getOther(), should.equal("foo"));
-                    } finally {
-                        tx.prepareAndCommit();
-                    }
+                    TransactionCoordinator tx = currentTx.get();
+//                    try {
+                    EntityLoader loader = injector.getInstance(EntityLoader.class);
+                    DummyEntity entity = (DummyEntity) loader.loadEntity(id.get());
+                    specify(entity.getOther(), should.equal("foo"));
+//                    } finally {
+                    tx.prepareAndCommit();
+//                    }
+                }
+            });
+        }
+
+        public void referenceFactoryAndEntityLoaderAreInSync() {
+            ThreadContext.runInContext(newContext.get(), new Runnable() {
+                public void run() {
+                    TransactionCoordinator tx = currentTx.get();
+
+                    ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
+                    EntityLoader loader = injector.getInstance(EntityLoader.class);
+
+                    DummyEntity entity = new DummyEntity();
+                    EntityReference<DummyEntity> ref = factory.createReference(entity);
+
+                    DummyEntity loaded = (DummyEntity) loader.loadEntity(ref.getId());
+                    specify(loaded, should.equal(entity));
+                    specify(factory, should.equal(loader));
+
+                    tx.prepareAndCommit();
                 }
             });
         }
