@@ -56,7 +56,7 @@ public class ThreadContextSpec extends Specification<Object> {
         myService = new MyServiceImpl();
         Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
         services.put(MyService.class, myService);
-        myContext = new SimpleContext(services);
+        myContext = new DummyContext(services);
     }
 
     public void destroy() throws Exception {
@@ -112,7 +112,7 @@ public class ThreadContextSpec extends Specification<Object> {
             ThreadContext.setUp(myContext);
             specify(new Block() {
                 public void run() throws Throwable {
-                    ThreadContext.setUp(new SimpleContext(new HashMap<Class<?>, Object>()));
+                    ThreadContext.setUp(new DummyContext());
                 }
             }, should.raise(IllegalStateException.class));
             specify(ThreadContext.get(MyService.class), should.equal(myService));

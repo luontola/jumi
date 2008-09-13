@@ -41,18 +41,22 @@ import java.util.Map;
  * @author Esko Luontola
  * @since 5.9.2008
  */
-public class SimpleContext implements Context {
+public class DummyContext implements Context {
 
     private final Map<Class<?>, Object> services;
 
-    public <T> SimpleContext(Class<T> type, T instance) {
+    public DummyContext() {
+        this(new HashMap<Class<?>, Object>());
+    }
+
+    public DummyContext(Map<Class<?>, Object> services) {
+        this.services = Collections.unmodifiableMap(new HashMap<Class<?>, Object>(services));
+    }
+
+    public <T> DummyContext(Class<T> type, T instance) {
         Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
         map.put(type, instance);
         this.services = Collections.unmodifiableMap(map);
-    }
-
-    public SimpleContext(Map<Class<?>, Object> services) {
-        this.services = Collections.unmodifiableMap(new HashMap<Class<?>, Object>(services));
     }
 
     public <T> T get(Class<T> service) {
