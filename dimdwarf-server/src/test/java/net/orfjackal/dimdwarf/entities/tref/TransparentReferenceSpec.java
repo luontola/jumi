@@ -44,7 +44,7 @@ import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.serial.SerializationListener;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
-import net.orfjackal.dimdwarf.util.DummyProvider;
+import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -70,7 +70,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactoryImpl(DummyProvider.with(referenceFactory));
+        proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
         entity = new DummyEntity();
     }
 

@@ -41,7 +41,7 @@ import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.util.DummyProvider;
+import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -62,7 +62,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactoryImpl(DummyProvider.with(referenceFactory));
+        proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
         entity = new MyEntity();
     }
 

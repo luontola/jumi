@@ -38,9 +38,6 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.entities.DummyInterface;
 import org.junit.runner.RunWith;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Esko Luontola
  * @since 5.9.2008
@@ -54,9 +51,7 @@ public class ThreadContextSpec extends Specification<Object> {
 
     public void create() throws Exception {
         myService = new MyServiceImpl();
-        Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
-        services.put(MyService.class, myService);
-        myContext = new DummyContext(services);
+        myContext = new FakeContext().with(MyService.class, myService);
     }
 
     public void destroy() throws Exception {
@@ -112,7 +107,7 @@ public class ThreadContextSpec extends Specification<Object> {
             ThreadContext.setUp(myContext);
             specify(new Block() {
                 public void run() throws Throwable {
-                    ThreadContext.setUp(new DummyContext());
+                    ThreadContext.setUp(new FakeContext());
                 }
             }, should.raise(IllegalStateException.class));
             specify(ThreadContext.get(MyService.class), should.equal(myService));

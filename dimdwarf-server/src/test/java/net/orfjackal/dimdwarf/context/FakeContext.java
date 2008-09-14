@@ -29,27 +29,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.util;
+package net.orfjackal.dimdwarf.context;
 
-import com.google.inject.Provider;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
+ * This class is NOT thread-safe.
+ *
  * @author Esko Luontola
- * @since 13.9.2008
+ * @since 5.9.2008
  */
-public class DummyProvider<T> implements Provider<T> {
+public class FakeContext implements Context {
 
-    private final T instance;
+    private final Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
 
-    public DummyProvider(T instance) {
-        this.instance = instance;
+    public <T> FakeContext with(Class<T> type, T instance) {
+        services.put(type, instance);
+        return this;
     }
 
-    public T get() {
-        return instance;
-    }
-
-    public static <T> Provider<T> with(T instance) {
-        return new DummyProvider<T>(instance);
+    public <T> T get(Class<T> service) {
+        Object instance = services.get(service);
+        if (instance == null) {
+            throw new IllegalArgumentException("Not found: " + service);
+        }
+        return service.cast(instance);
     }
 }

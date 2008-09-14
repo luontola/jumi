@@ -32,7 +32,8 @@
 package net.orfjackal.dimdwarf.context;
 
 /**
- * This class is thread-safe.
+ * This class is thread-safe. The contexts themselves do not need to be thread-safe,
+ * because this class will make sure that they are used in only one thread.
  *
  * @author Esko Luontola
  * @since 5.9.2008

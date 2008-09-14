@@ -29,41 +29,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.context;
+package net.orfjackal.dimdwarf.util;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Provider;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
- * @since 5.9.2008
+ * @since 13.9.2008
  */
-public class DummyContext implements Context {
+public class StubProvider<T> implements Provider<T> {
 
-    private final Map<Class<?>, Object> services;
+    private final T instance;
 
-    public DummyContext() {
-        this(new HashMap<Class<?>, Object>());
+    public StubProvider(T instance) {
+        this.instance = instance;
     }
 
-    public DummyContext(Map<Class<?>, Object> services) {
-        this.services = Collections.unmodifiableMap(new HashMap<Class<?>, Object>(services));
+    public T get() {
+        return instance;
     }
 
-    public <T> DummyContext(Class<T> type, T instance) {
-        Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
-        map.put(type, instance);
-        this.services = Collections.unmodifiableMap(map);
-    }
-
-    public <T> T get(Class<T> service) {
-        Object instance = services.get(service);
-        if (instance == null) {
-            throw new IllegalArgumentException("Not found: " + service);
-        }
-        return service.cast(instance);
+    public static <T> Provider<T> wrap(T instance) {
+        return new StubProvider<T>(instance);
     }
 }

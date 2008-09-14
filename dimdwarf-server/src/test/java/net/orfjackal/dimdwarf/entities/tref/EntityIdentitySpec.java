@@ -36,12 +36,12 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
-import net.orfjackal.dimdwarf.context.DummyContext;
+import net.orfjackal.dimdwarf.context.FakeContext;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
-import net.orfjackal.dimdwarf.util.DummyProvider;
+import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -66,7 +66,7 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactoryImpl(DummyProvider.with(referenceFactory));
+        proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
         checking(referencesMayBeCreatedFor(ent1, BigInteger.valueOf(1)));
@@ -75,7 +75,7 @@ public class EntityIdentitySpec extends Specification<Object> {
         tref1b = proxyFactory.createTransparentReference(ent1);
         tref2 = proxyFactory.createTransparentReference(ent2);
         obj = new Object();
-        ThreadContext.setUp(new DummyContext(ReferenceFactory.class, referenceFactory));
+        ThreadContext.setUp(new FakeContext().with(ReferenceFactory.class, referenceFactory));
     }
 
     public void destroy() throws Exception {

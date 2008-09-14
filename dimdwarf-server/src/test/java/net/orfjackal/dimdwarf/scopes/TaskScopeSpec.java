@@ -40,7 +40,7 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.DummyContext;
+import net.orfjackal.dimdwarf.context.FakeContext;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.modules.TaskScopeModule;
 import org.junit.runner.RunWith;
@@ -96,7 +96,7 @@ public class TaskScopeSpec extends Specification<Object> {
         }
 
         public void taskScopedBindingsCanNotBeAccessedInOtherThreadContexts() {
-            ThreadContext.setUp(new DummyContext());
+            ThreadContext.setUp(new FakeContext());
             specify(new Block() {
                 public void run() throws Throwable {
                     injector.getInstance(MyService.class);
