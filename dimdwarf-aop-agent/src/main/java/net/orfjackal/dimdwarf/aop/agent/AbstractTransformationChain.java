@@ -48,10 +48,23 @@ public abstract class AbstractTransformationChain implements ClassFileTransforme
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         ClassReader cr = new ClassReader(classfileBuffer);
-        ClassWriter cw = new ClassWriter(cr, 0);
+        ClassWriter cw;
+        if (enableAdditiveTransformationOptimization()) {
+            cw = new ClassWriter(cr, 0);
+        } else {
+            cw = new ClassWriter(0);
+        }
         ClassVisitor cv = getAdapters(cw);
         cr.accept(cv, 0);
         return cw.toByteArray();
+    }
+
+    /**
+     * See "Optimization" in section 2.2.4 of
+     * <a href="http://download.forge.objectweb.org/asm/asm-guide.pdf">ASM 3.0 User Guide</a>
+     */
+    protected boolean enableAdditiveTransformationOptimization() {
+        return true;
     }
 
     protected abstract ClassVisitor getAdapters(ClassVisitor cv);
