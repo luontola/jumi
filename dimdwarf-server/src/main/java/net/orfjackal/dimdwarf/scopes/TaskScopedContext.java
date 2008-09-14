@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.scopes;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 
@@ -63,7 +64,12 @@ public class TaskScopedContext implements Context {
         return injector.getInstance(service);
     }
 
-    public Map<Key<?>, Object> cache() {
-        return cache;
+    <T> T scopedGet(Key<T> key, Provider<T> unscoped) {
+        T value = (T) cache.get(key);
+        if (value == null) {
+            value = unscoped.get();
+            cache.put(key, value);
+        }
+        return value;
     }
 }

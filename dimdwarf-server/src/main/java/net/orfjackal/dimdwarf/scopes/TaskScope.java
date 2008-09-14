@@ -37,8 +37,6 @@ import com.google.inject.Scope;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 
-import java.util.Map;
-
 /**
  * This class is stateless.
  *
@@ -54,16 +52,7 @@ public class TaskScope implements Scope {
                 if (!(context instanceof TaskScopedContext)) {
                     throw new IllegalStateException("Not inside task scope");
                 }
-                return getCached(((TaskScopedContext) context).cache());
-            }
-
-            private T getCached(Map<Key<?>, Object> cache) {
-                T value = (T) cache.get(key);
-                if (value == null) {
-                    value = unscoped.get();
-                    cache.put(key, value);
-                }
-                return value;
+                return ((TaskScopedContext) context).scopedGet(key, unscoped);
             }
         };
     }
