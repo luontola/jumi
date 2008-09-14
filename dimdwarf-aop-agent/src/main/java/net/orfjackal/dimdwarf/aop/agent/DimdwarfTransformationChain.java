@@ -43,6 +43,7 @@ import org.objectweb.asm.ClassVisitor;
 public class DimdwarfTransformationChain extends AbstractTransformationChain {
 
     protected ClassVisitor getAdapters(ClassVisitor cv) {
+        // the adapter declared last is processed first
         cv = new AddEqualsAndHashCodeMethodsForEntities(cv);
         cv = new MarkAsEntitiesAllClassesAnnotatedWith(DimdwarfApi.ENTITY_ANNOTATION, cv);
         return cv;
