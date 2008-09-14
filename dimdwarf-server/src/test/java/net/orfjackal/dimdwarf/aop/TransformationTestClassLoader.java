@@ -48,6 +48,7 @@ public class TransformationTestClassLoader extends ClassLoader {
     private final String classToInstrument;
     private final ClassFileTransformer transformer;
 
+    // TODO: allow matching classes with (multiple) wildcards, maybe Ant style: http://ant.apache.org/manual/dirtasks.html
     public TransformationTestClassLoader(String classToInstrument, ClassFileTransformer transformer) {
         super(TransformationTestClassLoader.class.getClassLoader());
         if (transformer == null) {
