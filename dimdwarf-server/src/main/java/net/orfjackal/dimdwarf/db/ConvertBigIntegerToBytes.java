@@ -39,7 +39,7 @@ import java.math.BigInteger;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class BigIntegerConverter implements Converter<BigInteger, Blob> {
+public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
 
     public BigInteger back(Blob value) {
         if (value == null) {

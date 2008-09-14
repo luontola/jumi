@@ -33,7 +33,6 @@ package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.Converter;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
@@ -44,32 +43,32 @@ import net.orfjackal.dimdwarf.serial.ObjectSerializer;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class EntityConverter implements Converter<IEntity, Blob> {
+public class ConvertEntityToBytes implements Converter<Object, Blob> {
 
     private final ObjectSerializer serializer;
 
     @Inject
-    public EntityConverter(ObjectSerializer serializer) {
+    public ConvertEntityToBytes(ObjectSerializer serializer) {
         this.serializer = serializer;
     }
 
-    public IEntity back(Blob value) {
+    public Object back(Blob value) {
         if (value == null) {
             return null;
         }
         if (value.equals(Blob.EMPTY_BLOB)) {
             throw new EntityNotFoundException();
         }
-        return (IEntity) serializer.deserialize(value);
+        Object entity = serializer.deserialize(value);
+        assert Entities.isEntity(entity);
+        return entity;
     }
 
-    public Blob forth(IEntity value) {
-        if (value == null) {
+    public Blob forth(Object entity) {
+        if (entity == null) {
             return null;
         }
-        if (!Entities.isEntity(value)) {
-            throw new IllegalArgumentException("Not an entity");
-        }
-        return serializer.serialize(value);
+        assert Entities.isEntity(entity);
+        return serializer.serialize(entity);
     }
 }

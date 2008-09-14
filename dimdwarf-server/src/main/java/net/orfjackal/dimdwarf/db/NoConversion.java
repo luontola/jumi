@@ -31,29 +31,19 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import java.nio.charset.Charset;
-
 /**
  * This class is immutable.
  *
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class StringConverter implements Converter<String, Blob> {
+public class NoConversion<T> implements Converter<T, T> {
 
-    private static final Charset CHARSET = Charset.forName("UTF-8");
-
-    public String back(Blob value) {
-        if (value == null) {
-            return null;
-        }
-        return new String(value.getByteArray(), CHARSET);
+    public T back(T value) {
+        return value;
     }
 
-    public Blob forth(String value) {
-        if (value == null) {
-            return null;
-        }
-        return Blob.fromBytes(value.getBytes(CHARSET));
+    public T forth(T value) {
+        return value;
     }
 }

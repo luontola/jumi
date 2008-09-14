@@ -64,7 +64,7 @@ public class DatabaseAdapterSpec extends Specification<Object> {
     public void create() throws Exception {
         db = mock(Database.class);
         table = mock(DatabaseTable.class);
-        dbAdapter = new DatabaseAdapter<String, BigInteger, Blob, Blob>(db, new StringConverter(), new BigIntegerConverter());
+        dbAdapter = new DatabaseAdapter<String, BigInteger, Blob, Blob>(db, new ConvertStringToBytes(), new ConvertBigIntegerToBytes());
 
         key = "key";
         value = BigInteger.TEN;

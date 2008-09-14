@@ -98,7 +98,7 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader, Transa
     private IEntity loadAndRegister(BigInteger id, EntityReference<?> ref) {
         IEntity entity = entitiesById.get(id);
         if (entity == null) {
-            entity = storage.read(id);
+            entity = (IEntity) storage.read(id);
             if (ref == null) {
                 ref = new EntityReferenceImpl<Object>(id, entity);
             }

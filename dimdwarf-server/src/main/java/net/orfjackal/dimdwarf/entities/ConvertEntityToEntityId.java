@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.db.Converter;
 
 import java.math.BigInteger;
@@ -42,13 +43,13 @@ import java.math.BigInteger;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class EntityIdConverter implements Converter<Object, BigInteger> {
+public class ConvertEntityToEntityId implements Converter<Object, BigInteger> {
 
     private final ReferenceFactory referenceFactory;
     private final EntityLoader entityLoader;
 
     @Inject
-    public EntityIdConverter(ReferenceFactory referenceFactory, EntityLoader entityLoader) {
+    public ConvertEntityToEntityId(ReferenceFactory referenceFactory, EntityLoader entityLoader) {
         this.referenceFactory = referenceFactory;
         this.entityLoader = entityLoader;
     }
@@ -57,13 +58,16 @@ public class EntityIdConverter implements Converter<Object, BigInteger> {
         if (id == null) {
             return null;
         }
-        return entityLoader.loadEntity(id);
+        Object entity = entityLoader.loadEntity(id);
+        assert Entities.isEntity(entity);
+        return entity;
     }
 
     public BigInteger forth(Object entity) {
         if (entity == null) {
             return null;
         }
+        assert Entities.isEntity(entity);
         return referenceFactory.createReference(entity).getId();
     }
 }

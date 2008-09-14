@@ -46,10 +46,10 @@ public class BindingStorageImpl extends DatabaseTableAdapter<String, Object, Str
 
     @Inject
     public BindingStorageImpl(@BindingsTable DatabaseTable<Blob, Blob> bindings,
-                              StringConverter keys1,
-                              BigIntegerConverter values1,
-                              NullConverter<String> keys2,
-                              EntityIdConverter values2) {
-        super(new DatabaseTableAdapter<String, BigInteger, Blob, Blob>(bindings, keys1, values1), keys2, values2);
+                              NoConversion<String> keys1,
+                              ConvertStringToBytes keys2,
+                              ConvertEntityToEntityId values1,
+                              ConvertBigIntegerToBytes values2) {
+        super(new DatabaseTableAdapter<String, BigInteger, Blob, Blob>(bindings, keys2, values2), keys1, values1);
     }
 }
