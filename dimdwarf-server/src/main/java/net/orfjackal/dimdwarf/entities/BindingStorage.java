@@ -37,7 +37,7 @@ import net.orfjackal.dimdwarf.db.DatabaseTable;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public interface BindingManager extends DatabaseTable<String, Object> {
+public interface BindingStorage extends DatabaseTable<String, Object> {
 
     Object read(String binding);
 

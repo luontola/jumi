@@ -49,16 +49,16 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class BindingManagerSpec extends Specification<Object> {
+public class BindingStorageSpec extends Specification<Object> {
 
-    private BindingManager bindingManager;
+    private BindingStorage bindingStorage;
     private DatabaseManager dbms;
     private TransactionCoordinator tx;
 
     @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
-        bindingManager = createBindingManager(newDatabaseConnection());
+        bindingStorage = createBindingStorage(newDatabaseConnection());
     }
 
     private Database<Blob, Blob> newDatabaseConnection() {
@@ -66,7 +66,7 @@ public class BindingManagerSpec extends Specification<Object> {
         return dbms.openConnection(tx.getTransaction());
     }
 
-    private BindingManagerImpl createBindingManager(Database<Blob, Blob> db) {
+    private BindingStorageImpl createBindingStorage(Database<Blob, Blob> db) {
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
         DatabaseTable<Blob, Blob> entities = db.openTable("entities");
 
@@ -79,7 +79,7 @@ public class BindingManagerSpec extends Specification<Object> {
                                 new EntityConverter(new ObjectSerializerImpl())),
                         tx.getTransaction());
 
-        return new BindingManagerImpl(
+        return new BindingStorageImpl(
                 bindings,
                 new StringConverter(),
                 new BigIntegerConverter(),
@@ -93,28 +93,28 @@ public class BindingManagerSpec extends Specification<Object> {
         public Object create() {
             DummyEntity foo = new DummyEntity();
             foo.setOther("foo");
-            bindingManager.update("foo", foo);
-            bindingManager.update("foo.2", new DummyEntity());
-            bindingManager.update("foo.1", new DummyEntity());
-            bindingManager.update("bar.x", new DummyEntity());
-            bindingManager.update("bar.y", new DummyEntity());
+            bindingStorage.update("foo", foo);
+            bindingStorage.update("foo.2", new DummyEntity());
+            bindingStorage.update("foo.1", new DummyEntity());
+            bindingStorage.update("bar.x", new DummyEntity());
+            bindingStorage.update("bar.y", new DummyEntity());
             tx.prepareAndCommit();
-            bindingManager = createBindingManager(newDatabaseConnection());
+            bindingStorage = createBindingStorage(newDatabaseConnection());
             return null;
         }
 
         public void bindingsAreInAlphabeticalOrder() {
-            specify(bindingManager.firstKey(), should.equal("bar.x"));
+            specify(bindingStorage.firstKey(), should.equal("bar.x"));
         }
 
         public void whenBindingsHaveTheSamePrefixTheShortestBindingIsFirst() {
-            specify(bindingManager.nextKeyAfter("foo"), should.equal("foo.1"));
-            specify(bindingManager.nextKeyAfter("foo.1"), should.equal("foo.2"));
-            specify(bindingManager.nextKeyAfter("foo.2"), should.equal(null));
+            specify(bindingStorage.nextKeyAfter("foo"), should.equal("foo.1"));
+            specify(bindingStorage.nextKeyAfter("foo.1"), should.equal("foo.2"));
+            specify(bindingStorage.nextKeyAfter("foo.2"), should.equal(null));
         }
 
         public void entitiesCanBeAccessedByTheBindingName() {
-            DummyEntity entity = (DummyEntity) bindingManager.read("foo");
+            DummyEntity entity = (DummyEntity) bindingStorage.read("foo");
             specify(entity.getOther(), should.equal("foo"));
         }
     }

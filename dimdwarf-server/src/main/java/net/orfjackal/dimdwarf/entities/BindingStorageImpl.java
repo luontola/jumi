@@ -42,10 +42,10 @@ import java.math.BigInteger;
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public class BindingManagerImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingManager {
+public class BindingStorageImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingStorage {
 
     @Inject
-    public BindingManagerImpl(@BindingsTable DatabaseTable<Blob, Blob> bindings,
+    public BindingStorageImpl(@BindingsTable DatabaseTable<Blob, Blob> bindings,
                               StringConverter keys1,
                               BigIntegerConverter values1,
                               NullConverter<String> keys2,

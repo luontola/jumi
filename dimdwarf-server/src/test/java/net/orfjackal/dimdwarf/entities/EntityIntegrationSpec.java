@@ -89,16 +89,16 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void entityBindingsCreatedInOneTaskCanBeReadInTheNextTask() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingManager binder = injector.getInstance(BindingManager.class);
-                    binder.update("bar", new DummyEntity("foo"));
+                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    bindings.update("bar", new DummyEntity("foo"));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingManager binder = injector.getInstance(BindingManager.class);
-                    specify(binder.firstKey(), should.equal("bar"));
-                    specify(binder.nextKeyAfter("bar"), should.equal(null));
-                    DummyEntity entity = (DummyEntity) binder.read("bar");
+                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    specify(bindings.firstKey(), should.equal("bar"));
+                    specify(bindings.nextKeyAfter("bar"), should.equal(null));
+                    DummyEntity entity = (DummyEntity) bindings.read("bar");
                     specify(entity.getOther(), should.equal("foo"));
                 }
             });
@@ -107,14 +107,14 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void transparentReferencesAreCreatedAutomatically() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingManager binder = injector.getInstance(BindingManager.class);
-                    binder.update("foo", new DummyEntity(new DummyEntity("other")));
+                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    bindings.update("foo", new DummyEntity(new DummyEntity("other")));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingManager binder = injector.getInstance(BindingManager.class);
-                    DummyEntity entity = (DummyEntity) binder.read("foo");
+                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    DummyEntity entity = (DummyEntity) bindings.read("foo");
                     DummyInterface other = (DummyInterface) entity.getOther();
                     specify(other.getOther(), should.equal("other"));
                     specify(Entities.isEntity(entity));
