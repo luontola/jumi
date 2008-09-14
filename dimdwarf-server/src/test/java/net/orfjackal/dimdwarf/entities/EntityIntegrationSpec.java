@@ -38,7 +38,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.modules.DimdwarfModules;
+import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
@@ -57,7 +57,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
     private TaskExecutor taskExecutor;
 
     public void create() throws Exception {
-        injector = Guice.createInjector(new DimdwarfModules());
+        injector = Guice.createInjector(new CommonModules());
         taskExecutor = injector.getInstance(TaskExecutor.class);
     }
 

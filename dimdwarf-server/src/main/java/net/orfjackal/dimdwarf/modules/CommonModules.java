@@ -37,7 +37,7 @@ import com.google.inject.AbstractModule;
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class DimdwarfModules extends AbstractModule {
+public class CommonModules extends AbstractModule {
 
     protected void configure() {
         install(new TaskScopeModule());
