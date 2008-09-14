@@ -35,7 +35,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.scopes.DimdwarfScopes;
+import net.orfjackal.dimdwarf.scopes.TaskScope;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
 import net.orfjackal.dimdwarf.tx.Transaction;
@@ -50,17 +50,17 @@ public class TaskScopeModule extends AbstractModule {
 
     protected void configure() {
 
-        bindScope(TaskScoped.class, DimdwarfScopes.TASK);
+        bindScope(TaskScoped.class, new TaskScope());
 
         bind(Context.class)
                 .to(TaskScopedContext.class);
 
         bind(TransactionCoordinator.class)
                 .to(TransactionImpl.class)
-                .in(DimdwarfScopes.TASK);
+                .in(TaskScoped.class);
         bind(Transaction.class)
                 .toProvider(new TransactionProvider())
-                .in(DimdwarfScopes.TASK);
+                .in(TaskScoped.class);
     }
 
     private static class TransactionProvider implements Provider<Transaction> {

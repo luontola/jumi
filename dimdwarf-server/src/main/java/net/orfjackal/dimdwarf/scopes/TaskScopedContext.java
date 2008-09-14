@@ -35,11 +35,15 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * When {@code TaskScopedContext} is installed as the current {@link ThreadContext},
+ * then that thread is in a task scope identified by the {@code TaskScopedContext} instance.
+ * <p/>
  * This class is NOT thread-safe.
  *
  * @author Esko Luontola
