@@ -31,15 +31,16 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.Database;
 import net.orfjackal.dimdwarf.db.DatabaseManager;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabase;
 import net.orfjackal.dimdwarf.tx.Transaction;
-
-import java.lang.annotation.Annotation;
 
 /**
  * @author Esko Luontola
@@ -65,15 +66,17 @@ public class DatabaseModule extends AbstractModule {
         }
     }
 
-    public static void bindDatabaseTable(final String tableName, Class<? extends Annotation> annotation, Binder binder) {
-        binder.bind(new TypeLiteral<DatabaseTable<Blob, Blob>>() {})
-                .annotatedWith(annotation)
-                .toProvider(new Provider<DatabaseTable<Blob, Blob>>() {
-                    @Inject Provider<Database<Blob, Blob>> db;
+    public static TypeLiteral<DatabaseTable<Blob, Blob>> databaseTableConnection() {
+        return new TypeLiteral<DatabaseTable<Blob, Blob>>() {};
+    }
 
-                    public DatabaseTable<Blob, Blob> get() {
-                        return db.get().openTable(tableName);
-                    }
-                });
+    public static Provider<DatabaseTable<Blob, Blob>> databaseTable(final String name) {
+        return new Provider<DatabaseTable<Blob, Blob>>() {
+            @Inject Provider<Database<Blob, Blob>> db;
+
+            public DatabaseTable<Blob, Blob> get() {
+                return db.get().openTable(name);
+            }
+        };
     }
 }

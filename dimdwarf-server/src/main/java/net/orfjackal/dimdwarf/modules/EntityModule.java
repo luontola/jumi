@@ -38,6 +38,8 @@ import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.tref.ReplaceEntitiesWithTransparentReferences;
 import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactory;
 import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactoryImpl;
+import static net.orfjackal.dimdwarf.modules.DatabaseModule.databaseTable;
+import static net.orfjackal.dimdwarf.modules.DatabaseModule.databaseTableConnection;
 import net.orfjackal.dimdwarf.serial.*;
 
 import java.math.BigInteger;
@@ -50,6 +52,7 @@ public class EntityModule extends AbstractModule {
 
     protected void configure() {
 
+        bind(EntityManagerImpl.class);
         bind(EntityLoader.class).to(EntityManagerImpl.class);
         bind(ReferenceFactory.class).to(EntityManagerImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
@@ -61,10 +64,14 @@ public class EntityModule extends AbstractModule {
                 });
 
         bind(EntityStorage.class).to(EntityStorageImpl.class);
-        DatabaseModule.bindDatabaseTable("entities", EntitiesTable.class, binder());
+        bind(databaseTableConnection())
+                .annotatedWith(EntitiesTable.class)
+                .toProvider(databaseTable("entities"));
 
         bind(BindingManager.class).to(BindingManagerImpl.class);
-        DatabaseModule.bindDatabaseTable("bindings", BindingsTable.class, binder());
+        bind(databaseTableConnection())
+                .annotatedWith(BindingsTable.class)
+                .toProvider(databaseTable("bindings"));
 
         bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
         bind(SerializationListener[].class).toProvider(new SerializationListenerListProvider());
