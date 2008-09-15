@@ -48,6 +48,7 @@ public class Startup {
         logger.info("Dimdwarf {} starting up", getVersion());
 
         // start up server etc.
+        //Guice.createInjector(Stage.PRODUCTION, ...)
 
         logger.info("Shutting down");
     }
