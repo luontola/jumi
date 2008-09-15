@@ -61,6 +61,7 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
     }
 
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        // TODO: if equals was defined in "Foo implementes Entity", will "Bar extends Foo" keep the equals from Foo?
         if (name.equals("equals") && desc.equals("(Ljava/lang/Object;)Z")) {
             hasEqualsMethod = true;
         }
