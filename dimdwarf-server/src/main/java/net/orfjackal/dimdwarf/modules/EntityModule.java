@@ -52,7 +52,6 @@ public class EntityModule extends AbstractModule {
 
     protected void configure() {
 
-        bind(EntityManagerImpl.class);
         bind(EntityLoader.class).to(EntityManagerImpl.class);
         bind(ReferenceFactory.class).to(EntityManagerImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
