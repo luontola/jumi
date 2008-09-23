@@ -79,9 +79,9 @@ public class ObjectSerializerImpl implements ObjectSerializer {
 
     private Object deserializeFromStream(InputStream source) {
         try {
-            ObjectInputStream out = new MyObjectInputStream(source);
-            Object obj = out.readObject();
-            out.close();
+            ObjectInputStream in = new MyObjectInputStream(source);
+            Object obj = in.readObject();
+            in.close();
             return obj;
         } catch (IOException e) {
             throw new RuntimeException(e);

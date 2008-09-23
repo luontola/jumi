@@ -73,7 +73,7 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
     }
 
     /**
-     * Needs to be injected when the reference is deserialized. No need inject when
+     * Needs to be injected when the reference is deserialized. No need to inject when
      * the reference is created, because then the entity is already cached locally.
      */
     @Inject
