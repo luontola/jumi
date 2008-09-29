@@ -32,11 +32,8 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import com.google.inject.Singleton;
-import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.*;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseManager;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
@@ -174,6 +171,10 @@ public class InMemoryDatabase implements DatabaseManager {
             this.visibleRevision = visibleRevision;
             this.tx = tx;
             tx.join(this);
+        }
+
+        public IsolationLevel getIsolationLevel() {
+            return IsolationLevel.SNAPSHOT;
         }
 
         public Set<String> tables() {

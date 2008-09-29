@@ -51,6 +51,10 @@ public class DatabaseAdapter<K1, V1, K2, V2> implements Database<K1, V1> {
         this.values = values;
     }
 
+    public IsolationLevel getIsolationLevel() {
+        return parent.getIsolationLevel();
+    }
+
     public Set<String> tables() {
         return parent.tables();
     }

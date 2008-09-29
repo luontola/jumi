@@ -31,23 +31,41 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import java.util.Set;
-
 /**
  * @author Esko Luontola
- * @since 11.9.2008
+ * @since 29.9.2008
  */
-public interface Database<K, V> {
-
-    IsolationLevel getIsolationLevel();
+public enum IsolationLevel {
 
     /**
-     * Existing tables.
+     * Prevents: dirty reads, nonrepeatable reads, phantom reads, write skew.<br>
+     * Allows: none.
+     * <p/>
+     * This is the most restrictive isolation level.
      */
-    Set<String> tables();
+    SERIALIZABLE,
 
     /**
-     * Opens an existing table or creates a new table.
+     * Prevents dirty reads, nonrepeatable reads, phantom reads.<br>
+     * Allows: write skew.
      */
-    DatabaseTable<K, V> openTable(String name);
+    SNAPSHOT,
+
+    /**
+     * Prevents: dirty reads, nonrepeatable reads, write skew.<br>
+     * Allows: phantom reads.
+     */
+    REPEATABLE_READ,
+
+    /**
+     * Prevents: dirty reads, write skew.<br>
+     * Allows: nonrepeatable reads, phantom reads.
+     */
+    READ_COMMITTED,
+
+    /**
+     * Prevents: write skew.<br>
+     * Allows: dirty reads, nonrepeatable reads, phantom reads.
+     */
+    READ_UNCOMMITTED
 }
