@@ -32,6 +32,9 @@
 package net.orfjackal.dimdwarf.db;
 
 /**
+ * See:
+ * <a href="http://citeseer.ist.psu.edu/old/berenson95critique.html">A Critique of ANSI SQL Isolation Levels (1995)</a>
+ *
  * @author Esko Luontola
  * @since 29.9.2008
  */
