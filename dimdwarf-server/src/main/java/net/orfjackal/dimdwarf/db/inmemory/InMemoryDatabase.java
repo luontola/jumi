@@ -48,10 +48,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * An in-memory database which uses multiversion concurrency control
- * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">[1]</a>.
- * The current implementation allows write skew, but prevents phantom reads
- * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">[2]</a>.
+ * An in-memory database which uses multiversion concurrency control.
+ * The isolation mode is snapshot isolation - it allows write skew, but prevents phantom reads.
+ * <p/>
+ * See:
+ * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
+ * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
  * <p/>
  * This class is thread-safe.
  *

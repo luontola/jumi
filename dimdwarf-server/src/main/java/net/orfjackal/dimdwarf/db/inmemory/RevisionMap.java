@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * The old revisions can be purged with {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure
  * that those revisions will not be accessed. The revision system used by this class was inspired by Subversion.
  * <p/>
- * Also see:
+ * See:
  * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
  * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
  * <p/>
