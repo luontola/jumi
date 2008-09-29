@@ -58,14 +58,14 @@ public enum IsolationLevel {
     REPEATABLE_READ,
 
     /**
-     * Prevents: dirty reads, write skew<br>
-     * Allows: non-repeatable reads, phantom reads
+     * Prevents: dirty reads<br>
+     * Allows: non-repeatable reads, phantom reads, write skew
      */
     READ_COMMITTED,
 
     /**
-     * Prevents: write skew<br>
-     * Allows: dirty reads, non-repeatable reads, phantom reads
+     * Prevents: -<br>
+     * Allows: dirty reads, non-repeatable reads, phantom reads, write skew
      */
     READ_UNCOMMITTED
 }
