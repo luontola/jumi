@@ -38,7 +38,7 @@ package net.orfjackal.dimdwarf.db;
 public enum IsolationLevel {
 
     /**
-     * Prevents: dirty reads, nonrepeatable reads, phantom reads, write skew<br>
+     * Prevents: dirty reads, non-repeatable reads, phantom reads, write skew<br>
      * Allows: -
      * <p/>
      * This is the most restrictive isolation level.
@@ -46,26 +46,26 @@ public enum IsolationLevel {
     SERIALIZABLE,
 
     /**
-     * Prevents dirty reads, nonrepeatable reads, phantom reads<br>
+     * Prevents dirty reads, non-repeatable reads, phantom reads<br>
      * Allows: write skew
      */
     SNAPSHOT,
 
     /**
-     * Prevents: dirty reads, nonrepeatable reads, write skew<br>
+     * Prevents: dirty reads, non-repeatable reads, write skew<br>
      * Allows: phantom reads
      */
     REPEATABLE_READ,
 
     /**
      * Prevents: dirty reads, write skew<br>
-     * Allows: nonrepeatable reads, phantom reads
+     * Allows: non-repeatable reads, phantom reads
      */
     READ_COMMITTED,
 
     /**
      * Prevents: write skew<br>
-     * Allows: dirty reads, nonrepeatable reads, phantom reads
+     * Allows: dirty reads, non-repeatable reads, phantom reads
      */
     READ_UNCOMMITTED
 }
