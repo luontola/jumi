@@ -49,7 +49,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * <p/>
  * Also see:
  * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
- * <a href="http://en.wikipedia.org/wiki/Timestamp-based_concurrency_control">timestamp-based concurrency control</a>,
  * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
  * <p/>
  * This class is thread-safe.
