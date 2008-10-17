@@ -45,32 +45,6 @@ public class ThreadContext {
     private ThreadContext() {
     }
 
-    public static Context currentContext() {
-        return THREAD_LOCAL.get();
-    }
-
-    public static void setUp(Context context) {
-        if (THREAD_LOCAL.get() != null) {
-            throw new IllegalStateException("Already set up");
-        }
-        THREAD_LOCAL.set(context);
-    }
-
-    public static <T> T get(Class<T> service) {
-        Context context = THREAD_LOCAL.get();
-        if (context == null) {
-            throw new IllegalStateException("Not set up");
-        }
-        return context.get(service);
-    }
-
-    public static void tearDown() {
-        if (THREAD_LOCAL.get() == null) {
-            throw new IllegalStateException("Already torn down");
-        }
-        THREAD_LOCAL.set(null);
-    }
-
     public static void runInContext(Context context, Runnable runnable) {
         setUp(context);
         try {
@@ -78,5 +52,47 @@ public class ThreadContext {
         } finally {
             tearDown();
         }
+    }
+
+    /**
+     * WARNING: This method should be used <em>only</em> when it is not
+     * possible to access a service through dependency injection.
+     * The service locator pattern (which this method uses) makes
+     * dependencies non-explicit and code harder to test.
+     */
+    public static <T> T get(Class<T> service) {
+        Context context = currentContext();
+        if (context == null) {
+            throw new IllegalStateException("Not set up");
+        }
+        return context.get(service);
+    }
+
+    /**
+     * WARNING: Prefer using {@link #runInContext} instead of this method.
+     */
+    public static void setUp(Context context) {
+        if (currentContext() != null) {
+            throw new IllegalStateException("Already set up");
+        }
+        THREAD_LOCAL.set(context);
+    }
+
+    /**
+     * WARNING: Prefer using {@link #runInContext} instead of this method.
+     */
+    public static void tearDown() {
+        if (currentContext() == null) {
+            throw new IllegalStateException("Already torn down");
+        }
+        THREAD_LOCAL.set(null);
+    }
+
+    /**
+     * WARNING: This method should be used <em>only</em> if the framework
+     * requires direct access to the context implementation.
+     */
+    public static Context currentContext() {
+        return THREAD_LOCAL.get();
     }
 }
