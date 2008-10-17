@@ -61,7 +61,9 @@ public class TaskExecutor implements Executor {
     public void execute(final Runnable command) {
         ThreadContext.runInContext(contextProvider.get(), new Runnable() {
             public void run() {
-                // TODO: Refactor transaction handling out of this class. Use a nested chain of runnables for transactions, entity flushing, entity reference counting etc.
+                // TODO: Refactor transaction handling out of this class:
+                // - Use a nested chain of runnables for transactions, entity flushing, entity reference counting etc.
+                // - Then also get rid of TransactionListener.transactionWillDeactivate()
                 TransactionCoordinator tx = txProvider.get();
                 try {
                     command.run();
