@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionListener;
+import org.jetbrains.annotations.TestOnly;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -65,45 +66,71 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader, Transa
         tx.addTransactionListener(this);
     }
 
+    @TestOnly
     public int getRegisteredEntities() {
         return entities.size();
     }
 
-    @SuppressWarnings({"unchecked"})
-    public <T> EntityReference<T> createReference(T obj) {
+    // ReferenceFactory
+
+    public <T> EntityReference<T> createReference(T entity) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
-        if (!Entities.isEntity(obj)) {
-            throw new IllegalArgumentException("Not an entity: " + obj);
-        }
-        IEntity entity = (IEntity) obj;
-        EntityReference<T> ref = (EntityReference<T>) entities.get(entity);
+        checkIsEntity(entity);
+        EntityReference<T> ref = getExistingReference(entity);
         if (ref == null) {
-            ref = new EntityReferenceImpl<T>(idFactory.newId(), obj);
-            register(entity, ref);
+            ref = createNewReference(entity);
         }
         return ref;
     }
 
+    private static void checkIsEntity(Object obj) {
+        if (!Entities.isEntity(obj)) {
+            throw new IllegalArgumentException("Not an entity: " + obj);
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private <T> EntityReference<T> getExistingReference(T entity) {
+        return (EntityReference<T>) entities.get((IEntity) entity);
+    }
+
+    private <T> EntityReference<T> createNewReference(T obj) {
+        EntityReference<T> ref = new EntityReferenceImpl<T>(idFactory.newId(), obj);
+        register((IEntity) obj, ref);
+        return ref;
+    }
+
+    // EntityLoader
+
     public Object loadEntity(BigInteger id) {
         checkStateIs(State.ACTIVE);
-        return loadAndRegister(id, null);
+        return loadEntity(id, null);
     }
 
     @SuppressWarnings({"unchecked"})
     public <T> T loadEntity(EntityReference<T> ref) {
         checkStateIs(State.ACTIVE);
-        return (T) loadAndRegister(ref.getId(), ref);
+        return (T) loadEntity(ref.getId(), ref);
     }
 
-    private IEntity loadAndRegister(BigInteger id, EntityReference<?> ref) {
-        IEntity entity = entitiesById.get(id);
+    private IEntity loadEntity(BigInteger id, EntityReference<?> cachedRef) {
+        IEntity entity = getLoadedEntity(id);
         if (entity == null) {
-            entity = (IEntity) storage.read(id);
-            if (ref == null) {
-                ref = new EntityReferenceImpl<Object>(id, entity);
-            }
-            register(entity, ref);
+            entity = loadEntityFromDatabase(id, cachedRef);
         }
+        return entity;
+    }
+
+    private IEntity getLoadedEntity(BigInteger id) {
+        return entitiesById.get(id);
+    }
+
+    private IEntity loadEntityFromDatabase(BigInteger id, EntityReference<?> ref) {
+        IEntity entity = (IEntity) storage.read(id);
+        if (ref == null) {
+            ref = new EntityReferenceImpl<Object>(id, entity);
+        }
+        register(entity, ref);
         return entity;
     }
 
@@ -111,11 +138,12 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader, Transa
         if (state == State.FLUSHING) {
             flushQueue.add(entity);
         }
-        entitiesById.put(ref.getId(), entity);
-        EntityReference<?> previous =
-                entities.put(entity, ref);
-        assert previous == null : "Registered an entity twise: " + entity + ", " + ref;
+        Object previous1 = entitiesById.put(ref.getId(), entity);
+        Object previous2 = entities.put(entity, ref);
+        assert previous1 == null && previous2 == null : "Registered an entity twise: " + entity + ", " + ref;
     }
+
+    // IterableKeys
 
     public BigInteger firstKey() {
         checkStateIs(State.ACTIVE);
