@@ -46,6 +46,7 @@ public class CheckInnerClassSerialized extends SerializationAdapter {
         // generated automatically ($1, $2 etc.), which means that the next time that such an
         // object is deserialized from database, the class name might have changed because of
         // a change to the enclosing class, and the system might end up in an unspecified state.
+        // It is safer to serialize only top-level classes and member classes.
         Class<?> cls = obj.getClass();
         if (cls.isAnonymousClass()) {
             throw new IllegalArgumentException("Tried to serialize an anonymous class: " + cls.getName());
