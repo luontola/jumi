@@ -35,7 +35,6 @@ import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,15 +56,6 @@ public class TransparentReferenceUtil {
         } else if (Entities.isEntity(object)) {
 //            AppContext.getDataManager().markForUpdate(object);
         }
-    }
-
-    /**
-     * Used when converting {@link net.orfjackal.dimdwarf.api.impl.IEntity} instances to transparent references during serialization.
-     * Needed because {@link ObjectOutputStream#replaceObject} does not check whether the returned objects
-     * have a {@code writeReplace()} method.
-     */
-    public static Object createTransparentReferenceForSerialization(IEntity object, TransparentReferenceFactory factory) {
-        return factory.createTransparentReference(object).writeReplace();
     }
 
     public static Class<?>[] proxiedInterfaces(Class<?> aClass) {

@@ -75,10 +75,6 @@ public class TransparentReferenceImpl implements TransparentReference, Serializa
         return EntityHelper.hashCode(this);
     }
 
-    /**
-     * Proxy will delegate to this method, so that the TransparentReferenceImpl instead
-     * of the proxy will be serialized.
-     */
     public Object writeReplace() {
         return this;
     }

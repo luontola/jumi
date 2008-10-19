@@ -59,5 +59,9 @@ public interface TransparentReference {
      */
     int hashCode();
 
+    /**
+     * The proxy will delegate to this method, so that the {@link TransparentReference} implementation
+     * instead of the proxy will be serialized.
+     */
     Object writeReplace();
 }
