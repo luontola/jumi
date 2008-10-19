@@ -153,33 +153,47 @@ public class InMemoryDatabase implements DatabaseManager {
 
     private void prepareUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
-            for (TxDatabaseTable update : updates) {
-                update.prepare();
-            }
+            prepareAll(updates);
         }
     }
 
     private void commitUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
-            try {
-                revisionCounter.incrementRevision();
-                for (TxDatabaseTable update : updates) {
-                    update.commit();
-                }
-            } finally {
-                committedRevision = revisionCounter.getCurrentRevision();
-                for (TxDatabaseTable update : updates) {
-                    update.releaseLocks();
-                }
-            }
+            updateRevisionAndCommit(updates);
         }
     }
 
     private void rollbackUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
-            for (TxDatabaseTable update : updates) {
-                update.releaseLocks();
-            }
+            releaseAllLocks(updates);
+        }
+    }
+
+    private static void prepareAll(Collection<TxDatabaseTable> updates) {
+        for (TxDatabaseTable update : updates) {
+            update.prepare();
+        }
+    }
+
+    private void updateRevisionAndCommit(Collection<TxDatabaseTable> updates) {
+        try {
+            revisionCounter.incrementRevision();
+            commitAll(updates);
+        } finally {
+            committedRevision = revisionCounter.getCurrentRevision();
+            releaseAllLocks(updates);
+        }
+    }
+
+    private static void commitAll(Collection<TxDatabaseTable> updates) {
+        for (TxDatabaseTable update : updates) {
+            update.commit();
+        }
+    }
+
+    private static void releaseAllLocks(Collection<TxDatabaseTable> updates) {
+        for (TxDatabaseTable update : updates) {
+            update.releaseLocks();
         }
     }
 
