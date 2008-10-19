@@ -55,13 +55,33 @@ public class ThreadContext {
     }
 
     /**
+     * WARNING: Prefer using {@link #runInContext} instead of this method.
+     */
+    public static void setUp(Context context) {
+        if (getCurrentContext() != null) {
+            throw new IllegalStateException("Already set up");
+        }
+        setCurrentContext(context);
+    }
+
+    /**
+     * WARNING: Prefer using {@link #runInContext} instead of this method.
+     */
+    public static void tearDown() {
+        if (getCurrentContext() == null) {
+            throw new IllegalStateException("Already torn down");
+        }
+        setCurrentContext(null);
+    }
+
+    /**
      * WARNING: This method should be used <em>only</em> when it is not
      * possible to access a service through dependency injection.
      * The service locator pattern (which this method uses) makes
      * dependencies non-explicit and code harder to test.
      */
     public static <T> T get(Class<T> service) {
-        Context context = currentContext();
+        Context context = getCurrentContext();
         if (context == null) {
             throw new IllegalStateException("Not set up");
         }
@@ -69,30 +89,14 @@ public class ThreadContext {
     }
 
     /**
-     * WARNING: Prefer using {@link #runInContext} instead of this method.
-     */
-    public static void setUp(Context context) {
-        if (currentContext() != null) {
-            throw new IllegalStateException("Already set up");
-        }
-        THREAD_LOCAL.set(context);
-    }
-
-    /**
-     * WARNING: Prefer using {@link #runInContext} instead of this method.
-     */
-    public static void tearDown() {
-        if (currentContext() == null) {
-            throw new IllegalStateException("Already torn down");
-        }
-        THREAD_LOCAL.set(null);
-    }
-
-    /**
      * WARNING: This method should be used <em>only</em> if the framework
      * requires direct access to the context implementation.
      */
-    public static Context currentContext() {
+    public static Context getCurrentContext() {
         return THREAD_LOCAL.get();
+    }
+
+    private static void setCurrentContext(Context context) {
+        THREAD_LOCAL.set(context);
     }
 }

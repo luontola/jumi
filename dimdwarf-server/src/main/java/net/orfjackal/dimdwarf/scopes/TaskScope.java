@@ -48,7 +48,7 @@ public class TaskScope implements Scope {
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         return new Provider<T>() {
             public T get() {
-                Context context = ThreadContext.currentContext();
+                Context context = ThreadContext.getCurrentContext();
                 if (!(context instanceof TaskScopedContext)) {
                     throw new IllegalStateException("Not inside task scope");
                 }

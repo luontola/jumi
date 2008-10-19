@@ -55,13 +55,13 @@ public class ThreadContextSpec extends Specification<Object> {
     }
 
     public void destroy() throws Exception {
-        if (ThreadContext.currentContext() != null) {
+        if (ThreadContext.getCurrentContext() != null) {
             ThreadContext.tearDown();
         }
     }
 
     private void specifyContextIsDisabled() {
-        specify(ThreadContext.currentContext(), should.equal(null));
+        specify(ThreadContext.getCurrentContext(), should.equal(null));
         specify(new Block() {
             public void run() throws Throwable {
                 ThreadContext.get(MyService.class);
@@ -80,7 +80,7 @@ public class ThreadContextSpec extends Specification<Object> {
 
         public void givesAccessToTheInstalledServices() {
             ThreadContext.setUp(myContext);
-            specify(ThreadContext.currentContext(), should.equal(myContext));
+            specify(ThreadContext.getCurrentContext(), should.equal(myContext));
             specify(ThreadContext.get(MyService.class), should.equal(myService));
         }
 

@@ -66,7 +66,7 @@ public class TaskScopeSpec extends Specification<Object> {
     }
 
     public void destroy() throws Exception {
-        if (ThreadContext.currentContext() != null) {
+        if (ThreadContext.getCurrentContext() != null) {
             ThreadContext.tearDown();
         }
     }
