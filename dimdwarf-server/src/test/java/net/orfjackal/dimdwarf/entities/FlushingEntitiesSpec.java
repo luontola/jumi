@@ -123,7 +123,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.loadEntity(new EntityReferenceImpl<Object>(BigInteger.ONE, null));
+                    manager.loadEntity(new EntityReferenceImpl<Object>(BigInteger.ONE, entity));
                 }
             }, should.raise(IllegalStateException.class));
         }

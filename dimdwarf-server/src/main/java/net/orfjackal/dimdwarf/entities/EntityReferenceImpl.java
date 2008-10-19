@@ -54,6 +54,8 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
     private transient EntityLoader entityLoader;
 
     public EntityReferenceImpl(BigInteger id, T entity) {
+        assert id != null;
+        assert entity != null;
         this.id = id;
         this.entity = entity;
     }
