@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 
 import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
@@ -40,7 +41,7 @@ import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import java.math.BigInteger;
 
 /**
- * For transparent references to work correctly, all subclasses of {@link net.orfjackal.dimdwarf.api.impl.IEntity} should
+ * For transparent references to work correctly, all subclasses of {@link IEntity} should
  * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
  * <pre><code>
  * public boolean equals(Object obj) {
