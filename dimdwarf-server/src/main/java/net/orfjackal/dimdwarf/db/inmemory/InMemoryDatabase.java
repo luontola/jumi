@@ -74,21 +74,21 @@ public class InMemoryDatabase implements DatabaseManager {
 
     // Tables
 
-    private InMemoryDatabaseTable openOrCreate(String tableName) {
-        InMemoryDatabaseTable table = getExistingTable(tableName);
+    private InMemoryDatabaseTable openOrCreate(String name) {
+        InMemoryDatabaseTable table = getExistingTable(name);
         if (table == null) {
-            table = createNewTable(tableName);
+            table = createNewTable(name);
         }
         return table;
     }
 
-    private InMemoryDatabaseTable getExistingTable(String tableName) {
-        return tables.get(tableName);
+    private InMemoryDatabaseTable getExistingTable(String name) {
+        return tables.get(name);
     }
 
-    private InMemoryDatabaseTable createNewTable(String tableName) {
-        tables.putIfAbsent(tableName, new InMemoryDatabaseTable(revisionCounter));
-        return getExistingTable(tableName);
+    private InMemoryDatabaseTable createNewTable(String name) {
+        tables.putIfAbsent(name, new InMemoryDatabaseTable(revisionCounter));
+        return getExistingTable(name);
     }
 
     // Connections
@@ -217,18 +217,26 @@ public class InMemoryDatabase implements DatabaseManager {
             return IsolationLevel.SNAPSHOT;
         }
 
-        public Set<String> tables() {
+        public Set<String> getTableNames() {
             return tables.keySet();
         }
 
         public DatabaseTable<Blob, Blob> openTable(String name) {
             tx.mustBeActive();
-            TxDatabaseTable table = openTables.get(name);
+            TxDatabaseTable table = getCachedTable(name);
             if (table == null) {
-                openTables.putIfAbsent(name, new TxDatabaseTable(openOrCreate(name), visibleRevision, tx));
-                table = openTables.get(name);
+                table = cacheNewTable(name);
             }
             return table;
+        }
+
+        private TxDatabaseTable getCachedTable(String name) {
+            return openTables.get(name);
+        }
+
+        private TxDatabaseTable cacheNewTable(String name) {
+            openTables.putIfAbsent(name, new TxDatabaseTable(openOrCreate(name), visibleRevision, tx));
+            return getCachedTable(name);
         }
 
         public void prepare(Transaction tx) throws Throwable {

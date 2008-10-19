@@ -44,7 +44,7 @@ public interface Database<K, V> {
     /**
      * Existing tables.
      */
-    Set<String> tables();
+    Set<String> getTableNames();
 
     /**
      * Opens an existing table or creates a new table.

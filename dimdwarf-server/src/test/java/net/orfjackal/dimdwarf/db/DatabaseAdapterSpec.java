@@ -80,9 +80,9 @@ public class DatabaseAdapterSpec extends Specification<Object> {
 
         public void delegatesTables() {
             checking(new Expectations() {{
-                one(db).tables(); will(returnValue(new HashSet<String>(Arrays.asList("test"))));
+                one(db).getTableNames(); will(returnValue(new HashSet<String>(Arrays.asList("test"))));
             }});
-            specify(dbAdapter.tables(), should.containExactly("test"));
+            specify(dbAdapter.getTableNames(), should.containExactly("test"));
         }
 
         public void delegatesOpeningTables() {

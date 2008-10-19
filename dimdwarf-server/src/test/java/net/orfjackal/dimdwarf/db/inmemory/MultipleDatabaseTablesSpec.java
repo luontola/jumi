@@ -103,7 +103,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         }
 
         public void eachTableHasAName() {
-            specify(db.tables(), should.containExactly(TABLE1, TABLE2));
+            specify(db.getTableNames(), should.containExactly(TABLE1, TABLE2));
         }
 
         public void theSameNamesWillCorrespondTheSameTable() {
@@ -116,7 +116,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
         public void openingATableWhichDoesNotExistWillCreateThatTable() {
             specify(db.openTable("newTable"), should.not().equal(null));
-            specify(db.tables(), should.containExactly(TABLE1, TABLE2, "newTable"));
+            specify(db.getTableNames(), should.containExactly(TABLE1, TABLE2, "newTable"));
         }
     }
 
