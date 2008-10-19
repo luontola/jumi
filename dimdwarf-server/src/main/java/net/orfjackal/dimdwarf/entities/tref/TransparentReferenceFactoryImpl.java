@@ -54,7 +54,7 @@ import java.lang.reflect.Method;
 @Singleton
 public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
-    private final Cache<Class<?>, Factory> cache = new CglibProxyFactoryCache();
+    private final Cache<Class<?>, Factory> proxyFactories = new CglibProxyFactoryCache();
     private final Provider<ReferenceFactory> referenceFactory;
 
     @Inject
@@ -69,7 +69,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
     }
 
     public TransparentReference newProxy(TransparentReferenceImpl tref) {
-        Factory factory = cache.get(tref.getType());
+        Factory factory = proxyFactories.get(tref.getType());
         return (TransparentReference) factory.newInstance(new Callback[]{
                 new EntityCallback(tref),
                 new TransparentReferenceCallback(tref)
