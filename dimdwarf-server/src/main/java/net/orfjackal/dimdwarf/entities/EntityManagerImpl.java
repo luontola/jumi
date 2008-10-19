@@ -111,7 +111,8 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader, Transa
     public <T> T loadEntity(EntityReference<T> ref) {
         checkStateIs(State.ACTIVE);
         // TODO: is this reference caching even necessary? it should not make big difference 
-        // to create more reference instances, because we already create lots of them when deserializing
+        // to create more reference instances, because we already create lots of them when deserializing,
+        // so it might be best to remove this method and the reference parameter from following methods
         return (T) loadEntity(ref.getId(), ref);
     }
 
