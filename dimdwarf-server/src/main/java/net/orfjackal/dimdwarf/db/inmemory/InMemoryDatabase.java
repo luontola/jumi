@@ -72,26 +72,50 @@ public class InMemoryDatabase implements DatabaseManager {
         committedRevision = revisionCounter.getCurrentRevision();
     }
 
+    // Tables
+
     private InMemoryDatabaseTable openOrCreate(String tableName) {
-        InMemoryDatabaseTable table = tables.get(tableName);
+        InMemoryDatabaseTable table = getExistingTable(tableName);
         if (table == null) {
-            tables.putIfAbsent(tableName, new InMemoryDatabaseTable(revisionCounter));
-            table = tables.get(tableName);
+            table = createNewTable(tableName);
         }
         return table;
     }
 
+    private InMemoryDatabaseTable getExistingTable(String tableName) {
+        return tables.get(tableName);
+    }
+
+    private InMemoryDatabaseTable createNewTable(String tableName) {
+        tables.putIfAbsent(tableName, new InMemoryDatabaseTable(revisionCounter));
+        return getExistingTable(tableName);
+    }
+
+    // Connections
+
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        TxDatabase db = openConnections.get(tx);
+        TxDatabase db = getExistingConnection(tx);
         if (db == null) {
-            openConnections.putIfAbsent(tx, new TxDatabase(committedRevision, tx));
-            db = openConnections.get(tx);
+            db = createNewConnection(tx);
         }
         return db;
     }
 
+    private InMemoryDatabase.TxDatabase getExistingConnection(Transaction tx) {
+        return openConnections.get(tx);
+    }
+
+    private TxDatabase createNewConnection(Transaction tx) {
+        openConnections.putIfAbsent(tx, new TxDatabase(committedRevision, tx));
+        return getExistingConnection(tx);
+    }
+
     private void closeConnection(Transaction tx) {
         openConnections.remove(tx);
+        purgeOldUnusedRevisions();
+    }
+
+    private void purgeOldUnusedRevisions() {
         long oldestUncommitted = getOldestUncommittedRevision();
         for (InMemoryDatabaseTable table : tables.values()) {
             table.purgeRevisionsOlderThan(oldestUncommitted);
@@ -124,6 +148,8 @@ public class InMemoryDatabase implements DatabaseManager {
         }
         return oldest;
     }
+
+    // Transactions
 
     private void prepareUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
