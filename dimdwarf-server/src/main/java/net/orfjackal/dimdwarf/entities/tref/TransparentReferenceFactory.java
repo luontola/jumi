@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
+import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
 import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 
@@ -42,17 +43,15 @@ import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 public interface TransparentReferenceFactory {
 
     /**
-     * Creates a proxy for the specified ManagedObject instance, so that the ManagedObject will
-     * be referenced by a ManagedReference but the proxy implements all the same interfaces as
-     * the specified ManagedObject, excluding the ManagedObject interface. In other words, the
-     * objects returned by this method will behave the same as any domain objects, except that
-     * you will not need to wrap them in a ManagedReference.
+     * Creates a proxy for the specified entity, so that the proxy will have the same
+     * external interface as the proxied entity, but the proxy itself does not need
+     * to be wrapped into an {@link EntityReference}.
      */
     TransparentReference createTransparentReference(IEntity object);
 
     /**
-     * Creates a proxy for a TransparentReference instance which is not yet proxied. This is
-     * needed only during deserialization and should not be called elsewhere.
+     * Creates a proxy from a {@link TransparentReferenceImpl} which is not yet proxied.
+     * This is needed only during deserialization and should not be called elsewhere.
      */
     TransparentReference newProxy(TransparentReferenceImpl reference);
 }
