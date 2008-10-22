@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.impl.Entities;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.impl.TransparentReference;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 
 /**
@@ -53,11 +54,16 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationRe
 
     public Object replaceSerialized(Object rootObject, Object obj) {
         if (obj != rootObject && Entities.isEntity(obj)) {
-            // The call to writeReplace() is needed because ObjectOutputStream#replaceObject does not check
-            // whether the returned objects have a writeReplace() method.
-            return factory.createTransparentReference((IEntity) obj).writeReplace();
+            return createTransparentReferenceForSerialization(obj);
         }
         return obj;
+    }
+
+    private Object createTransparentReferenceForSerialization(Object obj) {
+        TransparentReference notSerializableProxy = factory.createTransparentReference((IEntity) obj);
+        // The call to writeReplace() is needed because ObjectOutputStream#replaceObject does not check
+        // whether the returned objects have a writeReplace() method.
+        return notSerializableProxy.writeReplace();
     }
 
     public Object resolveDeserialized(Object obj) {
