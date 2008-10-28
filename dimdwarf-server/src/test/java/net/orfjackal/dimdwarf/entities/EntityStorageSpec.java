@@ -40,6 +40,7 @@ import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.ConvertBigIntegerToBytes;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.util.Objects;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -61,9 +62,8 @@ public class EntityStorageSpec extends Specification<Object> {
     private IEntity entity;
     private Blob serialized;
 
-    @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
-        db = mock(DatabaseTable.class);
+        db = Objects.cast(mock(DatabaseTable.class));
         serializer = mock(ObjectSerializer.class);
         storage = new EntityStorageImpl(db, new ConvertBigIntegerToBytes(), new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();

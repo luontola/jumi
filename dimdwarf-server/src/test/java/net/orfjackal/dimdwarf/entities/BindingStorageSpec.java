@@ -55,7 +55,6 @@ public class BindingStorageSpec extends Specification<Object> {
     private DatabaseManager dbms;
     private TransactionCoordinator tx;
 
-    @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
         bindingStorage = createBindingStorage(newDatabaseConnection());

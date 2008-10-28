@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.db;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.util.Objects;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -60,10 +61,9 @@ public class DatabaseAdapterSpec extends Specification<Object> {
     private Blob keyBytes;
     private Blob valueBytes;
 
-    @SuppressWarnings({"unchecked"})
     public void create() throws Exception {
-        db = mock(Database.class);
-        table = mock(DatabaseTable.class);
+        db = Objects.cast(mock(Database.class));
+        table = Objects.cast(mock(DatabaseTable.class));
         dbAdapter = new DatabaseAdapter<String, BigInteger, Blob, Blob>(db, new ConvertStringToBytes(), new ConvertBigIntegerToBytes());
 
         key = "key";
