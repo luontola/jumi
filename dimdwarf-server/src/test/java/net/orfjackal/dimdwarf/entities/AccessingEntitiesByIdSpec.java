@@ -57,7 +57,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         storage = mock(EntityStorage.class);
-        loader = new EntityManagerImpl(mock(EntityIdFactory.class), storage, dummy(Transaction.class));
+        loader = new EntityManager(mock(EntityIdFactory.class), storage, dummy(Transaction.class));
     }
 
     private Expectations loadsFromStorage(final BigInteger id, final DummyEntity entity) {

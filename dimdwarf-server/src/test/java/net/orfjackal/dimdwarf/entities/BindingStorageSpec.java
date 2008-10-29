@@ -69,8 +69,8 @@ public class BindingStorageSpec extends Specification<Object> {
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
         DatabaseTable<Blob, Blob> entities = db.openTable("entities");
 
-        EntityManagerImpl entityManager =
-                new EntityManagerImpl(
+        EntityManager entityManager =
+                new EntityManager(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
                         new EntityStorageImpl(
                                 entities,

@@ -56,13 +56,13 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
     private EntityIdFactory idFactory;
     private EntityStorage storage;
-    private EntityManagerImpl manager;
+    private EntityManager manager;
     private DummyEntity entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(idFactory, storage, dummy(Transaction.class));
+        manager = new EntityManager(idFactory, storage, dummy(Transaction.class));
         entity = new DummyEntity();
     }
 

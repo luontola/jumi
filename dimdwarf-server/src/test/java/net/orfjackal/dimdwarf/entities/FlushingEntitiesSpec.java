@@ -54,7 +54,7 @@ import java.math.BigInteger;
 public class FlushingEntitiesSpec extends Specification<Object> {
 
     private EntityStorage storage;
-    private EntityManagerImpl manager;
+    private EntityManager manager;
     private DummyEntity entity;
     private DummyEntity newEntity;
     private Transaction tx;
@@ -62,10 +62,10 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     public void create() throws Exception {
         tx = mock(Transaction.class);
         checking(new Expectations() {{
-            one(tx).addTransactionListener(with(aNonNull(EntityManagerImpl.class)));
+            one(tx).addTransactionListener(with(aNonNull(EntityManager.class)));
         }});
         storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage, tx);
+        manager = new EntityManager(new EntityIdFactoryImpl(BigInteger.ZERO), storage, tx);
         entity = new DummyEntity();
         newEntity = new DummyEntity();
         manager.createReference(entity);

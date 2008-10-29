@@ -52,8 +52,8 @@ public class EntityModule extends AbstractModule {
 
     protected void configure() {
 
-        bind(EntityLoader.class).to(EntityManagerImpl.class);
-        bind(ReferenceFactory.class).to(EntityManagerImpl.class);
+        bind(EntityLoader.class).to(EntityManager.class);
+        bind(ReferenceFactory.class).to(EntityManager.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
         bind(EntityIdFactory.class)
                 .toProvider(new Provider<EntityIdFactory>() {

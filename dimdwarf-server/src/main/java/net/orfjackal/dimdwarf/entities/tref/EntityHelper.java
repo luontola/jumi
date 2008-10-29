@@ -61,7 +61,7 @@ public class EntityHelper {
     }
 
     public static BigInteger getId(Object obj) {
-        // TODO: does this method need to be static public? could it belong to some other class, maybe EntityManagerImpl?
+        // TODO: does this method need to be static public? could it belong to some other class, maybe EntityManager?
         EntityReference<?> ref = getReference(obj);
         if (ref == null) {
             throw new IllegalArgumentException("Not an entity: " + obj);

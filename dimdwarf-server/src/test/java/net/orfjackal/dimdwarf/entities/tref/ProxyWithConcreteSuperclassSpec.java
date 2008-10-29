@@ -100,7 +100,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
         public void entityReferencesCanNotBeCreatedForTheProxy() {
             final ReferenceFactory factory =
-                    new EntityManagerImpl(
+                    new EntityManager(
                             mock(EntityIdFactory.class),
                             mock(EntityStorage.class),
                             dummy(Transaction.class));

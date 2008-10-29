@@ -51,7 +51,7 @@ import java.util.*;
  * @since 25.8.2008
  */
 @TaskScoped
-public class EntityManagerImpl implements ReferenceFactory, EntityLoader, TransactionListener {
+public class EntityManager implements ReferenceFactory, EntityLoader, TransactionListener {
 
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
     private final Map<BigInteger, IEntity> entitiesById = new HashMap<BigInteger, IEntity>();
@@ -61,7 +61,7 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader, Transa
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage, Transaction tx) {
+    public EntityManager(EntityIdFactory idFactory, EntityStorage storage, Transaction tx) {
         this.idFactory = idFactory;
         this.storage = storage;
         tx.addTransactionListener(this);
@@ -112,7 +112,7 @@ public class EntityManagerImpl implements ReferenceFactory, EntityLoader, Transa
         // TODO: is this reference caching even necessary? it should not make big difference 
         // to create more reference instances, because we already create lots of them when deserializing,
         // so it might be best to remove this method and the reference parameter from following methods
-        return Objects.cast(loadEntity(ref.getId(), ref));
+        return Objects.<T>cast(loadEntity(ref.getId(), ref));
     }
 
     private IEntity loadEntity(BigInteger id, EntityReference<?> cachedRef) {
