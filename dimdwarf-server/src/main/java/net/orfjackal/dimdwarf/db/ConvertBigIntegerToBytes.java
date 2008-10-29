@@ -69,7 +69,7 @@ public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
         }
 
         for (Blob key = map.firstKey(); key != null; key = map.nextKeyAfter(key)) {
-            System.out.println(conv.back(key));
+            System.out.println(conv.back(key) + "\t" + key);
         }
     }
 }
