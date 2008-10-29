@@ -37,7 +37,8 @@ package net.orfjackal.dimdwarf.db;
  */
 public class LongOverflowTest {
 
-    // TODO: overflowing long would take over 178000 days (487 years), so maybe it would be good enough to use longs as entity IDs?
+    // TODO: overflowing long on C2Q6600 would take over 178000 days (487 years), so maybe it would be good enough to use longs as entity IDs?
+    // also: 2^63 nanoseconds == 292 years
 
     public static void main(String[] args) {
         final long SPEEDUP = Integer.MAX_VALUE / 10;
