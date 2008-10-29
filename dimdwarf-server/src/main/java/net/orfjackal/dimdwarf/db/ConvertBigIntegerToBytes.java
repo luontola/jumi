@@ -31,9 +31,6 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import net.orfjackal.dimdwarf.db.inmemory.RevisionCounter;
-import net.orfjackal.dimdwarf.db.inmemory.RevisionMap;
-
 import java.math.BigInteger;
 
 /**
@@ -56,20 +53,5 @@ public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
             return null;
         }
         return Blob.fromBytes(value.toByteArray());
-    }
-
-    public static void main(String[] args) {
-        // TODO: the entity IDs do not sort in numeric order when converted to bytes - would it be necessary?
-        ConvertBigIntegerToBytes conv = new ConvertBigIntegerToBytes();
-        RevisionMap<Blob, Blob> map = new RevisionMap<Blob, Blob>(new RevisionCounter());
-
-        for (int i = 0; i < 1000; i++) {
-            Blob key = conv.forth(BigInteger.valueOf(i));
-            map.put(key, Blob.EMPTY_BLOB);
-        }
-
-        for (Blob key = map.firstKey(); key != null; key = map.nextKeyAfter(key)) {
-            System.out.println(conv.back(key) + "\t" + key);
-        }
     }
 }
