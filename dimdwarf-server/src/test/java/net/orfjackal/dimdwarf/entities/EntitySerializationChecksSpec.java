@@ -39,7 +39,7 @@ import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.ConvertBigIntegerToBytes;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.serial.*;
-import net.orfjackal.dimdwarf.util.Objects;
+import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -61,7 +61,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private DelegatingSerializationReplacer replacer;
 
     public void create() throws Exception {
-        db = Objects.cast(mock(DatabaseTable.class));
+        db = uncheckedCast(mock(DatabaseTable.class));
         SerializationListener[] listeners = {
                 new CheckDirectlyReferredEntitySerialized(),
                 new CheckInnerClassSerialized()

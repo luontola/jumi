@@ -39,6 +39,7 @@ import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionListener;
 import net.orfjackal.dimdwarf.util.Objects;
+import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jetbrains.annotations.TestOnly;
 
 import java.math.BigInteger;
@@ -91,7 +92,7 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
     }
 
     private <T> EntityReference<T> getExistingReference(T entity) {
-        return Objects.cast(entities.get((IEntity) entity));
+        return uncheckedCast(entities.get((IEntity) entity));
     }
 
     private <T> EntityReference<T> createNewReference(T obj) {
@@ -112,7 +113,7 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
         // TODO: is this reference caching even necessary? it should not make big difference 
         // to create more reference instances, because we already create lots of them when deserializing,
         // so it might be best to remove this method and the reference parameter from following methods
-        return Objects.<T>cast(loadEntity(ref.getId(), ref));
+        return Objects.<T>uncheckedCast(loadEntity(ref.getId(), ref));
     }
 
     private IEntity loadEntity(BigInteger id, EntityReference<?> cachedRef) {

@@ -41,10 +41,10 @@ public class Objects {
     }
 
     /**
-     * Helps to avoid using {@code @SuppressWarnings({"unchecked"})}
+     * Helps to avoid using {@code @SuppressWarnings({"unchecked"})} when casting to a generic type.
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T cast(Object obj) {
+    public static <T> T uncheckedCast(Object obj) {
         return (T) obj;
     }
 }

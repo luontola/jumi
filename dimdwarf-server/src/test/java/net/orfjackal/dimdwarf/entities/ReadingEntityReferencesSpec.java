@@ -36,7 +36,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.EntityReference;
 import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.util.Objects;
+import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import net.orfjackal.dimdwarf.util.TestUtil;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -98,7 +98,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
         public Object create() throws IOException, ClassNotFoundException {
             byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
-            ref = Objects.cast(TestUtil.deserialize(bytes));
+            ref = uncheckedCast(TestUtil.deserialize(bytes));
             ref.setEntityLoader(manager);
             return null;
         }
@@ -133,9 +133,9 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
         public Object create() throws IOException, ClassNotFoundException {
             byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
-            ref1 = Objects.cast(TestUtil.deserialize(bytes));
+            ref1 = uncheckedCast(TestUtil.deserialize(bytes));
             ref1.setEntityLoader(manager);
-            ref2 = Objects.cast(TestUtil.deserialize(bytes));
+            ref2 = uncheckedCast(TestUtil.deserialize(bytes));
             ref2.setEntityLoader(manager);
             return null;
         }
