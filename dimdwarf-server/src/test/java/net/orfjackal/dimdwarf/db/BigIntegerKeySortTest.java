@@ -44,6 +44,21 @@ public class BigIntegerKeySortTest {
 
     public static void main(String[] args) {
         // TODO: the entity IDs do not sort in numeric order when converted to bytes - would it be necessary?
+        /*
+         One possibility could be to encode them in this format:
+         <unsigned byte NumberOfSignificantBytes> <byte Value>^NumberOfSignificantBytes
+
+         0   -> 00
+         1   -> 01 01
+         2   -> 01 02
+         127 -> 01 7F
+         128 -> 01 80
+         255 -> 01 FF
+         256 -> 02 01 00
+         257 -> 02 01 01
+         258 -> 02 01 02
+         */
+
         ConvertBigIntegerToBytes conv = new ConvertBigIntegerToBytes();
         RevisionMap<Blob, Blob> map = new RevisionMap<Blob, Blob>(new RevisionCounter());
 
