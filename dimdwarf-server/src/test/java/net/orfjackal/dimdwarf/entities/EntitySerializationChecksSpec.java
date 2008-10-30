@@ -73,7 +73,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     }
 
     private static Blob asBytes(BigInteger id) {
-        return Blob.fromBytes(id.toByteArray());
+        return new ConvertBigIntegerToBytes().forth(id);
     }
 
 

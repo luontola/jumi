@@ -45,13 +45,40 @@ public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
         if (value == null) {
             return null;
         }
-        return new BigInteger(value.getByteArray());
+        return new BigInteger(1, unpack(value.getByteArray()));
     }
 
     public Blob forth(BigInteger value) {
         if (value == null) {
             return null;
         }
-        return Blob.fromBytes(value.toByteArray());
+        if (value.signum() < 0) {
+            throw new IllegalArgumentException("Negative values are not allowed: " + value);
+        }
+        return Blob.fromBytes(pack(value.toByteArray()));
+    }
+
+    private static byte[] unpack(byte[] packed) {
+        int significantBytes = packed[0];
+        byte[] bytes = new byte[significantBytes];
+        System.arraycopy(packed, 1, bytes, 0, significantBytes);
+        return bytes;
+    }
+
+    private static byte[] pack(byte[] bytes) {
+        int leadingNullBytes = getLeadingNullBytes(bytes);
+        int significantBytes = bytes.length - leadingNullBytes;
+        byte[] packed = new byte[significantBytes + 1];
+        packed[0] = (byte) significantBytes;
+        System.arraycopy(bytes, leadingNullBytes, packed, 1, significantBytes);
+        return packed;
+    }
+
+    private static int getLeadingNullBytes(byte[] bytes) {
+        int leadingNullBytes = 0;
+        for (int i = 0; i < bytes.length && bytes[i] == 0x00; i++) {
+            leadingNullBytes++;
+        }
+        return leadingNullBytes;
     }
 }

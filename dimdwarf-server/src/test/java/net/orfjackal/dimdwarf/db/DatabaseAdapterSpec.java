@@ -69,7 +69,7 @@ public class DatabaseAdapterSpec extends Specification<Object> {
         key = "key";
         value = BigInteger.TEN;
         keyBytes = Blob.fromBytes(key.getBytes("UTF-8"));
-        valueBytes = Blob.fromBytes(value.toByteArray());
+        valueBytes = new ConvertBigIntegerToBytes().forth(value);
     }
 
     public class ADatabaseAdapter {

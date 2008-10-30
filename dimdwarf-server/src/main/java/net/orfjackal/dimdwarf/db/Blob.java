@@ -111,7 +111,9 @@ public final class Blob implements Comparable<Blob> {
             return 0;
         }
         for (int i = 0; i < bytes.length && i < other.bytes.length; i++) {
-            int cmp = bytes[i] - other.bytes[i];
+            int thisUnsigned = bytes[i] & 0xFF;
+            int otherUnsigned = other.bytes[i] & 0xFF;
+            int cmp = thisUnsigned - otherUnsigned;
             if (cmp != 0) {
                 return cmp;
             }
