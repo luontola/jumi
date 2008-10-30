@@ -59,9 +59,9 @@ public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
     }
 
     private static byte[] unpack(byte[] packed) {
-        int significantBytes = packed[0];
-        byte[] bytes = new byte[significantBytes];
-        System.arraycopy(packed, 1, bytes, 0, significantBytes);
+        byte[] bytes = new byte[packed.length - 1];
+        assert bytes.length == packed[0];
+        System.arraycopy(packed, 1, bytes, 0, bytes.length);
         return bytes;
     }
 
