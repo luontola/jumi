@@ -34,7 +34,9 @@ package net.orfjackal.dimdwarf.modules;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
+import net.orfjackal.dimdwarf.entities.tref.EntityInfoImpl;
 import net.orfjackal.dimdwarf.entities.tref.ReplaceEntitiesWithTransparentReferences;
 import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactory;
 import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactoryImpl;
@@ -52,8 +54,9 @@ public class EntityModule extends AbstractModule {
 
     protected void configure() {
 
-        bind(EntityLoader.class).to(EntityManager.class);
-        bind(ReferenceFactory.class).to(EntityManager.class);
+        bind(EntityManager.class).to(EntityManagerImpl.class);
+        bind(ReferenceFactory.class).to(ReferenceFactoryImpl.class);
+        bind(EntityInfo.class).to(EntityInfoImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
         bind(EntityIdFactory.class)
                 .toProvider(new Provider<EntityIdFactory>() {

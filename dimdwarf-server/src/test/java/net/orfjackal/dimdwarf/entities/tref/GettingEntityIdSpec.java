@@ -31,14 +31,16 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
+import com.google.inject.Provider;
 import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
+import net.orfjackal.dimdwarf.entities.ReferenceFactoryImpl;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -56,20 +58,20 @@ public class GettingEntityIdSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private EntityInfoImpl entityInfo;
-    private ReferenceFactory referenceFactory;
+    private EntityManager entityManager;
     private EntityObject entity;
     private Object proxy;
 
     public void create() throws Exception {
-        referenceFactory = mock(ReferenceFactory.class);
-        entityInfo = new EntityInfoImpl(referenceFactory);
+        entityManager = mock(EntityManager.class);
+        entityInfo = new EntityInfoImpl(entityManager);
 
         entity = new DummyEntity();
         checking(new Expectations() {{
-            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(ENTITY_ID, entity)));
+            allowing(entityManager).getEntityId(entity); will(returnValue(ENTITY_ID));
         }});
-        proxy = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory))
-                .createTransparentReference(entity);
+        Provider<ReferenceFactory> refFactory = StubProvider.<ReferenceFactory>wrap(new ReferenceFactoryImpl(entityManager));
+        proxy = new TransparentReferenceFactoryImpl(refFactory).createTransparentReference(entity);
     }
 
 

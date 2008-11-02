@@ -79,8 +79,8 @@ public class EntityIntegrationSpec extends Specification<Object> {
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    EntityLoader loader = injector.getInstance(EntityLoader.class);
-                    DummyEntity entity = (DummyEntity) loader.loadEntity(id.get());
+                    EntityManager manager = injector.getInstance(EntityManager.class);
+                    DummyEntity entity = (DummyEntity) manager.getEntityById(id.get());
                     specify(entity.getOther(), should.equal("foo"));
                 }
             });
@@ -127,14 +127,13 @@ public class EntityIntegrationSpec extends Specification<Object> {
             taskExecutor.execute(new Runnable() {
                 public void run() {
                     ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
-                    EntityLoader loader = injector.getInstance(EntityLoader.class);
+                    EntityManager manager = injector.getInstance(EntityManager.class);
 
                     DummyEntity entity = new DummyEntity();
                     EntityReference<DummyEntity> ref = factory.createReference(entity);
 
-                    DummyEntity loaded = (DummyEntity) loader.loadEntity(ref.getEntityId());
+                    DummyEntity loaded = (DummyEntity) manager.getEntityById(ref.getEntityId());
                     specify(loaded, should.equal(entity));
-                    specify(factory, should.equal(loader));
                 }
             });
         }

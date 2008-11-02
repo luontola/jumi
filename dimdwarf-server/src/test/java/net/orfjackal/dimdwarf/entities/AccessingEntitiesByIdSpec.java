@@ -49,7 +49,7 @@ import java.math.BigInteger;
 public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     private EntityStorage storage;
-    private EntityLoader loader;
+    private EntityManager manager;
 
     private DummyEntity entity1 = new DummyEntity();
     private BigInteger id1 = BigInteger.valueOf(1);
@@ -57,7 +57,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         storage = mock(EntityStorage.class);
-        loader = new EntityManager(mock(EntityIdFactory.class), storage, dummy(Transaction.class));
+        manager = new EntityManagerImpl(mock(EntityIdFactory.class), storage, dummy(Transaction.class));
     }
 
     private Expectations loadsFromStorage(final BigInteger id, final DummyEntity entity) {
@@ -69,19 +69,15 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public class WhenThereAreEntitiesInTheDatabase {
 
-        public Object create() {
-            return null;
-        }
-
         public void entitiesCanBeLoadedById() {
             checking(loadsFromStorage(id1, entity1));
-            specify(loader.loadEntity(id1), should.equal(entity1));
+            specify(manager.getEntityById(id1), should.equal(entity1));
         }
 
         public void entitiesAreRegisteredOnLoadById() {
             checking(loadsFromStorage(id1, entity1));
-            Object load1 = loader.loadEntity(id1);
-            Object load2 = loader.loadEntity(id1);
+            Object load1 = manager.getEntityById(id1);
+            Object load2 = manager.getEntityById(id1);
             specify(load1 == load2);
         }
 
@@ -90,8 +86,8 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
                 one(storage).firstKey(); will(returnValue(id1));
                 one(storage).nextKeyAfter(id1); will(returnValue(id2));
             }});
-            specify(loader.firstKey(), should.equal(id1));
-            specify(loader.nextKeyAfter(id1), should.equal(id2));
+            specify(manager.firstKey(), should.equal(id1));
+            specify(manager.nextKeyAfter(id1), should.equal(id2));
         }
     }
 }

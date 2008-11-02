@@ -31,11 +31,12 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.api.internal.TransparentReference;
-import net.orfjackal.dimdwarf.entities.ReferenceFactory;
+import net.orfjackal.dimdwarf.entities.EntityManager;
 
 import java.math.BigInteger;
 
@@ -45,23 +46,29 @@ import java.math.BigInteger;
  */
 public class EntityInfoImpl implements EntityInfo {
 
-    private final ReferenceFactory referenceFactory;
+    private final EntityManager entityManager;
 
-    public EntityInfoImpl(ReferenceFactory referenceFactory) {
-        this.referenceFactory = referenceFactory;
+    @Inject
+    public EntityInfoImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public BigInteger getEntityId(Object entity) {
-        return getReference(entity).getEntityId();
+        if (Entities.isEntity(entity)) {
+            return getIdFromEntity(entity);
+        }
+        if (Entities.isTransparentReference(entity)) {
+            return getIdFromProxy(entity);
+        }
+        throw new IllegalArgumentException("Not an entity: " + entity);
     }
 
-    private EntityReference<?> getReference(Object entity) {
-        if (Entities.isEntity(entity)) {
-            return referenceFactory.createReference(entity);
-        } else if (Entities.isTransparentReference(entity)) {
-            return ((TransparentReference) entity).getEntityReference();
-        } else {
-            throw new IllegalArgumentException("Not an entity: " + entity);
-        }
+    private BigInteger getIdFromEntity(Object entity) {
+        return entityManager.getEntityId((EntityObject) entity);
+    }
+
+    private BigInteger getIdFromProxy(Object proxy) {
+        TransparentReference tref = (TransparentReference) proxy;
+        return tref.getEntityReference().getEntityId();
     }
 }

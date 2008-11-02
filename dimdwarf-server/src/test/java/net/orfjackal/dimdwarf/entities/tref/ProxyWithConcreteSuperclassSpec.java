@@ -71,12 +71,11 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
         private Object proxy;
 
-        public Object create() {
+        public void create() {
             checking(new Expectations() {{
                 one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(BigInteger.ONE, entity)));
             }});
             proxy = proxyFactory.createTransparentReference(entity);
-            return null;
         }
 
         public void isATransparentReference() {
@@ -100,10 +99,11 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
         public void entityReferencesCanNotBeCreatedForTheProxy() {
             final ReferenceFactory factory =
-                    new EntityManager(
-                            mock(EntityIdFactory.class),
-                            mock(EntityStorage.class),
-                            dummy(Transaction.class));
+                    new ReferenceFactoryImpl(
+                            new EntityManagerImpl(
+                                    mock(EntityIdFactory.class),
+                                    mock(EntityStorage.class),
+                                    dummy(Transaction.class)));
             specify(new Block() {
                 public void run() throws Throwable {
                     factory.createReference(proxy);

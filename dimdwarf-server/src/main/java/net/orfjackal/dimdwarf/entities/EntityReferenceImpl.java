@@ -51,7 +51,7 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
 
     private BigInteger id;
     private transient T entity;
-    private transient EntityLoader entityLoader;
+    private transient EntityManager entityManager;
 
     public EntityReferenceImpl(BigInteger id, T entity) {
         assert id != null;
@@ -79,13 +79,13 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
      * the reference is created, because then the entity is already cached locally.
      */
     @Inject
-    public void setEntityLoader(EntityLoader loader) {
-        this.entityLoader = loader;
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public T get() {
         if (entity == null) {
-            entity = (T) entityLoader.loadEntity(id);
+            entity = (T) entityManager.getEntityById(id);
         }
         return entity;
     }

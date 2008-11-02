@@ -56,13 +56,15 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
     private EntityIdFactory idFactory;
     private EntityStorage storage;
-    private EntityManager manager;
+    private EntityManagerImpl manager;
+    private ReferenceFactory refFactory;
     private DummyEntity entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         storage = mock(EntityStorage.class);
-        manager = new EntityManager(idFactory, storage, dummy(Transaction.class));
+        manager = new EntityManagerImpl(idFactory, storage, dummy(Transaction.class));
+        refFactory = new ReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }
 
@@ -74,14 +76,14 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
 
     public class WhenTheReferenceWasJustCreated {
+
         private EntityReference<DummyEntity> ref;
 
-        public Object create() {
+        public void create() {
             checking(new Expectations() {{
                 one(idFactory).newId(); will(returnValue(ENTITY_ID));
             }});
-            ref = manager.createReference(entity);
-            return null;
+            ref = refFactory.createReference(entity);
         }
 
         public void theReferenceHasTheEntityId() {
@@ -94,13 +96,13 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
     }
 
     public class WhenAReferenceHasBeenDeserialized {
+
         private EntityReferenceImpl<DummyEntity> ref;
 
-        public Object create() throws IOException, ClassNotFoundException {
+        public void create() throws IOException, ClassNotFoundException {
             byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
             ref = uncheckedCast(TestUtil.deserialize(bytes));
-            ref.setEntityLoader(manager);
-            return null;
+            ref.setEntityManager(manager);
         }
 
         public void theReferenceHasTheEntityId() {
@@ -121,16 +123,16 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
     }
 
     public class WhenManyReferencesToTheSameEntityHaveBeenDeserialized {
+
         private EntityReferenceImpl<DummyEntity> ref1;
         private EntityReferenceImpl<DummyEntity> ref2;
 
-        public Object create() throws IOException, ClassNotFoundException {
+        public void create() throws IOException, ClassNotFoundException {
             byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
             ref1 = uncheckedCast(TestUtil.deserialize(bytes));
-            ref1.setEntityLoader(manager);
+            ref1.setEntityManager(manager);
             ref2 = uncheckedCast(TestUtil.deserialize(bytes));
-            ref2.setEntityLoader(manager);
-            return null;
+            ref2.setEntityManager(manager);
         }
 
         public void theEntityIsLoadedFromDatabaseOnlyOnce() {

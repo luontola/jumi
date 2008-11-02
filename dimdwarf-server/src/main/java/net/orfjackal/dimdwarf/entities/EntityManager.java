@@ -31,168 +31,18 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.scopes.TaskScoped;
-import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionListener;
-import org.jetbrains.annotations.TestOnly;
+import net.orfjackal.dimdwarf.db.IterableKeys;
 
 import java.math.BigInteger;
-import java.util.*;
 
 /**
- * This class is NOT thread-safe.
- *
  * @author Esko Luontola
- * @since 25.8.2008
+ * @since 31.8.2008
  */
-@TaskScoped
-public class EntityManager implements ReferenceFactory, EntityLoader, TransactionListener {
+public interface EntityManager extends IterableKeys<BigInteger> {
 
-    // TODO: separate responsibilities:
-    // - keeping track of in-memory entities (LoadedEntitiesRegistry)
-    // - loading entities from database (merge with above?)
-    // - flushing entities to database (merge with above?)
-    // - creating references (ReferenceFactoryImpl)
+    BigInteger getEntityId(EntityObject entity);
 
-    private final Map<EntityObject, BigInteger> entities = new IdentityHashMap<EntityObject, BigInteger>();
-    private final Map<BigInteger, EntityObject> entitiesById = new HashMap<BigInteger, EntityObject>();
-    private final Queue<EntityObject> flushQueue = new ArrayDeque<EntityObject>();
-    private final EntityIdFactory idFactory;
-    private final EntityStorage storage;
-    private State state = State.ACTIVE;
-
-    @Inject
-    public EntityManager(EntityIdFactory idFactory, EntityStorage storage, Transaction tx) {
-        this.idFactory = idFactory;
-        this.storage = storage;
-        tx.addTransactionListener(this);
-    }
-
-    @TestOnly
-    int getRegisteredEntities() {
-        return entities.size();
-    }
-
-    // ReferenceFactory
-
-    public <T> EntityReference<T> createReference(T entity) {
-        checkStateIs(State.ACTIVE, State.FLUSHING);
-        checkIsEntity(entity);
-        BigInteger id = getEntityId((EntityObject) entity);
-        return new EntityReferenceImpl<T>(id, entity);
-    }
-
-    private static void checkIsEntity(Object obj) {
-        if (!Entities.isEntity(obj)) {
-            throw new IllegalArgumentException("Not an entity: " + obj);
-        }
-    }
-
-    private BigInteger getEntityId(EntityObject entity) {
-        BigInteger id = getIdOfLoadedEntity(entity);
-        if (id == null) {
-            id = createIdForNewEntity(entity);
-        }
-        return id;
-    }
-
-    private BigInteger getIdOfLoadedEntity(EntityObject entity) {
-        return entities.get(entity);
-    }
-
-    private BigInteger createIdForNewEntity(EntityObject entity) {
-        BigInteger id = idFactory.newId();
-        register(entity, id);
-        return id;
-    }
-
-    // EntityLoader
-
-    public Object loadEntity(BigInteger id) {
-        checkStateIs(State.ACTIVE);
-        EntityObject entity = getLoadedEntity(id);
-        if (entity == null) {
-            entity = loadEntityFromDatabase(id);
-        }
-        return entity;
-    }
-
-    private EntityObject getLoadedEntity(BigInteger id) {
-        return entitiesById.get(id);
-    }
-
-    private EntityObject loadEntityFromDatabase(BigInteger id) {
-        EntityObject entity = (EntityObject) storage.read(id);
-        register(entity, id);
-        return entity;
-    }
-
-    private void register(EntityObject entity, BigInteger id) {
-        if (state == State.FLUSHING) {
-            flushQueue.add(entity);
-        }
-        Object previous1 = entities.put(entity, id);
-        Object previous2 = entitiesById.put(id, entity);
-        assert previous1 == null && previous2 == null : "Registered an entity twise: " + entity + ", " + id;
-    }
-
-    // IterableKeys
-
-    public BigInteger firstKey() {
-        checkStateIs(State.ACTIVE);
-        return storage.firstKey();
-    }
-
-    public BigInteger nextKeyAfter(BigInteger currentKey) {
-        checkStateIs(State.ACTIVE);
-        return storage.nextKeyAfter(currentKey);
-    }
-
-    public void transactionWillDeactivate(Transaction tx) {
-        flushAllEntities();
-    }
-
-    public void flushAllEntities() {
-        beginFlush();
-        flush();
-        endFlush();
-    }
-
-    private void beginFlush() {
-        checkStateIs(State.ACTIVE);
-        state = State.FLUSHING;
-        assert flushQueue.isEmpty();
-        flushQueue.addAll(entities.keySet());
-    }
-
-    private void flush() {
-        EntityObject entity;
-        while ((entity = flushQueue.poll()) != null) {
-            BigInteger id = entities.get(entity);
-            storage.update(id, entity);
-        }
-    }
-
-    private void endFlush() {
-        checkStateIs(State.FLUSHING);
-        state = State.CLOSED;
-        assert flushQueue.isEmpty();
-    }
-
-    private void checkStateIs(State... expectedStates) {
-        for (State expected : expectedStates) {
-            if (state == expected) {
-                return;
-            }
-        }
-        throw new IllegalStateException("Expected state " + Arrays.toString(expectedStates) + " but was " + state);
-    }
-
-    private enum State {
-        ACTIVE, FLUSHING, CLOSED
-    }
+    EntityObject getEntityById(BigInteger id);
 }

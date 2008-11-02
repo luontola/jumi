@@ -69,8 +69,8 @@ public class BindingStorageSpec extends Specification<Object> {
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
         DatabaseTable<Blob, Blob> entities = db.openTable("entities");
 
-        EntityManager entityManager =
-                new EntityManager(
+        EntityManager manager =
+                new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
                         new EntityStorageImpl(
                                 entities,
@@ -82,14 +82,14 @@ public class BindingStorageSpec extends Specification<Object> {
                 bindings,
                 new NoConversion<String>(),
                 new ConvertStringToBytes(),
-                new ConvertEntityToEntityId(entityManager, entityManager),
+                new ConvertEntityToEntityId(manager),
                 new ConvertBigIntegerToBytes());
     }
 
 
     public class BrowsingBindings {
 
-        public Object create() {
+        public void create() {
             DummyEntity foo = new DummyEntity();
             foo.setOther("foo");
             bindingStorage.update("foo", foo);
@@ -99,7 +99,6 @@ public class BindingStorageSpec extends Specification<Object> {
             bindingStorage.update("bar.y", new DummyEntity());
             tx.prepareAndCommit();
             bindingStorage = createBindingStorage(newDatabaseConnection());
-            return null;
         }
 
         public void bindingsAreInAlphabeticalOrder() {

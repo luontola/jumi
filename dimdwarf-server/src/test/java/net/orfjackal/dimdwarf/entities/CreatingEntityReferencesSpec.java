@@ -52,13 +52,15 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     private EntityIdFactory idFactory;
     private EntityStorage storage;
-    private EntityManager manager;
+    private EntityManagerImpl manager;
+    private ReferenceFactory refFactory;
     private EntityObject entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         storage = mock(EntityStorage.class);
-        manager = new EntityManager(idFactory, storage, dummy(Transaction.class));
+        manager = new EntityManagerImpl(idFactory, storage, dummy(Transaction.class));
+        refFactory = new ReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }
 
@@ -82,7 +84,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(idFactory).newId(); will(returnValue(BigInteger.valueOf(42)));
             }});
-            ref = manager.createReference(entity);
+            ref = refFactory.createReference(entity);
             return null;
         }
 
@@ -99,13 +101,13 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void onMultipleCallsAllReferencesToTheSameObjectAreEqual() {
-            EntityReference<EntityObject> ref2 = manager.createReference(entity);
+            EntityReference<EntityObject> ref2 = refFactory.createReference(entity);
             specify(ref2 != ref);
             specify(ref2, should.equal(ref));
         }
 
         public void onMultipleCallsTheEntityIsRegisteredOnlyOnce() {
-            manager.createReference(entity);
+            refFactory.createReference(entity);
             specify(manager.getRegisteredEntities(), should.equal(1));
         }
     }
@@ -120,8 +122,8 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
                 one(idFactory).newId(); will(returnValue(BigInteger.valueOf(1)));
                 one(idFactory).newId(); will(returnValue(BigInteger.valueOf(2)));
             }});
-            ref1 = manager.createReference(entity);
-            ref2 = manager.createReference(new DummyEntity());
+            ref1 = refFactory.createReference(entity);
+            ref2 = refFactory.createReference(new DummyEntity());
             return null;
         }
 

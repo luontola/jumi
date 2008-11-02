@@ -54,7 +54,8 @@ import java.math.BigInteger;
 public class FlushingEntitiesSpec extends Specification<Object> {
 
     private EntityStorage storage;
-    private EntityManager manager;
+    private EntityManagerImpl manager;
+    private ReferenceFactory refFactory;
     private DummyEntity entity;
     private DummyEntity newEntity;
     private Transaction tx;
@@ -62,13 +63,15 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     public void create() throws Exception {
         tx = mock(Transaction.class);
         checking(new Expectations() {{
-            one(tx).addTransactionListener(with(aNonNull(EntityManager.class)));
+            one(tx).addTransactionListener(with(aNonNull(EntityManagerImpl.class)));
         }});
         storage = mock(EntityStorage.class);
-        manager = new EntityManager(new EntityIdFactoryImpl(BigInteger.ZERO), storage, tx);
+        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage, tx);
+        refFactory = new ReferenceFactoryImpl(manager);
+
         entity = new DummyEntity();
         newEntity = new DummyEntity();
-        manager.createReference(entity);
+        refFactory.createReference(entity);
     }
 
     public class BeforeTransactionIsDeactivated {
@@ -120,12 +123,12 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             // try to call all public methods on the manager - all should fail
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.createReference(entity);
+                    manager.getEntityId(entity);
                 }
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.loadEntity(BigInteger.ONE);
+                    manager.getEntityById(BigInteger.ONE);
                 }
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
@@ -185,7 +188,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
         }
 
         public Object invoke(Invocation invocation) throws Throwable {
-            manager.createReference(entity);
+            refFactory.createReference(entity);
             return null;
         }
     }

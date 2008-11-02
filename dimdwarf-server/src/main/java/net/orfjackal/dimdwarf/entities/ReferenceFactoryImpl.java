@@ -31,15 +31,27 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.db.IterableKeys;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 31.8.2008
+ * @since 3.11.2008
  */
-public interface EntityLoader extends IterableKeys<BigInteger> {
+public class ReferenceFactoryImpl implements ReferenceFactory {
 
-    Object loadEntity(BigInteger id);
+    private final EntityManager entityManager;
+
+    @Inject
+    public ReferenceFactoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public <T> EntityReference<T> createReference(T entity) {
+        BigInteger id = entityManager.getEntityId((EntityObject) entity);
+        return new EntityReferenceImpl<T>(id, entity);
+    }
 }
