@@ -218,50 +218,6 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
     }
 
-/*
-    TODO: convert to JDave format (after marking for update is implemented)
-
-    public static class MarkingTransparentReferencesForUpdateTest extends TestCase {
-
-        protected TransparentReferenceFactory factory;
-        private DummyManagedObject managedObject;
-        private DummyInterface1 proxy;
-        private Object normalObject;
-
-        protected void setUp() throws Exception {
-            AppContext.setMockDataManager();
-
-            factory = new TransparentReferenceFactoryImpl(AppContext.getDataManager());
-            TransparentReferenceFactoryGlobal.setFactory(factory);
-            managedObject = new DummyManagedObject();
-            proxy = (DummyInterface1) factory.createTransparentReference(managedObject);
-            normalObject = new Object();
-        }
-
-        protected void tearDown() throws Exception {
-            AppContext.setDataManager(null);
-        }
-
-        public void testMarkForUpdateOnManagedObjectShouldUseMarkForUpdate() {
-            TransparentReferenceUtil.markForUpdate(managedObject);
-            // TODO: mock the DataManager
-            // unable to test, should call: AppContext.getDataManager().markForUpdate(managedObject);
-        }
-
-        public void testMarkForUpdateOnTransparentReferenceShouldUseGetForUpdate() {
-            TransparentReferenceUtil.markForUpdate(proxy);
-            // TODO: mock the DataManager
-            // unable to test, should call: ManagedReference.getForUpdate();
-        }
-
-        public void testMarkForUpdateOnNormalObjectShouldDoNothing() {
-            TransparentReferenceUtil.markForUpdate(normalObject);
-            // TODO: mock the DataManager
-            // unable to test, should call nothing
-        }
-    }
-*/
-
 
     private static class SerializationTestEntity implements IEntity, Serializable {
         private static final long serialVersionUID = 1L;

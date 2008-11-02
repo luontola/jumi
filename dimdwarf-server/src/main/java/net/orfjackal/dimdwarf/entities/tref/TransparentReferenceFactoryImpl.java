@@ -44,6 +44,8 @@ import net.orfjackal.dimdwarf.util.Cache;
 import net.sf.cglib.proxy.*;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The thread-safeness of this class depends on the injected dependencies.
@@ -76,6 +78,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         });
     }
 
+
     private static class CglibProxyFactoryCache extends Cache<Class<?>, Factory> {
 
         protected Factory newInstance(Class<?> type) {
@@ -83,7 +86,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
             if (useConcreteSuperclass(type)) {
                 e.setSuperclass(type);
             }
-            e.setInterfaces(TransparentReferenceUtil.proxiedInterfaces(type));
+            e.setInterfaces(proxiedInterfaces(type));
             e.setCallbacks(new Callback[]{
                     new EntityCallback(null),
                     new TransparentReferenceCallback(null)
@@ -95,6 +98,40 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         private static boolean useConcreteSuperclass(Class<?> type) {
             Entity ann = type.getAnnotation(Entity.class);
             return ann != null && ann.value().equals(ProxyType.CLASS);
+        }
+
+        private static Class<?>[] proxiedInterfaces(Class<?> aClass) {
+            List<Class<?>> results = new ArrayList<Class<?>>();
+            for (Class<?> c = aClass; c != null; c = c.getSuperclass()) {
+                for (Class<?> anInterface : c.getInterfaces()) {
+                    assert !TransparentReference.class.equals(anInterface);
+                    if (!IEntity.class.isAssignableFrom(anInterface)) {
+                        results.add(anInterface);
+                    }
+                }
+            }
+            results.add(TransparentReference.class);
+            return results.toArray(new Class<?>[results.size()]);
+        }
+    }
+
+    private static class TransparentReferenceCallbackFilter implements CallbackFilter {
+
+        private static final int ENTITY_CALLBACK = 0;
+        private static final int TRANSPARENT_REF_CALLBACK = 1;
+
+        public int accept(Method method) {
+            if (shouldDelegateToTransparentReference(method)) {
+                return TRANSPARENT_REF_CALLBACK;
+            } else {
+                return ENTITY_CALLBACK;
+            }
+        }
+
+        private static boolean shouldDelegateToTransparentReference(Method method) {
+            return method.getDeclaringClass().equals(TransparentReference.class)
+                    || (method.getDeclaringClass().equals(Object.class) && method.getName().equals("equals"))
+                    || (method.getDeclaringClass().equals(Object.class) && method.getName().equals("hashCode"));
         }
     }
 
@@ -121,20 +158,6 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
 
         public Object loadObject() throws Exception {
             return tref;
-        }
-    }
-
-    private static class TransparentReferenceCallbackFilter implements CallbackFilter {
-
-        private static final int ENTITY = 0;
-        private static final int TRANSPARENT_REFERENCE = 1;
-
-        public int accept(Method method) {
-            if (TransparentReferenceUtil.shouldDelegateToTransparentReference(method)) {
-                return TRANSPARENT_REFERENCE;
-            } else {
-                return ENTITY;
-            }
         }
     }
 }
