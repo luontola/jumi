@@ -36,9 +36,9 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.ProxyType;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.util.Cache;
 import net.sf.cglib.proxy.*;
@@ -64,7 +64,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         this.referenceFactory = referenceFactory;
     }
 
-    public TransparentReference createTransparentReference(IEntity object) {
+    public TransparentReference createTransparentReference(EntityObject object) {
         Class<?> type = object.getClass();
         EntityReference<?> ref = referenceFactory.get().createReference(object);
         return newProxy(new TransparentReferenceImpl(type, ref));
@@ -105,7 +105,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
             for (Class<?> c = aClass; c != null; c = c.getSuperclass()) {
                 for (Class<?> anInterface : c.getInterfaces()) {
                     assert !TransparentReference.class.equals(anInterface);
-                    if (!IEntity.class.isAssignableFrom(anInterface)) {
+                    if (!EntityObject.class.isAssignableFrom(anInterface)) {
                         results.add(anInterface);
                     }
                 }

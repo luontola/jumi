@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import net.orfjackal.dimdwarf.util.TestUtil;
@@ -85,7 +85,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theReferenceHasTheEntityId() {
-            specify(ref.getId(), should.equal(ENTITY_ID));
+            specify(ref.getEntityId(), should.equal(ENTITY_ID));
         }
 
         public void theEntityIsCachedLocally() {
@@ -104,7 +104,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theReferenceHasTheEntityId() {
-            specify(ref.getId(), should.equal(ENTITY_ID));
+            specify(ref.getEntityId(), should.equal(ENTITY_ID));
         }
 
         public void theEntityIsLazyLoadedFromDatabase() {

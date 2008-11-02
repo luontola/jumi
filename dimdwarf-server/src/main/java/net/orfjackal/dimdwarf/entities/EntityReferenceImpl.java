@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
         return entity;
     }
 
-    public BigInteger getId() {
+    public BigInteger getEntityId() {
         return id;
     }
 

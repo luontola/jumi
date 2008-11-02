@@ -31,16 +31,16 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.util.Objects;
 
 /**
- * For transparent references to work correctly, all subclasses of {@link IEntity} should
+ * For transparent references to work correctly, all subclasses of {@link EntityObject} should
  * define their {@link #equals(Object)} and {@link #hashCode()} methods as follows:
  * <pre><code>
  * public boolean equals(Object obj) {

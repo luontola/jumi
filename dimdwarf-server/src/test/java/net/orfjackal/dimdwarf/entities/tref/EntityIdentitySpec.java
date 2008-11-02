@@ -34,8 +34,8 @@ package net.orfjackal.dimdwarf.entities.tref;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.context.FakeContext;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
@@ -57,8 +57,8 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     private ReferenceFactory referenceFactory;
     protected TransparentReferenceFactory proxyFactory;
-    private IEntity ent1;
-    private IEntity ent2;
+    private EntityObject ent1;
+    private EntityObject ent2;
     private TransparentReference tref1;
     private TransparentReference tref1b;
     private TransparentReference tref2;
@@ -82,9 +82,9 @@ public class EntityIdentitySpec extends Specification<Object> {
         ThreadContext.tearDown();
     }
 
-    private Expectations referencesMayBeCreatedFor(final IEntity entity, final BigInteger id) {
+    private Expectations referencesMayBeCreatedFor(final EntityObject entity, final BigInteger id) {
         return new Expectations() {{
-            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
+            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(id, entity)));
         }};
     }
 
@@ -155,14 +155,14 @@ public class EntityIdentitySpec extends Specification<Object> {
         }
 
         public void equalsMethodOnProxyWillNotDelegateToEntity() {
-            final IEntity entity = mock(IEntity.class);
+            final EntityObject entity = mock(EntityObject.class);
             checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
             TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.equals(entity);
         }
 
         public void hashCodeMethodOnProxyWillNotDelegateToEntity() {
-            final IEntity entity = mock(IEntity.class);
+            final EntityObject entity = mock(EntityObject.class);
             checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
             TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.hashCode();

@@ -29,19 +29,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api.impl;
-
-import java.math.BigInteger;
+package net.orfjackal.dimdwarf.api.internal;
 
 /**
- * Reference to an entity, equivalent to Darkstar's ManagedReference.
+ * Marker interface equivalent to Darkstar's ManagedObject.
+ * <p/>
+ * Internally the system uses only this interface, and not the {@link net.orfjackal.dimdwarf.api.Entity} annotation.
+ * Classes annotated with {@code @Entity} will be automatically transformed to implement this interface.
  *
  * @author Esko Luontola
  * @since 15.8.2008
  */
-public interface EntityReference<T> {
-
-    T get();
-
-    BigInteger getId();
+public interface EntityObject {
 }

@@ -34,8 +34,8 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -53,7 +53,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
     private EntityIdFactory idFactory;
     private EntityStorage storage;
     private EntityManager manager;
-    private IEntity entity;
+    private EntityObject entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
@@ -76,7 +76,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     public class WhenAReferenceIsCreated {
 
-        private EntityReference<IEntity> ref;
+        private EntityReference<EntityObject> ref;
 
         public Object create() {
             checking(new Expectations() {{
@@ -95,7 +95,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theEntityGetsAnId() {
-            specify(ref.getId(), should.equal(BigInteger.valueOf(42)));
+            specify(ref.getEntityId(), should.equal(BigInteger.valueOf(42)));
         }
 
         public void onMultipleCallsTheSameReferenceInstanceIsReturned() {
@@ -111,7 +111,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     public class WhenReferencesToManyEntitiesAreCreated {
 
-        private EntityReference<IEntity> ref1;
+        private EntityReference<EntityObject> ref1;
         private EntityReference<DummyEntity> ref2;
 
         public Object create() {
@@ -133,8 +133,8 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void eachEntityGetsItsOwnId() {
-            specify(ref1.getId(), should.equal(BigInteger.valueOf(1)));
-            specify(ref2.getId(), should.equal(BigInteger.valueOf(2)));
+            specify(ref1.getEntityId(), should.equal(BigInteger.valueOf(1)));
+            specify(ref2.getEntityId(), should.equal(BigInteger.valueOf(2)));
         }
     }
 }

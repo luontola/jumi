@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.impl.Entities;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.serial.SerializationAdapter;
 
 /**

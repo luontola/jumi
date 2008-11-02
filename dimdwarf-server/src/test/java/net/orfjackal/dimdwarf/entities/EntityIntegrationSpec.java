@@ -36,8 +36,8 @@ import com.google.inject.Injector;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -74,7 +74,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
                 public void run() {
                     ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
                     EntityReference<DummyEntity> ref = factory.createReference(new DummyEntity("foo"));
-                    id.set(ref.getId());
+                    id.set(ref.getEntityId());
                 }
             });
             taskExecutor.execute(new Runnable() {
@@ -132,7 +132,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
                     DummyEntity entity = new DummyEntity();
                     EntityReference<DummyEntity> ref = factory.createReference(entity);
 
-                    DummyEntity loaded = (DummyEntity) loader.loadEntity(ref.getId());
+                    DummyEntity loaded = (DummyEntity) loader.loadEntity(ref.getEntityId());
                     specify(loaded, should.equal(entity));
                     specify(factory, should.equal(loader));
                 }

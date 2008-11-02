@@ -35,7 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionListener;
 import org.jmock.Expectations;
@@ -79,7 +79,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void entitiesAreFlushed() {
             checking(new Expectations() {{
-                one(storage).update(with(any(BigInteger.class)), with(any(IEntity.class)));
+                one(storage).update(with(any(BigInteger.class)), with(any(EntityObject.class)));
             }});
             TransactionListener l = manager;
             l.transactionWillDeactivate(tx);

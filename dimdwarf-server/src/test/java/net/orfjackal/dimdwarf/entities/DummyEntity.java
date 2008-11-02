@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 
 import java.io.Serializable;
 
@@ -41,7 +41,7 @@ import java.io.Serializable;
  * @since 25.8.2008
  */
 @Entity
-public class DummyEntity implements DummyInterface, IEntity, Serializable {
+public class DummyEntity implements DummyInterface, EntityObject, Serializable {
     private static final long serialVersionUID = 1L;
 
     public Object other;

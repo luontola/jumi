@@ -35,7 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.ConvertBigIntegerToBytes;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
@@ -59,7 +59,7 @@ public class EntityStorageSpec extends Specification<Object> {
     private DatabaseTable<Blob, Blob> db;
     private ObjectSerializer serializer;
     private EntityStorageImpl storage;
-    private IEntity entity;
+    private EntityObject entity;
     private Blob serialized;
 
     public void create() throws Exception {

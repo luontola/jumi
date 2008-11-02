@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.Converter;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;

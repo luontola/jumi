@@ -35,7 +35,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
@@ -57,7 +57,7 @@ public class GettingEntityIdSpec extends Specification<Object> {
 
     private EntityInfoImpl entityInfo;
     private ReferenceFactory referenceFactory;
-    private IEntity entity;
+    private EntityObject entity;
     private Object proxy;
 
     public void create() throws Exception {
@@ -66,7 +66,7 @@ public class GettingEntityIdSpec extends Specification<Object> {
 
         entity = new DummyEntity();
         checking(new Expectations() {{
-            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(ENTITY_ID, entity)));
+            allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(ENTITY_ID, entity)));
         }});
         proxy = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory))
                 .createTransparentReference(entity);

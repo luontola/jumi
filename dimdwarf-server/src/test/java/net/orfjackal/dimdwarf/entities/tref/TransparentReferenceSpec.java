@@ -35,10 +35,10 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
@@ -74,9 +74,9 @@ public class TransparentReferenceSpec extends Specification<Object> {
         entity = new DummyEntity();
     }
 
-    private Expectations referenceIsCreatedFor(final IEntity entity, final BigInteger id) {
+    private Expectations referenceIsCreatedFor(final EntityObject entity, final BigInteger id) {
         return new Expectations() {{
-            one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(id, entity)));
+            one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(id, entity)));
         }};
     }
 
@@ -219,7 +219,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
     }
 
 
-    private static class SerializationTestEntity implements IEntity, Serializable {
+    private static class SerializationTestEntity implements EntityObject, Serializable {
         private static final long serialVersionUID = 1L;
 
         private DummyInterface entity;

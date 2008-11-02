@@ -32,9 +32,9 @@
 package net.orfjackal.dimdwarf.entities.tref;
 
 import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 
 import java.math.BigInteger;
@@ -52,7 +52,7 @@ public class EntityInfoImpl implements EntityInfo {
     }
 
     public BigInteger getEntityId(Object entity) {
-        return getReference(entity).getId();
+        return getReference(entity).getEntityId();
     }
 
     private EntityReference<?> getReference(Object entity) {

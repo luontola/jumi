@@ -29,16 +29,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api.impl;
+package net.orfjackal.dimdwarf.api.internal;
 
 /**
- * Marker interface equivalent to Darkstar's ManagedObject.
- * <p/>
- * Internally the system uses only this interface, and not the {@link net.orfjackal.dimdwarf.api.Entity} annotation.
- * Classes annotated with {@code @Entity} will be automatically transformed to implement this interface.
- *
  * @author Esko Luontola
- * @since 15.8.2008
+ * @since 10.9.2008
  */
-public interface IEntity {
+public class Entities {
+
+    private Entities() {
+    }
+
+    public static boolean isEntity(Object obj) {
+        return obj instanceof EntityObject && !isTransparentReference(obj);
+    }
+
+    public static boolean isTransparentReference(Object obj) {
+        return obj instanceof TransparentReference;
+    }
 }

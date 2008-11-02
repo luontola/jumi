@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.impl.Entities;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.db.Converter;
 
 import java.math.BigInteger;
@@ -68,6 +68,6 @@ public class ConvertEntityToEntityId implements Converter<Object, BigInteger> {
             return null;
         }
         assert Entities.isEntity(entity);
-        return referenceFactory.createReference(entity).getId();
+        return referenceFactory.createReference(entity).getEntityId();
     }
 }

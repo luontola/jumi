@@ -31,9 +31,9 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 
 
 /**
@@ -47,7 +47,7 @@ public interface TransparentReferenceFactory {
      * external interface as the proxied entity, but the proxy itself does not need
      * to be wrapped into an {@link EntityReference}.
      */
-    TransparentReference createTransparentReference(IEntity object);
+    TransparentReference createTransparentReference(EntityObject object);
 
     /**
      * Creates a proxy from a {@link TransparentReferenceImpl} which is not yet proxied.

@@ -32,9 +32,9 @@
 package net.orfjackal.dimdwarf.entities.tref;
 
 
-import net.orfjackal.dimdwarf.api.impl.EntityReference;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.api.impl.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.TransparentReference;
 
 import java.io.Serializable;
 
@@ -55,8 +55,8 @@ public class TransparentReferenceImpl implements TransparentReference, Serializa
         this.reference = reference;
     }
 
-    public IEntity getEntity() {
-        return (IEntity) reference.get();
+    public EntityObject getEntity() {
+        return (EntityObject) reference.get();
     }
 
     public EntityReference<?> getEntityReference() {

@@ -37,8 +37,8 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.ProxyType;
-import net.orfjackal.dimdwarf.api.impl.Entities;
-import net.orfjackal.dimdwarf.api.impl.IEntity;
+import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.StubProvider;
@@ -73,7 +73,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
         public Object create() {
             checking(new Expectations() {{
-                one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(BigInteger.ONE, entity)));
+                one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(BigInteger.ONE, entity)));
             }});
             proxy = proxyFactory.createTransparentReference(entity);
             return null;
@@ -114,7 +114,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
 
     @Entity(ProxyType.CLASS)
-    public static class MyEntity implements IEntity, Serializable {
+    public static class MyEntity implements EntityObject, Serializable {
         private static final long serialVersionUID = 1L;
 
         public int value = 0;

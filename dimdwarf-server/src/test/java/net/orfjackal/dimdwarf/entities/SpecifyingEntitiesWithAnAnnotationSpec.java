@@ -39,7 +39,7 @@ import net.orfjackal.dimdwarf.aop.MarkAsEntitiesAllClassesAnnotatedWith;
 import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
 import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
 import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.impl.Entities;
+import net.orfjackal.dimdwarf.api.internal.Entities;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
