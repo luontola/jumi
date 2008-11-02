@@ -54,6 +54,12 @@ import java.util.*;
 @TaskScoped
 public class EntityManager implements ReferenceFactory, EntityLoader, TransactionListener {
 
+    // TODO: separate responsibilities:
+    // - keeping track of in-memory entities (LoadedEntitiesRegistry)
+    // - loading entities from database (merge with above?)
+    // - flushing entities to database (merge with above?)
+    // - creating references (ReferenceFactoryImpl)
+
     private final Map<IEntity, EntityReference<?>> entities = new IdentityHashMap<IEntity, EntityReference<?>>();
     private final Map<BigInteger, IEntity> entitiesById = new HashMap<BigInteger, IEntity>();
     private final Queue<IEntity> flushQueue = new ArrayDeque<IEntity>();
