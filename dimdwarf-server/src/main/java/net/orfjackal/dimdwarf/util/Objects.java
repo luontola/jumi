@@ -47,4 +47,8 @@ public class Objects {
     public static <T> T uncheckedCast(Object obj) {
         return (T) obj;
     }
+
+    public static boolean safeEquals(Object x, Object y) {
+        return x == y || (x != null && x.equals(y));
+    }
 }

@@ -36,8 +36,6 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.impl.IEntity;
-import net.orfjackal.dimdwarf.context.FakeContext;
-import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
 import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
@@ -53,48 +51,42 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class AccessingEntityIdSpec extends Specification<Object> {
+public class GettingEntityIdSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
+    private EntityInfoImpl entityInfo;
     private ReferenceFactory referenceFactory;
     private IEntity entity;
     private Object proxy;
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
-        TransparentReferenceFactory proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
+        entityInfo = new EntityInfoImpl(referenceFactory);
+
         entity = new DummyEntity();
         checking(new Expectations() {{
             allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<IEntity>(ENTITY_ID, entity)));
         }});
-        proxy = proxyFactory.createTransparentReference(entity);
-        ThreadContext.setUp(new FakeContext().with(ReferenceFactory.class, referenceFactory));
-    }
-
-    public void destroy() throws Exception {
-        ThreadContext.tearDown();
+        proxy = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory))
+                .createTransparentReference(entity);
     }
 
 
     public class TheEntityId {
 
-        public Object create() {
-            return null;
-        }
-
         public void canBeGetFromEntity() {
-            specify(EntityHelper.getId(entity), should.equal(ENTITY_ID));
+            specify(entityInfo.getEntityId(entity), should.equal(ENTITY_ID));
         }
 
         public void canBeGetFromTransparentReferenceProxy() {
-            specify(EntityHelper.getId(proxy), should.equal(ENTITY_ID));
+            specify(entityInfo.getEntityId(proxy), should.equal(ENTITY_ID));
         }
 
         public void normalObjectsDoNotHaveAnEntityId() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    EntityHelper.getId(new Object());
+                    entityInfo.getEntityId(new Object());
                 }
             }, should.raise(IllegalArgumentException.class));
         }
