@@ -118,13 +118,6 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
             ref.get();
             specify(manager.getRegisteredEntities(), should.equal(1));
         }
-
-        public void theReferenceInstanceIsCachedOnLoad() {
-            checking(loadsFromStorage(ENTITY_ID, entity));
-            ref.get();
-            specify(manager.createReference(entity), should.equal(ref));
-            specify(manager.createReference(entity) == ref);
-        }
     }
 
     public class WhenManyReferencesToTheSameEntityHaveBeenDeserialized {

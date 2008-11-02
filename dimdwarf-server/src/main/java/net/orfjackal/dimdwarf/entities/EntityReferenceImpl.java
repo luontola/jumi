@@ -85,7 +85,7 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
 
     public T get() {
         if (entity == null) {
-            entity = entityLoader.loadEntity(this);
+            entity = (T) entityLoader.loadEntity(id);
         }
         return entity;
     }

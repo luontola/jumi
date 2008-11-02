@@ -38,8 +38,6 @@ import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionListener;
-import net.orfjackal.dimdwarf.util.Objects;
-import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jetbrains.annotations.TestOnly;
 
 import java.math.BigInteger;
@@ -60,7 +58,7 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
     // - flushing entities to database (merge with above?)
     // - creating references (ReferenceFactoryImpl)
 
-    private final Map<EntityObject, EntityReference<?>> entities = new IdentityHashMap<EntityObject, EntityReference<?>>();
+    private final Map<EntityObject, BigInteger> entities = new IdentityHashMap<EntityObject, BigInteger>();
     private final Map<BigInteger, EntityObject> entitiesById = new HashMap<BigInteger, EntityObject>();
     private final Queue<EntityObject> flushQueue = new ArrayDeque<EntityObject>();
     private final EntityIdFactory idFactory;
@@ -75,7 +73,7 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
     }
 
     @TestOnly
-    public int getRegisteredEntities() {
+    int getRegisteredEntities() {
         return entities.size();
     }
 
@@ -84,11 +82,8 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
     public <T> EntityReference<T> createReference(T entity) {
         checkStateIs(State.ACTIVE, State.FLUSHING);
         checkIsEntity(entity);
-        EntityReference<T> ref = getExistingReference(entity);
-        if (ref == null) {
-            ref = createNewReference(entity);
-        }
-        return ref;
+        BigInteger id = getEntityId((EntityObject) entity);
+        return new EntityReferenceImpl<T>(id, entity);
     }
 
     private static void checkIsEntity(Object obj) {
@@ -97,35 +92,31 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
         }
     }
 
-    private <T> EntityReference<T> getExistingReference(T entity) {
-        return uncheckedCast(entities.get((EntityObject) entity));
+    private BigInteger getEntityId(EntityObject entity) {
+        BigInteger id = getIdOfLoadedEntity(entity);
+        if (id == null) {
+            id = createIdForNewEntity(entity);
+        }
+        return id;
     }
 
-    private <T> EntityReference<T> createNewReference(T obj) {
-        EntityReference<T> ref = new EntityReferenceImpl<T>(idFactory.newId(), obj);
-        register((EntityObject) obj, ref);
-        return ref;
+    private BigInteger getIdOfLoadedEntity(EntityObject entity) {
+        return entities.get(entity);
+    }
+
+    private BigInteger createIdForNewEntity(EntityObject entity) {
+        BigInteger id = idFactory.newId();
+        register(entity, id);
+        return id;
     }
 
     // EntityLoader
 
     public Object loadEntity(BigInteger id) {
         checkStateIs(State.ACTIVE);
-        return loadEntity(id, null);
-    }
-
-    public <T> T loadEntity(EntityReference<T> ref) {
-        checkStateIs(State.ACTIVE);
-        // TODO: is this reference caching even necessary? it should not make big difference 
-        // to create more reference instances, because we already create lots of them when deserializing,
-        // so it might be best to remove this method and the reference parameter from following methods
-        return Objects.<T>uncheckedCast(loadEntity(ref.getEntityId(), ref));
-    }
-
-    private EntityObject loadEntity(BigInteger id, EntityReference<?> cachedRef) {
         EntityObject entity = getLoadedEntity(id);
         if (entity == null) {
-            entity = loadEntityFromDatabase(id, cachedRef);
+            entity = loadEntityFromDatabase(id);
         }
         return entity;
     }
@@ -134,22 +125,19 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
         return entitiesById.get(id);
     }
 
-    private EntityObject loadEntityFromDatabase(BigInteger id, EntityReference<?> ref) {
+    private EntityObject loadEntityFromDatabase(BigInteger id) {
         EntityObject entity = (EntityObject) storage.read(id);
-        if (ref == null) {
-            ref = new EntityReferenceImpl<Object>(id, entity);
-        }
-        register(entity, ref);
+        register(entity, id);
         return entity;
     }
 
-    private void register(EntityObject entity, EntityReference<?> ref) {
+    private void register(EntityObject entity, BigInteger id) {
         if (state == State.FLUSHING) {
             flushQueue.add(entity);
         }
-        Object previous1 = entitiesById.put(ref.getEntityId(), entity);
-        Object previous2 = entities.put(entity, ref);
-        assert previous1 == null && previous2 == null : "Registered an entity twise: " + entity + ", " + ref;
+        Object previous1 = entities.put(entity, id);
+        Object previous2 = entitiesById.put(id, entity);
+        assert previous1 == null && previous2 == null : "Registered an entity twise: " + entity + ", " + id;
     }
 
     // IterableKeys
@@ -184,7 +172,7 @@ public class EntityManager implements ReferenceFactory, EntityLoader, Transactio
     private void flush() {
         EntityObject entity;
         while ((entity = flushQueue.poll()) != null) {
-            BigInteger id = entities.get(entity).getEntityId();
+            BigInteger id = entities.get(entity);
             storage.update(id, entity);
         }
     }

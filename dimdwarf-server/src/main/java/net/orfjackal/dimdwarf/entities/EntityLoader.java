@@ -31,7 +31,6 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.db.IterableKeys;
 
 import java.math.BigInteger;
@@ -43,6 +42,4 @@ import java.math.BigInteger;
 public interface EntityLoader extends IterableKeys<BigInteger> {
 
     Object loadEntity(BigInteger id);
-
-    <T> T loadEntity(EntityReference<T> ref);
 }

@@ -116,6 +116,8 @@ public class FlushingEntitiesSpec extends Specification<Object> {
                 one(storage).update(BigInteger.ONE, entity);
             }});
             manager.flushAllEntities();
+
+            // try to call all public methods on the manager - all should fail
             specify(new Block() {
                 public void run() throws Throwable {
                     manager.createReference(entity);
@@ -123,7 +125,22 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.loadEntity(new EntityReferenceImpl<Object>(BigInteger.ONE, entity));
+                    manager.loadEntity(BigInteger.ONE);
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.firstKey();
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.nextKeyAfter(BigInteger.ONE);
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    manager.flushAllEntities();
                 }
             }, should.raise(IllegalStateException.class));
         }

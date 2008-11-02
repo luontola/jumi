@@ -98,9 +98,10 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
             specify(ref.getEntityId(), should.equal(BigInteger.valueOf(42)));
         }
 
-        public void onMultipleCallsTheSameReferenceInstanceIsReturned() {
-            specify(manager.createReference(entity), should.equal(ref));
-            specify(manager.createReference(entity) == ref);
+        public void onMultipleCallsAllReferencesToTheSameObjectAreEqual() {
+            EntityReference<EntityObject> ref2 = manager.createReference(entity);
+            specify(ref2 != ref);
+            specify(ref2, should.equal(ref));
         }
 
         public void onMultipleCallsTheEntityIsRegisteredOnlyOnce() {
