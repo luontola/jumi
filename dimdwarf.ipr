@@ -334,7 +334,7 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="false" name="All tests with coverage" type="JUnit" factoryName="JUnit" enabled="true" merge="false" per_test_coverage_enabled="false" runner="idea">
+    <configuration default="false" name="All tests with coverage" type="JUnit" factoryName="JUnit" enabled="true" merge="false" runner="idea">
       <pattern>
         <option name="PATTERN" value="net.orfjackal.dimdwarf.*" />
         <option name="ENABLED" value="true" />
