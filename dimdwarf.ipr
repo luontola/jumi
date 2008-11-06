@@ -394,20 +394,6 @@
         <entry key="$PROJECT_DIR$">
           <value>
             <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/branches">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                  <entry key="https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/tags">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                </map>
-              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/branches" />
