@@ -44,14 +44,18 @@ public class RevisionCounter {
     private final AtomicLong currentRevision = new AtomicLong();
 
     public long getCurrentRevision() {
-        return currentRevision.get();
+        return checkForOverflow(currentRevision.get());
+    }
+
+    private static long checkForOverflow(long x) {
+        // TODO: any good ideas on how to allow the revisions to loop freely?
+        if (x < 0) {
+            throw new Error("Numeric overflow has happened");
+        }
+        return x;
     }
 
     public void incrementRevision() {
-        if (currentRevision.get() == Long.MAX_VALUE) {
-            // TODO: any good ideas on how to allow the revisions to loop freely?
-            throw new Error("Numeric overflow: tried to increment past Long.MAX_VALUE");
-        }
         currentRevision.getAndIncrement();
     }
 }
