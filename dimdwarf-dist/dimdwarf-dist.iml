@@ -9,8 +9,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-jdk14:1.5.2" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-api:1.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-jdk14:1.5.5" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-api:1.5.5" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.4" level="project" />
     <orderEntry type="library" name="Maven: org.jdave:jdave-junit4:1.1-rc1" level="project" />
     <orderEntry type="library" name="Maven: org.jmock:jmock:2.4.0" level="project" />
@@ -28,7 +28,7 @@
     <orderEntry type="library" exported="" name="Maven: asm:asm-tree:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.google.code.guice:guice:1.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.intellij:annotations:7.0.3" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-simple:1.5.2" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-simple:1.5.5" level="project" />
   </component>
   <component name="copyright">
     <Base>
