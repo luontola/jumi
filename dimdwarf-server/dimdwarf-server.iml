@@ -23,7 +23,7 @@
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-library:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.jmock:jmock-legacy:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.objenesis:objenesis:1.1" level="project" />
-    <orderEntry type="library" exported="" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
+    <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
     <orderEntry type="library" name="Maven: org.jdave:jdave-core:1.1-rc1" level="project" />
     <orderEntry type="library" name="Maven: junit:junit-dep:4.4" level="project" />
     <orderEntry type="library" name="Maven: org.easymock:easymock:2.4" level="project" />
@@ -32,6 +32,7 @@
     <orderEntry type="library" exported="" name="Maven: asm:asm:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: asm:asm-tree:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.google.code.guice:guice:1.0" level="project" />
+    <orderEntry type="library" exported="" name="Maven: cglib:cglib:2.2" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-all:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.intellij:annotations:7.0.3" level="project" />
   </component>
