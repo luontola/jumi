@@ -45,8 +45,7 @@ public enum ProxyType {
     INTERFACE,
 
     /**
-     * The proxy will extend the target class, which should have an accessible default constructor.
+     * The proxy will extend the target class. The target class must have a non-private default constructor.
      */
-    // TODO: or does CGLIB use objenesis and does not require a default constructor? -> test it and edit the above comment
     CLASS
 }
