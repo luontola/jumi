@@ -73,7 +73,8 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
-                one(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(BigInteger.ONE, entity)));
+                one(referenceFactory).createReference(entity);
+                will(returnValue(new EntityReferenceImpl<EntityObject>(BigInteger.ONE, entity)));
             }});
             proxy = proxyFactory.createTransparentReference(entity);
         }
@@ -118,6 +119,10 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
         private static final long serialVersionUID = 1L;
 
         public int value = 0;
+
+        // TODO: modify CGLIB so that the proxied classes don't need an accessible default constructor - https://sourceforge.net/tracker2/?func=detail&aid=2070600&group_id=56933&atid=482371
+//        private MyEntity() {
+//        }
 
         public int getValue() {
             return value;
