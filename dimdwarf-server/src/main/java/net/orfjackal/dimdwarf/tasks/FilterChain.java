@@ -54,7 +54,8 @@ public class FilterChain implements Executor {
 
     private void execute(Runnable command, int nextFilter) {
         if (nextFilter < filters.length) {
-            filters[nextFilter].filter(new FilterRecursion(command, nextFilter + 1));
+            Runnable nextInChain = new FilterRecursion(command, nextFilter + 1);
+            filters[nextFilter].filter(nextInChain);
         } else {
             command.run();
         }
