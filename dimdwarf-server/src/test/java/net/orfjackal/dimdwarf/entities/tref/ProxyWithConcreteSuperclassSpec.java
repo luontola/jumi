@@ -40,7 +40,6 @@ import net.orfjackal.dimdwarf.api.ProxyType;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -103,8 +102,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
                     new ReferenceFactoryImpl(
                             new EntityManagerImpl(
                                     mock(EntityIdFactory.class),
-                                    mock(EntityStorage.class),
-                                    dummy(Transaction.class)));
+                                    mock(EntityStorage.class)));
             specify(new Block() {
                 public void run() throws Throwable {
                     factory.createReference(proxy);

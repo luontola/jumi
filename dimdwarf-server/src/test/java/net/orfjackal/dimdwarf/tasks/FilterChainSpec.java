@@ -116,9 +116,9 @@ public class FilterChainSpec extends Specification<Object> {
             this.name = name;
         }
 
-        public void filter(Runnable next) {
+        public void filter(Runnable nextInChain) {
             executionOrder.add("enter " + name);
-            next.run();
+            nextInChain.run();
             executionOrder.add("exit " + name);
         }
     }

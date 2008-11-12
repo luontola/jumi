@@ -35,9 +35,6 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionListener;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -58,35 +55,15 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     private ReferenceFactory refFactory;
     private DummyEntity entity;
     private DummyEntity newEntity;
-    private Transaction tx;
 
     public void create() throws Exception {
-        tx = mock(Transaction.class);
-        checking(new Expectations() {{
-            one(tx).addTransactionListener(with(aNonNull(EntityManagerImpl.class)));
-        }});
         storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage, tx);
+        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage);
         refFactory = new ReferenceFactoryImpl(manager);
 
         entity = new DummyEntity();
         newEntity = new DummyEntity();
         refFactory.createReference(entity);
-    }
-
-    public class BeforeTransactionIsDeactivated {
-
-        public Object create() {
-            return null;
-        }
-
-        public void entitiesAreFlushed() {
-            checking(new Expectations() {{
-                one(storage).update(with(any(BigInteger.class)), with(any(EntityObject.class)));
-            }});
-            TransactionListener l = manager;
-            l.transactionWillDeactivate(tx);
-        }
     }
 
     public class WhenRegisteredEntitiesAreFlushed {
@@ -99,17 +76,17 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
             }});
-            manager.flushAllEntities();
+            manager.flushAllEntitiesToDatabase();
         }
 
         public void flushingTwiseIsNotAllowed() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
             }});
-            manager.flushAllEntities();
+            manager.flushAllEntitiesToDatabase();
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.flushAllEntities();
+                    manager.flushAllEntitiesToDatabase();
                 }
             }, should.raise(IllegalStateException.class));
         }
@@ -118,7 +95,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
             }});
-            manager.flushAllEntities();
+            manager.flushAllEntitiesToDatabase();
 
             // try to call all public methods on the manager - all should fail
             specify(new Block() {
@@ -143,7 +120,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.flushAllEntities();
+                    manager.flushAllEntitiesToDatabase();
                 }
             }, should.raise(IllegalStateException.class));
         }
@@ -160,7 +137,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
                 one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
                 one(storage).update(BigInteger.valueOf(2), newEntity);
             }});
-            manager.flushAllEntities();
+            manager.flushAllEntitiesToDatabase();
         }
     }
 
@@ -174,7 +151,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(entity));
             }});
-            manager.flushAllEntities();
+            manager.flushAllEntitiesToDatabase();
         }
     }
 

@@ -34,7 +34,6 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -57,7 +56,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(mock(EntityIdFactory.class), storage, dummy(Transaction.class));
+        manager = new EntityManagerImpl(mock(EntityIdFactory.class), storage);
     }
 
     private Expectations loadsFromStorage(final BigInteger id, final DummyEntity entity) {

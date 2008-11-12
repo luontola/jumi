@@ -51,11 +51,9 @@ public class TransactionFilter implements Filter {
         this.tx = tx;
     }
 
-    public void filter(Runnable next) {
-        // TODO: Use a nested chain of runnables for transactions, entity flushing, entity reference counting etc.
-        // TODO: Then also get rid of TransactionListener.transactionWillDeactivate()
+    public void filter(Runnable nextInChain) {
         try {
-            next.run();
+            nextInChain.run();
             tx.prepareAndCommit();
         } catch (Throwable t) {
             logger.warn("Task failed, rolling back its transaction", t);

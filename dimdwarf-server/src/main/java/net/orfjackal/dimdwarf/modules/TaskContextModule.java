@@ -35,6 +35,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.entities.EntityFlushingFilter;
 import net.orfjackal.dimdwarf.scopes.TaskScope;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
@@ -79,11 +80,10 @@ public class TaskContextModule extends AbstractModule {
 
     private class FilterProvider implements Provider<Filter[]> {
         @Inject public Provider<TransactionFilter> filter1;
+        @Inject public Provider<EntityFlushingFilter> filter2;
 
         public Filter[] get() {
-            return new Filter[]{
-                    filter1.get(),
-            };
+            return new Filter[]{filter1.get(), filter2.get()};
         }
     }
 }

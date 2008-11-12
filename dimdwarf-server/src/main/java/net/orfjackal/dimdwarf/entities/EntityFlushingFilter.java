@@ -29,18 +29,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tx;
+package net.orfjackal.dimdwarf.entities;
 
-import java.util.EventListener;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.tasks.Filter;
 
 /**
  * @author Esko Luontola
- * @since 13.9.2008
+ * @since 12.11.2008
  */
-public interface TransactionListener extends EventListener {
+public class EntityFlushingFilter implements Filter {
 
-    /**
-     * Called before the transaction deactives at the beginning of the prepare stage.
-     */
-    void transactionWillDeactivate(Transaction tx);
+    private final EntityManagerImpl entityManager;
+
+    @Inject
+    public EntityFlushingFilter(EntityManagerImpl entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public void filter(Runnable nextInChain) {
+        nextInChain.run();
+        entityManager.flushAllEntitiesToDatabase();
+    }
 }

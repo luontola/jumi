@@ -35,7 +35,6 @@ import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.event.EventListenerList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -50,7 +49,6 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
     private static final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
-    private final EventListenerList listeners = new EventListenerList();
     private final Object statusLock = new Object();
     private volatile TransactionStatus status = ACTIVE;
     private volatile boolean rollbackOnly = false;
@@ -66,19 +64,12 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
         }
     }
 
-    public void addTransactionListener(TransactionListener l) {
-        listeners.add(TransactionListener.class, l);
-    }
-
     public void prepareAndCommit() throws TransactionException {
         prepare();
         commit();
     }
 
     public void prepare() throws TransactionException {
-        for (TransactionListener l : listeners.getListeners(TransactionListener.class)) {
-            l.transactionWillDeactivate(getTransaction());
-        }
         changeStatus(ACTIVE, PREPARING);
         try {
             checkIsNotRollbackOnly();

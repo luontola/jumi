@@ -39,8 +39,6 @@ public interface Transaction {
 
     void join(TransactionParticipant p);
 
-    void addTransactionListener(TransactionListener l);
-
     TransactionStatus getStatus();
 
     boolean isActive();

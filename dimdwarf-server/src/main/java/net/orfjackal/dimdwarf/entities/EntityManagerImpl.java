@@ -35,8 +35,6 @@ import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
-import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionListener;
 import org.jetbrains.annotations.TestOnly;
 
 import java.math.BigInteger;
@@ -49,7 +47,7 @@ import java.util.*;
  * @since 25.8.2008
  */
 @TaskScoped
-public class EntityManagerImpl implements EntityManager, TransactionListener {
+public class EntityManagerImpl implements EntityManager {
 
     private final EntityIdFactory idFactory;
     private final EntityStorage storage;
@@ -60,10 +58,9 @@ public class EntityManagerImpl implements EntityManager, TransactionListener {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage, Transaction tx) {
+    public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage) {
         this.idFactory = idFactory;
         this.storage = storage;
-        tx.addTransactionListener(this);
     }
 
     @TestOnly
@@ -135,11 +132,10 @@ public class EntityManagerImpl implements EntityManager, TransactionListener {
         return storage.nextKeyAfter(currentKey);
     }
 
-    public void transactionWillDeactivate(Transaction tx) {
-        flushAllEntities();
-    }
-
-    public void flushAllEntities() {
+    /**
+     * Must be called before transaction deactivates, or the changes to entities will not be persisted.
+     */
+    public void flushAllEntitiesToDatabase() {
         beginFlush();
         flush();
         endFlush();

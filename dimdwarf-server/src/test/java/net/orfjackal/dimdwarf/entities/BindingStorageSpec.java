@@ -54,42 +54,44 @@ public class BindingStorageSpec extends Specification<Object> {
     private BindingStorage bindingStorage;
     private DatabaseManager dbms;
     private TransactionCoordinator tx;
+    private EntityManagerImpl entityManager;
 
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
-        bindingStorage = createBindingStorage(newDatabaseConnection());
     }
 
-    private Database<Blob, Blob> newDatabaseConnection() {
+    private void beginTask() {
         tx = new TransactionImpl();
-        return dbms.openConnection(tx.getTransaction());
-    }
 
-    private BindingStorageImpl createBindingStorage(Database<Blob, Blob> db) {
+        Database<Blob, Blob> db = dbms.openConnection(tx.getTransaction());
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
         DatabaseTable<Blob, Blob> entities = db.openTable("entities");
 
-        EntityManager manager =
+        entityManager =
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
                         new EntityStorageImpl(
                                 entities,
                                 new ConvertBigIntegerToBytes(),
-                                new ConvertEntityToBytes(new ObjectSerializerImpl())),
-                        tx.getTransaction());
+                                new ConvertEntityToBytes(new ObjectSerializerImpl())));
 
-        return new BindingStorageImpl(
+        bindingStorage = new BindingStorageImpl(
                 bindings,
                 new NoConversion<String>(),
                 new ConvertStringToBytes(),
-                new ConvertEntityToEntityId(manager),
+                new ConvertEntityToEntityId(entityManager),
                 new ConvertBigIntegerToBytes());
     }
 
+    private void endTask() {
+        entityManager.flushAllEntitiesToDatabase();
+        tx.prepareAndCommit();
+    }
 
     public class BrowsingBindings {
 
         public void create() {
+            beginTask();
             DummyEntity foo = new DummyEntity();
             foo.setOther("foo");
             bindingStorage.update("foo", foo);
@@ -97,8 +99,8 @@ public class BindingStorageSpec extends Specification<Object> {
             bindingStorage.update("foo.1", new DummyEntity());
             bindingStorage.update("bar.x", new DummyEntity());
             bindingStorage.update("bar.y", new DummyEntity());
-            tx.prepareAndCommit();
-            bindingStorage = createBindingStorage(newDatabaseConnection());
+            endTask();
+            beginTask();
         }
 
         public void bindingsAreInAlphabeticalOrder() {

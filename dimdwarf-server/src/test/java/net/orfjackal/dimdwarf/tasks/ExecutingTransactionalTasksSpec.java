@@ -31,12 +31,15 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.entities.EntityFlushingFilter;
+import net.orfjackal.dimdwarf.entities.EntityManagerImpl;
 import net.orfjackal.dimdwarf.modules.TaskContextModule;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionException;
@@ -54,14 +57,19 @@ import java.util.logging.Logger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class RunningTasksSpec extends Specification<Object> {
+public class ExecutingTransactionalTasksSpec extends Specification<Object> {
 
     private Injector injector;
     private TaskExecutor taskExecutor;
     private Logger logger;
 
     public void create() throws Exception {
-        injector = Guice.createInjector(new TaskContextModule());
+        injector = Guice.createInjector(new TaskContextModule(), new AbstractModule() {
+            protected void configure() {
+                bind(EntityFlushingFilter.class)
+                        .toInstance(new EntityFlushingFilter(dummy(EntityManagerImpl.class)));
+            }
+        });
         taskExecutor = injector.getInstance(TaskExecutor.class);
         
         logger = Logger.getLogger(TransactionFilter.class.getName());

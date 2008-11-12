@@ -37,5 +37,5 @@ package net.orfjackal.dimdwarf.tasks;
  */
 public interface Filter {
 
-    void filter(Runnable next);
+    void filter(Runnable nextInChain);
 }
