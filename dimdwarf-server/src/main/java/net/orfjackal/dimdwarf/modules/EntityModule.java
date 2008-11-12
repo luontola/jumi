@@ -81,9 +81,9 @@ public class EntityModule extends AbstractModule {
     }
 
     private static class SerializationListenerListProvider implements Provider<SerializationListener[]> {
-        @Inject Provider<CheckInnerClassSerialized> listeneter1;
-        @Inject Provider<CheckDirectlyReferredEntitySerialized> listeneter2;
-        @Inject Provider<InjectObjectsOnDeserialization> listener3;
+        @Inject public Provider<CheckInnerClassSerialized> listeneter1;
+        @Inject public Provider<CheckDirectlyReferredEntitySerialized> listeneter2;
+        @Inject public Provider<InjectObjectsOnDeserialization> listener3;
 
         public SerializationListener[] get() {
             return new SerializationListener[]{listeneter1.get(), listeneter2.get(), listener3.get()};
@@ -91,7 +91,7 @@ public class EntityModule extends AbstractModule {
     }
 
     private static class SerializationReplacerListProvider implements Provider<SerializationReplacer[]> {
-        @Inject Provider<ReplaceEntitiesWithTransparentReferences> replacer1;
+        @Inject public Provider<ReplaceEntitiesWithTransparentReferences> replacer1;
 
         public SerializationReplacer[] get() {
             return new SerializationReplacer[]{replacer1.get()};

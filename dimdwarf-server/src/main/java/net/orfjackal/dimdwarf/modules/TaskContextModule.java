@@ -48,7 +48,7 @@ import net.orfjackal.dimdwarf.tx.TransactionImpl;
  * @author Esko Luontola
  * @since 13.9.2008
  */
-public class TaskScopeModule extends AbstractModule {
+public class TaskContextModule extends AbstractModule {
 
     protected void configure() {
 
@@ -70,7 +70,7 @@ public class TaskScopeModule extends AbstractModule {
     }
 
     private static class TransactionProvider implements Provider<Transaction> {
-        @Inject Provider<TransactionCoordinator> coordinator;
+        @Inject public Provider<TransactionCoordinator> coordinator;
 
         public Transaction get() {
             return coordinator.get().getTransaction();
@@ -78,7 +78,7 @@ public class TaskScopeModule extends AbstractModule {
     }
 
     private class FilterProvider implements Provider<Filter[]> {
-        @Inject Provider<TransactionFilter> filter1;
+        @Inject public Provider<TransactionFilter> filter1;
 
         public Filter[] get() {
             return new Filter[]{

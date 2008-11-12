@@ -58,8 +58,8 @@ public class DatabaseModule extends AbstractModule {
     }
 
     private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
-        @Inject Provider<DatabaseManager> dbms;
-        @Inject Provider<Transaction> tx;
+        @Inject public Provider<DatabaseManager> dbms;
+        @Inject public Provider<Transaction> tx;
 
         public Database<Blob, Blob> get() {
             return dbms.get().openConnection(tx.get());
@@ -72,7 +72,7 @@ public class DatabaseModule extends AbstractModule {
 
     public static Provider<DatabaseTable<Blob, Blob>> databaseTable(final String name) {
         return new Provider<DatabaseTable<Blob, Blob>>() {
-            @Inject Provider<Database<Blob, Blob>> db;
+            @Inject public Provider<Database<Blob, Blob>> db;
 
             public DatabaseTable<Blob, Blob> get() {
                 return db.get().openTable(name);

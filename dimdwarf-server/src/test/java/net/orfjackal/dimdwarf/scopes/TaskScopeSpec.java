@@ -42,7 +42,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.FakeContext;
 import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.modules.TaskScopeModule;
+import net.orfjackal.dimdwarf.modules.TaskContextModule;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
@@ -61,7 +61,7 @@ public class TaskScopeSpec extends Specification<Object> {
     private Provider<Context> contextProvider;
 
     public void create() throws Exception {
-        injector = Guice.createInjector(new MyModule(), new TaskScopeModule());
+        injector = Guice.createInjector(new MyModule(), new TaskContextModule());
         contextProvider = injector.getProvider(Context.class);
     }
 

@@ -40,7 +40,7 @@ import com.google.inject.AbstractModule;
 public class CommonModules extends AbstractModule {
 
     protected void configure() {
-        install(new TaskScopeModule());
+        install(new TaskContextModule());
         install(new DatabaseModule());
         install(new EntityModule());
     }

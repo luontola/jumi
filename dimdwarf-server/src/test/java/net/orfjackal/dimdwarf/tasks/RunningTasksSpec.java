@@ -37,7 +37,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.modules.TaskScopeModule;
+import net.orfjackal.dimdwarf.modules.TaskContextModule;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionException;
 import net.orfjackal.dimdwarf.tx.TransactionParticipant;
@@ -61,7 +61,7 @@ public class RunningTasksSpec extends Specification<Object> {
     private Logger logger;
 
     public void create() throws Exception {
-        injector = Guice.createInjector(new TaskScopeModule());
+        injector = Guice.createInjector(new TaskContextModule());
         taskExecutor = injector.getInstance(TaskExecutor.class);
         
         logger = Logger.getLogger(TransactionFilter.class.getName());
