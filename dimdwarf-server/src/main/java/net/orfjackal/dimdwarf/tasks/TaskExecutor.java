@@ -34,7 +34,6 @@ package net.orfjackal.dimdwarf.tasks;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.FilterChain;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 
 import java.util.concurrent.Executor;

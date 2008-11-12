@@ -32,7 +32,6 @@
 package net.orfjackal.dimdwarf.tasks;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.context.Filter;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

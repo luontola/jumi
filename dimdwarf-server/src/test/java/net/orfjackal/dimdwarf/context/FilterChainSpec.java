@@ -34,6 +34,8 @@ package net.orfjackal.dimdwarf.context;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.tasks.Filter;
+import net.orfjackal.dimdwarf.tasks.FilterChain;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
