@@ -63,7 +63,8 @@ public class RunningTasksSpec extends Specification<Object> {
     public void create() throws Exception {
         injector = Guice.createInjector(new TaskScopeModule());
         taskExecutor = injector.getInstance(TaskExecutor.class);
-        logger = Logger.getLogger(TaskExecutor.class.getName());
+        
+        logger = Logger.getLogger(TransactionFilter.class.getName());
         logger.setLevel(Level.OFF);
     }
 

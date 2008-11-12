@@ -29,49 +29,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.context;
+package net.orfjackal.dimdwarf.tasks;
 
 import com.google.inject.Inject;
-
-import java.util.concurrent.Executor;
+import net.orfjackal.dimdwarf.context.Filter;
+import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Esko Luontola
  * @since 12.11.2008
  */
-public class FilterChain implements Executor {
+public class TransactionFilter implements Filter {
 
-    private final Filter[] filters;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionFilter.class);
+
+    private final TransactionCoordinator tx;
 
     @Inject
-    public FilterChain(Filter[] filters) {
-        this.filters = filters;
+    public TransactionFilter(TransactionCoordinator tx) {
+        this.tx = tx;
     }
 
-    public void execute(Runnable command) {
-        execute(command, 0);
-    }
-
-    private void execute(Runnable command, int nextFilter) {
-        if (nextFilter < filters.length) {
-            filters[nextFilter].filter(new FilterRecursion(command, nextFilter + 1));
-        } else {
-            command.run();
+    public void filter(Runnable next) {
+        // TODO: Use a nested chain of runnables for transactions, entity flushing, entity reference counting etc.
+        // TODO: Then also get rid of TransactionListener.transactionWillDeactivate()
+        try {
+            next.run();
+            tx.prepareAndCommit();
+        } catch (Throwable t) {
+            logger.warn("Task failed, rolling back its transaction", t);
+            tx.rollback();
+            throw throwAsUnchecked(t);
         }
     }
 
-    private class FilterRecursion implements Runnable {
-
-        private final Runnable command;
-        private final int nextFilter;
-
-        public FilterRecursion(Runnable command, int nextFilter) {
-            this.command = command;
-            this.nextFilter = nextFilter;
+    private static RuntimeException throwAsUnchecked(Throwable t) {
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
         }
-
-        public void run() {
-            execute(command, nextFilter);
+        if (t instanceof Error) {
+            throw (Error) t;
         }
+        throw new RuntimeException(t);
     }
 }

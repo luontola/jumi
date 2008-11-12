@@ -35,9 +35,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.context.Filter;
 import net.orfjackal.dimdwarf.scopes.TaskScope;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
+import net.orfjackal.dimdwarf.tasks.TransactionFilter;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
@@ -61,6 +63,10 @@ public class TaskScopeModule extends AbstractModule {
         bind(Transaction.class)
                 .toProvider(new TransactionProvider())
                 .in(TaskScoped.class);
+
+        bind(Filter[].class)
+                .toProvider(new FilterProvider())
+                .in(TaskScoped.class);
     }
 
     private static class TransactionProvider implements Provider<Transaction> {
@@ -68,6 +74,16 @@ public class TaskScopeModule extends AbstractModule {
 
         public Transaction get() {
             return coordinator.get().getTransaction();
+        }
+    }
+
+    private class FilterProvider implements Provider<Filter[]> {
+        @Inject Provider<TransactionFilter> filter1;
+
+        public Filter[] get() {
+            return new Filter[]{
+                    filter1.get(),
+            };
         }
     }
 }

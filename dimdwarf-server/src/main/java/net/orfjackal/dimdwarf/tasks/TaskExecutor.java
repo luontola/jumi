@@ -34,10 +34,8 @@ package net.orfjackal.dimdwarf.tasks;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.context.FilterChain;
 import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
 
@@ -47,43 +45,21 @@ import java.util.concurrent.Executor;
  */
 public class TaskExecutor implements Executor {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskExecutor.class);
-
     private final Provider<Context> contextProvider;
-    private final Provider<TransactionCoordinator> txProvider;
+    private final Provider<FilterChain> filterProvider;
 
     @Inject
-    public TaskExecutor(Provider<Context> contextProvider, Provider<TransactionCoordinator> txProvider) {
+    public TaskExecutor(Provider<Context> contextProvider,
+                        Provider<FilterChain> filterProvider) {
         this.contextProvider = contextProvider;
-        this.txProvider = txProvider;
+        this.filterProvider = filterProvider;
     }
 
     public void execute(final Runnable command) {
         ThreadContext.runInContext(contextProvider.get(), new Runnable() {
             public void run() {
-                // TODO: Refactor transaction handling out of this class:
-                // - Use a nested chain of runnables for transactions, entity flushing, entity reference counting etc.
-                // - Then also get rid of TransactionListener.transactionWillDeactivate()
-                TransactionCoordinator tx = txProvider.get();
-                try {
-                    command.run();
-                    tx.prepareAndCommit();
-                } catch (Throwable t) {
-                    logger.warn("Task failed, rolling back its transaction", t);
-                    tx.rollback();
-                    throw throwAsUnchecked(t);
-                }
+                filterProvider.get().execute(command);
             }
         });
-    }
-
-    private static RuntimeException throwAsUnchecked(Throwable t) {
-        if (t instanceof RuntimeException) {
-            throw (RuntimeException) t;
-        }
-        if (t instanceof Error) {
-            throw (Error) t;
-        }
-        throw new RuntimeException(t);
     }
 }
