@@ -41,21 +41,21 @@ import java.util.concurrent.Executor;
  */
 public class FilterChain implements Executor {
 
-    private final Filter[] filters;
+    private final Filter[] chain;
 
     @Inject
-    public FilterChain(Filter[] filters) {
-        this.filters = filters;
+    public FilterChain(Filter[] chain) {
+        this.chain = chain;
     }
 
     public void execute(Runnable command) {
         execute(command, 0);
     }
 
-    private void execute(Runnable command, int nextFilter) {
-        if (nextFilter < filters.length) {
-            Runnable nextInChain = new FilterRecursion(command, nextFilter + 1);
-            filters[nextFilter].filter(nextInChain);
+    private void execute(Runnable command, int currentFilter) {
+        if (currentFilter < chain.length) {
+            Runnable nextInChain = new FilterRecursion(command, currentFilter + 1);
+            chain[currentFilter].filter(nextInChain);
         } else {
             command.run();
         }
