@@ -31,34 +31,19 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.inject.BindingAnnotation;
 
-import java.math.BigInteger;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * This class is thread-safe.
- *
  * @author Esko Luontola
- * @since 4.9.2008
+ * @since 13.11.2008
  */
-@Singleton
-public class EntityIdFactoryImpl implements EntityIdFactory {
-
-    // using java.util.concurrent.atomic.AtomicLong would also be an option
-
-    private BigInteger next;
-
-    @Inject
-    public EntityIdFactoryImpl(@MaxEntityId BigInteger largestUsedId) {
-        next = largestUsedId.add(BigInteger.ONE);
-    }
-
-    public synchronized BigInteger newId() {
-        try {
-            return next;
-        } finally {
-            next = next.add(BigInteger.ONE);
-        }
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@BindingAnnotation
+public @interface MaxEntityId {
 }

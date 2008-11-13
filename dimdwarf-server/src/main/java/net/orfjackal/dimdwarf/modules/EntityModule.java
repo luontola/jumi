@@ -58,13 +58,11 @@ public class EntityModule extends AbstractModule {
         bind(ReferenceFactory.class).to(ReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(EntityInfoImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
-        bind(EntityIdFactory.class)
-                .toProvider(new Provider<EntityIdFactory>() {
-                    // TODO: binding a provider instance like this does not honor EntityIdFactoryImpl's @Singleton annotation?
-                    public EntityIdFactory get() {
-                        return new EntityIdFactoryImpl(BigInteger.ZERO); // TODO: import from database
-                    }
-                });
+
+        bind(EntityIdFactory.class).to(EntityIdFactoryImpl.class);
+        bind(BigInteger.class)
+                .annotatedWith(MaxEntityId.class)
+                .toInstance(BigInteger.ZERO); // TODO: import from database
 
         bind(EntityStorage.class).to(EntityStorageImpl.class);
         bind(databaseTableConnection())

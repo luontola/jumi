@@ -33,9 +33,11 @@ package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.modules.CommonModules;
@@ -82,6 +84,25 @@ public class EntityIntegrationSpec extends Specification<Object> {
                     EntityManager manager = injector.getInstance(EntityManager.class);
                     DummyEntity entity = (DummyEntity) manager.getEntityById(id.get());
                     specify(entity.getOther(), should.equal("foo"));
+                }
+            });
+        }
+
+        public void entityIdsAreUniqueOverAllTasks() {
+            final Provider<EntityInfo> entityInfo = injector.getProvider(EntityInfo.class);
+            final AtomicReference<BigInteger> idInFirstTask = new AtomicReference<BigInteger>();
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    BigInteger id1 = entityInfo.get().getEntityId(new DummyEntity());
+                    idInFirstTask.set(id1);
+                }
+            });
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    BigInteger id2 = entityInfo.get().getEntityId(new DummyEntity());
+                    BigInteger id1 = idInFirstTask.get();
+                    specify(id2, should.not().equal(id1));
+                    specify(id2, should.equal(id1.add(BigInteger.ONE)));
                 }
             });
         }
