@@ -60,6 +60,7 @@ public class EntityModule extends AbstractModule {
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
         bind(EntityIdFactory.class)
                 .toProvider(new Provider<EntityIdFactory>() {
+                    // TODO: binding a provider instance like this does not honor EntityIdFactoryImpl's @Singleton annotation?
                     public EntityIdFactory get() {
                         return new EntityIdFactoryImpl(BigInteger.ZERO); // TODO: import from database
                     }
@@ -76,25 +77,25 @@ public class EntityModule extends AbstractModule {
                 .toProvider(databaseTable("bindings"));
 
         bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
-        bind(SerializationListener[].class).toProvider(new SerializationListenerListProvider());
-        bind(SerializationReplacer[].class).toProvider(new SerializationReplacerListProvider());
+        bind(SerializationListener[].class).toProvider(SerializationListenerListProvider.class);
+        bind(SerializationReplacer[].class).toProvider(SerializationReplacerListProvider.class);
     }
 
     private static class SerializationListenerListProvider implements Provider<SerializationListener[]> {
-        @Inject public Provider<CheckInnerClassSerialized> listeneter1;
-        @Inject public Provider<CheckDirectlyReferredEntitySerialized> listeneter2;
-        @Inject public Provider<InjectObjectsOnDeserialization> listener3;
+        @Inject public CheckInnerClassSerialized listeneter1;
+        @Inject public CheckDirectlyReferredEntitySerialized listeneter2;
+        @Inject public InjectObjectsOnDeserialization listener3;
 
         public SerializationListener[] get() {
-            return new SerializationListener[]{listeneter1.get(), listeneter2.get(), listener3.get()};
+            return new SerializationListener[]{listeneter1, listeneter2, listener3};
         }
     }
 
     private static class SerializationReplacerListProvider implements Provider<SerializationReplacer[]> {
-        @Inject public Provider<ReplaceEntitiesWithTransparentReferences> replacer1;
+        @Inject public ReplaceEntitiesWithTransparentReferences replacer1;
 
         public SerializationReplacer[] get() {
-            return new SerializationReplacer[]{replacer1.get()};
+            return new SerializationReplacer[]{replacer1};
         }
     }
 }

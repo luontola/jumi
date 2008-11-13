@@ -54,36 +54,29 @@ public class TaskContextModule extends AbstractModule {
     protected void configure() {
 
         bindScope(TaskScoped.class, new TaskScope());
-
-        bind(Context.class)
-                .to(TaskScopedContext.class);
+        bind(Context.class).to(TaskScopedContext.class);
 
         bind(TransactionCoordinator.class)
                 .to(TransactionImpl.class)
                 .in(TaskScoped.class);
-        bind(Transaction.class)
-                .toProvider(new TransactionProvider())
-                .in(TaskScoped.class);
-
-        bind(Filter[].class)
-                .toProvider(new FilterProvider())
-                .in(TaskScoped.class);
+        bind(Transaction.class).toProvider(TransactionProvider.class);
+        bind(Filter[].class).toProvider(FilterListProvider.class);
     }
 
     private static class TransactionProvider implements Provider<Transaction> {
-        @Inject public Provider<TransactionCoordinator> coordinator;
+        @Inject public TransactionCoordinator coordinator;
 
         public Transaction get() {
-            return coordinator.get().getTransaction();
+            return coordinator.getTransaction();
         }
     }
 
-    private class FilterProvider implements Provider<Filter[]> {
-        @Inject public Provider<TransactionFilter> filter1;
-        @Inject public Provider<EntityFlushingFilter> filter2;
+    private static class FilterListProvider implements Provider<Filter[]> {
+        @Inject public TransactionFilter filter1;
+        @Inject public EntityFlushingFilter filter2;
 
         public Filter[] get() {
-            return new Filter[]{filter1.get(), filter2.get()};
+            return new Filter[]{filter1, filter2};
         }
     }
 }

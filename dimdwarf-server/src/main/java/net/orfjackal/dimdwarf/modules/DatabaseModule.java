@@ -54,15 +54,15 @@ public class DatabaseModule extends AbstractModule {
                 .to(InMemoryDatabase.class);
 
         bind(new TypeLiteral<Database<Blob, Blob>>() {})
-                .toProvider(new DatabaseConnectionProvider());
+                .toProvider(DatabaseConnectionProvider.class);
     }
 
     private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
-        @Inject public Provider<DatabaseManager> dbms;
-        @Inject public Provider<Transaction> tx;
+        @Inject public DatabaseManager dbms;
+        @Inject public Transaction tx;
 
         public Database<Blob, Blob> get() {
-            return dbms.get().openConnection(tx.get());
+            return dbms.openConnection(tx);
         }
     }
 
