@@ -47,18 +47,16 @@ public class EntityIdFactoryImpl implements EntityIdFactory {
 
     // using java.util.concurrent.atomic.AtomicLong would also be an option
 
-    private BigInteger next;
+    private BigInteger nextId;
 
     @Inject
     public EntityIdFactoryImpl(@MaxEntityId BigInteger largestUsedId) {
-        next = largestUsedId.add(BigInteger.ONE);
+        nextId = largestUsedId.add(BigInteger.ONE);
     }
 
     public synchronized BigInteger newId() {
-        try {
-            return next;
-        } finally {
-            next = next.add(BigInteger.ONE);
-        }
+        BigInteger currentId = nextId;
+        nextId = nextId.add(BigInteger.ONE);
+        return currentId;
     }
 }
