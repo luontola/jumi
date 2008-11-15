@@ -70,6 +70,6 @@ public class MarkAsEntitiesAllClassesAnnotatedWith extends ClassNode {
     }
 
     private List<AnnotationNode> visibleAnnotations() {
-        return visibleAnnotations != null ? visibleAnnotations : Collections.EMPTY_LIST;
+        return visibleAnnotations != null ? visibleAnnotations : Collections.emptyList();
     }
 }
