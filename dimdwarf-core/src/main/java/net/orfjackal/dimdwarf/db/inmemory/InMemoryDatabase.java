@@ -60,6 +60,8 @@ import java.util.concurrent.ConcurrentMap;
 @Singleton
 public class InMemoryDatabase implements DatabaseManager {
 
+    // TODO: this class smells too big/messy
+
     private final ConcurrentMap<Transaction, TxDatabase> openConnections = new ConcurrentHashMap<Transaction, TxDatabase>();
     private final Object commitLock = new Object();
 
