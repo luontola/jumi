@@ -17,7 +17,7 @@
 
         <dependency>
             <groupId>net.orfjackal.dimdwarf</groupId>
-            <artifactId>dimdwarf-server</artifactId>
+            <artifactId>dimdwarf-core</artifactId>
         </dependency>
 
         <!-- Logging implementation -->

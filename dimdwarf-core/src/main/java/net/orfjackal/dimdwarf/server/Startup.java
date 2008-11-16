@@ -54,7 +54,7 @@ public class Startup {
     }
 
     private static String getVersion() throws IOException {
-        String version = MavenUtil.getPom("net.orfjackal.dimdwarf", "dimdwarf-server").getProperty("version");
+        String version = MavenUtil.getPom("net.orfjackal.dimdwarf", "dimdwarf-core").getProperty("version");
         return version != null ? version : "<unknown version>";
     }
 }

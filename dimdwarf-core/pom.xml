@@ -8,10 +8,10 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dimdwarf-server</artifactId>
+    <artifactId>dimdwarf-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>dimdwarf-server</name>
+    <name>dimdwarf-core</name>
 
     <dependencies>
 
