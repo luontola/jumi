@@ -114,15 +114,15 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
             });
         }
 
-        public void theTransactionIsRolledBackIfAnExceptionIsRaised() {
+        public void theTransactionIsRolledBackIfAnExceptionIsRaisedDuringTaskExecution() {
             final Runnable exceptionInTask = new Runnable() {
                 public void run() {
-                    final TransactionParticipant participant = mock(TransactionParticipant.class);
+                    final TransactionParticipant txSpy = mock(TransactionParticipant.class);
                     final Transaction tx = getTransaction();
                     checking(new Expectations() {{
-                        one(participant).rollback(tx);
+                        one(txSpy).rollback(tx);
                     }});
-                    tx.join(participant);
+                    tx.join(txSpy);
                     throw new IllegalArgumentException("dummy exception");
                 }
             };
@@ -137,17 +137,17 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
             final Runnable exceptionInPrepare = new Runnable() {
                 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
                 public void run() {
-                    final TransactionParticipant participant = mock(TransactionParticipant.class);
+                    final TransactionParticipant exceptionThrower = mock(TransactionParticipant.class);
                     final Transaction tx = getTransaction();
                     try {
                         checking(new Expectations() {{
-                            one(participant).prepare(tx); will(throwException(new IllegalArgumentException("dummy exception")));
-                            one(participant).rollback(tx);
+                            one(exceptionThrower).prepare(tx); will(throwException(new IllegalArgumentException("dummy exception")));
+                            one(exceptionThrower).rollback(tx);
                         }});
                     } catch (Throwable t) {
-                        throw new RuntimeException(t);
+                        throw new AssertionError(t);
                     }
-                    tx.join(participant);
+                    tx.join(exceptionThrower);
                 }
             };
             specify(new Block() {

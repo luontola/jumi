@@ -148,7 +148,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
             specify(containsEntityReference);
         }
 
-        public void proxyMethodsDelegateTheEntityMethods() {
+        public void proxyMethodsDelegateToTheEntityMethods() {
             DummyInterface proxy = (DummyInterface) this.proxy;
             proxy.setOther("set through proxy");
             specify(entity.other, should.equal("set through proxy"));

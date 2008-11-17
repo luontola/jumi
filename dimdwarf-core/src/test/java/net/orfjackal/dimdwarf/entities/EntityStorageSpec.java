@@ -89,7 +89,7 @@ public class EntityStorageSpec extends Specification<Object> {
             specify(storage.read(ENTITY_ID), should.equal(entity));
         }
 
-        public void canNotBeReadNonexistentEntities() {
+        public void canNotReadNonexistentEntities() {
             checking(new Expectations() {{
                 one(db).read(asBytes(ENTITY_ID)); will(returnValue(Blob.EMPTY_BLOB));
             }});

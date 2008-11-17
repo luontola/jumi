@@ -115,11 +115,11 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
             specify(table.nextKeyAfter(key2), should.equal(key3));
         }
 
-        public void nextKeyAfterLastKey() {
+        public void nextKeyAfterExistingLastKey() {
             specify(table.nextKeyAfter(key3), should.equal(null));
         }
 
-        public void nextKeyAfterNonexistentKeyAfterLastKey() {
+        public void nextKeyAfterNonexistentLastKey() {
             specify(table.nextKeyAfter(key4), should.equal(null));
         }
     }

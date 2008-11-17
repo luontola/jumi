@@ -50,6 +50,8 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
         super(cv);
     }
 
+    // TODO: would it be best to transform annotated classes only, to avoid the following inheritance issues?
+
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         for (String s : interfaces) {
             // TODO: will this work for inherited interfaces?
