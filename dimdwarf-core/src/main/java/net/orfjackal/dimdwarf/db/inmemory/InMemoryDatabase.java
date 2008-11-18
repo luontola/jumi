@@ -162,7 +162,9 @@ public class InMemoryDatabase implements DatabaseManager {
 
     private void prepareUpdates(Collection<TxDatabaseTable> updates) {
         synchronized (commitLock) {
-            prepareAll(updates);
+            for (TxDatabaseTable update : updates) {
+                update.prepare();
+            }
         }
     }
 
@@ -172,37 +174,22 @@ public class InMemoryDatabase implements DatabaseManager {
         }
     }
 
-    private void rollbackUpdates(Collection<TxDatabaseTable> updates) {
-        synchronized (commitLock) {
-            releaseAllLocks(updates);
-        }
-    }
-
-    private static void prepareAll(Collection<TxDatabaseTable> updates) {
-        for (TxDatabaseTable update : updates) {
-            update.prepare();
-        }
-    }
-
     private void updateRevisionAndCommit(Collection<TxDatabaseTable> updates) {
         try {
             revisionCounter.incrementRevision();
-            commitAll(updates);
+            for (TxDatabaseTable update : updates) {
+                update.commit();
+            }
         } finally {
             committedRevision = revisionCounter.getCurrentRevision();
-            releaseAllLocks(updates);
         }
     }
 
-    private static void commitAll(Collection<TxDatabaseTable> updates) {
-        for (TxDatabaseTable update : updates) {
-            update.commit();
-        }
-    }
-
-    private static void releaseAllLocks(Collection<TxDatabaseTable> updates) {
-        for (TxDatabaseTable update : updates) {
-            update.releaseLocks();
+    private void rollbackUpdates(Collection<TxDatabaseTable> updates) {
+        synchronized (commitLock) {
+            for (TxDatabaseTable update : updates) {
+                update.rollback();
+            }
         }
     }
 
@@ -278,6 +265,7 @@ public class InMemoryDatabase implements DatabaseManager {
         private final InMemoryDatabaseTable table;
         private final long visibleRevision;
         private final Transaction tx;
+        private CommitHandle commitHandle;
 
         public TxDatabaseTable(InMemoryDatabaseTable table, long visibleRevision, Transaction tx) {
             this.table = table;
@@ -320,16 +308,15 @@ public class InMemoryDatabase implements DatabaseManager {
         }
 
         private void prepare() {
-            table.checkForConflicts(updates.keySet(), visibleRevision);
-            table.lock(tx, updates.keySet());
+            commitHandle = table.prepare(updates, visibleRevision);
         }
 
         private void commit() {
-            table.putAll(tx, updates);
+            commitHandle.commit();
         }
 
-        private void releaseLocks() {
-            table.unlock(tx, updates.keySet());
+        private void rollback() {
+            commitHandle.rollback();
         }
     }
 }
