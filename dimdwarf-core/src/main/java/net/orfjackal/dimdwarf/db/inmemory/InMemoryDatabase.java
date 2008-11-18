@@ -35,9 +35,11 @@ import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.db.Database;
 import net.orfjackal.dimdwarf.db.DatabaseManager;
+import net.orfjackal.dimdwarf.db.IsolationLevel;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,13 +82,17 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         committedRevision = revisionCounter.getCurrentRevision();
     }
 
+    public IsolationLevel getIsolationLevel() {
+        return IsolationLevel.SNAPSHOT;
+    }
+
     // Tables
 
     public Set<String> getTableNames() {
         return tables.keySet();
     }
 
-    public PersistedDatabaseTable openOrCreateTable(String name) {
+    public PersistedDatabaseTable openTable(String name) {
         PersistedDatabaseTable table = getExistingTable(name);
         if (table == null) {
             table = createNewTable(name);
@@ -164,9 +170,13 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // Transactions
 
+    public CommitHandle prepare(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+        return new MyCommitHandle(updates, tx);
+    }
+
     // TODO: move these to VolatileDatabase
 
-    public void prepareUpdates(Collection<VolatileDatabaseTable> updates) {
+    private void prepareUpdates(Collection<VolatileDatabaseTable> updates) {
         synchronized (commitLock) {
             for (VolatileDatabaseTable update : updates) {
                 update.prepare();
@@ -174,7 +184,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         }
     }
 
-    public void commitUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+    private void commitUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
             try {
                 updateRevisionAndCommit(updates);
@@ -195,7 +205,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         }
     }
 
-    public void rollbackUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+    private void rollbackUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
             try {
                 for (VolatileDatabaseTable update : updates) {
@@ -204,6 +214,30 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
             } finally {
                 closeConnection(tx);
             }
+        }
+    }
+
+    private class MyCommitHandle implements CommitHandle {
+
+        private final Collection<VolatileDatabaseTable> updates;
+        private final Transaction tx;
+
+        public MyCommitHandle(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+            this.updates = new ArrayList<VolatileDatabaseTable>(updates);
+            this.tx = tx;
+            prepare();
+        }
+
+        private void prepare() {
+            prepareUpdates(updates);
+        }
+
+        public void commit() {
+            commitUpdates(updates, tx);
+        }
+
+        public void rollback() {
+            rollbackUpdates(updates, tx);
         }
     }
 }

@@ -51,6 +51,7 @@ public class VolatileDatabase implements Database<Blob, Blob>, TransactionPartic
     final long visibleRevision;
     private final Transaction tx;
     private PersistedDatabase db;
+    private CommitHandle commitHandle;
 
     public VolatileDatabase(PersistedDatabase db, long visibleRevision, Transaction tx) {
         this.db = db;
@@ -60,7 +61,7 @@ public class VolatileDatabase implements Database<Blob, Blob>, TransactionPartic
     }
 
     public IsolationLevel getIsolationLevel() {
-        return IsolationLevel.SNAPSHOT;
+        return db.getIsolationLevel();
     }
 
     public Set<String> getTableNames() {
@@ -81,22 +82,22 @@ public class VolatileDatabase implements Database<Blob, Blob>, TransactionPartic
     }
 
     private VolatileDatabaseTable cacheNewTable(String name) {
-        PersistedDatabaseTable backend = db.openOrCreateTable(name);
+        PersistedDatabaseTable backend = db.openTable(name);
         openTables.putIfAbsent(name, new VolatileDatabaseTable(backend, visibleRevision, tx));
         return getCachedTable(name);
     }
 
-    // TODO: use CommitHandle
-
     public void prepare(Transaction tx) throws Throwable {
-        db.prepareUpdates(openTables.values());
+        commitHandle = db.prepare(openTables.values(), tx);
     }
 
     public void commit(Transaction tx) {
-        db.commitUpdates(openTables.values(), tx);
+        commitHandle.commit();
     }
 
     public void rollback(Transaction tx) {
-        db.rollbackUpdates(openTables.values(), tx);
+        if (commitHandle != null) {
+            commitHandle.rollback();
+        }
     }
 }

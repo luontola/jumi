@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import net.orfjackal.dimdwarf.db.IsolationLevel;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
 import java.util.Collection;
@@ -42,13 +43,11 @@ import java.util.Set;
  */
 public interface PersistedDatabase {
 
+    IsolationLevel getIsolationLevel();
+
     Set<String> getTableNames();
 
-    PersistedDatabaseTable openOrCreateTable(String name);
+    PersistedDatabaseTable openTable(String name);
 
-    void prepareUpdates(Collection<VolatileDatabaseTable> updates);
-
-    void commitUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx);
-
-    void rollbackUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx);
+    CommitHandle prepare(Collection<VolatileDatabaseTable> updates, Transaction tx);
 }
