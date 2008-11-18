@@ -103,8 +103,8 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
                     final Transaction tx = getTransaction();
                     try {
                         checking(new Expectations() {{
-                            one(participant).prepare(tx);
-                            one(participant).commit(tx);
+                            one(participant).prepare();
+                            one(participant).commit();
                         }});
                     } catch (Throwable t) {
                         throw new RuntimeException(t);
@@ -120,7 +120,7 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
                     final TransactionParticipant txSpy = mock(TransactionParticipant.class);
                     final Transaction tx = getTransaction();
                     checking(new Expectations() {{
-                        one(txSpy).rollback(tx);
+                        one(txSpy).rollback();
                     }});
                     tx.join(txSpy);
                     throw new IllegalArgumentException("dummy exception");
@@ -141,8 +141,8 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
                     final Transaction tx = getTransaction();
                     try {
                         checking(new Expectations() {{
-                            one(exceptionThrower).prepare(tx); will(throwException(new IllegalArgumentException("dummy exception")));
-                            one(exceptionThrower).rollback(tx);
+                            one(exceptionThrower).prepare(); will(throwException(new IllegalArgumentException("dummy exception")));
+                            one(exceptionThrower).rollback();
                         }});
                     } catch (Throwable t) {
                         throw new AssertionError(t);

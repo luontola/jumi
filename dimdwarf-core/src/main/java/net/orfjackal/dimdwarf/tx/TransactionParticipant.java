@@ -42,19 +42,19 @@ public interface TransactionParticipant {
      * If the participant is unable to prepare (for example because of a transaction conflict), it may
      * throw an exception, in which case the transaction is rolled back.
      */
-    void prepare(Transaction tx) throws Throwable;
+    void prepare() throws Throwable;
 
     /**
      * Called by the transaction coordinator to signify that this participant commit. The participant is
      * not allowed to fail the commit, but if it anyways throws an exception, the commit of other participants
      * is not interrupted and the system will possibly end up in an inconsistent state.
      */
-    void commit(Transaction tx);
+    void commit();
 
     /**
      * Called by the transaction coordinator to signify that this participant rollback. The participant is
      * not allowed to fail the rollback, but if anyways throws an exception, the rollback of other participants
      * is not interrupted and the system will possibly end up in an inconsistent state.
      */
-    void rollback(Transaction tx);
+    void rollback();
 }

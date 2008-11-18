@@ -64,8 +64,8 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     private Expectations allParticipantsArePrepared() {
         try {
             return new Expectations() {{
-                one(participant1).prepare(tx);
-                one(participant2).prepare(tx);
+                one(participant1).prepare();
+                one(participant2).prepare();
             }};
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -76,9 +76,9 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     private Expectations prepareFailsFor(final TransactionParticipant participant) {
         try {
             return new Expectations() {{
-                one(participant).prepare(tx); will(throwException(new Throwable("Failed to prepare")));
-                allowing(participant1).prepare(tx);
-                allowing(participant2).prepare(tx);
+                one(participant).prepare(); will(throwException(new Throwable("Failed to prepare")));
+                allowing(participant1).prepare();
+                allowing(participant2).prepare();
             }};
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -87,15 +87,15 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     private Expectations allParticipantsAreCommitted() {
         return new Expectations() {{
-            one(participant1).commit(tx);
-            one(participant2).commit(tx);
+            one(participant1).commit();
+            one(participant2).commit();
         }};
     }
 
     private Expectations allParticipantsAreRolledBack() {
         return new Expectations() {{
-            one(participant1).rollback(tx);
-            one(participant2).rollback(tx);
+            one(participant1).rollback();
+            one(participant2).rollback();
         }};
     }
 
@@ -148,7 +148,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
         public void transactionIsDeactivatedBeforeParticipantsArePrepared() {
             tx.join(new DummyTransactionParticipant() {
-                public void prepare(final Transaction tx) throws Throwable {
+                public void prepare() throws Throwable {
                     specify(new Block() {
                         public void run() throws Throwable {
                             tx.mustBeActive();
@@ -204,7 +204,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         public void canNotPrepareTwiseConcurrently() {
             checking(allParticipantsArePrepared());
             Blocker blocker = new Blocker() {
-                public void prepare(Transaction tx) {
+                public void prepare() {
                     waitHere();
                 }
             };
@@ -274,9 +274,9 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             final Sequence sq = sequence("commit-sequence");
             final Throwable t = new AssertionError("Failed to commit");
             checking(new Expectations() {{
-                one(participant1).commit(tx); will(throwException(t)); inSequence(sq);
+                one(participant1).commit(); will(throwException(t)); inSequence(sq);
                 one(txLogger).error("Commit failed for participant " + participant1, t); inSequence(sq);
-                one(participant2).commit(tx); inSequence(sq);
+                one(participant2).commit(); inSequence(sq);
             }});
             tx.commit();
             specify(tx.getStatus(), should.equal(COMMITTED));
@@ -295,7 +295,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         public void canNotCommitTwiseConcurrently() {
             tx = new TransactionImpl(txLogger);
             Blocker blocker = new Blocker() {
-                public void commit(Transaction tx) {
+                public void commit() {
                     waitHere();
                 }
             };
@@ -342,9 +342,9 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             final Sequence sq = sequence("rollback-sequence");
             final Throwable t = new AssertionError("Failed to rollback");
             checking(new Expectations() {{
-                one(participant1).rollback(tx); will(throwException(t)); inSequence(sq);
+                one(participant1).rollback(); will(throwException(t)); inSequence(sq);
                 one(txLogger).error("Rollback failed for participant " + participant1, t); inSequence(sq);
-                one(participant2).rollback(tx); inSequence(sq);
+                one(participant2).rollback(); inSequence(sq);
             }});
             tx.rollback();
             specify(tx.getStatus(), should.equal(ROLLED_BACK));
@@ -363,7 +363,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         public void canNotRollbackTwiseConcurrently() {
             checking(allParticipantsAreRolledBack());
             Blocker blocker = new Blocker() {
-                public void rollback(Transaction tx) {
+                public void rollback() {
                     waitHere();
                 }
             };
@@ -448,7 +448,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
         public void prepareFailsWhenItIsMarkedRollbackOnlyDuringPrepare() {
             tx.join(new DummyTransactionParticipant() {
-                public void prepare(Transaction tx) throws Throwable {
+                public void prepare() throws Throwable {
                     tx.setRollbackOnly();
                 }
             });
@@ -501,13 +501,13 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     private static class DummyTransactionParticipant implements TransactionParticipant {
 
-        public void prepare(Transaction tx) throws Throwable {
+        public void prepare() throws Throwable {
         }
 
-        public void commit(Transaction tx) {
+        public void commit() {
         }
 
-        public void rollback(Transaction tx) {
+        public void rollback() {
         }
     }
 }

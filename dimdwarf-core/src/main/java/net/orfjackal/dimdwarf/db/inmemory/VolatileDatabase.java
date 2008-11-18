@@ -87,15 +87,15 @@ public class VolatileDatabase implements Database<Blob, Blob>, TransactionPartic
         return getCachedTable(name);
     }
 
-    public void prepare(Transaction tx) throws Throwable {
+    public void prepare() throws Throwable {
         commitHandle = db.prepare(openTables.values(), tx);
     }
 
-    public void commit(Transaction tx) {
+    public void commit() {
         commitHandle.commit();
     }
 
-    public void rollback(Transaction tx) {
+    public void rollback() {
         if (commitHandle != null) {
             commitHandle.rollback();
         }

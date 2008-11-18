@@ -107,14 +107,14 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
 
     private void tryPrepareAllParticipants() throws Throwable {
         for (TransactionParticipant p : participants) {
-            p.prepare(getTransaction());
+            p.prepare();
         }
     }
 
     private void commitAllParticipants() {
         for (TransactionParticipant p : participants) {
             try {
-                p.commit(getTransaction());
+                p.commit();
             } catch (Throwable t) {
                 logger.error("Commit failed for participant " + p, t);
             }
@@ -124,7 +124,7 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
     private void rollbackAllParticipants() {
         for (TransactionParticipant p : participants) {
             try {
-                p.rollback(getTransaction());
+                p.rollback();
             } catch (Throwable t) {
                 logger.error("Rollback failed for participant " + p, t);
             }
