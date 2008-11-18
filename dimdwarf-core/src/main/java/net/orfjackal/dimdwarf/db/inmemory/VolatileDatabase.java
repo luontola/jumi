@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentMap;
 public class VolatileDatabase implements Database<Blob, Blob>, TransactionParticipant {
 
     private final ConcurrentMap<String, VolatileDatabaseTable> openTables = new ConcurrentHashMap<String, VolatileDatabaseTable>();
-    final long visibleRevision;
+    private final long visibleRevision;
     private final Transaction tx;
     private PersistedDatabase db;
     private CommitHandle commitHandle;
@@ -58,6 +58,10 @@ public class VolatileDatabase implements Database<Blob, Blob>, TransactionPartic
         this.visibleRevision = visibleRevision;
         this.tx = tx;
         tx.join(this);
+    }
+
+    public long getVisibleRevision() {
+        return visibleRevision;
     }
 
     public IsolationLevel getIsolationLevel() {

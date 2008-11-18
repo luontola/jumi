@@ -143,7 +143,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     protected long getOldestUncommittedRevision() {
         long oldest = committedRevision;
         for (VolatileDatabase db : openConnections.values()) {
-            oldest = Math.min(oldest, db.visibleRevision);
+            oldest = Math.min(oldest, db.getVisibleRevision());
         }
         return oldest;
     }
@@ -173,7 +173,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         return new MyCommitHandle(updates, tx);
     }
 
-    // TODO: move these to VolatileDatabase
+    // TODO: move these to VolatileDatabase?
 
     private void prepareUpdates(Collection<VolatileDatabaseTable> updates) {
         synchronized (commitLock) {
