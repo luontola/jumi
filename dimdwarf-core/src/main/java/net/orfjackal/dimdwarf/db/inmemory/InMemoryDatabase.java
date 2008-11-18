@@ -63,12 +63,11 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // TODO: this class smells too big/messy
     // Responsibilities:
-    // - keep track of uncommitted database connections
-    // - keep track of available database tables
-    // - keep track of committed database revision
-    // - prepare and commit modifications (includes locking)
-    // - keep track of data and revision seen inside a transaction
-    // - keep track of uncommitted modified data inside a transaction
+    // - knows which database tables exist
+    // - can create new database tables
+    // - keeps track of uncommitted database connections
+    // - keeps track of committed database revision
+    // - prepare and commit modifications
 
     private final ConcurrentMap<Transaction, VolatileDatabase> openConnections = new ConcurrentHashMap<Transaction, VolatileDatabase>();
     private final Object commitLock = new Object();
