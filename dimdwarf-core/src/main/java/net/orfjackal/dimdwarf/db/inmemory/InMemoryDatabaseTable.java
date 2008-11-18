@@ -32,7 +32,6 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.IterableKeys;
 import net.orfjackal.dimdwarf.db.OptimisticLockException;
 
 import java.util.HashMap;
@@ -47,13 +46,21 @@ import java.util.concurrent.ConcurrentMap;
  * @author Esko Luontola
  * @since 11.9.2008
  */
-class InMemoryDatabaseTable implements IterableKeys<Blob> {
+class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
     private final RevisionMap<Blob, Blob> revisions;
     private final ConcurrentMap<Blob, MyCommitHandle> lockedForCommit = new ConcurrentHashMap<Blob, MyCommitHandle>();
 
     public InMemoryDatabaseTable(RevisionCounter revisionCounter) {
         revisions = new RevisionMap<Blob, Blob>(revisionCounter);
+    }
+
+    public Blob firstKey() {
+        return revisions.firstKey();
+    }
+
+    public Blob nextKeyAfter(Blob currentKey) {
+        return revisions.nextKeyAfter(currentKey);
     }
 
     public Blob get(Blob key, long revision) {
@@ -68,8 +75,8 @@ class InMemoryDatabaseTable implements IterableKeys<Blob> {
         return revisions.getOldestRevision();
     }
 
-    public CommitHandle prepare(Map<Blob, Blob> updates, long visibleRevision) {
-        return new MyCommitHandle(updates, visibleRevision);
+    public CommitHandle prepare(Map<Blob, Blob> updates, long revision) {
+        return new MyCommitHandle(updates, revision);
     }
 
     // TODO: refactor this locking logic out of this class or simplify it
@@ -106,14 +113,6 @@ class InMemoryDatabaseTable implements IterableKeys<Blob> {
                 assert wasLockedByMe : "key = " + key;
             }
         }
-    }
-
-    public Blob firstKey() {
-        return revisions.firstKey();
-    }
-
-    public Blob nextKeyAfter(Blob currentKey) {
-        return revisions.nextKeyAfter(currentKey);
     }
 
     private class MyCommitHandle implements CommitHandle {

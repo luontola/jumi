@@ -32,14 +32,13 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import com.google.inject.Singleton;
-import net.orfjackal.dimdwarf.db.*;
-import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
+import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.Database;
+import net.orfjackal.dimdwarf.db.DatabaseManager;
 import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionParticipant;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -58,7 +57,7 @@ import java.util.concurrent.ConcurrentMap;
  * @since 18.8.2008
  */
 @Singleton
-public class InMemoryDatabase implements DatabaseManager {
+public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // TODO: this class smells too big/messy
     // Responsibilities:
@@ -69,7 +68,7 @@ public class InMemoryDatabase implements DatabaseManager {
     // - keep track of data and revision seen inside a transaction
     // - keep track of uncommitted modified data inside a transaction
 
-    private final ConcurrentMap<Transaction, TxDatabase> openConnections = new ConcurrentHashMap<Transaction, TxDatabase>();
+    private final ConcurrentMap<Transaction, VolatileDatabase> openConnections = new ConcurrentHashMap<Transaction, VolatileDatabase>();
     private final Object commitLock = new Object();
 
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
@@ -83,19 +82,23 @@ public class InMemoryDatabase implements DatabaseManager {
 
     // Tables
 
-    private InMemoryDatabaseTable openOrCreate(String name) {
-        InMemoryDatabaseTable table = getExistingTable(name);
+    public Set<String> getTableNames() {
+        return tables.keySet();
+    }
+
+    public PersistedDatabaseTable openOrCreateTable(String name) {
+        PersistedDatabaseTable table = getExistingTable(name);
         if (table == null) {
             table = createNewTable(name);
         }
         return table;
     }
 
-    private InMemoryDatabaseTable getExistingTable(String name) {
+    private PersistedDatabaseTable getExistingTable(String name) {
         return tables.get(name);
     }
 
-    private InMemoryDatabaseTable createNewTable(String name) {
+    private PersistedDatabaseTable createNewTable(String name) {
         tables.putIfAbsent(name, new InMemoryDatabaseTable(revisionCounter));
         return getExistingTable(name);
     }
@@ -103,24 +106,25 @@ public class InMemoryDatabase implements DatabaseManager {
     // Connections
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        TxDatabase db = getExistingConnection(tx);
+        VolatileDatabase db = getExistingConnection(tx);
         if (db == null) {
             db = createNewConnection(tx);
         }
         return db;
     }
 
-    private InMemoryDatabase.TxDatabase getExistingConnection(Transaction tx) {
+    private VolatileDatabase getExistingConnection(Transaction tx) {
         return openConnections.get(tx);
     }
 
-    private TxDatabase createNewConnection(Transaction tx) {
-        openConnections.putIfAbsent(tx, new TxDatabase(committedRevision, tx));
+    private VolatileDatabase createNewConnection(Transaction tx) {
+        openConnections.putIfAbsent(tx, new VolatileDatabase(this, committedRevision, tx));
         return getExistingConnection(tx);
     }
 
     private void closeConnection(Transaction tx) {
-        openConnections.remove(tx);
+        VolatileDatabase removed = openConnections.remove(tx);
+        assert removed != null : "Tried to close connection twise: " + tx;
         purgeOldUnusedRevisions();
     }
 
@@ -133,7 +137,7 @@ public class InMemoryDatabase implements DatabaseManager {
 
     protected long getOldestUncommittedRevision() {
         long oldest = committedRevision;
-        for (TxDatabase db : openConnections.values()) {
+        for (VolatileDatabase db : openConnections.values()) {
             oldest = Math.min(oldest, db.visibleRevision);
         }
         return oldest;
@@ -160,24 +164,30 @@ public class InMemoryDatabase implements DatabaseManager {
 
     // Transactions
 
-    private void prepareUpdates(Collection<TxDatabaseTable> updates) {
+    // TODO: move these to VolatileDatabase
+
+    public void prepareUpdates(Collection<VolatileDatabaseTable> updates) {
         synchronized (commitLock) {
-            for (TxDatabaseTable update : updates) {
+            for (VolatileDatabaseTable update : updates) {
                 update.prepare();
             }
         }
     }
 
-    private void commitUpdates(Collection<TxDatabaseTable> updates) {
+    public void commitUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
-            updateRevisionAndCommit(updates);
+            try {
+                updateRevisionAndCommit(updates);
+            } finally {
+                closeConnection(tx);
+            }
         }
     }
 
-    private void updateRevisionAndCommit(Collection<TxDatabaseTable> updates) {
+    private void updateRevisionAndCommit(Collection<VolatileDatabaseTable> updates) {
         try {
             revisionCounter.incrementRevision();
-            for (TxDatabaseTable update : updates) {
+            for (VolatileDatabaseTable update : updates) {
                 update.commit();
             }
         } finally {
@@ -185,138 +195,15 @@ public class InMemoryDatabase implements DatabaseManager {
         }
     }
 
-    private void rollbackUpdates(Collection<TxDatabaseTable> updates) {
+    public void rollbackUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
-            for (TxDatabaseTable update : updates) {
-                update.rollback();
-            }
-        }
-    }
-
-
-    /**
-     * This class is thread-safe.
-     */
-    private class TxDatabase implements Database<Blob, Blob>, TransactionParticipant {
-
-        private final ConcurrentMap<String, TxDatabaseTable> openTables = new ConcurrentHashMap<String, TxDatabaseTable>();
-        private final long visibleRevision;
-        private final Transaction tx;
-
-        public TxDatabase(long visibleRevision, Transaction tx) {
-            this.visibleRevision = visibleRevision;
-            this.tx = tx;
-            tx.join(this);
-        }
-
-        public IsolationLevel getIsolationLevel() {
-            return IsolationLevel.SNAPSHOT;
-        }
-
-        public Set<String> getTableNames() {
-            return tables.keySet();
-        }
-
-        public DatabaseTable<Blob, Blob> openTable(String name) {
-            tx.mustBeActive();
-            TxDatabaseTable table = getCachedTable(name);
-            if (table == null) {
-                table = cacheNewTable(name);
-            }
-            return table;
-        }
-
-        private TxDatabaseTable getCachedTable(String name) {
-            return openTables.get(name);
-        }
-
-        private TxDatabaseTable cacheNewTable(String name) {
-            openTables.putIfAbsent(name, new TxDatabaseTable(openOrCreate(name), visibleRevision, tx));
-            return getCachedTable(name);
-        }
-
-        public void prepare(Transaction tx) throws Throwable {
-            prepareUpdates(openTables.values());
-        }
-
-        public void commit(Transaction tx) {
             try {
-                commitUpdates(openTables.values());
+                for (VolatileDatabaseTable update : updates) {
+                    update.rollback();
+                }
             } finally {
                 closeConnection(tx);
             }
-        }
-
-        public void rollback(Transaction tx) {
-            try {
-                rollbackUpdates(openTables.values());
-            } finally {
-                closeConnection(tx);
-            }
-        }
-    }
-
-    /**
-     * This class is thread-safe.
-     */
-    private static class TxDatabaseTable implements DatabaseTable<Blob, Blob> {
-
-        private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
-        private final InMemoryDatabaseTable table;
-        private final long visibleRevision;
-        private final Transaction tx;
-        private CommitHandle commitHandle;
-
-        public TxDatabaseTable(InMemoryDatabaseTable table, long visibleRevision, Transaction tx) {
-            this.table = table;
-            this.visibleRevision = visibleRevision;
-            this.tx = tx;
-        }
-
-        public Blob read(Blob key) {
-            tx.mustBeActive();
-            Blob blob = updates.get(key);
-            if (blob == null) {
-                blob = table.get(key, visibleRevision);
-            }
-            if (blob == null) {
-                blob = EMPTY_BLOB;
-            }
-            return blob;
-        }
-
-        public void update(Blob key, Blob value) {
-            tx.mustBeActive();
-            updates.put(key, value);
-        }
-
-        public void delete(Blob key) {
-            tx.mustBeActive();
-            updates.put(key, EMPTY_BLOB);
-        }
-
-        // TODO: 'firstKey' and 'nextKeyAfter' do not see keys which were created during this transaction
-
-        public Blob firstKey() {
-            tx.mustBeActive();
-            return table.firstKey();
-        }
-
-        public Blob nextKeyAfter(Blob currentKey) {
-            tx.mustBeActive();
-            return table.nextKeyAfter(currentKey);
-        }
-
-        private void prepare() {
-            commitHandle = table.prepare(updates, visibleRevision);
-        }
-
-        private void commit() {
-            commitHandle.commit();
-        }
-
-        private void rollback() {
-            commitHandle.rollback();
         }
     }
 }
