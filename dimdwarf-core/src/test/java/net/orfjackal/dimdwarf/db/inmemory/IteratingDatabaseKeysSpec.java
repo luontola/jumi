@@ -40,6 +40,7 @@ import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 /**
  * @author Esko Luontola
@@ -54,6 +55,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
     private TransactionCoordinator tx;
     private DatabaseManager dbms;
     private DatabaseTable<Blob, Blob> table;
+    private Logger txLogger;
 
     private Blob key1;
     private Blob key2;
@@ -63,6 +65,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
 
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
+        txLogger = mock(Logger.class);
         beginNewTransaction();
 
         key1 = Blob.fromBytes(new byte[]{1});
@@ -73,7 +76,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
     }
 
     private void beginNewTransaction() {
-        tx = new TransactionImpl();
+        tx = new TransactionImpl(txLogger);
         table = dbms.openConnection(tx.getTransaction()).openTable(TABLE);
     }
 

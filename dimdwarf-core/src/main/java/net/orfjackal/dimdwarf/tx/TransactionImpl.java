@@ -46,12 +46,21 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 15.8.2008
  */
 public class TransactionImpl implements Transaction, TransactionCoordinator {
-    private static final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
+    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TransactionImpl.class);
+    private final Logger logger;
 
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
     private final Object statusLock = new Object();
     private volatile TransactionStatus status = ACTIVE;
     private volatile boolean rollbackOnly = false;
+
+    public TransactionImpl() {
+        this(DEFAULT_LOGGER);
+    }
+
+    public TransactionImpl(Logger logger) {
+        this.logger = logger;
+    }
 
     public Transaction getTransaction() {
         return this;

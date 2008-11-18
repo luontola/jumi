@@ -43,6 +43,7 @@ import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import net.orfjackal.dimdwarf.tx.TransactionRequiredException;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 /**
  * @author Esko Luontola
@@ -65,7 +66,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
-        tx = new TransactionImpl();
+        tx = new TransactionImpl(mock(Logger.class));
         db = dbms.openConnection(tx.getTransaction());
         table = db.openTable(TABLE);
         key = Blob.fromBytes(new byte[]{1});

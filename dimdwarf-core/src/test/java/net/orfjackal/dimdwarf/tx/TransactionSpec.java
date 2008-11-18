@@ -39,10 +39,7 @@ import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.junit.runner.RunWith;
-
-import java.util.logging.Filter;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 
 /**
  * @author Esko Luontola
@@ -55,22 +52,13 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     private TransactionImpl tx;
     private TransactionParticipant participant1;
     private TransactionParticipant participant2;
-
     private Logger txLogger;
-    private Filter txLoggerFilter;
 
     public void create() throws Exception {
-        txLoggerFilter = mock(Filter.class);
-        txLogger = Logger.getLogger(TransactionImpl.class.getName());
-        txLogger.setFilter(txLoggerFilter);
-
-        tx = new TransactionImpl();
+        txLogger = mock(Logger.class);
+        tx = new TransactionImpl(txLogger);
         participant1 = mock(TransactionParticipant.class, "participant1");
         participant2 = mock(TransactionParticipant.class, "participant2");
-    }
-
-    public void destroy() throws Exception {
-        txLogger.setFilter(null);
     }
 
     private Expectations allParticipantsArePrepared() {
@@ -287,7 +275,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             final Throwable t = new AssertionError("Failed to commit");
             checking(new Expectations() {{
                 one(participant1).commit(tx); will(throwException(t)); inSequence(sq);
-                one(txLoggerFilter).isLoggable(with(any(LogRecord.class))); inSequence(sq);
+                one(txLogger).error("Commit failed for participant " + participant1, t); inSequence(sq);
                 one(participant2).commit(tx); inSequence(sq);
             }});
             tx.commit();
@@ -305,7 +293,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         }
 
         public void canNotCommitTwiseConcurrently() {
-            tx = new TransactionImpl();
+            tx = new TransactionImpl(txLogger);
             Blocker blocker = new Blocker() {
                 public void commit(Transaction tx) {
                     waitHere();
@@ -355,7 +343,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             final Throwable t = new AssertionError("Failed to rollback");
             checking(new Expectations() {{
                 one(participant1).rollback(tx); will(throwException(t)); inSequence(sq);
-                one(txLoggerFilter).isLoggable(with(any(LogRecord.class))); inSequence(sq);
+                one(txLogger).error("Rollback failed for participant " + participant1, t); inSequence(sq);
                 one(participant2).rollback(tx); inSequence(sq);
             }});
             tx.rollback();

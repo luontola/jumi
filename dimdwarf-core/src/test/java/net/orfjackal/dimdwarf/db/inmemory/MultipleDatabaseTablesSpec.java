@@ -40,6 +40,7 @@ import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 /**
  * @author Esko Luontola
@@ -57,6 +58,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private Database<Blob, Blob> db;
     private DatabaseTable<Blob, Blob> table1;
     private DatabaseTable<Blob, Blob> table2;
+    private Logger txLogger;
 
     private Blob key;
     private Blob value1;
@@ -66,7 +68,8 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
 
-        tx = new TransactionImpl();
+        txLogger = mock(Logger.class);
+        tx = new TransactionImpl(txLogger);
         db = dbms.openConnection(tx.getTransaction());
         table1 = db.openTable(TABLE1);
         table2 = db.openTable(TABLE2);
@@ -78,7 +81,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     }
 
     private Blob readInNewTransaction(String table, Blob key) {
-        TransactionCoordinator tx = new TransactionImpl();
+        TransactionCoordinator tx = new TransactionImpl(txLogger);
         try {
             return dbms.openConnection(tx.getTransaction()).openTable(table).read(key);
         } finally {
@@ -87,7 +90,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     }
 
     private void updateInNewTransaction(String table, Blob key, Blob value) {
-        TransactionCoordinator tx = new TransactionImpl();
+        TransactionCoordinator tx = new TransactionImpl(txLogger);
         try {
             dbms.openConnection(tx.getTransaction()).openTable(table).update(key, value);
         } finally {

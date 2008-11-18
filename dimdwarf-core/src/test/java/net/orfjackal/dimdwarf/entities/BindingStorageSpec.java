@@ -40,6 +40,7 @@ import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.tx.TransactionImpl;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 import java.math.BigInteger;
 
@@ -55,13 +56,15 @@ public class BindingStorageSpec extends Specification<Object> {
     private DatabaseManager dbms;
     private TransactionCoordinator tx;
     private EntityManagerImpl entityManager;
+    private Logger txLogger;
 
     public void create() throws Exception {
         dbms = new InMemoryDatabase();
+        txLogger = mock(Logger.class);
     }
 
     private void beginTask() {
-        tx = new TransactionImpl();
+        tx = new TransactionImpl(txLogger);
 
         Database<Blob, Blob> db = dbms.openConnection(tx.getTransaction());
         DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
