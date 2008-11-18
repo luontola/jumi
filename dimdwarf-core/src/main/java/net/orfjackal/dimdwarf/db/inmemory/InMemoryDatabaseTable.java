@@ -68,6 +68,10 @@ class InMemoryDatabaseTable implements IterableKeys<Blob> {
         return revisions.getOldestRevision();
     }
 
+    // TODO: This check, lock, putAll, unlock sequence does not force the right order of calling the methods.
+    // It would be better to create an API like this:
+    // CommitHandle handle = prepare(updatedData, revision); handle.commit/rollback();
+
     public synchronized void checkForConflicts(Set<Blob> keys, long visibleRevision) {
         for (Blob key : keys) {
             long lastWrite = revisions.getLatestRevisionForKey(key);

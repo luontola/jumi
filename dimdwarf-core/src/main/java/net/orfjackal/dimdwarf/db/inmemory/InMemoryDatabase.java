@@ -61,6 +61,13 @@ import java.util.concurrent.ConcurrentMap;
 public class InMemoryDatabase implements DatabaseManager {
 
     // TODO: this class smells too big/messy
+    // Responsibilities:
+    // - keep track of uncommitted database connections
+    // - keep track of available database tables
+    // - keep track of committed database revision
+    // - prepare and commit modifications (includes locking)
+    // - keep track of data and revision seen inside a transaction
+    // - keep track of uncommitted modified data inside a transaction
 
     private final ConcurrentMap<Transaction, TxDatabase> openConnections = new ConcurrentHashMap<Transaction, TxDatabase>();
     private final Object commitLock = new Object();
