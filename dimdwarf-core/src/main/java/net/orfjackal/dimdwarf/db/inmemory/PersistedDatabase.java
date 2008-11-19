@@ -34,8 +34,8 @@ package net.orfjackal.dimdwarf.db.inmemory;
 import net.orfjackal.dimdwarf.db.IsolationLevel;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
-import java.util.Collection;
-import java.util.Set;
+import javax.annotation.CheckReturnValue;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -49,5 +49,6 @@ public interface PersistedDatabase {
 
     PersistedDatabaseTable openTable(String name);
 
+    @CheckReturnValue
     CommitHandle prepare(Collection<VolatileDatabaseTable> updates, Transaction tx);
 }

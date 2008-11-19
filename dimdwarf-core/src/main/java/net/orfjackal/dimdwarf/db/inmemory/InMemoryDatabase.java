@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
@@ -163,6 +164,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // Transactions
 
+    @CheckReturnValue
     public CommitHandle prepare(Collection<VolatileDatabaseTable> updates, Transaction tx) {
         return new MyCommitHandle(updates, tx);
     }
