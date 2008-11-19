@@ -79,7 +79,7 @@ class InMemoryDatabaseTable implements PersistedDatabaseTable {
         return new MyCommitHandle(updates, revision);
     }
 
-    // TODO: refactor this locking logic out of this class or simplify it
+    // TODO: refactor this locking logic out of this class or simplify it - maybe create GroupLock which locks a set of keys simultanously
 
     private synchronized void checkForConflicts(Set<Blob> keys, long visibleRevision) {
         for (Blob key : keys) {
