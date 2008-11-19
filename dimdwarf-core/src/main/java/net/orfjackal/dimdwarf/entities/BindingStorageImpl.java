@@ -34,14 +34,14 @@ package net.orfjackal.dimdwarf.entities;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@Immutable
 public class BindingStorageImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingStorage {
 
     @Inject

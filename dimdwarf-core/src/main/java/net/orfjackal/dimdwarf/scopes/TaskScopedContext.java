@@ -31,25 +31,21 @@
 
 package net.orfjackal.dimdwarf.scopes;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.ThreadContext;
+import net.orfjackal.dimdwarf.context.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.util.*;
 
 /**
  * When {@code TaskScopedContext} is installed as the current {@link ThreadContext},
  * then that thread is in a task scope identified by the {@code TaskScopedContext} instance.
- * <p/>
- * This class is NOT thread-safe.
  *
  * @author Esko Luontola
  * @since 13.9.2008
  */
+@NotThreadSafe
 public class TaskScopedContext implements Context {
 
     private final Map<Key<?>, Object> cache = new HashMap<Key<?>, Object>();

@@ -31,18 +31,17 @@
 
 package net.orfjackal.dimdwarf.scopes;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.Scope;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.ThreadContext;
+import net.orfjackal.dimdwarf.context.*;
+
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * This class is stateless.
- *
  * @author Esko Luontola
  * @since 13.9.2008
  */
+@ThreadSafe
 public class TaskScope implements Scope {
 
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {

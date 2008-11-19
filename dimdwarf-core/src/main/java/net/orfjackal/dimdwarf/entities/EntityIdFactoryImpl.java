@@ -31,18 +31,17 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.inject.*;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.math.BigInteger;
 
 /**
- * This class is thread-safe.
- *
  * @author Esko Luontola
  * @since 4.9.2008
  */
 @Singleton
+@ThreadSafe
 public class EntityIdFactoryImpl implements EntityIdFactory {
 
     // using java.util.concurrent.atomic.AtomicLong would also be an option

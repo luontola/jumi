@@ -31,16 +31,14 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.util.*;
 
 /**
- * This class is NOT thread-safe.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@NotThreadSafe
 public class RevisionMapIterator<K, V> implements Iterator<Map.Entry<K, V>> {
 
     private final RevisionMap<K, V> map;

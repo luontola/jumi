@@ -31,26 +31,24 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.IsolationLevel;
-import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionParticipant;
+import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.tx.*;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 /**
- * This class is thread-safe.
+ * @author Esko Luontola
+ * @since 18.11.2008
  */
+@ThreadSafe
 public class VolatileDatabase implements Database<Blob, Blob>, TransactionParticipant {
 
     private final ConcurrentMap<String, VolatileDatabaseTable> openTables = new ConcurrentHashMap<String, VolatileDatabaseTable>();
     private final long visibleRevision;
     private final Transaction tx;
-    private PersistedDatabase db;
+    private final PersistedDatabase db;
     private CommitHandle commitHandle;
 
     public VolatileDatabase(PersistedDatabase db, long visibleRevision, Transaction tx) {

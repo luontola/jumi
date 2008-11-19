@@ -31,14 +31,14 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * This class is thread-safe.
- *
  * @author Esko Luontola
  * @since 11.9.2008
  */
+@ThreadSafe
 public class RevisionCounter {
 
     private final AtomicLong currentRevision = new AtomicLong();

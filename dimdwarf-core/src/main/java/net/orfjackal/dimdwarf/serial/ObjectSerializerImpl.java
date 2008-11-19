@@ -34,14 +34,14 @@ package net.orfjackal.dimdwarf.serial;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.Blob;
 
+import javax.annotation.concurrent.Immutable;
 import java.io.*;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 1.9.2008
  */
+@Immutable
 public class ObjectSerializerImpl implements ObjectSerializer {
 
     private final SerializationListener[] listeners;

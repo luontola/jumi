@@ -31,13 +31,15 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
- * This class is thread-safe. The latest revision of the list is immutable
- * (i.e. the only possible modification is that old revisions are purged).
+ * The latest revision of the list is immutable (i.e. the only possible modification is that old revisions are purged).
  *
  * @author Esko Luontola
  * @since 19.8.2008
  */
+@ThreadSafe
 public class RevisionList<T> {
 
     private final long revision;

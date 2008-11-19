@@ -921,6 +921,17 @@
         <root url="jar://$M2_REPO$/org/jdave/jdave-core/1.1-rc3/jdave-core-1.1-rc3-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: net.orfjackal.ext.javax.annotations:jsr305:20080825">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-sources.jar!/" />
+      </SOURCES>
+    </library>
   </component>
   <UsedPathMacros>
     <macro name="M2_REPO" />

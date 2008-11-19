@@ -33,18 +33,16 @@ package net.orfjackal.dimdwarf.db;
 
 import static net.orfjackal.dimdwarf.util.ByteUtil.asByteArray;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.annotation.concurrent.Immutable;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 18.8.2008
  */
+@Immutable
 public final class Blob implements Comparable<Blob> {
 
     public static final Blob EMPTY_BLOB = new Blob(new byte[0]);

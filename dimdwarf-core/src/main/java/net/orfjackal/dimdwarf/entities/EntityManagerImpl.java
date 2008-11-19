@@ -32,21 +32,20 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import org.jetbrains.annotations.TestOnly;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigInteger;
 import java.util.*;
 
 /**
- * This class is NOT thread-safe.
- *
  * @author Esko Luontola
  * @since 25.8.2008
  */
 @TaskScoped
+@NotThreadSafe
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityIdFactory idFactory;

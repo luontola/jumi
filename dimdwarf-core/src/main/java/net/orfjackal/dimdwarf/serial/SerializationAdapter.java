@@ -31,10 +31,13 @@
 
 package net.orfjackal.dimdwarf.serial;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
  * @author Esko Luontola
  * @since 1.9.2008
  */
+@Immutable
 public abstract class SerializationAdapter implements SerializationListener {
 
     public void beforeReplace(Object rootObject, Object obj) {

@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -38,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Esko Luontola
  * @since 19.11.2008
  */
+@ThreadSafe
 public class GroupLock<T> {
 
     private final Set<T> lockedKeys = new HashSet<T>();

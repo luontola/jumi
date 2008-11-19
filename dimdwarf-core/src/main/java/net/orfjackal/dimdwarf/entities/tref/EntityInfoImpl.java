@@ -33,17 +33,17 @@ package net.orfjackal.dimdwarf.entities.tref;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.EntityManager;
 
+import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 2.11.2008
  */
+@Immutable
 public class EntityInfoImpl implements EntityInfo {
 
     private final EntityManager entityManager;

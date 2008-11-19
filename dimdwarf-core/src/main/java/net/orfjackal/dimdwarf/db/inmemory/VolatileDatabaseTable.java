@@ -31,16 +31,18 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class is thread-safe.
+ * @author Esko Luontola
+ * @since 18.11.2008
  */
+@ThreadSafe
 public class VolatileDatabaseTable implements DatabaseTable<Blob, Blob> {
 
     private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();

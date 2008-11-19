@@ -31,12 +31,13 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@Immutable
 public class NoConversion<T> implements Converter<T, T> {
 
     public T back(T value) {

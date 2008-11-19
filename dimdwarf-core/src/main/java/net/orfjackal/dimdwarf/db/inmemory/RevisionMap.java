@@ -33,10 +33,8 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.IterableKeys;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.SortedMap;
+import javax.annotation.concurrent.ThreadSafe;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -50,12 +48,11 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * See:
  * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
  * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
- * <p/>
- * This class is thread-safe.
  *
  * @author Esko Luontola
  * @since 20.8.2008
  */
+@ThreadSafe
 public class RevisionMap<K, V> implements IterableKeys<K> {
 
     private final SortedMap<K, RevisionList<V>> map = new ConcurrentSkipListMap<K, RevisionList<V>>();

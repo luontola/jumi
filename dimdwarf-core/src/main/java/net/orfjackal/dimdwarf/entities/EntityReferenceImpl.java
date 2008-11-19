@@ -34,18 +34,15 @@ package net.orfjackal.dimdwarf.entities;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.*;
 import java.math.BigInteger;
 
 /**
- * This class is NOT thread-safe.
- *
  * @author Esko Luontola
  * @since 25.8.2008
  */
+@NotThreadSafe
 public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizable {
     private static final long serialVersionUID = 1L;
 

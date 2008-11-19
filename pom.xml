@@ -194,6 +194,11 @@
                 <artifactId>annotations</artifactId>
                 <version>7.0.3</version>
             </dependency>
+            <dependency>
+                <groupId>net.orfjackal.ext.javax.annotations</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>20080825</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

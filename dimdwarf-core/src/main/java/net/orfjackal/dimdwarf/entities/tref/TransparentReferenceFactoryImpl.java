@@ -31,29 +31,23 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.ProxyType;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import com.google.inject.*;
+import net.orfjackal.dimdwarf.api.*;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.util.Cache;
 import net.sf.cglib.proxy.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
  * @since 26.1.2008
  */
 @Singleton
+@Immutable
 public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
     private final Cache<Class<?>, Factory> proxyFactories = new CglibProxyFactoryCache();

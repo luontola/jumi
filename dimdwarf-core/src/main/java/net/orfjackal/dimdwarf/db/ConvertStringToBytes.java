@@ -31,14 +31,14 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import javax.annotation.concurrent.Immutable;
 import java.nio.charset.Charset;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@Immutable
 public class ConvertStringToBytes implements Converter<String, Blob> {
 
     private static final Charset CHARSET = Charset.forName("UTF-8");

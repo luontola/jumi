@@ -33,12 +33,13 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.serial.SerializationAdapter;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
- * This class is stateless.
- *
  * @author Esko Luontola
  * @since 4.9.2008
  */
+@Immutable
 public class CheckInnerClassSerialized extends SerializationAdapter {
 
     public void beforeSerialize(Object rootObject, Object obj) {

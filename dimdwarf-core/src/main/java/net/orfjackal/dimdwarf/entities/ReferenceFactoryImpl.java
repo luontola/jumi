@@ -32,15 +32,16 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 3.11.2008
  */
+@Immutable
 public class ReferenceFactoryImpl implements ReferenceFactory {
 
     private final EntityManager entityManager;

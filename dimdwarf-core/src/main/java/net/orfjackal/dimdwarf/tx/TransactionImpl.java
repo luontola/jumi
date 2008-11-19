@@ -32,19 +32,17 @@
 package net.orfjackal.dimdwarf.tx;
 
 import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
-import java.util.Arrays;
-import java.util.Collection;
+import javax.annotation.concurrent.ThreadSafe;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * This class is thread-safe.
- *
  * @author Esko Luontola
  * @since 15.8.2008
  */
+@ThreadSafe
 public class TransactionImpl implements Transaction, TransactionCoordinator {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TransactionImpl.class);
     private final Logger logger;
@@ -53,6 +51,8 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
     private final Object statusLock = new Object();
     private volatile TransactionStatus status = ACTIVE;
     private volatile boolean rollbackOnly = false;
+
+    // TODO: would it be better to separate TransactionCoordinator and Transaction implementations?
 
     public TransactionImpl() {
         this(DEFAULT_LOGGER);

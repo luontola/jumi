@@ -33,14 +33,14 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.*;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 
 /**
- * This class is thread-safe.
- *
  * @author Esko Luontola
  * @since 11.9.2008
  */
+@ThreadSafe
 class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
     private final RevisionMap<Blob, Blob> revisions;

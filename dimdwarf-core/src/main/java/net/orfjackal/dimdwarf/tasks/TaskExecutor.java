@@ -31,17 +31,18 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.ThreadContext;
+import net.orfjackal.dimdwarf.context.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
  * @since 13.9.2008
  */
+@Immutable
 public class TaskExecutor implements Executor {
 
     private final Provider<Context> contextProvider;

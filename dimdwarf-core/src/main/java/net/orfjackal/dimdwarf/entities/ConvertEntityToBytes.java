@@ -33,16 +33,16 @@ package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Converter;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@Immutable
 public class ConvertEntityToBytes implements Converter<Object, Blob> {
 
     private final ObjectSerializer serializer;

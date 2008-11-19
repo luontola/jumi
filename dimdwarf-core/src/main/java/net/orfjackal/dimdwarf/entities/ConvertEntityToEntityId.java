@@ -32,18 +32,17 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.Converter;
 
+import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@Immutable
 public class ConvertEntityToEntityId implements Converter<Object, BigInteger> {
 
     private final EntityManager entityManager;

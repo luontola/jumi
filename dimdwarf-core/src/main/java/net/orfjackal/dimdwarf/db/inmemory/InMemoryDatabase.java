@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -46,13 +47,12 @@ import java.util.concurrent.*;
  * See:
  * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
  * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
- * <p/>
- * This class is thread-safe.
  *
  * @author Esko Luontola
  * @since 18.8.2008
  */
 @Singleton
+@ThreadSafe
 public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // TODO: this class smells too big/messy

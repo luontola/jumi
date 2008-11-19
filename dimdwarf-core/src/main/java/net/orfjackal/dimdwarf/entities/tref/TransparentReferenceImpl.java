@@ -32,18 +32,16 @@
 package net.orfjackal.dimdwarf.entities.tref;
 
 
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 31.1.2008
  */
+@Immutable
 public class TransparentReferenceImpl implements TransparentReference, Serializable {
     private static final long serialVersionUID = 1L;
 

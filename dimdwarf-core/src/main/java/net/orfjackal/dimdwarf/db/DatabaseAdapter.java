@@ -31,14 +31,14 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.Set;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 12.9.2008
  */
+@Immutable
 public class DatabaseAdapter<K1, V1, K2, V2> implements Database<K1, V1> {
 
     private final Database<K2, V2> parent;

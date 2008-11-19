@@ -32,19 +32,16 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.ConvertBigIntegerToBytes;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.db.DatabaseTableAdapter;
+import net.orfjackal.dimdwarf.db.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
- * This class is immutable.
- *
  * @author Esko Luontola
  * @since 1.9.2008
  */
+@Immutable
 public class EntityStorageImpl extends DatabaseTableAdapter<BigInteger, Object, Blob, Blob> implements EntityStorage {
 
     @Inject

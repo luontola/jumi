@@ -31,6 +31,7 @@
     <orderEntry type="library" exported="" name="Maven: cglib:cglib:2.2" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-all:3.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.intellij:annotations:7.0.3" level="project" />
+    <orderEntry type="library" exported="" name="Maven: net.orfjackal.ext.javax.annotations:jsr305:20080825" level="project" />
   </component>
   <component name="copyright">
     <Base>

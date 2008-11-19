@@ -32,17 +32,16 @@
 package net.orfjackal.dimdwarf.entities.tref;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.serial.SerializationReplacer;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
- * The thread-safeness of this class depends on the injected dependencies.
- *
  * @author Esko Luontola
  * @since 5.9.2008
  */
+@Immutable
 public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
 
     private final TransparentReferenceFactory factory;

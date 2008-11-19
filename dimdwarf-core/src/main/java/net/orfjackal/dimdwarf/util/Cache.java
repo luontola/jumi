@@ -31,19 +31,18 @@
 
 package net.orfjackal.dimdwarf.util;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import javax.annotation.concurrent.ThreadSafe;
+import java.util.concurrent.*;
 
 /**
  * Provides a value for a key, but caches the value returned by the underlying service. The {@link #newInstance}
  * method may be called more than once, but the {@link #get} method is guaranteed to return exactly one instance
  * for a key. The cache is never emptied during the life-time of the cache instance.
- * <p/>
- * This class is thread-safe.
  *
  * @author Esko Luontola
  * @since 7.5.2008
  */
+@ThreadSafe
 public abstract class Cache<K, V> {
 
     private final ConcurrentMap<K, V> cache = new ConcurrentHashMap<K, V>();
