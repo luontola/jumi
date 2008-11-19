@@ -143,17 +143,17 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     }
 
     @TestOnly
-    protected int getOpenConnections() {
+    int getOpenConnections() {
         return openConnections.size();
     }
 
     @TestOnly
-    protected long getCurrentRevision() {
+    long getCurrentRevision() {
         return committedRevision;
     }
 
     @TestOnly
-    protected long getOldestStoredRevision() {
+    long getOldestStoredRevision() {
         long oldest = revisionCounter.getCurrentRevision();
         for (InMemoryDatabaseTable table : tables.values()) {
             oldest = Math.min(oldest, table.getOldestRevision());
