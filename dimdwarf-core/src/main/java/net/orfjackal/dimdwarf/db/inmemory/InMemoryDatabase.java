@@ -32,18 +32,12 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import com.google.inject.Singleton;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseManager;
-import net.orfjackal.dimdwarf.db.IsolationLevel;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * An in-memory database which uses multiversion concurrency control.
@@ -63,11 +57,11 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // TODO: this class smells too big/messy
     // Responsibilities:
-    // - knows which database tables exist
-    // - can create new database tables
-    // - keeps track of uncommitted database connections
-    // - keeps track of committed database revision
-    // - prepare and commit modifications
+    // - knows which database tables exist (InMemoryDatabase?)
+    // - can create new database tables (InMemoryDatabase?)
+    // - keeps track of uncommitted database connections (InMemoryDatabaseManager?)
+    // - keeps track of committed database revision (shared CommitRevisionCounter?)
+    // - prepare and commit modifications (InMemoryDatabase?)
 
     private final ConcurrentMap<Transaction, VolatileDatabase> openConnections = new ConcurrentHashMap<Transaction, VolatileDatabase>();
     private final Object commitLock = new Object();
