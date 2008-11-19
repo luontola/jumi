@@ -210,13 +210,15 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         }
     }
 
+
+    @ThreadSafe
     private class MyCommitHandle implements CommitHandle {
 
         private final Collection<VolatileDatabaseTable> updates;
         private final Transaction tx;
 
         public MyCommitHandle(Collection<VolatileDatabaseTable> updates, Transaction tx) {
-            this.updates = new ArrayList<VolatileDatabaseTable>(updates);
+            this.updates = Collections.unmodifiableCollection(new ArrayList<VolatileDatabaseTable>(updates));
             this.tx = tx;
             prepare();
         }

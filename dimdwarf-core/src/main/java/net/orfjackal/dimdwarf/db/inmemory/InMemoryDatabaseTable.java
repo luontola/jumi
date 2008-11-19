@@ -75,26 +75,28 @@ class InMemoryDatabaseTable implements PersistedDatabaseTable {
     }
 
 
+    @ThreadSafe
     private class MyCommitHandle implements CommitHandle {
 
         private final Map<Blob, Blob> updates;
         private final long visibleRevision;
-        private LockHandle lockHandle;
+        private final LockHandle lockHandle;
 
         public MyCommitHandle(Map<Blob, Blob> updates, long visibleRevision) {
-            this.updates = new HashMap<Blob, Blob>(updates);
+            this.updates = Collections.unmodifiableMap(new HashMap<Blob, Blob>(updates));
             this.visibleRevision = visibleRevision;
-            prepare();
+            this.lockHandle = prepare();
         }
 
-        private void prepare() {
-            lockHandle = keysLockedForCommit.tryLock(updates.keySet());
+        private LockHandle prepare() {
+            LockHandle lockHandle = keysLockedForCommit.tryLock(updates.keySet());
             try {
                 checkForConflicts();
             } catch (OptimisticLockException e) {
                 lockHandle.unlock();
                 throw e;
             }
+            return lockHandle;
         }
 
         private void checkForConflicts() throws OptimisticLockException {

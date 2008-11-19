@@ -90,6 +90,7 @@ public class GroupLock<T> {
     }
 
 
+    @ThreadSafe
     private class MyLockHandle implements LockHandle {
 
         private Collection<T> keys;
