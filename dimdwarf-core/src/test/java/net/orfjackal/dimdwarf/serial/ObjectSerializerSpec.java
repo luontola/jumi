@@ -58,9 +58,8 @@ public class ObjectSerializerSpec extends Specification<Object> {
     public class AnObjectSerializer {
         private ObjectSerializerImpl serializer;
 
-        public Object create() {
+        public void create() {
             serializer = new ObjectSerializerImpl();
-            return null;
         }
 
         public void serializesAndDeserializesObjects() {
@@ -79,11 +78,10 @@ public class ObjectSerializerSpec extends Specification<Object> {
         private SerializationListener listener;
         private ObjectSerializerImpl serializer;
 
-        public Object create() {
+        public void create() {
             serializedBytes = new ObjectSerializerImpl().serialize(obj);
             listener = mock(SerializationListener.class);
             serializer = new ObjectSerializerImpl(new SerializationListener[]{listener}, new SerializationReplacer[0]);
-            return null;
         }
 
         public void areNotifiedOfAllSerializedObjects() {
@@ -112,7 +110,7 @@ public class ObjectSerializerSpec extends Specification<Object> {
         private ObjectSerializerImpl serializer;
         private SerializationListener listener;
 
-        public Object create() {
+        public void create() {
             serializedBytes = new ObjectSerializerImpl().serialize(obj);
             listener = mock(SerializationListener.class);
             SerializationReplacer replacer = new SerializationReplacer() {
@@ -134,7 +132,6 @@ public class ObjectSerializerSpec extends Specification<Object> {
             serializer = new ObjectSerializerImpl(
                     new SerializationListener[]{listener},
                     new SerializationReplacer[]{replacer});
-            return null;
         }
 
         public void canReplaceObjectsOnSerialization() {

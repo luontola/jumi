@@ -62,10 +62,9 @@ public class ClassFileTransformerSpec extends Specification<Object> {
 
     public class WhenNoTransformerIsInstalled {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             loader = new TransformationTestClassLoader(TARGET_CLASS, null);
             initTarget();
-            return null;
         }
 
         public void classesAreNotInstrumented() {
@@ -75,14 +74,13 @@ public class ClassFileTransformerSpec extends Specification<Object> {
 
     public class WhenATransformerIsInstalled {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             loader = new TransformationTestClassLoader(TARGET_CLASS, new AbstractTransformationChain() {
                 protected ClassVisitor getAdapters(ClassVisitor cv) {
                     return new AddEqualsMethodWhichReturnsTrue(cv);
                 }
             });
             initTarget();
-            return null;
         }
 
         public void classesAreInstrumented() {

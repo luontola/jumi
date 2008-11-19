@@ -66,10 +66,6 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     public class WhenNoReferencesHaveBeenCreated {
 
-        public Object create() {
-            return null;
-        }
-
         public void noEntitiesAreRegistered() {
             specify(manager.getRegisteredEntities(), should.equal(0));
         }
@@ -79,12 +75,11 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
         private EntityReference<EntityObject> ref;
 
-        public Object create() {
+        public void create() {
             checking(new Expectations() {{
                 one(idFactory).newId(); will(returnValue(BigInteger.valueOf(42)));
             }});
             ref = refFactory.createReference(entity);
-            return null;
         }
 
         public void theReferenceIsCreated() {
@@ -116,14 +111,13 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         private EntityReference<EntityObject> ref1;
         private EntityReference<DummyEntity> ref2;
 
-        public Object create() {
+        public void create() {
             checking(new Expectations() {{
                 one(idFactory).newId(); will(returnValue(BigInteger.valueOf(1)));
                 one(idFactory).newId(); will(returnValue(BigInteger.valueOf(2)));
             }});
             ref1 = refFactory.createReference(entity);
             ref2 = refFactory.createReference(new DummyEntity());
-            return null;
         }
 
         public void allTheEntitiesAreRegistered() {

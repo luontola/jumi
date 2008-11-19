@@ -74,10 +74,6 @@ public class DatabaseAdapterSpec extends Specification<Object> {
 
     public class ADatabaseAdapter {
 
-        public Object create() {
-            return null;
-        }
-
         public void delegatesTables() {
             checking(new Expectations() {{
                 one(db).getTableNames(); will(returnValue(new HashSet<String>(Arrays.asList("test"))));
@@ -95,12 +91,11 @@ public class DatabaseAdapterSpec extends Specification<Object> {
 
     public class ADatabaseTableAdapter {
 
-        public Object create() {
+        public void create() {
             checking(new Expectations() {{
                 one(db).openTable("test"); will(returnValue(table));
             }});
             tableAdapter = dbAdapter.openTable("test");
-            return null;
         }
 
         public void convertsReads() {

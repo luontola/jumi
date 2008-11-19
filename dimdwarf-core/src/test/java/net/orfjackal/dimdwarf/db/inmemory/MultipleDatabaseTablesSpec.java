@@ -101,10 +101,6 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
     public class OpeningDatabaseTables {
 
-        public Object create() {
-            return null;
-        }
-
         public void eachTableHasAName() {
             specify(db.getTableNames(), should.containExactly(TABLE1, TABLE2));
         }
@@ -125,9 +121,8 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
     public class DuringTransaction {
 
-        public Object create() {
+        public void create() {
             table1.update(key, value1);
-            return null;
         }
 
         public void updatesAreSeenInTheUpdatedTable() {
@@ -145,10 +140,9 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
     public class AfterTransactionIsCommitted {
 
-        public Object create() {
+        public void create() {
             table1.update(key, value1);
             tx.prepareAndCommit();
-            return null;
         }
 
         public void updatesAreSeenInTheUpdatedTable() {
@@ -162,10 +156,9 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
 
     public class WhenTheSameKeyIsUpdatedInDifferentTables {
 
-        public Object create() {
+        public void create() {
             table1.update(key, value1);
             table2.update(key, value2);
-            return null;
         }
 
         public void itDoesNotConflict() {
@@ -180,13 +173,12 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
         private long firstRevision;
         private long revision;
 
-        public Object create() {
+        public void create() {
             firstRevision = dbms.getCurrentRevision();
             table1.update(key, value1);
             table2.update(key, value2);
             tx.prepareAndCommit();
             revision = dbms.getCurrentRevision();
-            return null;
         }
 
         public void revisionIsIncrementedExactlyOncePerCommit() {

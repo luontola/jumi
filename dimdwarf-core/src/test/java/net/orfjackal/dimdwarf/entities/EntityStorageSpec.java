@@ -77,10 +77,6 @@ public class EntityStorageSpec extends Specification<Object> {
 
     public class AnEntityStorage {
 
-        public Object create() {
-            return null;
-        }
-
         public void readsEntitiesFromDatabase() {
             checking(new Expectations() {{
                 one(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));

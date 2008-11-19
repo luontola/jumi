@@ -68,10 +68,6 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
     public class WhenRegisteredEntitiesAreFlushed {
 
-        public Object create() {
-            return null;
-        }
-
         public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity);
@@ -128,10 +124,6 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
     public class WhenNewEntitiesAreRegisteredDuringFlush {
 
-        public Object create() {
-            return null;
-        }
-
         public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
                 one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
@@ -142,10 +134,6 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     }
 
     public class WhenAlreadyRegisteredEntitiesAreRegisteredDuringFlush {
-
-        public Object create() {
-            return null;
-        }
 
         public void theyAreStoredInDatabaseOnlyOnce() {
             checking(new Expectations() {{

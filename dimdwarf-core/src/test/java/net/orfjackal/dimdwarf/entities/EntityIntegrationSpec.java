@@ -66,10 +66,6 @@ public class EntityIntegrationSpec extends Specification<Object> {
 
     public class WhenTasksAreRun {
 
-        public Object create() {
-            return null;
-        }
-
         public void entitiesCreatedInOneTaskCanBeReadInTheNextTask() {
             final AtomicReference<BigInteger> id = new AtomicReference<BigInteger>();
             taskExecutor.execute(new Runnable() {

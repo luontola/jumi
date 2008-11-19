@@ -48,9 +48,8 @@ public class RevisionListSpec extends Specification<Object> {
 
         private RevisionList<String> list;
 
-        public Object create() {
+        public void create() {
             list = new RevisionList<String>(1, "one");
-            return null;
         }
 
         public void thatRevisionCanBeRead() {
@@ -70,10 +69,9 @@ public class RevisionListSpec extends Specification<Object> {
 
         private RevisionList<String> list;
 
-        public Object create() {
+        public void create() {
             RevisionList<String> previous = new RevisionList<String>(1, "one");
             list = new RevisionList<String>(2, "two", previous);
-            return null;
         }
 
         public void theLatestRevisionCanBeRead() {
@@ -89,10 +87,9 @@ public class RevisionListSpec extends Specification<Object> {
 
         private RevisionList<String> list;
 
-        public Object create() {
+        public void create() {
             RevisionList<String> previous = new RevisionList<String>(1, "one");
             list = new RevisionList<String>(3, "three", previous);
-            return null;
         }
 
         public void theLatestRevisionCanBeRead() {
@@ -113,12 +110,11 @@ public class RevisionListSpec extends Specification<Object> {
         private RevisionList<String> tail;
         private RevisionList<String> list;
 
-        public Object create() {
+        public void create() {
             tail = new RevisionList<String>(1, "one");
             RevisionList<String> two = new RevisionList<String>(2, "two", tail);
             RevisionList<String> four = new RevisionList<String>(4, "four", two);
             list = new RevisionList<String>(5, null, four);
-            return null;
         }
 
         public void purgingAlreadyPurgedRevisionsHasNoEffect() {

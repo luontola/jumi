@@ -55,10 +55,6 @@ public class RevisionMapSpec extends Specification<Object> {
 
     public class RevisionsOfARevisionMap {
 
-        public Object create() {
-            return null;
-        }
-
         public void startsFromFirstRevision() {
             specify(counter.getCurrentRevision(), should.equal(0));
             specify(map.getOldestRevision(), should.equal(0));
@@ -87,10 +83,6 @@ public class RevisionMapSpec extends Specification<Object> {
 
     public class AnEmptyRevisionMap {
 
-        public Object create() {
-            return null;
-        }
-
         public void isEmpty() {
             specify(map.size(), should.equal(0));
         }
@@ -104,11 +96,10 @@ public class RevisionMapSpec extends Specification<Object> {
 
         private long revision;
 
-        public Object create() {
+        public void create() {
             counter.incrementRevision();
             map.put("key", "value");
             revision = counter.getCurrentRevision();
-            return null;
         }
 
         public void theMapIsNotEmpty() {
@@ -139,7 +130,7 @@ public class RevisionMapSpec extends Specification<Object> {
         private long beforeUpdate;
         private long afterUpdate;
 
-        public Object create() {
+        public void create() {
             counter.incrementRevision();
             map.put("key", "old");
             beforeUpdate = counter.getCurrentRevision();
@@ -147,7 +138,6 @@ public class RevisionMapSpec extends Specification<Object> {
             counter.incrementRevision();
             map.put("key", "new");
             afterUpdate = counter.getCurrentRevision();
-            return null;
         }
 
         public void theValueNewValueExistsInTheCurrentRevision() {
@@ -183,14 +173,13 @@ public class RevisionMapSpec extends Specification<Object> {
         private long beforeRemove;
         private long afterRemove;
 
-        public Object create() {
+        public void create() {
             counter.incrementRevision();
             map.put("key", "value");
             beforeRemove = counter.getCurrentRevision();
             counter.incrementRevision();
             map.remove("key");
             afterRemove = counter.getCurrentRevision();
-            return null;
         }
 
         public void theValueDoesNotExistInTheCurrentRevision() {
@@ -214,11 +203,10 @@ public class RevisionMapSpec extends Specification<Object> {
 
     public class FindingTheNextKey {
 
-        public Object create() {
+        public void create() {
             counter.incrementRevision();
             map.put("a", "A");
             map.put("c", "C");
-            return null;
         }
 
         public void firstKey() {

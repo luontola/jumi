@@ -56,9 +56,8 @@ public class BlobSpec extends Specification<Blob> {
 
     public class AnEmptyBlob {
 
-        public Object create() {
+        public void create() {
             blob = Blob.EMPTY_BLOB;
-            return null;
         }
 
         public void hasZeroLength() {
@@ -82,9 +81,8 @@ public class BlobSpec extends Specification<Blob> {
 
     public class ABlobCreatedFromAByteArray {
 
-        public Object create() {
+        public void create() {
             blob = Blob.fromBytes(bytes);
-            return null;
         }
 
         public void hasTheSameLengthAsTheSourceByteArray() {
@@ -134,9 +132,8 @@ public class BlobSpec extends Specification<Blob> {
 
     public class ABlobCreatedFromAnInputStream {
 
-        public Object create() throws IOException {
+        public void create() throws IOException {
             blob = Blob.fromInputStream(new ByteArrayInputStream(bytes));
-            return null;
         }
 
         public void readsTheStreamFully() {
@@ -148,10 +145,9 @@ public class BlobSpec extends Specification<Blob> {
 
         private ByteBuffer buffer;
 
-        public Object create() {
+        public void create() {
             buffer = ByteBuffer.wrap(bytes);
             blob = Blob.fromByteBuffer(buffer);
-            return null;
         }
 
         public void readsTheBufferFully() {
@@ -177,12 +173,11 @@ public class BlobSpec extends Specification<Blob> {
         private Blob blob2;
         private Blob blob23;
 
-        public Object create() {
+        public void create() {
             blob1a = Blob.fromBytes(new byte[]{1});
             blob1b = Blob.fromBytes(new byte[]{1});
             blob2 = Blob.fromBytes(new byte[]{2});
             blob23 = Blob.fromBytes(new byte[]{2, 3});
-            return null;
         }
 
         public void equalsItself() {
@@ -229,12 +224,11 @@ public class BlobSpec extends Specification<Blob> {
         private Blob blob2;
         private Blob blob23;
 
-        public Object create() {
+        public void create() {
             blob1a = Blob.fromBytes(new byte[]{1});
             blob1b = Blob.fromBytes(new byte[]{1});
             blob2 = Blob.fromBytes(new byte[]{2});
             blob23 = Blob.fromBytes(new byte[]{2, 3});
-            return null;
         }
 
         public void equalsItself() {

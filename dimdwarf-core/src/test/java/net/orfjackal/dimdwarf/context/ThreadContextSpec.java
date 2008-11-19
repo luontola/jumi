@@ -74,10 +74,6 @@ public class ThreadContextSpec extends Specification<Object> {
 
         private boolean wasExecuted;
 
-        public Object create() {
-            return null;
-        }
-
         public void givesAccessToTheInstalledServices() {
             ThreadContext.setUp(myContext);
             specify(ThreadContext.getCurrentContext(), should.equal(myContext));

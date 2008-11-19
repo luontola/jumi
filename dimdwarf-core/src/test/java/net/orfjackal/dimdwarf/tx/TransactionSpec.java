@@ -102,10 +102,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     public class WhenTransactionBegins {
 
-        public Object create() {
-            return null;
-        }
-
         public void itIsActive() {
             specify(tx.getStatus(), should.equal(ACTIVE));
             tx.mustBeActive();
@@ -118,9 +114,8 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     public class WhenParticipantJoinsTransaction {
 
-        public Object create() {
+        public void create() {
             tx.join(participant1);
-            return null;
         }
 
         public void itHasParticipants() {
@@ -140,10 +135,9 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     public class WhenTransactionPreparesToCommit {
 
-        public Object create() {
+        public void create() {
             tx.join(participant1);
             tx.join(participant2);
-            return null;
         }
 
         public void transactionIsDeactivatedBeforeParticipantsArePrepared() {
@@ -250,12 +244,11 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     public class WhenTransactionCommits {
 
-        public Object create() {
+        public void create() {
             tx.join(participant1);
             tx.join(participant2);
             checking(allParticipantsArePrepared());
             tx.prepare();
-            return null;
         }
 
         public void allParticipantsAreToldToCommit() {
@@ -320,10 +313,9 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     public class RollingBackATransaction {
 
-        public Object create() {
+        public void create() {
             tx.join(participant1);
             tx.join(participant2);
-            return null;
         }
 
         public void allParticipantsAreToldToRollBack() {
@@ -421,10 +413,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     }
 
     public class MarkingATransactionForRollbackOnly {
-
-        public Object create() {
-            return null;
-        }
 
         public void atFirstItIsNotRollbackOnly() {
             specify(!tx.isRollbackOnly());

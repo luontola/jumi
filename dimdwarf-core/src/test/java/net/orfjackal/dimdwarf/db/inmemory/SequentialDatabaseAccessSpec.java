@@ -110,10 +110,6 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenDatabaseConnectionIsOpened {
 
-        public Object create() {
-            return null;
-        }
-
         public void theConnectionIsOpen() {
             specify(db, should.not().equal(null));
             specify(table, should.not().equal(null));
@@ -150,10 +146,6 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryDoesNotExist {
 
-        public Object create() {
-            return null;
-        }
-
         public void itDoesNotExist() {
             specify(table.read(key), should.equal(EMPTY_BLOB));
         }
@@ -161,9 +153,8 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryIsCreated {
 
-        public Object create() {
+        public void create() {
             table.update(key, value);
-            return null;
         }
 
         public void theValueCanBeRead() {
@@ -173,10 +164,9 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryIsUpdated {
 
-        public Object create() {
+        public void create() {
             table.update(key, value);
             table.update(key, otherValue);
-            return null;
         }
 
         public void theLatestValueCanBeRead() {
@@ -186,10 +176,9 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryIsDeleted {
 
-        public Object create() {
+        public void create() {
             table.update(key, value);
             table.delete(key);
-            return null;
         }
 
         public void itDoesNotExistAnymore() {

@@ -90,9 +90,8 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
 
     public class AnInstrumentedNormalObject {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             target = newInstrumentedInstance(DummyObject.class);
-            return null;
         }
 
         public void doesNotDelegateItsEqualsMethod() {
@@ -108,9 +107,8 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
 
     public class AnInstrumentedEntityWithNoEqualsAndHashCodeMethods {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             target = newInstrumentedInstance(DummyEntity.class);
-            return null;
         }
 
         public void delegatesItsEqualsMethodToEntityIdentity() {
@@ -126,9 +124,8 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
 
     public class AnInstrumentedEntityWithACustomEqualsMethod {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             target = newInstrumentedInstance(EntityWithEquals.class);
-            return null;
         }
 
         public void doesNotDelegateItsEqualsMethod() {
@@ -144,9 +141,8 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
 
     public class AnInstrumentedEntityWithACustomHashCodeMethod {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             target = newInstrumentedInstance(EntityWithHashCode.class);
-            return null;
         }
 
         public void delegatesItsEqualsMethodToEntityIdentity() {

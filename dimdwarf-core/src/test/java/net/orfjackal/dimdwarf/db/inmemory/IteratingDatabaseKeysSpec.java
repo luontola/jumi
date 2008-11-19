@@ -83,10 +83,6 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
 
     public class AnEmptyDatabaseTable {
 
-        public Object create() {
-            return null;
-        }
-
         public void firstKey() {
             specify(table.firstKey(), should.equal(null));
         }
@@ -98,12 +94,11 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
 
     public class ANonEmptyDatabaseTable {
 
-        public Object create() {
+        public void create() {
             table.update(key1, value);
             table.update(key3, value);
             tx.prepareAndCommit();
             beginNewTransaction();
-            return null;
         }
 
         public void firstKey() {

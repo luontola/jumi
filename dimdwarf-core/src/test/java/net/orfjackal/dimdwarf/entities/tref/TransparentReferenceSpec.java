@@ -85,10 +85,9 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         private Object proxy;
 
-        public Object create() {
+        public void create() {
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
             proxy = proxyFactory.createTransparentReference(entity);
-            return null;
         }
 
         public void aProxyIsCreated() {
@@ -188,14 +187,13 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         private SerializationTestEntity deserialized;
 
-        public Object create() {
+        public void create() {
             ObjectSerializerImpl serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{
                     new ReplaceEntitiesWithTransparentReferences(proxyFactory)
             });
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
             Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject()));
             deserialized = (SerializationTestEntity) serializer.deserialize(data);
-            return null;
         }
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {

@@ -62,7 +62,7 @@ public class RevisionMapIteratorSpec extends Specification<Object> {
         private List<String> values = new ArrayList<String>();
         private long revision;
 
-        public Object create() {
+        public void create() {
             counter.incrementRevision();
             map.put("a", "AA");
             map.put("b", "BB");
@@ -72,7 +72,6 @@ public class RevisionMapIteratorSpec extends Specification<Object> {
             revision = counter.getCurrentRevision();
             counter.incrementRevision();
             map.put("b", "Y");
-            return null;
         }
 
         private void readFully(long revision) {

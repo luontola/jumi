@@ -88,10 +88,6 @@ public class TaskScopeSpec extends Specification<Object> {
 
     public class WhenOutOfTaskScope {
 
-        public Object create() {
-            return null;
-        }
-
         public void taskScopedBindingsCanNotBeAccessed() {
             specify(new Block() {
                 public void run() throws Throwable {
@@ -112,9 +108,8 @@ public class TaskScopeSpec extends Specification<Object> {
 
     public class WhenInsideTaskScope {
 
-        public Object create() {
+        public void create() {
             ThreadContext.setUp(contextProvider.get());
-            return null;
         }
 
         public void taskScopedBindingsMayBeAccessed() {

@@ -79,10 +79,6 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
     public class ReferringEntities {
 
-        public Object create() {
-            return null;
-        }
-
         public void referringAnEntityDirectlyIsForbidden() {
             entity.other = new DummyEntity();
             specify(new Block() {
@@ -124,10 +120,6 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
      * static member classes), including local and anonymous classes, is strongly discouraged.
      */
     public class ReferringInnerClasses {
-
-        public Object create() {
-            return null;
-        }
 
         public void serializingAnonymousClassesIsForbidden() {
             entity.other = newAnonymousClassInstance();

@@ -57,10 +57,6 @@ public class EntityIdFactorySpec extends Specification<Object> {
 
     public class AnEntityIdFactory {
 
-        public Object create() {
-            return null;
-        }
-
         public void startsFromTheNextUnusedId() {
             BigInteger nextUnused = LARGEST_USED_ID.add(BigInteger.ONE);
             specify(factory.newId(), should.equal(nextUnused));

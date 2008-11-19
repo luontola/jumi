@@ -83,10 +83,6 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
 
     public class WhenATaskIsExecuted {
 
-        public Object create() {
-            return null;
-        }
-
         public void aTransactionIsActive() {
             taskExecutor.execute(new Runnable() {
                 public void run() {

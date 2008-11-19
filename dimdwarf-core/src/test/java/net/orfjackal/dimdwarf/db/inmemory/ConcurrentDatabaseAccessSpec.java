@@ -118,10 +118,9 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenMultipleDatabaseConnectionsAreOpen {
 
-        public Object create() {
+        public void create() {
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
-            return null;
         }
 
         public void databaseKeepsTrackOfTheNumberOfOpenConnections() {
@@ -159,12 +158,11 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryIsCreatedInATransaction {
 
-        public Object create() {
+        public void create() {
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
             table1.update(key, value1);
             specify(dbms.getOpenConnections(), should.equal(2));
-            return null;
         }
 
         public void otherTransactionsCanNotSeeIt() {
@@ -197,13 +195,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryIsUpdatedInATransaction {
 
-        public Object create() {
+        public void create() {
             updateInNewTransaction(key, value1);
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
             table1.update(key, value2);
             specify(dbms.getOpenConnections(), should.equal(2));
-            return null;
         }
 
         public void otherTransactionsCanNotSeeIt() {
@@ -236,13 +233,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class WhenEntryIsDeletedInATransaction {
 
-        public Object create() {
+        public void create() {
             updateInNewTransaction(key, value1);
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
             table1.delete(key);
             specify(dbms.getOpenConnections(), should.equal(2));
-            return null;
         }
 
 
@@ -276,12 +272,11 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class IfTwoTransactionsCreateAnEntryWithTheSameKey {
 
-        public Object create() {
+        public void create() {
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
             table1.update(key, value1);
             table2.update(key, value2);
-            return null;
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {
@@ -297,13 +292,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class IfTwoTransactionsUpdateAnEntryWithTheSameKey {
 
-        public Object create() {
+        public void create() {
             updateInNewTransaction(key, value3);
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
             table1.update(key, value1);
             table2.update(key, value2);
-            return null;
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {
@@ -319,13 +313,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     public class IfTwoTransactionsDeleteAnEntryWithTheSameKey {
 
-        public Object create() {
+        public void create() {
             updateInNewTransaction(key, value3);
             table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
             table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
             table1.delete(key);
             table2.delete(key);
-            return null;
         }
 
         public void onlyTheFirstToPrepareWillSucceed() {

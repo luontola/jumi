@@ -68,9 +68,8 @@ public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object
 
     public class AClassWithNoAnnotations {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             target = newInstrumentedInstance(DummyObject.class);
-            return null;
         }
 
         public void isNotTransformed() {
@@ -80,9 +79,8 @@ public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object
 
     public class AClassWithTheEntityAnnotation {
 
-        public Object create() throws Exception {
+        public void create() throws Exception {
             target = newInstrumentedInstance(AnnotatedEntity.class);
-            return null;
         }
 
         public void isTransformedToAnEntity() {
