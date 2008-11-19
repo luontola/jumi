@@ -31,7 +31,8 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
+
 
 /**
  * @author Esko Luontola
