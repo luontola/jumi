@@ -31,11 +31,8 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.*;
+import java.util.concurrent.locks.*;
 
 /**
  * @author Esko Luontola
@@ -44,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GroupLock<T> {
 
     private final Set<T> lockedKeys = new HashSet<T>();
-    private final ReentrantLock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public LockHandle tryLock(T... keys) throws IllegalStateException {
         return tryLock(Arrays.asList(keys));
@@ -93,7 +90,7 @@ public class GroupLock<T> {
         private Collection<T> keys;
 
         public MyLockHandle(Collection<T> keys) {
-            this.keys = keys;
+            this.keys = Collections.unmodifiableCollection(new ArrayList<T>(keys));
         }
 
         public void unlock() {

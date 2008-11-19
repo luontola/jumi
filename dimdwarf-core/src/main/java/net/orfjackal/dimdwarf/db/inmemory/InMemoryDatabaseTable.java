@@ -31,14 +31,9 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.OptimisticLockException;
+import net.orfjackal.dimdwarf.db.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.*;
 
 /**
  * This class is thread-safe.
@@ -49,7 +44,7 @@ import java.util.concurrent.ConcurrentMap;
 class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
     private final RevisionMap<Blob, Blob> revisions;
-    private final ConcurrentMap<Blob, MyCommitHandle> lockedForCommit = new ConcurrentHashMap<Blob, MyCommitHandle>();
+    private final GroupLock<Blob> keysLockedForCommit = new GroupLock<Blob>();
 
     public InMemoryDatabaseTable(RevisionCounter revisionCounter) {
         revisions = new RevisionMap<Blob, Blob>(revisionCounter);
@@ -79,46 +74,12 @@ class InMemoryDatabaseTable implements PersistedDatabaseTable {
         return new MyCommitHandle(updates, revision);
     }
 
-    // TODO: refactor this locking logic out of this class or simplify it - maybe create GroupLock which locks a set of keys simultanously
-
-    private synchronized void checkForConflicts(Set<Blob> keys, long visibleRevision) {
-        for (Blob key : keys) {
-            long lastWrite = revisions.getLatestRevisionForKey(key);
-            if (lastWrite > visibleRevision) {
-                throw new OptimisticLockException("Key " + key + " already modified in revision " + lastWrite);
-            }
-        }
-    }
-
-    private synchronized void lock(MyCommitHandle h, Set<Blob> keys) {
-        for (Blob key : keys) {
-            MyCommitHandle alreadyLocked = lockedForCommit.putIfAbsent(key, h);
-            if (alreadyLocked != null) {
-                throw new OptimisticLockException("Key " + key + " already locked by " + alreadyLocked);
-            }
-        }
-    }
-
-    private synchronized void putAll(MyCommitHandle h, Map<Blob, Blob> updates) {
-        for (Map.Entry<Blob, Blob> update : updates.entrySet()) {
-            assert lockedForCommit.get(update.getKey()).equals(h);
-            revisions.put(update.getKey(), update.getValue());
-        }
-    }
-
-    private synchronized void unlock(MyCommitHandle h, Set<Blob> keys) {
-        for (Blob key : keys) {
-            if (lockedForCommit.containsKey(key)) {
-                boolean wasLockedByMe = lockedForCommit.remove(key, h);
-                assert wasLockedByMe : "key = " + key;
-            }
-        }
-    }
 
     private class MyCommitHandle implements CommitHandle {
 
         private final Map<Blob, Blob> updates;
         private final long visibleRevision;
+        private LockHandle lockHandle;
 
         public MyCommitHandle(Map<Blob, Blob> updates, long visibleRevision) {
             this.updates = new HashMap<Blob, Blob>(updates);
@@ -127,17 +88,46 @@ class InMemoryDatabaseTable implements PersistedDatabaseTable {
         }
 
         private void prepare() {
-            checkForConflicts(updates.keySet(), visibleRevision);
-            lock(this, updates.keySet());
+            lockHandle = keysLockedForCommit.tryLock(updates.keySet());
+            try {
+                checkForConflicts();
+            } catch (OptimisticLockException e) {
+                lockHandle.unlock();
+                throw e;
+            }
+        }
+
+        private void checkForConflicts() throws OptimisticLockException {
+            for (Blob key : updates.keySet()) {
+                checkForModifiedInOtherTransaction(key);
+            }
+        }
+
+        private void checkForModifiedInOtherTransaction(Blob key) throws OptimisticLockException {
+            long lastWrite = revisions.getLatestRevisionForKey(key);
+            if (lastWrite > visibleRevision) {
+                throw new OptimisticLockException("Key " + key + " already modified in revision " + lastWrite);
+            }
         }
 
         public void commit() {
-            putAll(this, updates);
-            unlock(this, updates.keySet());
+            commitUpdates();
+            lockHandle.unlock();
+        }
+
+        private void commitUpdates() {
+            for (Map.Entry<Blob, Blob> update : updates.entrySet()) {
+                commitUpdate(update.getKey(), update.getValue());
+            }
+        }
+
+        private void commitUpdate(Blob key, Blob value) {
+            assert keysLockedForCommit.isLocked(key);
+            revisions.put(key, value);
         }
 
         public void rollback() {
-            unlock(this, updates.keySet());
+            lockHandle.unlock();
         }
     }
 }

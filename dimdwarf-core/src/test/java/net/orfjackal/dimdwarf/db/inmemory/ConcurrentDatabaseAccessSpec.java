@@ -31,16 +31,11 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.*;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionException;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
+import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
@@ -308,6 +303,15 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         public void onlyTheFirstToPrepareAndCommitWillSucceed() {
             tx1PreparesAndCommitsBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
+        }
+
+        /**
+         * Checks that InMemoryDatabaseTable releases its commit locks if there is a modification conflict.
+         */
+        public void theKeyMayBeUpdatedInALaterTransaction() {
+            tx1PreparesAndCommitsBeforeTx2();
+            updateInNewTransaction(key, value2);
+            specify(readInNewTransaction(key), should.equal(value2));
         }
     }
 
