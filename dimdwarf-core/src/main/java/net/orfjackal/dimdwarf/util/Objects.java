@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.util;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Esko Luontola
  * @since 29.10.2008
@@ -43,12 +45,13 @@ public class Objects {
     /**
      * Helps to avoid using {@code @SuppressWarnings({"unchecked"})} when casting to a generic type.
      */
+    @Nullable
     @SuppressWarnings({"unchecked"})
-    public static <T> T uncheckedCast(Object obj) {
+    public static <T> T uncheckedCast(@Nullable Object obj) {
         return (T) obj;
     }
 
-    public static boolean safeEquals(Object x, Object y) {
+    public static boolean safeEquals(@Nullable Object x, @Nullable Object y) {
         return x == y || (x != null && x.equals(y));
     }
 }

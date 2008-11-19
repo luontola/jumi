@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.entities;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
 import java.math.BigInteger;
@@ -47,8 +48,8 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
     private static final long serialVersionUID = 1L;
 
     private BigInteger id;
-    private transient T entity;
-    private transient EntityManager entityManager;
+    @Nullable private transient T entity;
+    @Nullable private transient EntityManager entityManager;
 
     public EntityReferenceImpl(BigInteger id, T entity) {
         assert id != null;

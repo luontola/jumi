@@ -33,7 +33,6 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.*;
 
-import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 
@@ -71,7 +70,6 @@ class InMemoryDatabaseTable implements PersistedDatabaseTable {
         return revisions.getOldestRevision();
     }
 
-    @CheckReturnValue
     public CommitHandle prepare(Map<Blob, Blob> updates, long revision) {
         return new MyCommitHandle(updates, revision);
     }

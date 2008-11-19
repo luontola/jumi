@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import org.jetbrains.annotations.TestOnly;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigInteger;
 import java.util.*;
@@ -102,6 +103,7 @@ public class EntityManagerImpl implements EntityManager {
         return entity;
     }
 
+    @Nullable
     private EntityObject getLoadedEntity(BigInteger id) {
         return entitiesById.get(id);
     }

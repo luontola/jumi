@@ -31,13 +31,12 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.util.Objects;
+
+import javax.annotation.Nullable;
 
 /**
  * For transparent references to work correctly, all subclasses of {@link EntityObject} should
@@ -59,18 +58,19 @@ public class EntityHelper {
     private EntityHelper() {
     }
 
-    public static boolean equals(Object obj1, Object obj2) {
+    public static boolean equals(@Nullable Object obj1, @Nullable Object obj2) {
         Object id1 = getReference(obj1);
         Object id2 = getReference(obj2);
         return Objects.safeEquals(id1, id2);
     }
 
-    public static int hashCode(Object obj) {
+    public static int hashCode(@Nullable Object obj) {
         Object id = getReference(obj);
         return id.hashCode();
     }
 
-    private static EntityReference<?> getReference(Object obj) {
+    @Nullable
+    private static EntityReference<?> getReference(@Nullable Object obj) {
         if (Entities.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference();
         } else if (Entities.isEntity(obj)) {

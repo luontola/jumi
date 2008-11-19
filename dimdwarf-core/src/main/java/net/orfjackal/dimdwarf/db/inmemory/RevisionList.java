@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -43,19 +44,20 @@ import javax.annotation.concurrent.ThreadSafe;
 public class RevisionList<T> {
 
     private final long revision;
-    private final T value;
-    private volatile RevisionList<T> previous;
+    @Nullable private final T value;
+    @Nullable private volatile RevisionList<T> previous;
 
     public RevisionList(long revision, T value) {
         this(revision, value, null);
     }
 
-    public RevisionList(long revision, T value, RevisionList<T> previous) {
+    public RevisionList(long revision, @Nullable T value, @Nullable RevisionList<T> previous) {
         this.revision = revision;
         this.value = value;
         this.previous = previous;
     }
 
+    @Nullable
     public T get(long revision) {
         for (RevisionList<T> node = this; node != null; node = node.previous) {
             if (node.revision <= revision) {

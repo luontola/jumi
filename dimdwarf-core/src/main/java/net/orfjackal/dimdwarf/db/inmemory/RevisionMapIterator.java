@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
@@ -43,8 +44,8 @@ public class RevisionMapIterator<K, V> implements Iterator<Map.Entry<K, V>> {
 
     private final RevisionMap<K, V> map;
     private final long revision;
-    private Map.Entry<K, V> fetchedNext;
-    private K nextKey;
+    @Nullable private Map.Entry<K, V> fetchedNext;
+    @Nullable private K nextKey;
 
     public RevisionMapIterator(RevisionMap<K, V> map, long revision) {
         this.map = map;

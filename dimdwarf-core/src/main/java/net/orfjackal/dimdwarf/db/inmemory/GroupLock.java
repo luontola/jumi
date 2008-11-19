@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,10 +46,12 @@ public class GroupLock<T> {
     private final Set<T> lockedKeys = new HashSet<T>();
     private final ReentrantLock lock = new ReentrantLock();
 
+    @CheckReturnValue
     public LockHandle tryLock(T... keys) throws IllegalStateException {
         return tryLock(Arrays.asList(keys));
     }
 
+    @CheckReturnValue
     public LockHandle tryLock(Collection<T> keys) throws IllegalStateException {
         lock.lock();
         try {

@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.IterableKeys;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -65,6 +66,7 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
         this.counter = counter;
     }
 
+    @Nullable
     public V get(K key, long revision) {
         RevisionList<V> revs = map.get(key);
         return revs != null ? revs.get(revision) : null;
@@ -75,7 +77,7 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
         return revs != null ? revs.latestRevision() : counter.getCurrentRevision();
     }
 
-    public void put(K key, V value) {
+    public void put(K key, @Nullable V value) {
         synchronized (writeLock) {
             RevisionList<V> previous = map.get(key);
             if (previous != null && previous.latestRevision() == counter.getCurrentRevision()) {
