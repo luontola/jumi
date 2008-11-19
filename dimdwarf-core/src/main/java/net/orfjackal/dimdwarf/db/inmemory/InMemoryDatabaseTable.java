@@ -41,7 +41,7 @@ import java.util.*;
  * @since 11.9.2008
  */
 @ThreadSafe
-class InMemoryDatabaseTable implements PersistedDatabaseTable {
+public class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
     private final RevisionMap<Blob, Blob> revisions;
     private final GroupLock<Blob> keysLockedForCommit = new GroupLock<Blob>();
