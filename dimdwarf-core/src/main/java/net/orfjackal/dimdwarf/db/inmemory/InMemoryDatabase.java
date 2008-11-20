@@ -39,6 +39,7 @@ import org.jetbrains.annotations.TestOnly;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * An in-memory database which uses multiversion concurrency control.
@@ -67,12 +68,12 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     private final Object commitLock = new Object();
 
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
-    private final RevisionCounter revisionCounter;
+    private final AtomicLong revisionCounter;
     private volatile long committedRevision;
 
     public InMemoryDatabase() {
-        revisionCounter = new RevisionCounter();
-        committedRevision = revisionCounter.getCurrentRevision();
+        revisionCounter = new AtomicLong();
+        committedRevision = revisionCounter.get();
     }
 
     public IsolationLevel getIsolationLevel() {
@@ -171,7 +172,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     private void commitUpdates(Collection<TransientDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
             try {
-                long writeRevision = revisionCounter.nextRevision();
+                long writeRevision = revisionCounter.incrementAndGet();
                 try {
                     // TODO: allow committing many revisions concurrently
                     for (TransientDatabaseTable update : updates) {
