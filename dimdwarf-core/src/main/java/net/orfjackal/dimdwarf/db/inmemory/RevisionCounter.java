@@ -45,13 +45,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @ThreadSafe
 public class RevisionCounter {
 
-    public static final int FIRST_REVISION = 0;
-
     private final Collection<RevisionHandle> revisionsInUse = new ConcurrentLinkedQueue<RevisionHandle>();
-    private final AtomicLong writeRevision = new AtomicLong(FIRST_REVISION);
-    private volatile long oldestReadableRevision = FIRST_REVISION;
-    private volatile long newestReadableRevision = FIRST_REVISION;
-    private volatile long newestCommittedRevision = FIRST_REVISION;
+    private final AtomicLong writeRevision = new AtomicLong(RevisionList.NULL_REVISION);
+    private volatile long oldestReadableRevision = RevisionList.NULL_REVISION;
+    private volatile long newestReadableRevision = RevisionList.NULL_REVISION;
+    private volatile long newestCommittedRevision = RevisionList.NULL_REVISION;
 
     public long getOldestReadableRevision() {
         return oldestReadableRevision;
@@ -114,7 +112,7 @@ public class RevisionCounter {
 
     private static long checkForOverflow(long x) {
         // TODO: any good ideas on how to allow the revisions to loop freely?
-        if (x < FIRST_REVISION) {
+        if (x < RevisionList.NULL_REVISION) {
             throw new Error("Numeric overflow has happened");
         }
         return x;

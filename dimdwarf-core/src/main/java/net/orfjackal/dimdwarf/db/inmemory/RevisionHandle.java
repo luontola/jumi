@@ -37,7 +37,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
  */
 public class RevisionHandle {
 
-    private static final long UNDEFINED = RevisionCounter.FIRST_REVISION - 1;
+    private static final long UNDEFINED = RevisionList.NULL_REVISION - 1;
 
     private final RevisionCounter controller;
     private final long readRevision;

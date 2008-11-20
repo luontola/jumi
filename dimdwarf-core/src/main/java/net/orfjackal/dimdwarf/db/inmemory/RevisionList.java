@@ -43,18 +43,18 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class RevisionList<T> {
 
+    public static final long NULL_REVISION = 0L;
+
     private final long revision;
     @Nullable private final T value;
     @Nullable private volatile RevisionList<T> previous;
 
-    public RevisionList(long revision, T value) {
+    public RevisionList(long revision, @Nullable T value) {
         this(revision, value, null);
     }
 
     public RevisionList(long revision, @Nullable T value, @Nullable RevisionList<T> previous) {
-        if (revision <= 0) {
-            throw new IllegalArgumentException("Revision must be positive: " + revision);
-        }
+        assert revision > NULL_REVISION;
         this.revision = revision;
         this.value = value;
         this.previous = previous;

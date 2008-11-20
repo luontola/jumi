@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.*;
 import java.util.*;
 
 /**
@@ -87,9 +87,8 @@ public class RevisionMapIterator<K, V> implements Iterator<Map.Entry<K, V>> {
         return next;
     }
 
-    /**
-     * This class is immutable.
-     */
+
+    @Immutable
     private static class MyEntry<K, V> implements Map.Entry<K, V> {
         private final K key;
         private final V value;
