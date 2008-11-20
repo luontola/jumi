@@ -104,6 +104,14 @@ public class RevisionCounter {
         return oldest;
     }
 
+    public String toString() {
+        return getClass().getSimpleName()
+                + "[readableRange=" + oldestReadableRevision + "-" + newestReadableRevision
+                + ", newestCommitted=" + newestCommittedRevision
+                + ", revisionsInUse=" + revisionsInUse
+                + "]";
+    }
+
     private static long checkForOverflow(long x) {
         // TODO: any good ideas on how to allow the revisions to loop freely?
         if (x < FIRST_REVISION) {

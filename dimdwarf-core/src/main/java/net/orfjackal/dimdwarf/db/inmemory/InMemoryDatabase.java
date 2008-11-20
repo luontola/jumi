@@ -68,11 +68,6 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
     private final RevisionCounter revisionCounter = new RevisionCounter();
-    private volatile long committedRevision;
-
-    public InMemoryDatabase() {
-        committedRevision = revisionCounter.getNewestReadableRevision();
-    }
 
     public IsolationLevel getIsolationLevel() {
         return IsolationLevel.SNAPSHOT;
@@ -116,7 +111,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     }
 
     private TransientDatabase createNewConnection(Transaction tx) {
-        openConnections.putIfAbsent(tx, new TransientDatabase(this, committedRevision, tx));
+        openConnections.putIfAbsent(tx, new TransientDatabase(this, revisionCounter.getNewestReadableRevision(), tx));
         return getExistingConnection(tx);
     }
 
@@ -134,7 +129,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     }
 
     protected long getOldestUncommittedRevision() {
-        long oldest = committedRevision;
+        long oldest = revisionCounter.getNewestReadableRevision();
         for (TransientDatabase db : openConnections.values()) {
             oldest = Math.min(oldest, db.getReadRevision());
         }
@@ -148,7 +143,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     @TestOnly
     long getCurrentRevision() {
-        return committedRevision;
+        return revisionCounter.getNewestReadableRevision();
     }
 
     // Transactions
@@ -177,7 +172,6 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
                     update.commit(h.getWriteRevision());
                 }
             } finally {
-                committedRevision = h.getWriteRevision();
                 h.commitWrites();
                 closeConnection(tx);
             }
