@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.common.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;

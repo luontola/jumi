@@ -29,26 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db.inmemory;
-
-import net.orfjackal.dimdwarf.db.IsolationLevel;
-import net.orfjackal.dimdwarf.tx.Transaction;
-
-import javax.annotation.CheckReturnValue;
-import java.util.*;
+package net.orfjackal.dimdwarf.db.common;
 
 /**
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface PersistedDatabase<H> {
+public interface CommitHandle {
 
-    IsolationLevel getIsolationLevel();
+    void commit();
 
-    Set<String> getTableNames();
-
-    PersistedDatabaseTable<H> openTable(String name);
-
-    @CheckReturnValue
-    CommitHandle prepare(Collection<TransientDatabaseTable<H>> updates, H handle, Transaction tx);
+    void rollback();
 }

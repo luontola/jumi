@@ -29,21 +29,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db.inmemory;
+package net.orfjackal.dimdwarf.db.common;
 
-import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.IsolationLevel;
+import net.orfjackal.dimdwarf.tx.Transaction;
 
 import javax.annotation.CheckReturnValue;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface PersistedDatabaseTable<H> extends IterableKeys<Blob> {
+public interface PersistedDatabase<H> {
 
-    Blob get(Blob key, H handle);
+    IsolationLevel getIsolationLevel();
+
+    Set<String> getTableNames();
+
+    PersistedDatabaseTable<H> openTable(String name);
 
     @CheckReturnValue
-    CommitHandle prepare(Map<Blob, Blob> updates, H handle);
+    CommitHandle prepare(Collection<TransientDatabaseTable<H>> updates, H handle, Transaction tx);
 }

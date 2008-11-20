@@ -29,70 +29,64 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db.inmemory;
+package net.orfjackal.dimdwarf.db.common;
 
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.*;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
  * @since 18.11.2008
  */
 @ThreadSafe
-public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
+public class TransientDatabase<H> implements Database<Blob, Blob>, TransactionParticipant {
 
-    private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
-    private final PersistedDatabaseTable<H> dbTable;
+    private final ConcurrentMap<String, TransientDatabaseTable<H>> openTables = new ConcurrentHashMap<String, TransientDatabaseTable<H>>();
+    private final PersistedDatabase<H> db;
     private final H dbHandle;
     private final Transaction tx;
     private CommitHandle commitHandle;
 
-    public TransientDatabaseTable(PersistedDatabaseTable<H> dbTable, H dbHandle, Transaction tx) {
-        this.dbTable = dbTable;
+    public TransientDatabase(PersistedDatabase<H> db, H dbHandle, Transaction tx) {
+        this.db = db;
         this.dbHandle = dbHandle;
         this.tx = tx;
+        tx.join(this);
     }
 
-    public Blob read(Blob key) {
+    public IsolationLevel getIsolationLevel() {
+        return db.getIsolationLevel();
+    }
+
+    public Set<String> getTableNames() {
+        return db.getTableNames();
+    }
+
+    public DatabaseTable<Blob, Blob> openTable(String name) {
         tx.mustBeActive();
-        Blob blob = updates.get(key);
-        if (blob == null) {
-            blob = dbTable.get(key, dbHandle);
+        TransientDatabaseTable<H> table = getCachedTable(name);
+        if (table == null) {
+            table = cacheNewTable(name);
         }
-        if (blob == null) {
-            blob = Blob.EMPTY_BLOB;
-        }
-        return blob;
+        return table;
     }
 
-    public void update(Blob key, Blob value) {
-        tx.mustBeActive();
-        updates.put(key, value);
+    private TransientDatabaseTable<H> getCachedTable(String name) {
+        return openTables.get(name);
     }
 
-    public void delete(Blob key) {
-        tx.mustBeActive();
-        updates.put(key, Blob.EMPTY_BLOB);
+    private TransientDatabaseTable<H> cacheNewTable(String name) {
+        PersistedDatabaseTable<H> backend = db.openTable(name);
+        openTables.putIfAbsent(name, new TransientDatabaseTable<H>(backend, dbHandle, tx));
+        return getCachedTable(name);
     }
 
-    // TODO: 'firstKey' and 'nextKeyAfter' do not see keys which were created during this transaction
-
-    public Blob firstKey() {
-        tx.mustBeActive();
-        return dbTable.firstKey();
-    }
-
-    public Blob nextKeyAfter(Blob currentKey) {
-        tx.mustBeActive();
-        return dbTable.nextKeyAfter(currentKey);
-    }
-
-    public void prepare() {
-        commitHandle = dbTable.prepare(updates, dbHandle);
+    public void prepare() throws Throwable {
+        commitHandle = db.prepare(openTables.values(), dbHandle, tx);
     }
 
     public void commit() {

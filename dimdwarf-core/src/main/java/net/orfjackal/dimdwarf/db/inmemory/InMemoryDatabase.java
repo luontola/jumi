@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.common.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
 

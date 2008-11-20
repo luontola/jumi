@@ -29,15 +29,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.db.inmemory;
+package net.orfjackal.dimdwarf.db.common;
+
+import net.orfjackal.dimdwarf.db.*;
+
+import javax.annotation.CheckReturnValue;
+import java.util.Map;
 
 /**
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface CommitHandle {
+public interface PersistedDatabaseTable<H> extends IterableKeys<Blob> {
 
-    void commit();
+    Blob get(Blob key, H handle);
 
-    void rollback();
+    @CheckReturnValue
+    CommitHandle prepare(Map<Blob, Blob> updates, H handle);
 }
