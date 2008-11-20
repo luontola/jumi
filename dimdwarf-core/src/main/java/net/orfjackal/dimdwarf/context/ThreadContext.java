@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.context;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -95,11 +96,12 @@ public class ThreadContext {
      * WARNING: This method should be used <em>only</em> if the framework
      * requires direct access to the context implementation.
      */
+    @Nullable
     public static Context getCurrentContext() {
         return THREAD_LOCAL.get();
     }
 
-    private static void setCurrentContext(Context context) {
+    private static void setCurrentContext(@Nullable Context context) {
         THREAD_LOCAL.set(context);
     }
 }
