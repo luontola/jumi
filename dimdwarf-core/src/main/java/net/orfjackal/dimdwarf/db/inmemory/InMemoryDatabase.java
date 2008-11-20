@@ -39,7 +39,6 @@ import org.jetbrains.annotations.TestOnly;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * An in-memory database which uses multiversion concurrency control.
@@ -68,12 +67,11 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     private final Object commitLock = new Object();
 
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
-    private final AtomicLong revisionCounter;
+    private final RevisionCounter revisionCounter = new RevisionCounter();
     private volatile long committedRevision;
 
     public InMemoryDatabase() {
-        revisionCounter = new AtomicLong();
-        committedRevision = revisionCounter.get();
+        committedRevision = revisionCounter.getNewestReadableRevision();
     }
 
     public IsolationLevel getIsolationLevel() {
@@ -171,17 +169,16 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     private void commitUpdates(Collection<TransientDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
+            RevisionHandle h = revisionCounter.openNewestRevision();
+            h.prepareForWrite();
             try {
-                long writeRevision = revisionCounter.incrementAndGet();
-                try {
-                    // TODO: allow committing many revisions concurrently
-                    for (TransientDatabaseTable update : updates) {
-                        update.commit(writeRevision);
-                    }
-                } finally {
-                    committedRevision = writeRevision;
+                // TODO: allow committing many revisions concurrently
+                for (TransientDatabaseTable update : updates) {
+                    update.commit(h.getWriteRevision());
                 }
             } finally {
+                committedRevision = h.getWriteRevision();
+                h.commitWrites();
                 closeConnection(tx);
             }
         }
