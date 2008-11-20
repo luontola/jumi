@@ -32,67 +32,65 @@
 package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.*;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
  * @since 18.11.2008
  */
 @ThreadSafe
-public class VolatileDatabaseTable implements DatabaseTable<Blob, Blob> {
+public class TransientDatabase implements Database<Blob, Blob>, TransactionParticipant {
 
-    private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
-    private final PersistedDatabaseTable table;
-    private final long visibleRevision;
+    private final ConcurrentMap<String, TransientDatabaseTable> openTables = new ConcurrentHashMap<String, TransientDatabaseTable>();
+    private final long readRevision;
     private final Transaction tx;
+    private final PersistedDatabase db;
     private CommitHandle commitHandle;
 
-    public VolatileDatabaseTable(PersistedDatabaseTable table, long visibleRevision, Transaction tx) {
-        this.table = table;
-        this.visibleRevision = visibleRevision;
+    public TransientDatabase(PersistedDatabase db, long readRevision, Transaction tx) {
+        this.db = db;
+        this.readRevision = readRevision;
         this.tx = tx;
+        tx.join(this);
     }
 
-    public Blob read(Blob key) {
+    public long getReadRevision() {
+        return readRevision;
+    }
+
+    public IsolationLevel getIsolationLevel() {
+        return db.getIsolationLevel();
+    }
+
+    public Set<String> getTableNames() {
+        return db.getTableNames();
+    }
+
+    public DatabaseTable<Blob, Blob> openTable(String name) {
         tx.mustBeActive();
-        Blob blob = updates.get(key);
-        if (blob == null) {
-            blob = table.get(key, visibleRevision);
+        TransientDatabaseTable table = getCachedTable(name);
+        if (table == null) {
+            table = cacheNewTable(name);
         }
-        if (blob == null) {
-            blob = net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
-        }
-        return blob;
+        return table;
     }
 
-    public void update(Blob key, Blob value) {
-        tx.mustBeActive();
-        updates.put(key, value);
+    private TransientDatabaseTable getCachedTable(String name) {
+        return openTables.get(name);
     }
 
-    public void delete(Blob key) {
-        tx.mustBeActive();
-        updates.put(key, net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB);
+    private TransientDatabaseTable cacheNewTable(String name) {
+        PersistedDatabaseTable backend = db.openTable(name);
+        openTables.putIfAbsent(name, new TransientDatabaseTable(backend, readRevision, tx));
+        return getCachedTable(name);
     }
 
-    // TODO: 'firstKey' and 'nextKeyAfter' do not see keys which were created during this transaction
-
-    public Blob firstKey() {
-        tx.mustBeActive();
-        return table.firstKey();
-    }
-
-    public Blob nextKeyAfter(Blob currentKey) {
-        tx.mustBeActive();
-        return table.nextKeyAfter(currentKey);
-    }
-
-    public void prepare() {
-        commitHandle = table.prepare(updates, visibleRevision);
+    public void prepare() throws Throwable {
+        commitHandle = db.prepare(openTables.values(), tx);
     }
 
     public void commit() {

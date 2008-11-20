@@ -63,7 +63,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     // - keeps track of committed database revision (shared CommitRevisionCounter?)
     // - prepare and commit modifications (InMemoryDatabase?)
 
-    private final ConcurrentMap<Transaction, VolatileDatabase> openConnections = new ConcurrentHashMap<Transaction, VolatileDatabase>();
+    private final ConcurrentMap<Transaction, TransientDatabase> openConnections = new ConcurrentHashMap<Transaction, TransientDatabase>();
     private final Object commitLock = new Object();
 
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
@@ -105,24 +105,24 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     // Connections
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        VolatileDatabase db = getExistingConnection(tx);
+        TransientDatabase db = getExistingConnection(tx);
         if (db == null) {
             db = createNewConnection(tx);
         }
         return db;
     }
 
-    private VolatileDatabase getExistingConnection(Transaction tx) {
+    private TransientDatabase getExistingConnection(Transaction tx) {
         return openConnections.get(tx);
     }
 
-    private VolatileDatabase createNewConnection(Transaction tx) {
-        openConnections.putIfAbsent(tx, new VolatileDatabase(this, committedRevision, tx));
+    private TransientDatabase createNewConnection(Transaction tx) {
+        openConnections.putIfAbsent(tx, new TransientDatabase(this, committedRevision, tx));
         return getExistingConnection(tx);
     }
 
     private void closeConnection(Transaction tx) {
-        VolatileDatabase removed = openConnections.remove(tx);
+        TransientDatabase removed = openConnections.remove(tx);
         assert removed != null : "Tried to close connection twise: " + tx;
         purgeOldUnusedRevisions();
     }
@@ -136,8 +136,8 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     protected long getOldestUncommittedRevision() {
         long oldest = committedRevision;
-        for (VolatileDatabase db : openConnections.values()) {
-            oldest = Math.min(oldest, db.getVisibleRevision());
+        for (TransientDatabase db : openConnections.values()) {
+            oldest = Math.min(oldest, db.getReadRevision());
         }
         return oldest;
     }
@@ -163,21 +163,21 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // Transactions
 
-    public CommitHandle prepare(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+    public CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx) {
         return new MyCommitHandle(updates, tx);
     }
 
-    // TODO: move these to VolatileDatabase?
+    // TODO: move these to TransientDatabase?
 
-    private void prepareUpdates(Collection<VolatileDatabaseTable> updates) {
+    private void prepareUpdates(Collection<TransientDatabaseTable> updates) {
         synchronized (commitLock) {
-            for (VolatileDatabaseTable update : updates) {
+            for (TransientDatabaseTable update : updates) {
                 update.prepare();
             }
         }
     }
 
-    private void commitUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+    private void commitUpdates(Collection<TransientDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
             try {
                 updateRevisionAndCommit(updates);
@@ -187,10 +187,10 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         }
     }
 
-    private void updateRevisionAndCommit(Collection<VolatileDatabaseTable> updates) {
+    private void updateRevisionAndCommit(Collection<TransientDatabaseTable> updates) {
         try {
             revisionCounter.incrementRevision();
-            for (VolatileDatabaseTable update : updates) {
+            for (TransientDatabaseTable update : updates) {
                 update.commit();
             }
         } finally {
@@ -198,10 +198,10 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         }
     }
 
-    private void rollbackUpdates(Collection<VolatileDatabaseTable> updates, Transaction tx) {
+    private void rollbackUpdates(Collection<TransientDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
             try {
-                for (VolatileDatabaseTable update : updates) {
+                for (TransientDatabaseTable update : updates) {
                     update.rollback();
                 }
             } finally {
@@ -214,11 +214,11 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     @ThreadSafe
     private class MyCommitHandle implements CommitHandle {
 
-        private final Collection<VolatileDatabaseTable> updates;
+        private final Collection<TransientDatabaseTable> updates;
         private final Transaction tx;
 
-        public MyCommitHandle(Collection<VolatileDatabaseTable> updates, Transaction tx) {
-            this.updates = Collections.unmodifiableCollection(new ArrayList<VolatileDatabaseTable>(updates));
+        public MyCommitHandle(Collection<TransientDatabaseTable> updates, Transaction tx) {
+            this.updates = Collections.unmodifiableCollection(new ArrayList<TransientDatabaseTable>(updates));
             this.tx = tx;
             prepare();
         }

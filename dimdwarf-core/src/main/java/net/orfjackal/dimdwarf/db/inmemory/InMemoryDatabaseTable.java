@@ -79,12 +79,12 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
     private class MyCommitHandle implements CommitHandle {
 
         private final Map<Blob, Blob> updates;
-        private final long visibleRevision;
+        private final long readRevision;
         private final LockHandle lockHandle;
 
-        public MyCommitHandle(Map<Blob, Blob> updates, long visibleRevision) {
+        public MyCommitHandle(Map<Blob, Blob> updates, long readRevision) {
             this.updates = Collections.unmodifiableMap(new HashMap<Blob, Blob>(updates));
-            this.visibleRevision = visibleRevision;
+            this.readRevision = readRevision;
             this.lockHandle = prepare();
         }
 
@@ -107,7 +107,7 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
         private void checkForModifiedInOtherTransaction(Blob key) throws OptimisticLockException {
             long lastWrite = revisions.getLatestRevisionForKey(key);
-            if (lastWrite > visibleRevision) {
+            if (lastWrite > readRevision) {
                 throw new OptimisticLockException("Key " + key + " already modified in revision " + lastWrite);
             }
         }
