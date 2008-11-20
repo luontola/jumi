@@ -69,7 +69,7 @@ public class RevisionCounterSpec extends Specification<Object> {
             handle = counter.openNewestRevision();
         }
 
-        public void theUserGetsToReadTheNewestRevision() {
+        public void theUserGetsToReadTheNewestReadableRevision() {
             specify(handle.getReadRevision(), should.equal(0L));
         }
 
@@ -143,6 +143,11 @@ public class RevisionCounterSpec extends Specification<Object> {
         public void theReadableRevisionsAreUpdated() {
             specifyReadableRange(writeRevision, writeRevision);
         }
+
+        public void theNextUserWillGetToReadTheNewestReadableRevision() {
+            RevisionHandle handle2 = counter.openNewestRevision();
+            specify(handle2.getReadRevision(), should.equal(writeRevision));
+        }
     }
 
     public class WhenThereAreManyConcurrentUsersAccessingTheSameRevision {
@@ -196,6 +201,15 @@ public class RevisionCounterSpec extends Specification<Object> {
             specifyReadableRange(0L, 0L);
             handle1.commitWrites();
             specifyReadableRange(2L, 2L);
+        }
+
+        public void theNextUserAlwaysGetsToReadTheNewestReadableRevision() {
+            handle1.prepareForWrite();
+            handle1.commitWrites();
+            specify(counter.openNewestRevision().getReadRevision(), should.equal(1L));
+            handle2.prepareForWrite();
+            handle2.commitWrites();
+            specify(counter.openNewestRevision().getReadRevision(), should.equal(2L));
         }
     }
 }

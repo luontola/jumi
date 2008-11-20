@@ -62,7 +62,7 @@ public class RevisionCounter {
     }
 
     public RevisionHandle openNewestRevision() {
-        RevisionHandle h = new RevisionHandle(0, this);
+        RevisionHandle h = new RevisionHandle(getNewestReadableRevision(), this);
         revisionsInUse.add(h);
         return h;
     }
