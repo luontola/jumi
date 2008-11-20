@@ -35,7 +35,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface RevisionCommitHandle {
+public interface CommitHandle {
 
     void commit(long writeRevision);
 

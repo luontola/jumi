@@ -58,7 +58,7 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
         return revisions.get(key, readRevision);
     }
 
-    public RevisionCommitHandle prepare(Map<Blob, Blob> updates, long readRevision) {
+    public CommitHandle prepare(Map<Blob, Blob> updates, long readRevision) {
         return new MyCommitHandle(updates, readRevision);
     }
 
@@ -68,7 +68,7 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
 
     @ThreadSafe
-    private class MyCommitHandle implements RevisionCommitHandle {
+    private class MyCommitHandle implements CommitHandle {
 
         private final Map<Blob, Blob> updates;
         private final long readRevision;

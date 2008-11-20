@@ -45,5 +45,5 @@ public interface PersistedDatabaseTable extends IterableKeys<Blob> {
     Blob get(Blob key, long readRevision);
 
     @CheckReturnValue
-    RevisionCommitHandle prepare(Map<Blob, Blob> updates, long readRevision);
+    CommitHandle prepare(Map<Blob, Blob> updates, long readRevision);
 }

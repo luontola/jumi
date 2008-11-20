@@ -49,7 +49,7 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
     private final PersistedDatabase db;
     private final Transaction tx;
     private final RevisionHandle revisionHandle;
-    private RevisionCommitHandle commitHandle;
+    private CommitHandle commitHandle;
 
     public TransientDatabase(PersistedDatabase db, Transaction tx, RevisionHandle revisionHandle) {
         this.db = db;
@@ -94,7 +94,7 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
     }
 
     public void commit() {
-        revisionHandle.prepareForWrite();
+        revisionHandle.prepareWriteRevision();
         commitHandle.commit(revisionHandle.getWriteRevision());
         revisionHandle.commitWrites();
     }

@@ -59,17 +59,17 @@ public class RevisionHandle {
         return writeRevision;
     }
 
-    public boolean isPrepared() {
+    public boolean isWriteRevisionPrepared() {
         return writeRevision != UNDEFINED;
     }
 
-    public void prepareForWrite() {
-        assert !isPrepared();
+    public void prepareWriteRevision() {
+        assert !isWriteRevisionPrepared();
         writeRevision = controller.nextWriteRevision();
     }
 
     public void commitWrites() {
-        controller.commit(this);
+        controller.commitWrites(this);
     }
 
     public void rollback() {

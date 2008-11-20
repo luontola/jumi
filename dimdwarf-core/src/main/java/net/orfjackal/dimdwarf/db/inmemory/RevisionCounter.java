@@ -75,7 +75,7 @@ public class RevisionCounter {
         revisionsInUse.remove(handle);
     }
 
-    void commit(RevisionHandle handle) {
+    void commitWrites(RevisionHandle handle) {
         revisionsInUse.remove(handle);
         updateReadableRevisions(handle.getWriteRevision());
     }
@@ -89,7 +89,7 @@ public class RevisionCounter {
     private long getOldestCommittedRevision(long newestCommitted) {
         long oldest = newestCommitted;
         for (RevisionHandle h : revisionsInUse) {
-            if (h.isPrepared()) {
+            if (h.isWriteRevisionPrepared()) {
                 oldest = Math.min(oldest, h.getWriteRevision() - 1);
             }
         }

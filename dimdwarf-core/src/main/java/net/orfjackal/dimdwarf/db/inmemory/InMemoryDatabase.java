@@ -57,10 +57,9 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // TODO: this class smells too big/messy
     // Responsibilities:
+    // - keeps track of uncommitted database connections (InMemoryDatabaseManager?)
     // - knows which database tables exist (InMemoryDatabase?)
     // - can create new database tables (InMemoryDatabase?)
-    // - keeps track of uncommitted database connections (InMemoryDatabaseManager?)
-    // - keeps track of committed database revision (shared CommitRevisionCounter?)
     // - prepare and commit modifications (InMemoryDatabase?)
 
     private final ConcurrentMap<Transaction, TransientDatabase> openConnections = new ConcurrentHashMap<Transaction, TransientDatabase>();
@@ -146,13 +145,13 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // Transactions
 
-    public RevisionCommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx) {
+    public CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx) {
         return new MyCommitHandle(updates, tx);
     }
 
 
     @ThreadSafe
-    private class MyCommitHandle implements RevisionCommitHandle {
+    private class MyCommitHandle implements CommitHandle {
 
         private final Collection<TransientDatabaseTable> updates;
         private final Transaction tx;
@@ -166,34 +165,28 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         // TODO: move prepare/commit/rollback details to TransientDatabase?
 
         private void prepare() {
-            synchronized (commitLock) {
-                for (TransientDatabaseTable update : updates) {
-                    update.prepare();
-                }
+            for (TransientDatabaseTable update : updates) {
+                update.prepare();
             }
         }
 
         public void commit(long writeRevision) {
-            synchronized (commitLock) {
-                try {
-                    for (TransientDatabaseTable update : updates) {
-                        update.commit(writeRevision);
-                    }
-                } finally {
-                    closeConnection(tx);
+            try {
+                for (TransientDatabaseTable update : updates) {
+                    update.commit(writeRevision);
                 }
+            } finally {
+                closeConnection(tx);
             }
         }
 
         public void rollback() {
-            synchronized (commitLock) {
-                try {
-                    for (TransientDatabaseTable update : updates) {
-                        update.rollback();
-                    }
-                } finally {
-                    closeConnection(tx);
+            try {
+                for (TransientDatabaseTable update : updates) {
+                    update.rollback();
                 }
+            } finally {
+                closeConnection(tx);
             }
         }
     }

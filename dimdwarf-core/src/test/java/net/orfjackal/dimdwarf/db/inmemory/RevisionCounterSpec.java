@@ -102,7 +102,7 @@ public class RevisionCounterSpec extends Specification<Object> {
 
         public void create() {
             handle = counter.openNewestRevision();
-            handle.prepareForWrite();
+            handle.prepareWriteRevision();
             writeRevision = handle.getWriteRevision();
         }
 
@@ -131,7 +131,7 @@ public class RevisionCounterSpec extends Specification<Object> {
 
         public void create() {
             handle = counter.openNewestRevision();
-            handle.prepareForWrite();
+            handle.prepareWriteRevision();
             writeRevision = handle.getWriteRevision();
             handle.commitWrites();
         }
@@ -166,36 +166,36 @@ public class RevisionCounterSpec extends Specification<Object> {
         }
 
         public void onPrepareTheyGetDifferentWriteRevisions() {
-            handle1.prepareForWrite();
-            handle2.prepareForWrite();
+            handle1.prepareWriteRevision();
+            handle2.prepareWriteRevision();
             specify(handle1.getWriteRevision(), should.equal(1L));
             specify(handle2.getWriteRevision(), should.equal(2L));
         }
 
         public void theWriteRevisionsAreGivenInTheOrderOfPrepare() {
-            handle2.prepareForWrite();
-            handle1.prepareForWrite();
+            handle2.prepareWriteRevision();
+            handle1.prepareWriteRevision();
             specify(handle2.getWriteRevision(), should.equal(1L));
             specify(handle1.getWriteRevision(), should.equal(2L));
         }
 
         public void whenOnlyOneCommitsTheReadableRangeConsistsOfThePreviousAndTheNewRevisions() {
-            handle1.prepareForWrite();
+            handle1.prepareWriteRevision();
             handle1.commitWrites();
             specifyReadableRange(0L, 1L);
         }
 
         public void whenBothCommitTheReadableRangeConsistsOfTheNewestRevision() {
-            handle1.prepareForWrite();
+            handle1.prepareWriteRevision();
             handle1.commitWrites();
-            handle2.prepareForWrite();
+            handle2.prepareWriteRevision();
             handle2.commitWrites();
             specifyReadableRange(2L, 2L);
         }
 
         public void ifTheFirstToPrepareCommitsLastThenTheReadableRangeWillNotExposeTheNonCommittedRevision() {
-            handle1.prepareForWrite();
-            handle2.prepareForWrite();
+            handle1.prepareWriteRevision();
+            handle2.prepareWriteRevision();
             specifyReadableRange(0L, 0L);
             handle2.commitWrites();
             specifyReadableRange(0L, 0L);
@@ -204,10 +204,10 @@ public class RevisionCounterSpec extends Specification<Object> {
         }
 
         public void theNextUserAlwaysGetsToReadTheNewestReadableRevision() {
-            handle1.prepareForWrite();
+            handle1.prepareWriteRevision();
             handle1.commitWrites();
             specify(counter.openNewestRevision().getReadRevision(), should.equal(1L));
-            handle2.prepareForWrite();
+            handle2.prepareWriteRevision();
             handle2.commitWrites();
             specify(counter.openNewestRevision().getReadRevision(), should.equal(2L));
         }
