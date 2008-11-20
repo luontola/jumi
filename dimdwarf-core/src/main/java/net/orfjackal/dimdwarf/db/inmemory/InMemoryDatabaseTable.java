@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.common.*;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
 import java.util.*;
 
 /**
@@ -68,7 +68,7 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable<RevisionHan
     }
 
 
-    @ThreadSafe
+    @Immutable
     private class DbTableCommitHandle implements CommitHandle {
 
         private final Map<Blob, Blob> updates;

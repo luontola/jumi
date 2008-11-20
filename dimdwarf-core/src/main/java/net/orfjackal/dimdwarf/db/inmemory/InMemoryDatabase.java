@@ -37,7 +37,7 @@ import net.orfjackal.dimdwarf.db.common.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -148,25 +148,23 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase<Revi
     // Transactions
 
     public CommitHandle prepare(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle, Transaction tx) {
-        return new DbCommitHandle(updates, tx, handle);
+        return new DbCommitHandle(updates, handle, tx);
     }
 
 
-    @ThreadSafe
+    @Immutable
     private class DbCommitHandle implements CommitHandle {
 
         private final Collection<TransientDatabaseTable<RevisionHandle>> updates;
-        private final Transaction tx;
         private final RevisionHandle handle;
+        private final Transaction tx;
 
-        public DbCommitHandle(Collection<TransientDatabaseTable<RevisionHandle>> updates, Transaction tx, RevisionHandle handle) {
-            this.handle = handle;
+        public DbCommitHandle(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle, Transaction tx) {
             this.updates = Collections.unmodifiableCollection(new ArrayList<TransientDatabaseTable<RevisionHandle>>(updates));
+            this.handle = handle;
             this.tx = tx;
             prepare();
         }
-
-        // TODO: move prepare/commit/rollback details to TransientDatabase?
 
         private void prepare() {
             for (TransientDatabaseTable<RevisionHandle> update : updates) {
