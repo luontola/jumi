@@ -42,8 +42,8 @@ import java.util.Map;
  */
 public interface PersistedDatabaseTable extends IterableKeys<Blob> {
 
-    Blob get(Blob key, long readRevision);
+    Blob get(Blob key, RevisionHandle handle);
 
     @CheckReturnValue
-    CommitHandle prepare(Map<Blob, Blob> updates, long readRevision);
+    CommitHandle prepare(Map<Blob, Blob> updates, RevisionHandle handle);
 }

@@ -58,10 +58,6 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
         tx.join(this);
     }
 
-    public long getReadRevision() {
-        return revisionHandle.getReadRevision();
-    }
-
     public IsolationLevel getIsolationLevel() {
         return db.getIsolationLevel();
     }
@@ -85,18 +81,16 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
 
     private TransientDatabaseTable cacheNewTable(String name) {
         PersistedDatabaseTable backend = db.openTable(name);
-        openTables.putIfAbsent(name, new TransientDatabaseTable(backend, revisionHandle.getReadRevision(), tx));
+        openTables.putIfAbsent(name, new TransientDatabaseTable(backend, revisionHandle, tx));
         return getCachedTable(name);
     }
 
     public void prepare() throws Throwable {
-        commitHandle = db.prepare(openTables.values(), tx);
+        commitHandle = db.prepare(openTables.values(), tx, revisionHandle);
     }
 
     public void commit() {
-        revisionHandle.prepareWriteRevision();
-        commitHandle.commit(revisionHandle.getWriteRevision());
-        revisionHandle.commitWrites();
+        commitHandle.commit();
     }
 
     public void rollback() {

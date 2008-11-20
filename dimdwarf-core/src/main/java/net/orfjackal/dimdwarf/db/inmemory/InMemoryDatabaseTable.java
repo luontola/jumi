@@ -54,12 +54,12 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
         return revisions.nextKeyAfter(currentKey);
     }
 
-    public Blob get(Blob key, long readRevision) {
-        return revisions.get(key, readRevision);
+    public Blob get(Blob key, RevisionHandle handle) {
+        return revisions.get(key, handle.getReadRevision());
     }
 
-    public CommitHandle prepare(Map<Blob, Blob> updates, long readRevision) {
-        return new MyCommitHandle(updates, readRevision);
+    public CommitHandle prepare(Map<Blob, Blob> updates, RevisionHandle handle) {
+        return new DbTableCommitHandle(updates, handle);
     }
 
     public void purgeRevisionsOlderThan(long revisionToKeep) {
@@ -68,16 +68,16 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
 
     @ThreadSafe
-    private class MyCommitHandle implements CommitHandle {
+    private class DbTableCommitHandle implements CommitHandle {
 
         private final Map<Blob, Blob> updates;
-        private final long readRevision;
-        private final LockHandle lockHandle;
+        private final RevisionHandle handle;
+        private final LockHandle lock;
 
-        public MyCommitHandle(Map<Blob, Blob> updates, long readRevision) {
+        public DbTableCommitHandle(Map<Blob, Blob> updates, RevisionHandle handle) {
             this.updates = Collections.unmodifiableMap(new HashMap<Blob, Blob>(updates));
-            this.readRevision = readRevision;
-            this.lockHandle = prepare();
+            this.handle = handle;
+            this.lock = prepare();
         }
 
         private LockHandle prepare() {
@@ -99,29 +99,25 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable {
 
         private void checkForConcurrentModification(Blob key) throws OptimisticLockException {
             long lastWrite = revisions.getLatestRevisionForKey(key);
-            if (lastWrite > readRevision) {
+            if (lastWrite > handle.getReadRevision()) {
                 throw new OptimisticLockException("Key " + key + " already modified in revision " + lastWrite);
             }
         }
 
-        public void commit(long writeRevision) {
-            commitUpdates(writeRevision);
-            lockHandle.unlock();
-        }
-
-        private void commitUpdates(long writeRevision) {
+        public void commit() {
             for (Map.Entry<Blob, Blob> update : updates.entrySet()) {
-                commitUpdate(update.getKey(), update.getValue(), writeRevision);
+                commitUpdate(update.getKey(), update.getValue());
             }
+            lock.unlock();
         }
 
-        private void commitUpdate(Blob key, Blob value, long writeRevision) {
+        private void commitUpdate(Blob key, Blob value) {
             assert keysLockedForCommit.isLocked(key);
-            revisions.put(key, value, writeRevision);
+            revisions.put(key, value, handle.getWriteRevision());
         }
 
         public void rollback() {
-            lockHandle.unlock();
+            lock.unlock();
         }
     }
 }

@@ -63,8 +63,6 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     // - prepare and commit modifications (InMemoryDatabase?)
 
     private final ConcurrentMap<Transaction, TransientDatabase> openConnections = new ConcurrentHashMap<Transaction, TransientDatabase>();
-    private final Object commitLock = new Object();
-
     private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
     private final RevisionCounter revisionCounter = new RevisionCounter();
 
@@ -145,18 +143,20 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // Transactions
 
-    public CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx) {
-        return new MyCommitHandle(updates, tx);
+    public CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx, RevisionHandle handle) {
+        return new DbCommitHandle(updates, tx, handle);
     }
 
 
     @ThreadSafe
-    private class MyCommitHandle implements CommitHandle {
+    private class DbCommitHandle implements CommitHandle {
 
         private final Collection<TransientDatabaseTable> updates;
         private final Transaction tx;
+        private final RevisionHandle handle;
 
-        public MyCommitHandle(Collection<TransientDatabaseTable> updates, Transaction tx) {
+        public DbCommitHandle(Collection<TransientDatabaseTable> updates, Transaction tx, RevisionHandle handle) {
+            this.handle = handle;
             this.updates = Collections.unmodifiableCollection(new ArrayList<TransientDatabaseTable>(updates));
             this.tx = tx;
             prepare();
@@ -170,12 +170,14 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
             }
         }
 
-        public void commit(long writeRevision) {
+        public void commit() {
             try {
+                handle.prepareWriteRevision();
                 for (TransientDatabaseTable update : updates) {
-                    update.commit(writeRevision);
+                    update.commit();
                 }
             } finally {
+                handle.commitWrites();
                 closeConnection(tx);
             }
         }
@@ -186,6 +188,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
                     update.rollback();
                 }
             } finally {
+                handle.rollback();
                 closeConnection(tx);
             }
         }

@@ -47,13 +47,13 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
 
     private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
     private final PersistedDatabaseTable table;
-    private final long readRevision;
+    private final RevisionHandle revisionHandle;
     private final Transaction tx;
     private CommitHandle commitHandle;
 
-    public TransientDatabaseTable(PersistedDatabaseTable table, long readRevision, Transaction tx) {
+    public TransientDatabaseTable(PersistedDatabaseTable table, RevisionHandle revisionHandle, Transaction tx) {
         this.table = table;
-        this.readRevision = readRevision;
+        this.revisionHandle = revisionHandle;
         this.tx = tx;
     }
 
@@ -61,10 +61,10 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
         tx.mustBeActive();
         Blob blob = updates.get(key);
         if (blob == null) {
-            blob = table.get(key, readRevision);
+            blob = table.get(key, revisionHandle);
         }
         if (blob == null) {
-            blob = net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
+            blob = Blob.EMPTY_BLOB;
         }
         return blob;
     }
@@ -76,7 +76,7 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
 
     public void delete(Blob key) {
         tx.mustBeActive();
-        updates.put(key, net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB);
+        updates.put(key, Blob.EMPTY_BLOB);
     }
 
     // TODO: 'firstKey' and 'nextKeyAfter' do not see keys which were created during this transaction
@@ -92,11 +92,11 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
     }
 
     public void prepare() {
-        commitHandle = table.prepare(updates, readRevision);
+        commitHandle = table.prepare(updates, revisionHandle);
     }
 
-    public void commit(long writeRevision) {
-        commitHandle.commit(writeRevision);
+    public void commit() {
+        commitHandle.commit();
     }
 
     public void rollback() {

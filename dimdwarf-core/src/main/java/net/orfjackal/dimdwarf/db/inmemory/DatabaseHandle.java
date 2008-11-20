@@ -33,50 +33,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 /**
  * @author Esko Luontola
- * @since 20.11.2008
+ * @since 21.11.2008
  */
-public class RevisionHandle implements DatabaseHandle {
-
-    private static final long UNDEFINED = RevisionCounter.FIRST_REVISION - 1;
-
-    private final RevisionCounter controller;
-    private final long readRevision;
-    private long writeRevision = UNDEFINED;
-
-    public RevisionHandle(long readRevision, RevisionCounter controller) {
-        this.readRevision = readRevision;
-        this.controller = controller;
-    }
-
-    public long getReadRevision() {
-        return readRevision;
-    }
-
-    public long getWriteRevision() {
-        if (writeRevision == UNDEFINED) {
-            throw new IllegalStateException("Not prepared");
-        }
-        return writeRevision;
-    }
-
-    public boolean isWriteRevisionPrepared() {
-        return writeRevision != UNDEFINED;
-    }
-
-    public void prepareWriteRevision() {
-        assert !isWriteRevisionPrepared();
-        writeRevision = controller.nextWriteRevision();
-    }
-
-    public void commitWrites() {
-        controller.commitWrites(this);
-    }
-
-    public void rollback() {
-        controller.rollback(this);
-    }
-
-    public String toString() {
-        return getClass().getSimpleName() + "[read=" + readRevision + ",write=" + writeRevision + "]";
-    }
+public interface DatabaseHandle {
 }

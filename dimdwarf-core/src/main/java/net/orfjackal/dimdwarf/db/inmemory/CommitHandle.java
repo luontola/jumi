@@ -37,7 +37,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
  */
 public interface CommitHandle {
 
-    void commit(long writeRevision);
+    void commit();
 
     void rollback();
 }
