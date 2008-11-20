@@ -31,7 +31,11 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import org.jetbrains.annotations.TestOnly;
+
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -41,21 +45,79 @@ import java.util.concurrent.atomic.AtomicLong;
 @ThreadSafe
 public class RevisionCounter {
 
-    private final AtomicLong currentRevision = new AtomicLong();
+    public static final int FIRST_REVISION = 0;
 
-    public long getCurrentRevision() {
-        return checkForOverflow(currentRevision.get());
+    private final Collection<RevisionHandle> revisionsInUse = new ConcurrentLinkedQueue<RevisionHandle>();
+    private final AtomicLong writeRevision = new AtomicLong(FIRST_REVISION);
+    private volatile long oldestReadableRevision = FIRST_REVISION;
+    private volatile long newestReadableRevision = FIRST_REVISION;
+    private volatile long newestCommittedRevision = FIRST_REVISION;
+
+    public long getOldestReadableRevision() {
+        return oldestReadableRevision;
     }
 
-    public long nextRevision() {
-        return checkForOverflow(currentRevision.incrementAndGet());
+    public long getNewestReadableRevision() {
+        return newestReadableRevision;
+    }
+
+    public RevisionHandle openNewestRevision() {
+        RevisionHandle h = new RevisionHandle(0, this);
+        revisionsInUse.add(h);
+        return h;
+    }
+
+    long nextWriteRevision() {
+        return checkForOverflow(writeRevision.incrementAndGet());
+    }
+
+    void rollback(RevisionHandle handle) {
+        revisionsInUse.remove(handle);
+    }
+
+    void commit(RevisionHandle handle) {
+        revisionsInUse.remove(handle);
+        updateReadableRevisions(handle.getWriteRevision());
+    }
+
+    private synchronized void updateReadableRevisions(long currentlyCommittedRevision) {
+        newestCommittedRevision = Math.max(newestCommittedRevision, currentlyCommittedRevision);
+        newestReadableRevision = getOldestCommittedRevision(newestCommittedRevision);
+        oldestReadableRevision = getOldestRevisionInUse(newestCommittedRevision);
+    }
+
+    private long getOldestCommittedRevision(long newestCommitted) {
+        long oldest = newestCommitted;
+        for (RevisionHandle h : revisionsInUse) {
+            if (h.isPrepared()) {
+                oldest = Math.min(oldest, h.getWriteRevision() - 1);
+            }
+        }
+        return oldest;
+    }
+
+    private long getOldestRevisionInUse(long newestCommitted) {
+        long oldest = newestCommitted;
+        for (RevisionHandle h : revisionsInUse) {
+            oldest = Math.min(oldest, h.getReadRevision());
+        }
+        return oldest;
     }
 
     private static long checkForOverflow(long x) {
         // TODO: any good ideas on how to allow the revisions to loop freely?
-        if (x < 0) {
+        if (x < FIRST_REVISION) {
             throw new Error("Numeric overflow has happened");
         }
         return x;
+    }
+
+    @TestOnly
+    Collection<Long> getRevisionsInUse() {
+        ArrayList<Long> revisions = new ArrayList<Long>();
+        for (RevisionHandle h : revisionsInUse) {
+            revisions.add(h.getReadRevision());
+        }
+        return Collections.unmodifiableCollection(revisions);
     }
 }
