@@ -134,12 +134,12 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             specify(dbms.getCurrentRevision(), should.equal(2));
         }
 
-        public void databaseKeepsTrackOfTheOldestUncommittedRevision() {
-            specify(dbms.getOldestUncommittedRevision(), should.equal(0));
+        public void databaseKeepsTrackOfTheOldestRevisionInUse() {
+            specify(dbms.getOldestRevisionInUse(), should.equal(0));
             tx1.prepareAndCommit();
-            specify(dbms.getOldestUncommittedRevision(), should.equal(0));
+            specify(dbms.getOldestRevisionInUse(), should.equal(0));
             tx2.prepareAndCommit();
-            specify(dbms.getOldestUncommittedRevision(), should.equal(2));
+            specify(dbms.getOldestRevisionInUse(), should.equal(2));
         }
     }
 

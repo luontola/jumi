@@ -50,5 +50,5 @@ public interface PersistedDatabase {
     PersistedDatabaseTable openTable(String name);
 
     @CheckReturnValue
-    TxCommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx);
+    RevisionCommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx);
 }

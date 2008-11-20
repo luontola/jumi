@@ -46,20 +46,20 @@ import java.util.concurrent.*;
 public class TransientDatabase implements Database<Blob, Blob>, TransactionParticipant {
 
     private final ConcurrentMap<String, TransientDatabaseTable> openTables = new ConcurrentHashMap<String, TransientDatabaseTable>();
-    private final long readRevision;
-    private final Transaction tx;
     private final PersistedDatabase db;
-    private TxCommitHandle commitHandle;
+    private final Transaction tx;
+    private final RevisionHandle revisionHandle;
+    private RevisionCommitHandle commitHandle;
 
-    public TransientDatabase(PersistedDatabase db, long readRevision, Transaction tx) {
+    public TransientDatabase(PersistedDatabase db, Transaction tx, RevisionHandle revisionHandle) {
         this.db = db;
-        this.readRevision = readRevision;
         this.tx = tx;
+        this.revisionHandle = revisionHandle;
         tx.join(this);
     }
 
     public long getReadRevision() {
-        return readRevision;
+        return revisionHandle.getReadRevision();
     }
 
     public IsolationLevel getIsolationLevel() {
@@ -85,7 +85,7 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
 
     private TransientDatabaseTable cacheNewTable(String name) {
         PersistedDatabaseTable backend = db.openTable(name);
-        openTables.putIfAbsent(name, new TransientDatabaseTable(backend, readRevision, tx));
+        openTables.putIfAbsent(name, new TransientDatabaseTable(backend, revisionHandle.getReadRevision(), tx));
         return getCachedTable(name);
     }
 
@@ -94,7 +94,9 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
     }
 
     public void commit() {
-        commitHandle.commit();
+        revisionHandle.prepareForWrite();
+        commitHandle.commit(revisionHandle.getWriteRevision());
+        revisionHandle.commitWrites();
     }
 
     public void rollback() {
