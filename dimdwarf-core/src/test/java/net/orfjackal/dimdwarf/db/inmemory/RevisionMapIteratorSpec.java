@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
@@ -47,64 +45,62 @@ import java.util.*;
 @Group({"fast"})
 public class RevisionMapIteratorSpec extends Specification<Object> {
 
-    private RevisionMap<String, String> map;
-    private RevisionCounter counter;
+    private RevisionMap<String, String> map = new RevisionMap<String, String>();
+    private List<String> keys = new ArrayList<String>();
+    private List<String> values = new ArrayList<String>();
 
-    public void create() throws Exception {
-        counter = new RevisionCounter();
-        map = new RevisionMap<String, String>(counter);
+    private void readFully(long readRevision) {
+        Iterator<Map.Entry<String, String>> it = new RevisionMapIterator<String, String>(map, readRevision);
+        while (it.hasNext()) {
+            Map.Entry<String, String> e = it.next();
+            keys.add(e.getKey());
+            values.add(e.getValue());
+        }
     }
 
 
     public class IteratingOverARevision {
 
-        private List<String> keys = new ArrayList<String>();
-        private List<String> values = new ArrayList<String>();
-        private long revision;
+        private long writeRevision;
+        private long readRevision;
 
         public void create() {
-            counter.incrementRevision();
-            map.put("a", "AA");
-            map.put("b", "BB");
-            map.put("c", "X");
-            counter.incrementRevision();
-            map.remove("c");
-            revision = counter.getCurrentRevision();
-            counter.incrementRevision();
-            map.put("b", "Y");
-        }
+            writeRevision = 1;
+            map.put("a", "AA", writeRevision);
+            map.put("b", "BB", writeRevision);
+            map.put("c", "X", writeRevision);
 
-        private void readFully(long revision) {
-            Iterator<Map.Entry<String, String>> it = new RevisionMapIterator<String, String>(map, revision);
-            while (it.hasNext()) {
-                Map.Entry<String, String> e = it.next();
-                keys.add(e.getKey());
-                values.add(e.getValue());
-            }
+            writeRevision++;
+            map.remove("c", writeRevision);
+            readRevision = writeRevision;
+
+            writeRevision++;
+            map.put("b", "Y", writeRevision);
         }
 
         public void iteratesOverAllValuesInTheRevision() {
-            readFully(revision);
+            readFully(readRevision);
             specify(keys, should.containInPartialOrder("a", "b"));
             specify(values, should.containInPartialOrder("AA", "BB"));
         }
 
         public void doesNotIterateOverValuesOfOtherRevisions() {
-            readFully(revision);
+            readFully(readRevision);
             specify(keys, should.not().contain("c"));
             specify(values, should.not().contain("X"));
             specify(values, should.not().contain("Y"));
         }
 
         public void concurrentModificationInOtherTransactionsIsAllowed() {
-            Iterator<Map.Entry<String, String>> it = new RevisionMapIterator<String, String>(map, revision);
-            map.put("newkey", "Z");
+            Iterator<Map.Entry<String, String>> it = new RevisionMapIterator<String, String>(map, readRevision);
+            assert writeRevision > readRevision;
+            map.put("newkey", "Z", writeRevision);
             specify(it.hasNext()); // should not throw ConcurrentModificationException
-            specify(it.next(), should.not().equal(null));
+            specify(it.next(), should.not().equal(null)); // the above modification can not be seen in older revisions
         }
 
         public void iteratorStopsWhenAllValuesHaveBeenIterated() {
-            final Iterator<Map.Entry<String, String>> it = new RevisionMapIterator<String, String>(map, revision);
+            final Iterator<Map.Entry<String, String>> it = new RevisionMapIterator<String, String>(map, readRevision);
             specify(it.hasNext());
             it.next();
             specify(it.hasNext());

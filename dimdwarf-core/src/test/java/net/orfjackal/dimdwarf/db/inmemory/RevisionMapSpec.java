@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
@@ -45,41 +43,11 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class RevisionMapSpec extends Specification<Object> {
 
-    private RevisionMap<String, String> map;
-    private RevisionCounter counter;
+    private static final long FIRST_REVISION = 0;
 
-    public void create() throws Exception {
-        counter = new RevisionCounter();
-        map = new RevisionMap<String, String>(counter);
-    }
+    private RevisionMap<String, String> map = new RevisionMap<String, String>();
+    private long writeRevision = FIRST_REVISION;
 
-    public class RevisionsOfARevisionMap {
-
-        public void startsFromFirstRevision() {
-            specify(counter.getCurrentRevision(), should.equal(0));
-            specify(map.getOldestRevision(), should.equal(0));
-        }
-
-        public void increasesCurrentRevisionOnIncrement() {
-            counter.incrementRevision();
-            specify(counter.getCurrentRevision(), should.equal(1));
-            specify(map.getOldestRevision(), should.equal(0));
-        }
-
-        public void increasesOldestRevisionOnPurge() {
-            counter.incrementRevision();
-            map.purgeRevisionsOlderThan(1);
-            specify(counter.getCurrentRevision(), should.equal(1));
-            specify(map.getOldestRevision(), should.equal(1));
-        }
-
-        public void oldestRevisionIsAtMostTheCurrentRevision() {
-            counter.incrementRevision();
-            map.purgeRevisionsOlderThan(2);
-            specify(counter.getCurrentRevision(), should.equal(1));
-            specify(map.getOldestRevision(), should.equal(1));
-        }
-    }
 
     public class AnEmptyRevisionMap {
 
@@ -88,18 +56,35 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void doesNotContainAnyValues() {
-            specify(map.get("key", counter.getCurrentRevision()), should.equal(null));
+            specify(map.get("key", 0), should.equal(null));
+        }
+
+        public void valuesCanBeAddedToOnlyPositiveRevisions() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    map.put("key", "value", -1);
+                }
+            }, should.raise(IllegalArgumentException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    map.put("key", "value", 0);
+                }
+            }, should.raise(IllegalArgumentException.class));
+            map.put("key", "value", 1);
         }
     }
 
     public class WhenAValueIsAdded {
 
-        private long revision;
+        private long beforeAdd;
+        private long afterAdd;
 
         public void create() {
-            counter.incrementRevision();
-            map.put("key", "value");
-            revision = counter.getCurrentRevision();
+            beforeAdd = writeRevision;
+
+            writeRevision++;
+            map.put("key", "value", writeRevision);
+            afterAdd = writeRevision;
         }
 
         public void theMapIsNotEmpty() {
@@ -107,21 +92,21 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void theValueExistsOnCurrentRevision() {
-            specify(map.get("key", revision), should.equal("value"));
+            specify(map.get("key", afterAdd), should.equal("value"));
         }
 
         public void theValueExistsOnFutureRevisions() {
-            specify(map.get("key", revision + 1), should.equal("value"));
+            specify(map.get("key", afterAdd + 1), should.equal("value"));
         }
 
-        public void theValueDoesNotExistOnPreviousRevision() {
-            specify(map.get("key", revision - 1), should.equal(null));
+        public void theValueDoesNotExistOnPreviousRevisions() {
+            specify(map.get("key", beforeAdd), should.equal(null));
         }
 
         public void theOnlyRevisionOfAValueCanNotBePurged() {
-            map.purgeRevisionsOlderThan(revision + 1);
+            map.purgeRevisionsOlderThan(afterAdd + 1);
             specify(map.size(), should.equal(1));
-            specify(map.get("key", revision), should.equal("value"));
+            specify(map.get("key", afterAdd), should.equal("value"));
         }
     }
 
@@ -131,13 +116,13 @@ public class RevisionMapSpec extends Specification<Object> {
         private long afterUpdate;
 
         public void create() {
-            counter.incrementRevision();
-            map.put("key", "old");
-            beforeUpdate = counter.getCurrentRevision();
+            writeRevision++;
+            map.put("key", "old", writeRevision);
+            beforeUpdate = writeRevision;
 
-            counter.incrementRevision();
-            map.put("key", "new");
-            afterUpdate = counter.getCurrentRevision();
+            writeRevision++;
+            map.put("key", "new", writeRevision);
+            afterUpdate = writeRevision;
         }
 
         public void theValueNewValueExistsInTheCurrentRevision() {
@@ -151,10 +136,25 @@ public class RevisionMapSpec extends Specification<Object> {
         public void aValueCanNotBeUpdatedTwiseDuringTheSameRevision() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    map.put("key", "even newer");
+                    map.put("key", "even newer", afterUpdate);
                 }
-            }, should.raise(IllegalArgumentException.class));
+            }, should.raise(IllegalArgumentException.class, "Key key already modified in revision " + afterUpdate));
             specify(map.get("key", afterUpdate), should.equal("new"));
+        }
+
+        public void aValueCanNotBeUpdatedDuringAnOlderRevision() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    map.put("key", "old revision", beforeUpdate);
+                }
+            }, should.raise(IllegalArgumentException.class, "Key key already modified in revision " + afterUpdate));
+            specify(map.get("key", afterUpdate), should.equal("new"));
+        }
+
+        public void aDifferentValueCanBeUpdatedDuringAnOlderRevision() {
+            map.put("key2", "new2", beforeUpdate);
+            specify(map.get("key2", beforeUpdate), should.equal("new2"));
+            specify(map.get("key2", afterUpdate), should.equal("new2"));
         }
 
         public void theOldValueCanBePurged() {
@@ -174,12 +174,13 @@ public class RevisionMapSpec extends Specification<Object> {
         private long afterRemove;
 
         public void create() {
-            counter.incrementRevision();
-            map.put("key", "value");
-            beforeRemove = counter.getCurrentRevision();
-            counter.incrementRevision();
-            map.remove("key");
-            afterRemove = counter.getCurrentRevision();
+            writeRevision++;
+            map.put("key", "value", writeRevision);
+            beforeRemove = writeRevision;
+
+            writeRevision++;
+            map.remove("key", writeRevision);
+            afterRemove = writeRevision;
         }
 
         public void theValueDoesNotExistInTheCurrentRevision() {
@@ -204,9 +205,9 @@ public class RevisionMapSpec extends Specification<Object> {
     public class FindingTheNextKey {
 
         public void create() {
-            counter.incrementRevision();
-            map.put("a", "A");
-            map.put("c", "C");
+            writeRevision++;
+            map.put("a", "A", writeRevision);
+            map.put("c", "C", writeRevision);
         }
 
         public void firstKey() {
@@ -214,7 +215,7 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void firstKeyOfEmptySet() {
-            map = new RevisionMap<String, String>(counter);
+            map = new RevisionMap<String, String>();
             specify(map.firstKey(), should.equal(null));
         }
 

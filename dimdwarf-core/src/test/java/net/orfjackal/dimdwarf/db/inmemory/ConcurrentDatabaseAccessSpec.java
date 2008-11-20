@@ -141,14 +141,6 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             tx2.prepareAndCommit();
             specify(dbms.getOldestUncommittedRevision(), should.equal(2));
         }
-
-        public void databasePurgesOldRevisionsRegularly() {
-            specify(dbms.getOldestStoredRevision(), should.equal(0));
-            tx1.prepareAndCommit();
-            specify(dbms.getOldestStoredRevision(), should.equal(0));
-            tx2.prepareAndCommit();
-            specify(dbms.getOldestStoredRevision(), should.equal(2));
-        }
     }
 
     public class WhenEntryIsCreatedInATransaction {
@@ -305,10 +297,8 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             specify(readInNewTransaction(key), should.equal(value1));
         }
 
-        /**
-         * Checks that InMemoryDatabaseTable releases its commit locks if there is a modification conflict.
-         */
         public void theKeyMayBeUpdatedInALaterTransaction() {
+            // Checks that InMemoryDatabaseTable releases its commit locks if there is a modification conflict.
             tx1PreparesAndCommitsBeforeTx2();
             updateInNewTransaction(key, value2);
             specify(readInNewTransaction(key), should.equal(value2));

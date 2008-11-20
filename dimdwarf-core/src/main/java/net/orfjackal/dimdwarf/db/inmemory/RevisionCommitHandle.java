@@ -31,19 +31,13 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.*;
-
-import javax.annotation.CheckReturnValue;
-import java.util.Map;
-
 /**
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface PersistedDatabaseTable extends IterableKeys<Blob> {
+public interface RevisionCommitHandle {
 
-    Blob get(Blob key, long readRevision);
+    void commit(long writeRevision);
 
-    @CheckReturnValue
-    RevisionCommitHandle prepare(Map<Blob, Blob> updates, long readRevision);
+    void rollback();
 }

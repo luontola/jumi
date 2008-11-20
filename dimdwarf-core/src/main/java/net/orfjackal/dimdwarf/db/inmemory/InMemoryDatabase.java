@@ -98,7 +98,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     }
 
     private PersistedDatabaseTable createNewTable(String name) {
-        tables.putIfAbsent(name, new InMemoryDatabaseTable(revisionCounter));
+        tables.putIfAbsent(name, new InMemoryDatabaseTable());
         return getExistingTable(name);
     }
 
@@ -152,18 +152,9 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         return committedRevision;
     }
 
-    @TestOnly
-    long getOldestStoredRevision() {
-        long oldest = revisionCounter.getCurrentRevision();
-        for (InMemoryDatabaseTable table : tables.values()) {
-            oldest = Math.min(oldest, table.getOldestRevision());
-        }
-        return oldest;
-    }
-
     // Transactions
 
-    public CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx) {
+    public TxCommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx) {
         return new MyCommitHandle(updates, tx);
     }
 
@@ -180,21 +171,18 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     private void commitUpdates(Collection<TransientDatabaseTable> updates, Transaction tx) {
         synchronized (commitLock) {
             try {
-                updateRevisionAndCommit(updates);
+                long writeRevision = revisionCounter.nextRevision();
+                try {
+                    // TODO: allow committing many revisions concurrently
+                    for (TransientDatabaseTable update : updates) {
+                        update.commit(writeRevision);
+                    }
+                } finally {
+                    committedRevision = writeRevision;
+                }
             } finally {
                 closeConnection(tx);
             }
-        }
-    }
-
-    private void updateRevisionAndCommit(Collection<TransientDatabaseTable> updates) {
-        try {
-            revisionCounter.incrementRevision();
-            for (TransientDatabaseTable update : updates) {
-                update.commit();
-            }
-        } finally {
-            committedRevision = revisionCounter.getCurrentRevision();
         }
     }
 
@@ -212,7 +200,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
 
     @ThreadSafe
-    private class MyCommitHandle implements CommitHandle {
+    private class MyCommitHandle implements TxCommitHandle {
 
         private final Collection<TransientDatabaseTable> updates;
         private final Transaction tx;

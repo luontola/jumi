@@ -35,7 +35,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface CommitHandle {
+public interface TxCommitHandle {
 
     void commit();
 

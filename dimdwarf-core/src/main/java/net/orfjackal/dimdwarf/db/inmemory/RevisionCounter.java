@@ -47,15 +47,15 @@ public class RevisionCounter {
         return checkForOverflow(currentRevision.get());
     }
 
+    public long nextRevision() {
+        return checkForOverflow(currentRevision.incrementAndGet());
+    }
+
     private static long checkForOverflow(long x) {
         // TODO: any good ideas on how to allow the revisions to loop freely?
         if (x < 0) {
             throw new Error("Numeric overflow has happened");
         }
         return x;
-    }
-
-    public void incrementRevision() {
-        currentRevision.getAndIncrement();
     }
 }

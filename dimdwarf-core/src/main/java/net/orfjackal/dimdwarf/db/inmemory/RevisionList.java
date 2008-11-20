@@ -52,6 +52,9 @@ public class RevisionList<T> {
     }
 
     public RevisionList(long revision, @Nullable T value, @Nullable RevisionList<T> previous) {
+        if (revision <= 0) {
+            throw new IllegalArgumentException("Revision must be positive: " + revision);
+        }
         this.revision = revision;
         this.value = value;
         this.previous = previous;
@@ -76,7 +79,7 @@ public class RevisionList<T> {
         }
     }
 
-    public long latestRevision() {
+    public long getLatestRevision() {
         return revision;
     }
 

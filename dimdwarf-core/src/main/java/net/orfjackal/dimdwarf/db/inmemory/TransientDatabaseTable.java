@@ -49,7 +49,7 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
     private final PersistedDatabaseTable table;
     private final long readRevision;
     private final Transaction tx;
-    private CommitHandle commitHandle;
+    private RevisionCommitHandle commitHandle;
 
     public TransientDatabaseTable(PersistedDatabaseTable table, long readRevision, Transaction tx) {
         this.table = table;
@@ -95,8 +95,8 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
         commitHandle = table.prepare(updates, readRevision);
     }
 
-    public void commit() {
-        commitHandle.commit();
+    public void commit(long writeRevision) {
+        commitHandle.commit(writeRevision);
     }
 
     public void rollback() {

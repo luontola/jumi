@@ -39,16 +39,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
- * Map which keeps track of its modification history. Within one revision, each key may be modified only once.
- * The {@link RevisionCounter#incrementRevision()} method of the injected counter must be called between every
- * group of modifications. Once the revision is incremented, the values in older revisions can not be changed.
+ * Map which keeps track of its modification history. Can be used to implement multiversion concurrency control.
  * <p/>
- * The old revisions can be purged with {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure
- * that those revisions will not be accessed. The revision system used by this class was inspired by Subversion.
- * <p/>
- * See:
- * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
- * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
+ * When a key is modified using revision X, the next time that same key is modified the revision must be greater
+ * than X. Modifying other keys concurrently in older revisions is allowed. The old revisions can be purged with
+ * {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure that those revisions will not be
+ * accessed.
  *
  * @author Esko Luontola
  * @since 20.8.2008
@@ -59,31 +55,24 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
     private final SortedMap<K, RevisionList<V>> map = new ConcurrentSkipListMap<K, RevisionList<V>>();
     private final Set<K> hasOldRevisions = new HashSet<K>();
     private final Object writeLock = new Object();
-    private final RevisionCounter counter;
-    private volatile long oldestRevision = 0;
-
-    public RevisionMap(RevisionCounter counter) {
-        this.counter = counter;
-    }
 
     @Nullable
-    public V get(K key, long revision) {
+    public V get(K key, long readRevision) {
+        assert readRevision >= 0;
         RevisionList<V> revs = map.get(key);
-        return revs != null ? revs.get(revision) : null;
+        return revs != null ? revs.get(readRevision) : null;
     }
 
     public long getLatestRevisionForKey(K key) {
         RevisionList<V> revs = map.get(key);
-        return revs != null ? revs.latestRevision() : counter.getCurrentRevision();
+        return revs != null ? revs.getLatestRevision() : 0;
     }
 
-    public void put(K key, @Nullable V value) {
+    public void put(K key, @Nullable V value, long writeRevision) {
         synchronized (writeLock) {
             RevisionList<V> previous = map.get(key);
-            if (previous != null && previous.latestRevision() == counter.getCurrentRevision()) {
-                throw new IllegalArgumentException("Key already set in this revision: " + key);
-            }
-            RevisionList<V> updated = new RevisionList<V>(counter.getCurrentRevision(), value, previous);
+            checkForConcurrentModification(writeRevision, key, previous);
+            RevisionList<V> updated = new RevisionList<V>(writeRevision, value, previous);
             map.put(key, updated);
             if (previous != null) {
                 hasOldRevisions.add(key);
@@ -91,8 +80,15 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
         }
     }
 
-    public void remove(K key) {
-        put(key, null);
+    private static <K, V> void checkForConcurrentModification(long writeRevision, K key, @Nullable RevisionList<V> previous) {
+        long lastWrite = previous != null ? previous.getLatestRevision() : 0;
+        if (lastWrite >= writeRevision) {
+            throw new IllegalArgumentException("Key " + key + " already modified in revision " + lastWrite);
+        }
+    }
+
+    public void remove(K key, long writeRevision) {
+        put(key, null, writeRevision);
     }
 
     // TODO: add support for purging sparse revisions, i.e. purgeRevisionsOtherThan(long... revisionsToKeep)
@@ -100,14 +96,11 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
 
     public void purgeRevisionsOlderThan(long revisionToKeep) {
         synchronized (writeLock) {
-            revisionToKeep = Math.min(revisionToKeep, counter.getCurrentRevision());
-            oldestRevision = Math.max(revisionToKeep, oldestRevision);
-
             for (Iterator<K> purgeQueueIter = hasOldRevisions.iterator(); purgeQueueIter.hasNext();) {
                 K key = purgeQueueIter.next();
                 RevisionList<V> value = map.get(key);
 
-                value.purgeRevisionsOlderThan(oldestRevision);
+                value.purgeRevisionsOlderThan(revisionToKeep);
                 if (!value.hasOldRevisions()) {
                     purgeQueueIter.remove();
                 }
@@ -120,10 +113,6 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
 
     public int size() {
         return map.size();
-    }
-
-    public long getOldestRevision() {
-        return oldestRevision;
     }
 
     public K firstKey() {

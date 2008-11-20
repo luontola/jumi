@@ -49,7 +49,7 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
     private final long readRevision;
     private final Transaction tx;
     private final PersistedDatabase db;
-    private CommitHandle commitHandle;
+    private TxCommitHandle commitHandle;
 
     public TransientDatabase(PersistedDatabase db, long readRevision, Transaction tx) {
         this.db = db;

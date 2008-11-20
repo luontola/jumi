@@ -43,13 +43,13 @@ import java.util.*;
 public class RevisionMapIterator<K, V> implements Iterator<Map.Entry<K, V>> {
 
     private final RevisionMap<K, V> map;
-    private final long revision;
+    private final long readRevision;
     @Nullable private Map.Entry<K, V> fetchedNext;
     @Nullable private K nextKey;
 
-    public RevisionMapIterator(RevisionMap<K, V> map, long revision) {
+    public RevisionMapIterator(RevisionMap<K, V> map, long readRevision) {
         this.map = map;
-        this.revision = revision;
+        this.readRevision = readRevision;
         nextKey = map.firstKey();
     }
 
@@ -70,7 +70,7 @@ public class RevisionMapIterator<K, V> implements Iterator<Map.Entry<K, V>> {
     private void fetchNext() {
         while (fetchedNext == null && nextKey != null) {
             K key = nextKey;
-            V value = map.get(key, revision);
+            V value = map.get(key, readRevision);
             nextKey = map.nextKeyAfter(key);
             if (value != null) {
                 fetchedNext = new MyEntry<K, V>(key, value);
