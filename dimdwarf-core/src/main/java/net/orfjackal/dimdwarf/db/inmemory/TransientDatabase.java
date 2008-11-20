@@ -43,18 +43,18 @@ import java.util.concurrent.*;
  * @since 18.11.2008
  */
 @ThreadSafe
-public class TransientDatabase implements Database<Blob, Blob>, TransactionParticipant {
+public class TransientDatabase<H> implements Database<Blob, Blob>, TransactionParticipant {
 
-    private final ConcurrentMap<String, TransientDatabaseTable> openTables = new ConcurrentHashMap<String, TransientDatabaseTable>();
-    private final PersistedDatabase db;
+    private final ConcurrentMap<String, TransientDatabaseTable<H>> openTables = new ConcurrentHashMap<String, TransientDatabaseTable<H>>();
+    private final PersistedDatabase<H> db;
+    private final H dbHandle;
     private final Transaction tx;
-    private final RevisionHandle revisionHandle;
     private CommitHandle commitHandle;
 
-    public TransientDatabase(PersistedDatabase db, Transaction tx, RevisionHandle revisionHandle) {
+    public TransientDatabase(PersistedDatabase<H> db, H dbHandle, Transaction tx) {
         this.db = db;
+        this.dbHandle = dbHandle;
         this.tx = tx;
-        this.revisionHandle = revisionHandle;
         tx.join(this);
     }
 
@@ -68,25 +68,25 @@ public class TransientDatabase implements Database<Blob, Blob>, TransactionParti
 
     public DatabaseTable<Blob, Blob> openTable(String name) {
         tx.mustBeActive();
-        TransientDatabaseTable table = getCachedTable(name);
+        TransientDatabaseTable<H> table = getCachedTable(name);
         if (table == null) {
             table = cacheNewTable(name);
         }
         return table;
     }
 
-    private TransientDatabaseTable getCachedTable(String name) {
+    private TransientDatabaseTable<H> getCachedTable(String name) {
         return openTables.get(name);
     }
 
-    private TransientDatabaseTable cacheNewTable(String name) {
-        PersistedDatabaseTable backend = db.openTable(name);
-        openTables.putIfAbsent(name, new TransientDatabaseTable(backend, revisionHandle, tx));
+    private TransientDatabaseTable<H> cacheNewTable(String name) {
+        PersistedDatabaseTable<H> backend = db.openTable(name);
+        openTables.putIfAbsent(name, new TransientDatabaseTable<H>(backend, dbHandle, tx));
         return getCachedTable(name);
     }
 
     public void prepare() throws Throwable {
-        commitHandle = db.prepare(openTables.values(), tx, revisionHandle);
+        commitHandle = db.prepare(openTables.values(), dbHandle, tx);
     }
 
     public void commit() {

@@ -41,14 +41,14 @@ import java.util.*;
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface PersistedDatabase {
+public interface PersistedDatabase<H> {
 
     IsolationLevel getIsolationLevel();
 
     Set<String> getTableNames();
 
-    PersistedDatabaseTable openTable(String name);
+    PersistedDatabaseTable<H> openTable(String name);
 
     @CheckReturnValue
-    CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx, RevisionHandle handle);
+    CommitHandle prepare(Collection<TransientDatabaseTable<H>> updates, H handle, Transaction tx);
 }

@@ -53,7 +53,7 @@ import java.util.concurrent.*;
  */
 @Singleton
 @ThreadSafe
-public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
+public class InMemoryDatabase implements DatabaseManager, PersistedDatabase<RevisionHandle> {
 
     // TODO: this class smells too big/messy
     // Responsibilities:
@@ -62,8 +62,10 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     // - can create new database tables (InMemoryDatabase?)
     // - prepare and commit modifications (InMemoryDatabase?)
 
-    private final ConcurrentMap<Transaction, TransientDatabase> openConnections = new ConcurrentHashMap<Transaction, TransientDatabase>();
-    private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
+    private final ConcurrentMap<Transaction, TransientDatabase<RevisionHandle>>
+            openConnections = new ConcurrentHashMap<Transaction, TransientDatabase<RevisionHandle>>();
+    private final ConcurrentMap<String, InMemoryDatabaseTable>
+            tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
     private final RevisionCounter revisionCounter = new RevisionCounter();
 
     public IsolationLevel getIsolationLevel() {
@@ -76,19 +78,19 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         return tables.keySet();
     }
 
-    public PersistedDatabaseTable openTable(String name) {
-        PersistedDatabaseTable table = getExistingTable(name);
+    public PersistedDatabaseTable<RevisionHandle> openTable(String name) {
+        InMemoryDatabaseTable table = getExistingTable(name);
         if (table == null) {
             table = createNewTable(name);
         }
         return table;
     }
 
-    private PersistedDatabaseTable getExistingTable(String name) {
+    private InMemoryDatabaseTable getExistingTable(String name) {
         return tables.get(name);
     }
 
-    private PersistedDatabaseTable createNewTable(String name) {
+    private InMemoryDatabaseTable createNewTable(String name) {
         tables.putIfAbsent(name, new InMemoryDatabaseTable());
         return getExistingTable(name);
     }
@@ -96,26 +98,27 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     // Connections
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        TransientDatabase db = getExistingConnection(tx);
+        TransientDatabase<RevisionHandle> db = getExistingConnection(tx);
         if (db == null) {
             db = createNewConnection(tx);
         }
         return db;
     }
 
-    private TransientDatabase getExistingConnection(Transaction tx) {
+    private TransientDatabase<RevisionHandle> getExistingConnection(Transaction tx) {
         return openConnections.get(tx);
     }
 
-    private TransientDatabase createNewConnection(Transaction tx) {
-        TransientDatabase con = new TransientDatabase(this, tx, revisionCounter.openNewestRevision());
+    private TransientDatabase<RevisionHandle> createNewConnection(Transaction tx) {
+        RevisionHandle h = revisionCounter.openNewestRevision();
+        TransientDatabase<RevisionHandle> con = new TransientDatabase<RevisionHandle>(this, h, tx);
         Object prev = openConnections.putIfAbsent(tx, con);
         assert prev == null : "Connection " + prev + " already exists in transaction " + tx;
         return con;
     }
 
     private void closeConnection(Transaction tx) {
-        TransientDatabase removed = openConnections.remove(tx);
+        Object removed = openConnections.remove(tx);
         assert removed != null : "No connection open in transaction " + tx;
         purgeOldUnusedRevisions();
     }
@@ -143,7 +146,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
     // Transactions
 
-    public CommitHandle prepare(Collection<TransientDatabaseTable> updates, Transaction tx, RevisionHandle handle) {
+    public CommitHandle prepare(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle, Transaction tx) {
         return new DbCommitHandle(updates, tx, handle);
     }
 
@@ -151,13 +154,13 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
     @ThreadSafe
     private class DbCommitHandle implements CommitHandle {
 
-        private final Collection<TransientDatabaseTable> updates;
+        private final Collection<TransientDatabaseTable<RevisionHandle>> updates;
         private final Transaction tx;
         private final RevisionHandle handle;
 
-        public DbCommitHandle(Collection<TransientDatabaseTable> updates, Transaction tx, RevisionHandle handle) {
+        public DbCommitHandle(Collection<TransientDatabaseTable<RevisionHandle>> updates, Transaction tx, RevisionHandle handle) {
             this.handle = handle;
-            this.updates = Collections.unmodifiableCollection(new ArrayList<TransientDatabaseTable>(updates));
+            this.updates = Collections.unmodifiableCollection(new ArrayList<TransientDatabaseTable<RevisionHandle>>(updates));
             this.tx = tx;
             prepare();
         }
@@ -165,7 +168,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         // TODO: move prepare/commit/rollback details to TransientDatabase?
 
         private void prepare() {
-            for (TransientDatabaseTable update : updates) {
+            for (TransientDatabaseTable<RevisionHandle> update : updates) {
                 update.prepare();
             }
         }
@@ -173,7 +176,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
         public void commit() {
             try {
                 handle.prepareWriteRevision();
-                for (TransientDatabaseTable update : updates) {
+                for (TransientDatabaseTable<RevisionHandle> update : updates) {
                     update.commit();
                 }
             } finally {
@@ -184,7 +187,7 @@ public class InMemoryDatabase implements DatabaseManager, PersistedDatabase {
 
         public void rollback() {
             try {
-                for (TransientDatabaseTable update : updates) {
+                for (TransientDatabaseTable<RevisionHandle> update : updates) {
                     update.rollback();
                 }
             } finally {

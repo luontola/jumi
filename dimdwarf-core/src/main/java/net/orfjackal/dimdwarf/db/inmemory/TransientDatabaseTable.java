@@ -43,17 +43,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 18.11.2008
  */
 @ThreadSafe
-public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
+public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
 
     private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
-    private final PersistedDatabaseTable table;
-    private final RevisionHandle revisionHandle;
+    private final PersistedDatabaseTable<H> dbTable;
+    private final H dbHandle;
     private final Transaction tx;
     private CommitHandle commitHandle;
 
-    public TransientDatabaseTable(PersistedDatabaseTable table, RevisionHandle revisionHandle, Transaction tx) {
-        this.table = table;
-        this.revisionHandle = revisionHandle;
+    public TransientDatabaseTable(PersistedDatabaseTable<H> dbTable, H dbHandle, Transaction tx) {
+        this.dbTable = dbTable;
+        this.dbHandle = dbHandle;
         this.tx = tx;
     }
 
@@ -61,7 +61,7 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
         tx.mustBeActive();
         Blob blob = updates.get(key);
         if (blob == null) {
-            blob = table.get(key, revisionHandle);
+            blob = dbTable.get(key, dbHandle);
         }
         if (blob == null) {
             blob = Blob.EMPTY_BLOB;
@@ -83,16 +83,16 @@ public class TransientDatabaseTable implements DatabaseTable<Blob, Blob> {
 
     public Blob firstKey() {
         tx.mustBeActive();
-        return table.firstKey();
+        return dbTable.firstKey();
     }
 
     public Blob nextKeyAfter(Blob currentKey) {
         tx.mustBeActive();
-        return table.nextKeyAfter(currentKey);
+        return dbTable.nextKeyAfter(currentKey);
     }
 
     public void prepare() {
-        commitHandle = table.prepare(updates, revisionHandle);
+        commitHandle = dbTable.prepare(updates, dbHandle);
     }
 
     public void commit() {

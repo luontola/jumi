@@ -40,10 +40,10 @@ import java.util.Map;
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface PersistedDatabaseTable extends IterableKeys<Blob> {
+public interface PersistedDatabaseTable<H> extends IterableKeys<Blob> {
 
-    Blob get(Blob key, RevisionHandle handle);
+    Blob get(Blob key, H handle);
 
     @CheckReturnValue
-    CommitHandle prepare(Map<Blob, Blob> updates, RevisionHandle handle);
+    CommitHandle prepare(Map<Blob, Blob> updates, H handle);
 }
