@@ -33,11 +33,11 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.db.common.TransientDatabase;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tx.*;
 import org.jetbrains.annotations.TestOnly;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
@@ -47,14 +47,37 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class InMemoryDatabaseManager implements DatabaseManager {
 
-    private InMemoryDatabase db = new InMemoryDatabase();
+    private final InMemoryDatabase db = new InMemoryDatabase();
+    private final ConcurrentMap<Transaction, Database<Blob, Blob>> openConnections = new ConcurrentHashMap<Transaction, Database<Blob, Blob>>();
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        TransientDatabase<RevisionHandle> connection = db.getExistingConnection(tx);
+        Database<Blob, Blob> connection = getExistingConnection(tx);
         if (connection == null) {
-            connection = db.createNewConnection(tx);
+            connection = createNewConnection(tx);
         }
         return connection;
+    }
+
+    private Database<Blob, Blob> getExistingConnection(Transaction tx) {
+        return openConnections.get(tx);
+    }
+
+    private Database<Blob, Blob> createNewConnection(Transaction tx) {
+        Database<Blob, Blob> con = db.createNewConnection(tx);
+        Object prev = openConnections.putIfAbsent(tx, con);
+        assert prev == null : "Connection " + prev + " already exists in transaction " + tx;
+        tx.join(new ConnectionCloser(tx));
+        return con;
+    }
+
+    private void closeConnection(Transaction tx) {
+        Object removed = openConnections.remove(tx);
+        assert removed != null : "No connection open in transaction " + tx;
+    }
+
+    @TestOnly
+    int getOpenConnections() {
+        return openConnections.size();
     }
 
     @TestOnly
@@ -63,12 +86,29 @@ public class InMemoryDatabaseManager implements DatabaseManager {
     }
 
     @TestOnly
-    int getOpenConnections() {
-        return db.getOpenConnections();
-    }
-
-    @TestOnly
     long getCurrentRevision() {
         return db.getCurrentRevision();
+    }
+
+
+    @Immutable
+    private class ConnectionCloser implements TransactionParticipant {
+
+        private final Transaction tx;
+
+        public ConnectionCloser(Transaction tx) {
+            this.tx = tx;
+        }
+
+        public void prepare() throws Throwable {
+        }
+
+        public void commit() {
+            closeConnection(tx);
+        }
+
+        public void rollback() {
+            closeConnection(tx);
+        }
     }
 }

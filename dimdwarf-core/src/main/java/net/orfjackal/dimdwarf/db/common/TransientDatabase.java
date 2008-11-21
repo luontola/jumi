@@ -86,7 +86,7 @@ public class TransientDatabase<H> implements Database<Blob, Blob>, TransactionPa
     }
 
     public void prepare() throws Throwable {
-        commitHandle = db.prepare(openTables.values(), dbHandle, tx);
+        commitHandle = db.prepare(openTables.values(), dbHandle);
     }
 
     public void commit() {

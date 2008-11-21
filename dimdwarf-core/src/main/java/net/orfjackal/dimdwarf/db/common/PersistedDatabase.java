@@ -32,7 +32,6 @@
 package net.orfjackal.dimdwarf.db.common;
 
 import net.orfjackal.dimdwarf.db.IsolationLevel;
-import net.orfjackal.dimdwarf.tx.Transaction;
 
 import javax.annotation.CheckReturnValue;
 import java.util.*;
@@ -50,5 +49,5 @@ public interface PersistedDatabase<H> {
     PersistedDatabaseTable<H> openTable(String name);
 
     @CheckReturnValue
-    CommitHandle prepare(Collection<TransientDatabaseTable<H>> updates, H handle, Transaction tx);
+    CommitHandle prepare(Collection<TransientDatabaseTable<H>> updates, H handle);
 }

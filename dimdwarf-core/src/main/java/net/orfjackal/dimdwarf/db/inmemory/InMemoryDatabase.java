@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.IsolationLevel;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.common.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
@@ -54,24 +54,12 @@ import java.util.concurrent.*;
 @ThreadSafe
 public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
 
-    // TODO: this class smells too big/messy
-    // Responsibilities:
-    // - keeps track of uncommitted database connections (InMemoryDatabaseManager?)
-    // - knows which database tables exist (InMemoryDatabase?)
-    // - can create new database tables (InMemoryDatabase?)
-    // - prepare and commit modifications (InMemoryDatabase?)
-
-    private final ConcurrentMap<Transaction, TransientDatabase<RevisionHandle>>
-            openConnections = new ConcurrentHashMap<Transaction, TransientDatabase<RevisionHandle>>();
-    private final ConcurrentMap<String, InMemoryDatabaseTable>
-            tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
+    private final ConcurrentMap<String, InMemoryDatabaseTable> tables = new ConcurrentHashMap<String, InMemoryDatabaseTable>();
     private final RevisionCounter revisionCounter = new RevisionCounter();
 
     public IsolationLevel getIsolationLevel() {
         return IsolationLevel.SNAPSHOT;
     }
-
-    // Tables
 
     public Set<String> getTableNames() {
         return tables.keySet();
@@ -94,32 +82,9 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
         return getExistingTable(name);
     }
 
-    // Connections
-
-//    public Database<Blob, Blob> openConnection(Transaction tx) {
-//        TransientDatabase<RevisionHandle> db = getExistingConnection(tx);
-//        if (db == null) {
-//            db = createNewConnection(tx);
-//        }
-//        return db;
-//    }
-
-    TransientDatabase<RevisionHandle> getExistingConnection(Transaction tx) {
-        return openConnections.get(tx);
-    }
-
-    TransientDatabase<RevisionHandle> createNewConnection(Transaction tx) {
+    public Database<Blob, Blob> createNewConnection(Transaction tx) {
         RevisionHandle h = revisionCounter.openNewestRevision();
-        TransientDatabase<RevisionHandle> con = new TransientDatabase<RevisionHandle>(this, h, tx);
-        Object prev = openConnections.putIfAbsent(tx, con);
-        assert prev == null : "Connection " + prev + " already exists in transaction " + tx;
-        return con;
-    }
-
-    private void closeConnection(Transaction tx) {
-        Object removed = openConnections.remove(tx);
-        assert removed != null : "No connection open in transaction " + tx;
-        purgeOldUnusedRevisions();
+        return new TransientDatabase<RevisionHandle>(this, h, tx);
     }
 
     private void purgeOldUnusedRevisions() {
@@ -134,19 +99,12 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
     }
 
     @TestOnly
-    int getOpenConnections() {
-        return openConnections.size();
-    }
-
-    @TestOnly
     long getCurrentRevision() {
         return revisionCounter.getNewestReadableRevision();
     }
 
-    // Transactions
-
-    public CommitHandle prepare(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle, Transaction tx) {
-        return new DbCommitHandle(updates, handle, tx);
+    public CommitHandle prepare(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle) {
+        return new DbCommitHandle(updates, handle);
     }
 
 
@@ -155,12 +113,10 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
 
         private final Collection<TransientDatabaseTable<RevisionHandle>> updates;
         private final RevisionHandle handle;
-        private final Transaction tx;
 
-        public DbCommitHandle(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle, Transaction tx) {
+        public DbCommitHandle(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle) {
             this.updates = Collections.unmodifiableCollection(new ArrayList<TransientDatabaseTable<RevisionHandle>>(updates));
             this.handle = handle;
-            this.tx = tx;
             prepare();
         }
 
@@ -178,7 +134,7 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
                 }
             } finally {
                 handle.commitWrites();
-                closeConnection(tx);
+                purgeOldUnusedRevisions();
             }
         }
 
@@ -189,7 +145,7 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
                 }
             } finally {
                 handle.rollback();
-                closeConnection(tx);
+                purgeOldUnusedRevisions();
             }
         }
     }
