@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
@@ -137,7 +135,7 @@ public class GroupLockSpec extends Specification<Object> {
             specify(lock.isLocked("B"));
         }
 
-        public void theSameKeysCanNotBeUnlockedTwise() {
+        public void unlockedKeysCanNotBeReunlocked() {
             specify(lock.getLockCount(), should.equal(1));
             specify(new Block() {
                 public void run() throws Throwable {
@@ -147,7 +145,7 @@ public class GroupLockSpec extends Specification<Object> {
             specify(lock.getLockCount(), should.equal(1));
         }
 
-        public void theSameKeysCanNotBeUnlockedTwiseWithAUsedHandle() {
+        public void aUsedHandleCanNotUnlockAKeyWhichIsRelocked() {
             specify(lock.getLockCount(), should.equal(1));
             final LockHandle oldHandleA = handleA;
             final LockHandle newHandleA = lock.tryLock("A");
