@@ -135,7 +135,7 @@ public class GroupLockSpec extends Specification<Object> {
             specify(lock.isLocked("B"));
         }
 
-        public void unlockedKeysCanNotBeReunlocked() {
+        public void theUnlockedKeysCanNotBeReunlocked() {
             specify(lock.getLockCount(), should.equal(1));
             specify(new Block() {
                 public void run() throws Throwable {
