@@ -31,7 +31,6 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.common.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
@@ -52,9 +51,8 @@ import java.util.concurrent.*;
  * @author Esko Luontola
  * @since 18.8.2008
  */
-@Singleton
 @ThreadSafe
-public class InMemoryDatabase implements DatabaseManager, PersistedDatabase<RevisionHandle> {
+public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
 
     // TODO: this class smells too big/messy
     // Responsibilities:

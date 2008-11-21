@@ -29,48 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
+package net.orfjackal.dimdwarf.db.inmemory;
 
-import com.google.inject.*;
+import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.tx.Transaction;
+
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @author Esko Luontola
- * @since 13.9.2008
+ * @since 21.11.2008
  */
-public class DatabaseModule extends AbstractModule {
+@Singleton
+@ThreadSafe
+public class InMemoryDatabaseManager implements DatabaseManager {
 
-    protected void configure() {
+    private InMemoryDatabase db = new InMemoryDatabase();
 
-        bind(DatabaseManager.class)
-                .to(InMemoryDatabaseManager.class);
-
-        bind(new TypeLiteral<Database<Blob, Blob>>() {})
-                .toProvider(DatabaseConnectionProvider.class);
-    }
-
-    private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
-        @Inject public DatabaseManager dbms;
-        @Inject public Transaction tx;
-
-        public Database<Blob, Blob> get() {
-            return dbms.openConnection(tx);
-        }
-    }
-
-    public static TypeLiteral<DatabaseTable<Blob, Blob>> databaseTableConnection() {
-        return new TypeLiteral<DatabaseTable<Blob, Blob>>() {};
-    }
-
-    public static Provider<DatabaseTable<Blob, Blob>> databaseTable(final String name) {
-        return new Provider<DatabaseTable<Blob, Blob>>() {
-            @Inject public Provider<Database<Blob, Blob>> db;
-
-            public DatabaseTable<Blob, Blob> get() {
-                return db.get().openTable(name);
-            }
-        };
+    public Database<Blob, Blob> openConnection(Transaction tx) {
+        return db.openConnection(tx);
     }
 }

@@ -31,14 +31,10 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.DatabaseManager;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
+import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
@@ -64,7 +60,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
     private Blob value;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase();
+        dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
         beginNewTransaction();
 

@@ -31,14 +31,12 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabase;
+import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
+import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
@@ -59,7 +57,7 @@ public class BindingStorageSpec extends Specification<Object> {
     private Logger txLogger;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase();
+        dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
     }
 
