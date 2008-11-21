@@ -35,7 +35,9 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * The latest revision of the list is immutable (i.e. the only possible modification is that old revisions are purged).
+ * Linked list which remembers multiple revisions of a value. The revisions are immutable, but revisions
+ * older than the latest revision may be purged to free memory. Reading the latest revision is an O(1) operation
+ * and reading older revisions is an O(N) operation.
  *
  * @author Esko Luontola
  * @since 19.8.2008
@@ -55,6 +57,7 @@ public class RevisionList<T> {
 
     public RevisionList(long revision, @Nullable T value, @Nullable RevisionList<T> previous) {
         assert revision > NULL_REVISION;
+        assert previous == null || previous.revision < revision;
         this.revision = revision;
         this.value = value;
         this.previous = previous;

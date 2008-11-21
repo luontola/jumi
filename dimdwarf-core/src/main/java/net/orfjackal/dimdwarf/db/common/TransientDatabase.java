@@ -68,21 +68,21 @@ public class TransientDatabase<H> implements Database<Blob, Blob>, TransactionPa
 
     public DatabaseTable<Blob, Blob> openTable(String name) {
         tx.mustBeActive();
-        TransientDatabaseTable<H> table = getCachedTable(name);
+        TransientDatabaseTable<H> table = getOpenedTable(name);
         if (table == null) {
-            table = cacheNewTable(name);
+            table = openNewTable(name);
         }
         return table;
     }
 
-    private TransientDatabaseTable<H> getCachedTable(String name) {
+    private TransientDatabaseTable<H> getOpenedTable(String name) {
         return openTables.get(name);
     }
 
-    private TransientDatabaseTable<H> cacheNewTable(String name) {
+    private TransientDatabaseTable<H> openNewTable(String name) {
         PersistedDatabaseTable<H> backend = db.openTable(name);
         openTables.putIfAbsent(name, new TransientDatabaseTable<H>(backend, dbHandle, tx));
-        return getCachedTable(name);
+        return getOpenedTable(name);
     }
 
     public void prepare() throws Throwable {

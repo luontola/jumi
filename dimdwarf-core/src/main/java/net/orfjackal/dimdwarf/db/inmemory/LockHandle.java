@@ -31,11 +31,14 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import javax.annotation.WillClose;
+
 /**
  * @author Esko Luontola
  * @since 19.11.2008
  */
 public interface LockHandle {
 
+    @WillClose
     void unlock();
 }
