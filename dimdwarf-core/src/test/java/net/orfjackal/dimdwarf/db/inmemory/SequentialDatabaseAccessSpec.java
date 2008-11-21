@@ -31,17 +31,11 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.*;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
-import net.orfjackal.dimdwarf.tx.TransactionRequiredException;
+import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
@@ -55,7 +49,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     private static final String TABLE = "test";
 
-    private InMemoryDatabase dbms;
+    private InMemoryDatabaseManager dbms;
     private Database<Blob, Blob> db;
     private DatabaseTable<Blob, Blob> table;
     private TransactionCoordinator tx;
@@ -65,7 +59,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     private Blob otherValue;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase();
+        dbms = new InMemoryDatabaseManager();
         tx = new TransactionImpl(mock(Logger.class));
         db = dbms.openConnection(tx.getTransaction());
         table = db.openTable(TABLE);

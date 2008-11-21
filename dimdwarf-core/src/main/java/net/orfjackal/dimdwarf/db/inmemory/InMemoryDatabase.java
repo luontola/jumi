@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.IsolationLevel;
 import net.orfjackal.dimdwarf.db.common.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import org.jetbrains.annotations.TestOnly;
@@ -96,19 +96,19 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
 
     // Connections
 
-    public Database<Blob, Blob> openConnection(Transaction tx) {
-        TransientDatabase<RevisionHandle> db = getExistingConnection(tx);
-        if (db == null) {
-            db = createNewConnection(tx);
-        }
-        return db;
-    }
+//    public Database<Blob, Blob> openConnection(Transaction tx) {
+//        TransientDatabase<RevisionHandle> db = getExistingConnection(tx);
+//        if (db == null) {
+//            db = createNewConnection(tx);
+//        }
+//        return db;
+//    }
 
-    private TransientDatabase<RevisionHandle> getExistingConnection(Transaction tx) {
+    TransientDatabase<RevisionHandle> getExistingConnection(Transaction tx) {
         return openConnections.get(tx);
     }
 
-    private TransientDatabase<RevisionHandle> createNewConnection(Transaction tx) {
+    TransientDatabase<RevisionHandle> createNewConnection(Transaction tx) {
         RevisionHandle h = revisionCounter.openNewestRevision();
         TransientDatabase<RevisionHandle> con = new TransientDatabase<RevisionHandle>(this, h, tx);
         Object prev = openConnections.putIfAbsent(tx, con);

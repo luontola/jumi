@@ -33,7 +33,9 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.common.TransientDatabase;
 import net.orfjackal.dimdwarf.tx.Transaction;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -48,6 +50,25 @@ public class InMemoryDatabaseManager implements DatabaseManager {
     private InMemoryDatabase db = new InMemoryDatabase();
 
     public Database<Blob, Blob> openConnection(Transaction tx) {
-        return db.openConnection(tx);
+        TransientDatabase<RevisionHandle> connection = db.getExistingConnection(tx);
+        if (connection == null) {
+            connection = db.createNewConnection(tx);
+        }
+        return connection;
+    }
+
+    @TestOnly
+    long getOldestRevisionInUse() {
+        return db.getOldestRevisionInUse();
+    }
+
+    @TestOnly
+    int getOpenConnections() {
+        return db.getOpenConnections();
+    }
+
+    @TestOnly
+    long getCurrentRevision() {
+        return db.getCurrentRevision();
     }
 }

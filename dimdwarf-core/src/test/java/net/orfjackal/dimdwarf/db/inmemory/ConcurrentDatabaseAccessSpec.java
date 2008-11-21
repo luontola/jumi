@@ -49,7 +49,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
 
     private static final String TABLE = "test";
 
-    private InMemoryDatabase dbms;
+    private InMemoryDatabaseManager dbms;
     private TransactionCoordinator tx1;
     private TransactionCoordinator tx2;
     private DatabaseTable<Blob, Blob> table1;
@@ -62,7 +62,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private Blob value3;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase();
+        dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
         tx1 = new TransactionImpl(txLogger);
         tx2 = new TransactionImpl(txLogger);

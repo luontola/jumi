@@ -31,14 +31,10 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.Database;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
+import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
@@ -53,7 +49,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private static final String TABLE1 = "table1";
     private static final String TABLE2 = "table2";
 
-    private InMemoryDatabase dbms;
+    private InMemoryDatabaseManager dbms;
     private TransactionCoordinator tx;
     private Database<Blob, Blob> db;
     private DatabaseTable<Blob, Blob> table1;
@@ -66,7 +62,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private Blob value3;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabase();
+        dbms = new InMemoryDatabaseManager();
 
         txLogger = mock(Logger.class);
         tx = new TransactionImpl(txLogger);
