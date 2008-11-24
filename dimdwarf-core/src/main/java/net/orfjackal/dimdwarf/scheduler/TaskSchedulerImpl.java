@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.Provider;
-import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.util.Clock;

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.scheduler;
+package net.orfjackal.dimdwarf.api;
 
 import java.util.concurrent.*;
 
