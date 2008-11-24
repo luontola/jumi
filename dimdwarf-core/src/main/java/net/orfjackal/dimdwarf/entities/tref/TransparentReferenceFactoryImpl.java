@@ -35,7 +35,7 @@ import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
-import net.orfjackal.dimdwarf.util.Cache;
+import net.orfjackal.dimdwarf.util.SingletonCache;
 import net.sf.cglib.proxy.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -50,7 +50,7 @@ import java.util.*;
 @Immutable
 public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
-    private final Cache<Class<?>, Factory> proxyFactories = new CglibProxyFactoryCache();
+    private final CglibProxyFactoryCache proxyFactories = new CglibProxyFactoryCache();
     private final Provider<ReferenceFactory> referenceFactory;
 
     @Inject
@@ -73,7 +73,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
     }
 
 
-    private static class CglibProxyFactoryCache extends Cache<Class<?>, Factory> {
+    private static class CglibProxyFactoryCache extends SingletonCache<Class<?>, Factory> {
 
         protected Factory newInstance(Class<?> type) {
             Enhancer e = new Enhancer();

@@ -43,7 +43,7 @@ import java.util.concurrent.*;
  * @since 7.5.2008
  */
 @ThreadSafe
-public abstract class Cache<K, V> {
+public abstract class SingletonCache<K, V> {
 
     private final ConcurrentMap<K, V> cache = new ConcurrentHashMap<K, V>();
 
