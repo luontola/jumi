@@ -31,101 +31,31 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Provider;
-import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.tasks.TaskExecutor;
-import net.orfjackal.dimdwarf.util.Clock;
-import org.jetbrains.annotations.TestOnly;
-
-import javax.annotation.concurrent.ThreadSafe;
-import java.math.BigInteger;
 import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
- * @since 24.11.2008
+ * @since 25.11.2008
  */
-@ThreadSafe
-public class TaskScheduler extends NullScheduledExecutorService {
+public interface TaskScheduler {
 
-    private static final String TASKS_PREFIX = TaskScheduler.class.getName() + ".tasks.";
+    /**
+     * @see ExecutorService#submit(Runnable)
+     */
+    Future<?> submit(Runnable task);
 
-    private final BlockingQueue<ScheduledTask> waitingForExecution = new DelayQueue<ScheduledTask>();
-    private final Provider<BindingStorage> bindings;
-    private final Provider<EntityInfo> entities;
-    private final Clock clock;
+    /**
+     * @see ScheduledExecutorService#schedule(Runnable, long, TimeUnit)
+     */
+    ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit);
 
-    public TaskScheduler(Provider<BindingStorage> bindings, Provider<EntityInfo> entities,
-                         Clock clock, TaskExecutor taskContext) {
-        this.bindings = bindings;
-        this.entities = entities;
-        this.clock = clock;
-        recoverTasksFromDatabase(taskContext);
-    }
+    /**
+     * @see ScheduledExecutorService#scheduleAtFixedRate
+     */
+    ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit);
 
-    private void recoverTasksFromDatabase(TaskExecutor taskContext) {
-        taskContext.execute(new Runnable() {
-            public void run() {
-                for (String binding : new BindingWalker(TASKS_PREFIX, bindings.get())) {
-                    recoverTaskFromDatabase(binding);
-                }
-            }
-        });
-    }
-
-    private void recoverTaskFromDatabase(String binding) {
-        ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
-        if (st != null) {
-            waitingForExecution.add(st);
-        }
-    }
-
-    public Future<?> submit(Runnable task) {
-        return schedule(task, 0, TimeUnit.MILLISECONDS);
-    }
-
-    public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-        // TODO: create ScheduledTask with assisted inject, to remove dependency to Clock from TaskScheduler
-        addToExecutionQueue(ScheduledTask.newScheduledTask(task, delay, unit, clock));
-        return null;
-    }
-
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-        addToExecutionQueue(ScheduledTask.newScheduledTaskWithFixedDelay(task, initialDelay, delay, unit, clock));
-        return null;
-    }
-
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        throw new UnsupportedOperationException(); // TODO
-    }
-
-    private void addToExecutionQueue(ScheduledTask st) {
-        bindings.get().update(bindingFor(st), st);
-        waitingForExecution.add(st);
-    }
-
-    public Runnable takeNextTask() throws InterruptedException {
-        ScheduledTask st = waitingForExecution.take();
-        bindings.get().delete(bindingFor(st));
-        repeatIfRepeatable(st);
-        return st.getRunnable();
-    }
-
-    private void repeatIfRepeatable(ScheduledTask st) {
-        ScheduledTask repeat = st.nextRepeatedTask();
-        if (repeat != null) {
-            addToExecutionQueue(repeat);
-        }
-    }
-
-    private String bindingFor(ScheduledTask st) {
-        BigInteger entityId = entities.get().getEntityId(st);
-        return TASKS_PREFIX + entityId;
-    }
-
-    @TestOnly
-    int getQueuedTasks() {
-        return waitingForExecution.size();
-    }
+    /**
+     * @see ScheduledExecutorService#scheduleWithFixedDelay
+     */
+    ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit);
 }

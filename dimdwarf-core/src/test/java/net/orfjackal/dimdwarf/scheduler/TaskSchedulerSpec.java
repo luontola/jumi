@@ -54,7 +54,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
     private static final int THREAD_SYNC_DELAY = 5;
 
-    private TaskScheduler scheduler;
+    private TaskSchedulerImpl scheduler;
     private Provider<BindingStorage> bindings;
     private Provider<EntityInfo> entities;
     private TaskExecutor taskContext;
@@ -79,7 +79,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         taskContext = injector.getInstance(TaskExecutor.class);
         specify(thereMayBeBindingsInOtherNamespaces());
 
-        scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+        scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
     }
@@ -99,7 +99,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         return true;
     }
 
-    private static DummyTask takeNextTaskFrom(TaskScheduler scheduler) {
+    private static DummyTask takeNextTaskFrom(TaskSchedulerImpl scheduler) {
         try {
             return (DummyTask) scheduler.takeNextTask();
         } catch (InterruptedException e) {
@@ -152,7 +152,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -180,7 +180,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartTheTaskIsStillQueued() {
-            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
@@ -204,7 +204,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
 
@@ -244,13 +244,13 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartAnExecutorCanNotTakeItBeforeTheDelay() {
-            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorCanNotTakeItBeforeTheDelay();
         }
 
         public void afterRestartAnExecutorMayTakeItAfterTheDelay() {
-            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorMayTakeItAfterTheDelay();
         }
@@ -266,6 +266,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             });
         }
     }
+
+    // TODO: schedule with fixed rate (enter here, above fixed delay, because that's how they are sorted in the sources)
 
     public class WhenATaskIsScheduledWithFixedDelay {
 
@@ -308,10 +310,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    // TODO: schedule with fixed rate
     // TODO: cancelling tasks
 
     private static class DummyTask implements Runnable, Serializable {
+        private static final long serialVersionUID = 1L;
 
         public String value;
 
