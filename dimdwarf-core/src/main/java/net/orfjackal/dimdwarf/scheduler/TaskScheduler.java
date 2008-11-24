@@ -86,15 +86,28 @@ public class TaskScheduler extends NullScheduledExecutorService {
     }
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-        ScheduledTask st = new ScheduledTask(task, delay, unit, clock);
+        // TODO: create ScheduledTask with assisted inject
+        addToExecutionQueue(new ScheduledTask(task, delay, unit, clock));
+        return null;
+    }
+
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+        addToExecutionQueue(new ScheduledTask(command, initialDelay, delay, unit, clock));
+        return null;
+    }
+
+    private void addToExecutionQueue(ScheduledTask st) {
         bindings.get().update(bindingFor(st), st);
         waitingForExecution.add(st);
-        return null;
     }
 
     public Runnable takeNextTask() throws InterruptedException {
         ScheduledTask st = waitingForExecution.take();
         bindings.get().delete(bindingFor(st));
+        ScheduledTask repeat = st.nextRepeatedTask();
+        if (repeat != null) {
+            addToExecutionQueue(repeat);
+        }
         return st.getRunnable();
     }
 

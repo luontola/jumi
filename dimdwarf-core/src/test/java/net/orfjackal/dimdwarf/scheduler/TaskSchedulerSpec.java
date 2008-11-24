@@ -77,20 +77,26 @@ public class TaskSchedulerSpec extends Specification<Object> {
         bindings = injector.getProvider(BindingStorage.class);
         entities = injector.getProvider(EntityInfo.class);
         taskContext = injector.getInstance(TaskExecutor.class);
-        specifyThereMayBeBindingsInOtherNamespaces();
+        specify(thereMayBeBindingsInOtherNamespaces());
 
         scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
     }
 
-    private void specifyThereMayBeBindingsInOtherNamespaces() {
+    private boolean thereMayBeBindingsInOtherNamespaces() {
         taskContext.execute(new Runnable() {
             public void run() {
                 bindings.get().update("a.shouldNotTouchThis", new DummyEntity());
                 bindings.get().update("z.shouldNotTouchThis", new DummyEntity());
             }
         });
+        return true;
+    }
+
+    private boolean taskCanBeTakenRightNow() {
+        specify(takeNextTaskFrom(scheduler), should.not().equal(null));
+        return true;
     }
 
     private static DummyTask takeNextTaskFrom(TaskScheduler scheduler) {
@@ -99,6 +105,15 @@ public class TaskSchedulerSpec extends Specification<Object> {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean taskCanBeTakenExactlyAfterDelay(int delay) {
+        clock.addTime(delay - 1);
+        interruptTestThreadAfter(THREAD_SYNC_DELAY);
+        specify(takeNextTaskIsInterrupted());
+        clock.addTime(1);
+        specify(taskCanBeTakenRightNow());
+        return true;
     }
 
     private static void interruptTestThreadAfter(final int delay) {
@@ -115,6 +130,15 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }).start();
     }
 
+    private boolean takeNextTaskIsInterrupted() {
+        specify(new Block() {
+            public void run() throws Throwable {
+                scheduler.takeNextTask();
+            }
+        }, should.raise(InterruptedException.class));
+        return true;
+    }
+
 
     public class WhenNoTasksHaveBeenSubmitted {
 
@@ -124,11 +148,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void anExecutorWillWaitUntilThereAreTasks() {
             interruptTestThreadAfter(THREAD_SYNC_DELAY);
-            specify(new Block() {
-                public void run() throws Throwable {
-                    scheduler.takeNextTask();
-                }
-            }, should.raise(InterruptedException.class));
+            specify(takeNextTaskIsInterrupted());
         }
 
         public void afterRestartNoTasksAreQueued() {
@@ -163,6 +183,9 @@ public class TaskSchedulerSpec extends Specification<Object> {
             scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
+
+        // TODO: if transaction rolls back, the task should not be executed
+        // TODO: the task should not be executed *before* the task commits
     }
 
     public class WhenATaskIsTakenFromTheQueue {
@@ -184,6 +207,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
+
+        // TODO: if transaction rolls back, the task should be rescheduled
     }
 
     public class WhenATaskIsScheduledWithADelay {
@@ -202,18 +227,14 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void anExecutorCanNotTakeItBeforeTheDelay() {
             interruptTestThreadAfter(THREAD_SYNC_DELAY);
-            specify(new Block() {
-                public void run() throws Throwable {
-                    scheduler.takeNextTask();
-                }
-            }, should.raise(InterruptedException.class));
+            specify(takeNextTaskIsInterrupted());
         }
 
         public void anExecutorMayTakeItAfterTheDelay() {
-            clock.addTime(1000);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(takeNextTaskFrom(scheduler), should.not().equal(null));
+                    clock.addTime(1000);
+                    specify(taskCanBeTakenRightNow());
                 }
             });
         }
@@ -241,6 +262,47 @@ public class TaskSchedulerSpec extends Specification<Object> {
             });
         }
     }
+
+    public class WhenATaskIsScheduledWithFixedDelay {
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.scheduleWithFixedDelay(task1, 1000, 2000, TimeUnit.MILLISECONDS);
+                }
+            });
+        }
+
+        public void theFirstExecutionIsAfterTheInitialDelay() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(taskCanBeTakenExactlyAfterDelay(1000));
+                }
+            });
+        }
+
+        public void theFollowingExecutionsAreAfterTheFixedDelay() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(taskCanBeTakenExactlyAfterDelay(1000));
+                    specify(taskCanBeTakenExactlyAfterDelay(2000));
+                    specify(taskCanBeTakenExactlyAfterDelay(2000));
+                }
+            });
+        }
+
+        public void whenAnExecutionIsLateThenTheDelayBetweenTaskExecutionsIsFixed() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    clock.addTime(1500);
+                    specify(taskCanBeTakenRightNow());
+                    specify(taskCanBeTakenExactlyAfterDelay(2000));
+                }
+            });
+        }
+    }
+
+    // TODO: cancelling tasks
 
     private static class DummyTask implements Runnable, Serializable {
 

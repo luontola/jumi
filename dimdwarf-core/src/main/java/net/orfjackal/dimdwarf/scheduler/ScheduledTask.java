@@ -35,6 +35,7 @@ import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.util.Clock;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.concurrent.*;
@@ -49,12 +50,28 @@ public class ScheduledTask implements Delayed, EntityObject, Serializable {
 
     private final Runnable task;
     private final long scheduledTime;
+    private final long fixedDelay;
     private transient Clock clock;
 
-    public ScheduledTask(Runnable task, long delay, TimeUnit unit, Clock clock) {
+    public ScheduledTask(Runnable task, long initialDelay, TimeUnit unit, Clock clock) {
         this.task = task;
         this.clock = clock;
-        this.scheduledTime = unit.toMillis(delay) + clock.currentTimeMillis();
+        this.fixedDelay = -1;
+        this.scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+    }
+
+    public ScheduledTask(Runnable task, long initialDelay, long fixedDelay, TimeUnit unit, Clock clock) {
+        this.task = task;
+        this.fixedDelay = fixedDelay;
+        this.clock = clock;
+        this.scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+    }
+
+    private ScheduledTask(Runnable task, long scheduledTime, long fixedDelay, Clock clock) {
+        this.task = task;
+        this.scheduledTime = scheduledTime;
+        this.fixedDelay = fixedDelay;
+        this.clock = clock;
     }
 
     @Inject
@@ -64,6 +81,14 @@ public class ScheduledTask implements Delayed, EntityObject, Serializable {
 
     public Runnable getRunnable() {
         return task;
+    }
+
+    @CheckForNull
+    public ScheduledTask nextRepeatedTask() {
+        if (fixedDelay < 0) {
+            return null;
+        }
+        return new ScheduledTask(task, clock.currentTimeMillis() + fixedDelay, fixedDelay, clock);
     }
 
     public long getDelay(TimeUnit unit) {
