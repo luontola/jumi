@@ -86,14 +86,18 @@ public class TaskScheduler extends NullScheduledExecutorService {
     }
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-        // TODO: create ScheduledTask with assisted inject
-        addToExecutionQueue(new ScheduledTask(task, delay, unit, clock));
+        // TODO: create ScheduledTask with assisted inject, to remove dependency to Clock from TaskScheduler
+        addToExecutionQueue(ScheduledTask.newScheduledTask(task, delay, unit, clock));
         return null;
     }
 
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        addToExecutionQueue(new ScheduledTask(command, initialDelay, delay, unit, clock));
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
+        addToExecutionQueue(ScheduledTask.newScheduledTaskWithFixedDelay(task, initialDelay, delay, unit, clock));
         return null;
+    }
+
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+        throw new UnsupportedOperationException(); // TODO
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
@@ -104,11 +108,15 @@ public class TaskScheduler extends NullScheduledExecutorService {
     public Runnable takeNextTask() throws InterruptedException {
         ScheduledTask st = waitingForExecution.take();
         bindings.get().delete(bindingFor(st));
+        repeatIfRepeatable(st);
+        return st.getRunnable();
+    }
+
+    private void repeatIfRepeatable(ScheduledTask st) {
         ScheduledTask repeat = st.nextRepeatedTask();
         if (repeat != null) {
             addToExecutionQueue(repeat);
         }
-        return st.getRunnable();
     }
 
     private String bindingFor(ScheduledTask st) {

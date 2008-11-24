@@ -211,12 +211,14 @@ public class TaskSchedulerSpec extends Specification<Object> {
         // TODO: if transaction rolls back, the task should be rescheduled
     }
 
-    public class WhenATaskIsScheduledWithADelay {
+    public class WhenATaskIsScheduled {
 
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.schedule(task1, 1000, TimeUnit.MILLISECONDS);
+                    // We use seconds here as the time unit, to test that
+                    // they are converted correctly to milliseconds.
+                    scheduler.schedule(task1, 1, TimeUnit.SECONDS);
                 }
             });
         }
@@ -228,6 +230,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anExecutorCanNotTakeItBeforeTheDelay() {
             interruptTestThreadAfter(THREAD_SYNC_DELAY);
             specify(takeNextTaskIsInterrupted());
+            specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
         public void anExecutorMayTakeItAfterTheDelay() {
@@ -237,6 +240,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
                     specify(taskCanBeTakenRightNow());
                 }
             });
+            specify(scheduler.getQueuedTasks(), should.equal(0));
         }
 
         public void afterRestartAnExecutorCanNotTakeItBeforeTheDelay() {
@@ -268,7 +272,9 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.scheduleWithFixedDelay(task1, 1000, 2000, TimeUnit.MILLISECONDS);
+                    // We use seconds here as the time unit, to test that
+                    // they are converted correctly to milliseconds.
+                    scheduler.scheduleWithFixedDelay(task1, 1, 2, TimeUnit.SECONDS);
                 }
             });
         }
@@ -302,6 +308,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
     }
 
+    // TODO: schedule with fixed rate
     // TODO: cancelling tasks
 
     private static class DummyTask implements Runnable, Serializable {

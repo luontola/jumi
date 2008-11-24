@@ -48,23 +48,25 @@ import java.util.concurrent.*;
 public class ScheduledTask implements Delayed, EntityObject, Serializable {
     private static final long serialVersionUID = 1L;
 
+    private static final int NO_FIXED_DELAY = -1;
+
     private final Runnable task;
     private final long scheduledTime;
     private final long fixedDelay;
     private transient Clock clock;
 
-    public ScheduledTask(Runnable task, long initialDelay, TimeUnit unit, Clock clock) {
-        this.task = task;
-        this.clock = clock;
-        this.fixedDelay = -1;
-        this.scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+    public static ScheduledTask newScheduledTask(Runnable task, long initialDelay,
+                                                 TimeUnit unit, Clock clock) {
+        long scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+        long fixedDelay = NO_FIXED_DELAY;
+        return new ScheduledTask(task, scheduledTime, fixedDelay, clock);
     }
 
-    public ScheduledTask(Runnable task, long initialDelay, long fixedDelay, TimeUnit unit, Clock clock) {
-        this.task = task;
-        this.fixedDelay = fixedDelay;
-        this.clock = clock;
-        this.scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+    public static ScheduledTask newScheduledTaskWithFixedDelay(Runnable task, long initialDelay, long fixedDelay,
+                                                               TimeUnit unit, Clock clock) {
+        long scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+        fixedDelay = unit.toMillis(fixedDelay);
+        return new ScheduledTask(task, scheduledTime, fixedDelay, clock);
     }
 
     private ScheduledTask(Runnable task, long scheduledTime, long fixedDelay, Clock clock) {
@@ -85,10 +87,14 @@ public class ScheduledTask implements Delayed, EntityObject, Serializable {
 
     @CheckForNull
     public ScheduledTask nextRepeatedTask() {
-        if (fixedDelay < 0) {
-            return null;
+        if (repeatWithFixedDelay()) {
+            return new ScheduledTask(task, clock.currentTimeMillis() + fixedDelay, fixedDelay, clock);
         }
-        return new ScheduledTask(task, clock.currentTimeMillis() + fixedDelay, fixedDelay, clock);
+        return null;
+    }
+
+    private boolean repeatWithFixedDelay() {
+        return fixedDelay != NO_FIXED_DELAY;
     }
 
     public long getDelay(TimeUnit unit) {
