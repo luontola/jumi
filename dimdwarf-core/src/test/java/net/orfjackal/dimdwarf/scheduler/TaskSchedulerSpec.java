@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
@@ -51,21 +52,36 @@ import java.util.concurrent.TimeUnit;
 @Group({"fast"})
 public class TaskSchedulerSpec extends Specification<Object> {
 
+    private static final int THREAD_SYNC_DELAY = 5;
+
     private TaskScheduler scheduler;
-    private DummyTask task;
     private Provider<BindingStorage> bindings;
     private Provider<EntityInfo> entities;
     private TaskExecutor taskContext;
+    private DummyClock clock;
 
-    public void create() throws Exception {
-        Injector injector = Guice.createInjector(new EntityModule(), new DatabaseModule(), new TaskContextModule());
+    private DummyTask task1;
+    private DummyTask task2;
+
+    public void create() {
+        clock = new DummyClock();
+        Injector injector = Guice.createInjector(
+                new EntityModule(),
+                new DatabaseModule(),
+                new TaskContextModule(),
+                new AbstractModule() {
+                    protected void configure() {
+                        bind(Clock.class).toInstance(clock);
+                    }
+                });
         bindings = injector.getProvider(BindingStorage.class);
         entities = injector.getProvider(EntityInfo.class);
         taskContext = injector.getInstance(TaskExecutor.class);
         specifyThereMayBeBindingsInOtherNamespaces();
 
-        scheduler = new TaskScheduler(bindings, entities, taskContext);
-        task = new DummyTask();
+        scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+        task1 = new DummyTask("1");
+        task2 = new DummyTask("2");
     }
 
     private void specifyThereMayBeBindingsInOtherNamespaces() {
@@ -77,20 +93,20 @@ public class TaskSchedulerSpec extends Specification<Object> {
         });
     }
 
-    private static Runnable takeNextTaskFrom(TaskScheduler scheduler) {
+    private static DummyTask takeNextTaskFrom(TaskScheduler scheduler) {
         try {
-            return scheduler.takeNextTask();
+            return (DummyTask) scheduler.takeNextTask();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void interruptTestThread() {
+    private static void interruptTestThreadAfter(final int delay) {
         final Thread testThread = Thread.currentThread();
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -106,8 +122,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
 
-        public void anExecutorWillWaitUntilThereAreTasks() throws Exception {
-            interruptTestThread();
+        public void anExecutorWillWaitUntilThereAreTasks() {
+            interruptTestThreadAfter(THREAD_SYNC_DELAY);
             specify(new Block() {
                 public void run() throws Throwable {
                     scheduler.takeNextTask();
@@ -116,7 +132,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskScheduler(bindings, entities, taskContext);
+            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -126,7 +142,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.submit(task);
+                    scheduler.submit(task1);
                 }
             });
         }
@@ -135,16 +151,16 @@ public class TaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
-        public void anExecutorMayTakeTheTask() throws Exception {
+        public void anExecutorMayTakeTheTask() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(takeNextTaskFrom(scheduler), should.equal(task));
+                    specify(takeNextTaskFrom(scheduler), should.equal(task1));
                 }
             });
         }
 
         public void afterRestartTheTaskIsStillQueued() {
-            scheduler = new TaskScheduler(bindings, entities, taskContext);
+            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
     }
@@ -154,7 +170,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.submit(task);
+                    scheduler.submit(task1);
                     takeNextTaskFrom(scheduler);
                 }
             });
@@ -165,7 +181,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskScheduler(bindings, entities, taskContext);
+            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -175,7 +191,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.schedule(task, 30, TimeUnit.MILLISECONDS);
+                    scheduler.schedule(task1, 1000, TimeUnit.MILLISECONDS);
                 }
             });
         }
@@ -184,8 +200,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
-        public void anExecutorCanNotGetTakeItBeforeTheDelay() throws Exception {
-            interruptTestThread();
+        public void anExecutorCanNotTakeItBeforeTheDelay() {
+            interruptTestThreadAfter(THREAD_SYNC_DELAY);
             specify(new Block() {
                 public void run() throws Throwable {
                     scheduler.takeNextTask();
@@ -193,15 +209,38 @@ public class TaskSchedulerSpec extends Specification<Object> {
             }, should.raise(InterruptedException.class));
         }
 
-        public void anExecutorMayTakeItAfterTheDelay() throws Exception {
+        public void anExecutorMayTakeItAfterTheDelay() {
+            clock.addTime(1000);
             taskContext.execute(new Runnable() {
                 public void run() {
                     specify(takeNextTaskFrom(scheduler), should.not().equal(null));
                 }
             });
         }
-    }
 
+        public void afterRestartAnExecutorCanNotTakeItBeforeTheDelay() {
+            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            specify(scheduler.getQueuedTasks(), should.equal(1));
+            anExecutorCanNotTakeItBeforeTheDelay();
+        }
+
+        public void afterRestartAnExecutorMayTakeItAfterTheDelay() {
+            scheduler = new TaskScheduler(bindings, entities, clock, taskContext);
+            specify(scheduler.getQueuedTasks(), should.equal(1));
+            anExecutorMayTakeItAfterTheDelay();
+        }
+
+        public void anotherTaskWithAShorterDelayWillBeExecutedFirst() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.schedule(task2, 500, TimeUnit.MILLISECONDS);
+                    clock.addTime(2000);
+                    specify(takeNextTaskFrom(scheduler).value, should.equal("2"));
+                    specify(takeNextTaskFrom(scheduler).value, should.equal("1"));
+                }
+            });
+        }
+    }
 
     private static class DummyTask implements Runnable, Serializable {
 
