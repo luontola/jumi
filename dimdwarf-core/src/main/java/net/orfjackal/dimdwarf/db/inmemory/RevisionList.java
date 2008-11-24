@@ -93,4 +93,12 @@ public class RevisionList<T> {
     public boolean hasOldRevisions() {
         return previous != null;
     }
+
+    public String toString() {
+        String s = "#" + revision + ": " + value;
+        if (previous != null) {
+            s += ", " + previous.toString();
+        }
+        return s;
+    }
 }

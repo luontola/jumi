@@ -130,4 +130,13 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
         } while (next != null && next.equals(currentKey));
         return next;
     }
+
+    public String toString() {
+        String s = getClass().getSimpleName() + "[\n";
+        for (Map.Entry<K, RevisionList<V>> e : map.entrySet()) {
+            s += "    " + e.getKey() + " -> " + e.getValue() + "\n";
+        }
+        s += "]";
+        return s;
+    }
 }
