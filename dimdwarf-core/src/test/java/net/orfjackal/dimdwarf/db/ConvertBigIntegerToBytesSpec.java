@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
@@ -97,6 +95,11 @@ public class ConvertBigIntegerToBytesSpec extends Specification<Object> {
             specify(bytesOfValue(255), should.containInOrder(new byte[]{0x01, (byte) 0xFF}));
             specify(bytesOfValue(256), should.containInOrder(new byte[]{0x02, 0x01, 0x00}));
             specify(bytesOfValue(257), should.containInOrder(new byte[]{0x02, 0x01, 0x01}));
+        }
+
+        public void emptyBlobConvertsToNullBigInteger() {
+            BigInteger converted = converter.back(Blob.EMPTY_BLOB);
+            specify(converted, should.equal(null));
         }
 
         public void negativeValuesAreNotAllowed() {

@@ -42,7 +42,7 @@ import java.math.BigInteger;
 public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
 
     public BigInteger back(Blob value) {
-        if (value == null) {
+        if (value == null || value.length() == 0) {
             return null;
         }
         return new BigInteger(1, unpack(value.getByteArray()));

@@ -33,12 +33,18 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Esko Luontola
  * @since 12.9.2008
  */
 public interface BindingStorage extends DatabaseTable<String, Object> {
 
+    /**
+     * If the binding does not exist in the current transaction, then the returned object is null.
+     */
+    @Nullable
     Object read(String binding);
 
     void update(String binding, Object entity);

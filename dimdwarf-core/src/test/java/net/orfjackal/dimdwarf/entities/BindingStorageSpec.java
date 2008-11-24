@@ -50,7 +50,7 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class BindingStorageSpec extends Specification<Object> {
 
-    private BindingStorage bindingStorage;
+    private BindingStorage bindings;
     private DatabaseManager dbms;
     private TransactionCoordinator tx;
     private EntityManagerImpl entityManager;
@@ -65,19 +65,19 @@ public class BindingStorageSpec extends Specification<Object> {
         tx = new TransactionImpl(txLogger);
 
         Database<Blob, Blob> db = dbms.openConnection(tx.getTransaction());
-        DatabaseTable<Blob, Blob> bindings = db.openTable("bindings");
-        DatabaseTable<Blob, Blob> entities = db.openTable("entities");
+        DatabaseTable<Blob, Blob> bindingsTable = db.openTable("bindings");
+        DatabaseTable<Blob, Blob> entitiesTable = db.openTable("entities");
 
         entityManager =
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
                         new EntityStorageImpl(
-                                entities,
+                                entitiesTable,
                                 new ConvertBigIntegerToBytes(),
                                 new ConvertEntityToBytes(new ObjectSerializerImpl())));
 
-        bindingStorage = new BindingStorageImpl(
-                bindings,
+        bindings = new BindingStorageImpl(
+                bindingsTable,
                 new NoConversion<String>(),
                 new ConvertStringToBytes(),
                 new ConvertEntityToEntityId(entityManager),
@@ -89,33 +89,64 @@ public class BindingStorageSpec extends Specification<Object> {
         tx.prepareAndCommit();
     }
 
+
+    public class BindingLifecycle {
+
+        public void create() {
+            beginTask();
+        }
+
+        public void whenBindingHasNotBeenCreatedItDoesNotExist() {
+            specify(bindings.read("foo"), should.equal(null));
+        }
+
+        public void whenBindingIsCreatedItDoesExist() {
+            bindings.update("foo", new DummyEntity());
+            specify(bindings.read("foo"), should.not().equal(null));
+        }
+
+        public void whenBindingIsUpdatedItIsChanged() {
+            DummyEntity d1 = new DummyEntity("1");
+            DummyEntity d2 = new DummyEntity("2");
+            bindings.update("foo", d1);
+            bindings.update("foo", d2);
+            specify(bindings.read("foo"), should.equal(d2));
+        }
+
+        public void whenBindingIsDeletedItDoesNotExist() {
+            bindings.update("foo", new DummyEntity());
+            bindings.delete("foo");
+            specify(bindings.read("foo"), should.equal(null));
+        }
+    }
+
     public class BrowsingBindings {
 
         public void create() {
             beginTask();
             DummyEntity foo = new DummyEntity();
             foo.setOther("foo");
-            bindingStorage.update("foo", foo);
-            bindingStorage.update("foo.2", new DummyEntity());
-            bindingStorage.update("foo.1", new DummyEntity());
-            bindingStorage.update("bar.x", new DummyEntity());
-            bindingStorage.update("bar.y", new DummyEntity());
+            bindings.update("foo", foo);
+            bindings.update("foo.2", new DummyEntity());
+            bindings.update("foo.1", new DummyEntity());
+            bindings.update("bar.x", new DummyEntity());
+            bindings.update("bar.y", new DummyEntity());
             endTask();
             beginTask();
         }
 
         public void bindingsAreInAlphabeticalOrder() {
-            specify(bindingStorage.firstKey(), should.equal("bar.x"));
+            specify(bindings.firstKey(), should.equal("bar.x"));
         }
 
         public void whenBindingsHaveTheSamePrefixTheShortestBindingIsFirst() {
-            specify(bindingStorage.nextKeyAfter("foo"), should.equal("foo.1"));
-            specify(bindingStorage.nextKeyAfter("foo.1"), should.equal("foo.2"));
-            specify(bindingStorage.nextKeyAfter("foo.2"), should.equal(null));
+            specify(bindings.nextKeyAfter("foo"), should.equal("foo.1"));
+            specify(bindings.nextKeyAfter("foo.1"), should.equal("foo.2"));
+            specify(bindings.nextKeyAfter("foo.2"), should.equal(null));
         }
 
         public void entitiesCanBeAccessedByTheBindingName() {
-            DummyEntity entity = (DummyEntity) bindingStorage.read("foo");
+            DummyEntity entity = (DummyEntity) bindings.read("foo");
             specify(entity.getOther(), should.equal("foo"));
         }
     }
