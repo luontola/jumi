@@ -33,10 +33,12 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.jetbrains.annotations.TestOnly;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.concurrent.*;
 
@@ -48,7 +50,7 @@ public class TaskScheduler extends NullScheduledExecutorService {
 
     private static final String TASKS_PREFIX = TaskScheduler.class.getName() + ".tasks.";
 
-    private final BlockingQueue<Runnable> waitingForExecution = new LinkedBlockingDeque<Runnable>();
+    private final BlockingQueue<ScheduledTask> waitingForExecution = new DelayQueue<ScheduledTask>();
     private final Provider<BindingStorage> bindings;
     private final Provider<EntityInfo> entities;
 
@@ -69,25 +71,30 @@ public class TaskScheduler extends NullScheduledExecutorService {
     }
 
     private void recoverTaskFromDatabase(String binding) {
-        Runnable task = (Runnable) bindings.get().read(binding);
+        ScheduledTask task = (ScheduledTask) bindings.get().read(binding);
         if (task != null) {
             waitingForExecution.add(task);
         }
     }
 
     public Future<?> submit(Runnable task) {
-        bindings.get().update(bindingFor(task), task);
-        waitingForExecution.add(task);
+        return schedule(task, 0, TimeUnit.MILLISECONDS);
+    }
+
+    public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
+        ScheduledTask st = new ScheduledTask(task, delay, unit);
+        bindings.get().update(bindingFor(st), st);
+        waitingForExecution.add(st);
         return null;
     }
 
     public Runnable takeNextTask() throws InterruptedException {
-        Runnable task = waitingForExecution.take();
-        bindings.get().delete(bindingFor(task));
-        return task;
+        ScheduledTask st = waitingForExecution.take();
+        bindings.get().delete(bindingFor(st));
+        return st.getRunnable();
     }
 
-    private String bindingFor(Runnable task) {
+    private String bindingFor(ScheduledTask task) {
         BigInteger entityId = entities.get().getEntityId(task);
         return TASKS_PREFIX + entityId;
     }
@@ -95,5 +102,29 @@ public class TaskScheduler extends NullScheduledExecutorService {
     @TestOnly
     int getQueuedTasks() {
         return waitingForExecution.size();
+    }
+
+    private static class ScheduledTask implements Delayed, EntityObject, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final Runnable task;
+        private final long targetTime;
+
+        public ScheduledTask(Runnable task, long delay, TimeUnit unit) {
+            this.task = task;
+            this.targetTime = unit.toMillis(delay) + System.currentTimeMillis();
+        }
+
+        public Runnable getRunnable() {
+            return task;
+        }
+
+        public long getDelay(TimeUnit unit) {
+            return targetTime - System.currentTimeMillis();
+        }
+
+        public int compareTo(Delayed o) {
+            return 0;
+        }
     }
 }

@@ -35,13 +35,13 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -77,10 +77,23 @@ public class TaskSchedulerSpec extends Specification<Object> {
         });
     }
 
+    private static Runnable takeNextTaskFrom(TaskScheduler scheduler) {
+        try {
+            return scheduler.takeNextTask();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void interruptTestThread() {
         final Thread testThread = Thread.currentThread();
         new Thread(new Runnable() {
             public void run() {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 testThread.interrupt();
             }
         }).start();
@@ -125,11 +138,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anExecutorMayTakeTheTask() throws Exception {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    try {
-                        specify(scheduler.takeNextTask(), should.equal(task));
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                    specify(takeNextTaskFrom(scheduler), should.equal(task));
                 }
             });
         }
@@ -146,11 +155,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     scheduler.submit(task);
-                    try {
-                        scheduler.takeNextTask();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                    takeNextTaskFrom(scheduler);
                 }
             });
         }
@@ -165,8 +170,50 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
     }
 
+    public class WhenATaskIsScheduledWithADelay {
 
-    private static class DummyTask implements Runnable, EntityObject, Serializable {
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.schedule(task, 30, TimeUnit.MILLISECONDS);
+                }
+            });
+        }
+
+        public void theTaskIsQueued() {
+            specify(scheduler.getQueuedTasks(), should.equal(1));
+        }
+
+        public void anExecutorCanNotGetTakeItBeforeTheDelay() throws Exception {
+            interruptTestThread();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    scheduler.takeNextTask();
+                }
+            }, should.raise(InterruptedException.class));
+        }
+
+        public void anExecutorMayTakeItAfterTheDelay() throws Exception {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(takeNextTaskFrom(scheduler), should.not().equal(null));
+                }
+            });
+        }
+    }
+
+
+    private static class DummyTask implements Runnable, Serializable {
+
+        public String value;
+
+        public DummyTask() {
+        }
+
+        public DummyTask(String value) {
+            this.value = value;
+        }
+
         public void run() {
         }
     }
