@@ -56,6 +56,7 @@ public class ScheduledWithFixedDelayTask extends AbstractScheduledTask {
     }
 
     public ScheduledTask nextRepeatedTask() {
-        return new ScheduledWithFixedDelayTask(getTask(), getClock().currentTimeMillis() + delay, delay, getControl(), getClock());
+        long nextScheduledTime = getClock().currentTimeMillis() + delay;
+        return new ScheduledWithFixedDelayTask(getTask(), nextScheduledTime, delay, getControl(), getClock());
     }
 }

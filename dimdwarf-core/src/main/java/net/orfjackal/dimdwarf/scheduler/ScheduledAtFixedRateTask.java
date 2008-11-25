@@ -56,6 +56,7 @@ public class ScheduledAtFixedRateTask extends AbstractScheduledTask {
     }
 
     public ScheduledTask nextRepeatedTask() {
-        return new ScheduledAtFixedRateTask(getTask(), getScheduledTime() + period, period, getControl(), getClock());
+        long nextScheduledTime = getScheduledTime() + period;
+        return new ScheduledAtFixedRateTask(getTask(), nextScheduledTime, period, getControl(), getClock());
     }
 }

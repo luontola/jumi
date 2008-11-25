@@ -144,7 +144,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
             ScheduledTaskHolder holder = waitingForExecution.take();
             cancelTakeOnRollback(holder);
             st = fromHolder(holder);
-        } while (st.isDone());
+        } while (st.isDone() || st.isCancelled());
         repeatIfRepeatable(st);
         return st.getTask();
     }
@@ -190,6 +190,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Immutable
     private class ScheduledTaskHolder implements Delayed {
+
         private final String binding;
         private final long scheduledTime;
 
