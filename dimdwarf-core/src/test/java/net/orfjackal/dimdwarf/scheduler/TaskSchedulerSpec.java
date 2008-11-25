@@ -267,7 +267,46 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    // TODO: schedule with fixed rate (enter here, above fixed delay, because that's how they are sorted in the sources)
+    public class WhenATaskIsScheduledAtFixedRate {
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    // We use seconds here as the time unit, to test that
+                    // they are converted correctly to milliseconds.
+                    scheduler.scheduleAtFixedRate(task1, 1, 2, TimeUnit.SECONDS);
+                }
+            });
+        }
+
+        public void theFirstExecutionIsAfterTheInitialDelay() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(taskCanBeTakenExactlyAfterDelay(1000));
+                }
+            });
+        }
+
+        public void theFollowingExecutionsAreAtTheFixedRate() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(taskCanBeTakenExactlyAfterDelay(1000));
+                    specify(taskCanBeTakenExactlyAfterDelay(2000));
+                    specify(taskCanBeTakenExactlyAfterDelay(2000));
+                }
+            });
+        }
+
+        public void whenAnExecutionIsLateThenTheDelayRateOfExecutionsIsFixed() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    clock.addTime(1200);
+                    specify(taskCanBeTakenRightNow());
+                    specify(taskCanBeTakenExactlyAfterDelay(1800));
+                }
+            });
+        }
+    }
 
     public class WhenATaskIsScheduledWithFixedDelay {
 
@@ -302,7 +341,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void whenAnExecutionIsLateThenTheDelayBetweenTaskExecutionsIsFixed() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    clock.addTime(1500);
+                    clock.addTime(1200);
                     specify(taskCanBeTakenRightNow());
                     specify(taskCanBeTakenExactlyAfterDelay(2000));
                 }

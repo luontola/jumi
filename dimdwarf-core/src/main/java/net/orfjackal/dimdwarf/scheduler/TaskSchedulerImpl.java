@@ -86,17 +86,17 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-        // TODO: create ScheduledTask with assisted inject, to remove dependency to Clock from TaskScheduler
-        addToExecutionQueue(ScheduledTask.newScheduledTask(task, delay, unit, clock));
+        addToExecutionQueue(ScheduledOneTimeTask.create(task, delay, unit, clock));
         return null;
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
-        throw new UnsupportedOperationException(); // TODO
+        addToExecutionQueue(ScheduledAtFixedRateTask.create(task, initialDelay, period, unit, clock));
+        return null;
     }
 
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-        addToExecutionQueue(ScheduledTask.newScheduledTaskWithFixedDelay(task, initialDelay, delay, unit, clock));
+        addToExecutionQueue(ScheduledWithFixedDelayTask.create(task, initialDelay, delay, unit, clock));
         return null;
     }
 

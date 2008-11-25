@@ -31,51 +31,33 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.util.Clock;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import java.io.Serializable;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
- * @since 24.11.2008
+ * @since 25.11.2008
  */
 @ThreadSafe
-public abstract class ScheduledTask implements Delayed, EntityObject, Serializable {
+public class ScheduledWithFixedDelayTask extends ScheduledTask {
     private static final long serialVersionUID = 1L;
 
-    protected final Runnable task;
-    protected final long scheduledTime;
-    protected transient Clock clock;
+    private final long delay;
 
-    protected ScheduledTask(Runnable task, long scheduledTime, Clock clock) {
-        this.task = task;
-        this.scheduledTime = scheduledTime;
-        this.clock = clock;
+    public static ScheduledTask create(Runnable task, long initialDelay, long delay, TimeUnit unit, Clock clock) {
+        long scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+        delay = unit.toMillis(delay);
+        return new ScheduledWithFixedDelayTask(task, scheduledTime, delay, clock);
     }
 
-    @CheckForNull
-    public abstract ScheduledTask nextRepeatedTask();
-
-    @Inject
-    public void setClock(Clock clock) {
-        this.clock = clock;
+    private ScheduledWithFixedDelayTask(Runnable task, long scheduledTime, long delay, Clock clock) {
+        super(task, scheduledTime, clock);
+        this.delay = delay;
     }
 
-    public Runnable getRunnable() {
-        return task;
-    }
-
-    public long getDelay(TimeUnit unit) {
-        return unit.convert(scheduledTime - clock.currentTimeMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    public int compareTo(Delayed o) {
-        ScheduledTask other = (ScheduledTask) o;
-        return (int) (this.scheduledTime - other.scheduledTime);
+    public ScheduledTask nextRepeatedTask() {
+        return new ScheduledWithFixedDelayTask(task, clock.currentTimeMillis() + delay, delay, clock);
     }
 }
