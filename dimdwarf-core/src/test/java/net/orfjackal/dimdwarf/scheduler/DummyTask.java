@@ -31,31 +31,24 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import net.orfjackal.dimdwarf.util.Clock;
-
-import javax.annotation.concurrent.ThreadSafe;
+import java.io.Serializable;
 
 /**
  * @author Esko Luontola
  * @since 25.11.2008
  */
-@ThreadSafe
-public class ScheduledAtFixedRateTask extends ScheduledTask {
+public class DummyTask implements Runnable, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final long period;
+    public String value;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long period, Clock clock) {
-        long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledAtFixedRateTask(task, scheduledTime, period, clock);
+    public DummyTask() {
     }
 
-    private ScheduledAtFixedRateTask(Runnable task, long scheduledTime, long period, Clock clock) {
-        super(task, scheduledTime, clock);
-        this.period = period;
+    public DummyTask(String value) {
+        this.value = value;
     }
 
-    public ScheduledTask nextRepeatedTask() {
-        return new ScheduledAtFixedRateTask(getTask(), getScheduledTime() + period, period, getClock());
+    public void run() {
     }
 }

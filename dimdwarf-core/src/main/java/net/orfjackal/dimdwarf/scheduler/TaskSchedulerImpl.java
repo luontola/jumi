@@ -51,7 +51,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks.";
 
-    private final BlockingQueue<ScheduledTask> waitingForExecution = new DelayQueue<ScheduledTask>();
+    private final BlockingQueue<ScheduledTaskHolder> waitingForExecution = new DelayQueue<ScheduledTaskHolder>();
     private final Provider<BindingStorage> bindings;
     private final Provider<EntityInfo> entities;
     private final Clock clock;
@@ -77,7 +77,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
     private void recoverTaskFromDatabase(String binding) {
         ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
         if (st != null) {
-            waitingForExecution.add(st);
+            waitingForExecution.add(new ScheduledTaskHolder(binding, st.getScheduledTime()));
         }
     }
 
@@ -106,15 +106,17 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
-        bindings.get().update(bindingFor(st), st);
-        waitingForExecution.add(st);
+        String binding = bindingFor(st);
+        bindings.get().update(binding, st);
+        waitingForExecution.add(new ScheduledTaskHolder(binding, st.getScheduledTime()));
     }
 
     public Runnable takeNextTask() throws InterruptedException {
-        ScheduledTask st = waitingForExecution.take();
-        bindings.get().delete(bindingFor(st));
+        ScheduledTaskHolder holder = waitingForExecution.take();
+        ScheduledTask st = (ScheduledTask) bindings.get().read(holder.binding);
+        bindings.get().delete(holder.binding);
         repeatIfRepeatable(st);
-        return st.getRunnable();
+        return st.getTask();
     }
 
     private void repeatIfRepeatable(ScheduledTask st) {
@@ -132,5 +134,24 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @TestOnly
     int getQueuedTasks() {
         return waitingForExecution.size();
+    }
+
+    private class ScheduledTaskHolder implements Delayed {
+        private final String binding;
+        private long scheduledTime;
+
+        public ScheduledTaskHolder(String binding, long scheduledTime) {
+            this.binding = binding;
+            this.scheduledTime = scheduledTime;
+        }
+
+        public long getDelay(TimeUnit unit) {
+            return unit.convert(scheduledTime - clock.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        }
+
+        public int compareTo(Delayed o) {
+            ScheduledTaskHolder other = (ScheduledTaskHolder) o;
+            return (int) (this.scheduledTime - other.scheduledTime);
+        }
     }
 }

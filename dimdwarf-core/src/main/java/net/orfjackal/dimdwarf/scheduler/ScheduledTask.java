@@ -38,19 +38,18 @@ import net.orfjackal.dimdwarf.util.Clock;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
-import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
  * @since 24.11.2008
  */
 @ThreadSafe
-public abstract class ScheduledTask implements Delayed, EntityObject, Serializable {
+public abstract class ScheduledTask implements EntityObject, Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected final Runnable task;
-    protected final long scheduledTime;
-    protected transient Clock clock;
+    private final Runnable task;
+    private final long scheduledTime;
+    private transient Clock clock;
 
     protected ScheduledTask(Runnable task, long scheduledTime, Clock clock) {
         this.task = task;
@@ -58,24 +57,23 @@ public abstract class ScheduledTask implements Delayed, EntityObject, Serializab
         this.clock = clock;
     }
 
-    @CheckForNull
-    public abstract ScheduledTask nextRepeatedTask();
-
     @Inject
     public void setClock(Clock clock) {
         this.clock = clock;
     }
 
-    public Runnable getRunnable() {
+    @CheckForNull
+    public abstract ScheduledTask nextRepeatedTask();
+
+    public Runnable getTask() {
         return task;
     }
 
-    public long getDelay(TimeUnit unit) {
-        return unit.convert(scheduledTime - clock.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    public long getScheduledTime() {
+        return scheduledTime;
     }
 
-    public int compareTo(Delayed o) {
-        ScheduledTask other = (ScheduledTask) o;
-        return (int) (this.scheduledTime - other.scheduledTime);
+    protected Clock getClock() {
+        return clock;
     }
 }

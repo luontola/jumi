@@ -41,7 +41,6 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
-import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -174,7 +173,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anExecutorMayTakeTheTask() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(takeNextTaskFrom(scheduler), should.equal(task1));
+                    specify(takeNextTaskFrom(scheduler).value, should.equal("1"));
                 }
             });
         }
@@ -194,6 +193,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     scheduler.submit(task1);
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     takeNextTaskFrom(scheduler);
                 }
             });
@@ -259,6 +262,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     scheduler.schedule(task2, 500, TimeUnit.MILLISECONDS);
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     clock.addTime(2000);
                     specify(takeNextTaskFrom(scheduler).value, should.equal("2"));
                     specify(takeNextTaskFrom(scheduler).value, should.equal("1"));
@@ -350,20 +357,4 @@ public class TaskSchedulerSpec extends Specification<Object> {
     }
 
     // TODO: cancelling tasks
-
-    private static class DummyTask implements Runnable, Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public String value;
-
-        public DummyTask() {
-        }
-
-        public DummyTask(String value) {
-            this.value = value;
-        }
-
-        public void run() {
-        }
-    }
 }

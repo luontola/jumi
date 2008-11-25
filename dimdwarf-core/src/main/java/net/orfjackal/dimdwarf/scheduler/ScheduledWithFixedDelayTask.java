@@ -56,6 +56,6 @@ public class ScheduledWithFixedDelayTask extends ScheduledTask {
     }
 
     public ScheduledTask nextRepeatedTask() {
-        return new ScheduledWithFixedDelayTask(task, clock.currentTimeMillis() + delay, delay, clock);
+        return new ScheduledWithFixedDelayTask(getTask(), getClock().currentTimeMillis() + delay, delay, getClock());
     }
 }
