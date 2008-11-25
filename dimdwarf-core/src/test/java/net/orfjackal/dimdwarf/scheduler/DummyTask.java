@@ -40,10 +40,10 @@ import java.io.Serializable;
 public class DummyTask implements Runnable, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String value;
+    private final String dummyId;
 
-    public DummyTask(String value) {
-        this.value = value;
+    public DummyTask(String dummyId) {
+        this.dummyId = dummyId;
     }
 
     public void run() {
@@ -52,7 +52,7 @@ public class DummyTask implements Runnable, Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof DummyTask) {
             DummyTask other = (DummyTask) obj;
-            return value.equals(other.value);
+            return dummyId.equals(other.dummyId);
         }
         return false;
     }
