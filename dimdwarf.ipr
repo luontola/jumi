@@ -953,7 +953,7 @@
     </library>
   </component>
   <UsedPathMacros>
-    <macro name="M2_REPO" />
+    <macro name="M2_REPO" description="Path to the local Maven repository" />
   </UsedPathMacros>
 </project>
 
