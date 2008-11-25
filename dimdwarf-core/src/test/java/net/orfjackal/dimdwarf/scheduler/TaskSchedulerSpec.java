@@ -42,6 +42,7 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
 import java.util.concurrent.*;
 
 /**
@@ -183,9 +184,9 @@ public class TaskSchedulerSpec extends Specification<Object> {
         bindings.get().update("future", new DummyEntity(future));
     }
 
-    private Future<?> _loadFuture() {
+    private ScheduledFuture<?> _loadFuture() {
         DummyEntity tmp = (DummyEntity) bindings.get().read("future");
-        return (Future<?>) tmp.getOther();
+        return (ScheduledFuture<?>) tmp.getOther();
     }
 
 
@@ -288,7 +289,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 public void run() {
                     // We use seconds here as the time unit, to test that
                     // they are converted correctly to milliseconds.
-                    scheduler.schedule(task1, 1, TimeUnit.SECONDS);
+                    ScheduledFuture<?> f = scheduler.schedule(task1, 1, TimeUnit.SECONDS);
+                    _saveFuture(f);
                 }
             });
         }
@@ -323,12 +325,17 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anotherTaskWithAShorterDelayWillBeExecutedFirst() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.schedule(task2, 500, TimeUnit.MILLISECONDS);
+                    ScheduledFuture<?> f1 = _loadFuture();
+                    ScheduledFuture<?> f2 = scheduler.schedule(task2, 500, TimeUnit.MILLISECONDS);
+
+                    ScheduledFuture<?>[] executionOrder = {f1, f2};
+                    Arrays.sort(executionOrder);
+                    specify(executionOrder, should.containInOrder(f2, f1));
                 }
             });
+            clock.addTime(2000);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    clock.addTime(2000);
                     specify(_takeNextTaskFrom(scheduler), should.equal(task2));
                     specify(_takeNextTaskFrom(scheduler), should.equal(task1));
                 }
@@ -400,13 +407,15 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     // Use each variation of scheduling when testing cancelling
-                    Future<?> f = scheduler.submit(task1);
+                    ScheduledFuture<?> f = scheduler.schedule(task1, 1, TimeUnit.SECONDS);
+                    specify(f.getDelay(TimeUnit.SECONDS), should.equal(1));
                     specify(cancelsSuccessfully(f));
                 }
             });
         }
 
         public void theTaskIsCancelled() {
+            clock.addTime(1000);
             specify(taskCanNotBeTakenRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
@@ -418,20 +427,22 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     // Use each variation of scheduling when testing cancelling
-                    Future<?> f = scheduler.scheduleAtFixedRate(task1, 1, 2, TimeUnit.SECONDS);
+                    ScheduledFuture<?> f = scheduler.scheduleAtFixedRate(task1, 1, 2, TimeUnit.SECONDS);
                     _saveFuture(f);
                 }
             });
+            clock.addTime(100);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    Future<?> f = _loadFuture();
+                    ScheduledFuture<?> f = _loadFuture();
+                    specify(f.getDelay(TimeUnit.MILLISECONDS), should.equal(900));
                     specify(cancelsSuccessfully(f));
                 }
             });
         }
 
         public void theTaskIsCancelled() {
-            clock.addTime(1000);
+            clock.addTime(900);
             specify(taskCanNotBeTakenRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
@@ -443,7 +454,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     // Use each variation of scheduling when testing cancelling
-                    Future<?> f = scheduler.scheduleWithFixedDelay(task1, 1, 2, TimeUnit.SECONDS);
+                    ScheduledFuture<?> f = scheduler.scheduleWithFixedDelay(task1, 1, 2, TimeUnit.SECONDS);
                     _saveFuture(f);
                 }
             });
@@ -451,7 +462,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     specify(_takeNextTaskFrom(scheduler), should.equal(task1));
-                    Future<?> f = _loadFuture();
+                    ScheduledFuture<?> f = _loadFuture();
+                    specify(f.getDelay(TimeUnit.MILLISECONDS), should.equal(2000));
                     specify(cancelsSuccessfully(f));
                 }
             });

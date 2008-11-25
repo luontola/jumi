@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.util.Clock;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -58,6 +59,7 @@ public abstract class AbstractScheduledTask implements EntityObject, Serializabl
         this.scheduledTime = scheduledTime;
         this.control = control;
         this.clock = clock;
+        control.setCurrentTask(this);
     }
 
     @Inject
@@ -71,6 +73,10 @@ public abstract class AbstractScheduledTask implements EntityObject, Serializabl
 
     public long getScheduledTime() {
         return scheduledTime;
+    }
+
+    public long getDelay(TimeUnit unit) {
+        return unit.convert(scheduledTime - clock.currentTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
     public boolean isDone() {

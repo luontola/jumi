@@ -50,11 +50,13 @@ public class SchedulingFuture implements ScheduledFuture<Object>, Serializable {
     }
 
     public long getDelay(TimeUnit unit) {
-        throw new UnsupportedOperationException();
+        return control.getDelay(unit);
     }
 
-    public int compareTo(Delayed o) {
-        throw new UnsupportedOperationException();
+    public int compareTo(Delayed other) {
+        long myDelay = getDelay(TimeUnit.MILLISECONDS);
+        long otherDelay = other.getDelay(TimeUnit.MILLISECONDS);
+        return (int) (myDelay - otherDelay);
     }
 
     public boolean cancel(boolean mayInterruptIfRunning) {

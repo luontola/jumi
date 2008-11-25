@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.api.internal.EntityObject;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -46,8 +47,17 @@ import java.io.Serializable;
 public class SchedulingControl implements EntityObject, Serializable {
     private static final long serialVersionUID = 1L;
 
+    private ScheduledTask currentTask;
     private boolean done = false;
     private boolean cancelled = false;
+
+    public void setCurrentTask(ScheduledTask currentTask) {
+        this.currentTask = currentTask;
+    }
+
+    public long getDelay(TimeUnit unit) {
+        return currentTask.getDelay(unit);
+    }
 
     public boolean isDone() {
         return done;

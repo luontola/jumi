@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import javax.annotation.CheckForNull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -45,6 +46,8 @@ public interface ScheduledTask {
     Runnable getTask();
 
     long getScheduledTime();
+
+    long getDelay(TimeUnit unit);
 
     boolean isDone();
 
