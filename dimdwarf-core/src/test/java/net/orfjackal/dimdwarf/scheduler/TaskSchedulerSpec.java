@@ -135,6 +135,16 @@ public class TaskSchedulerSpec extends Specification<Object> {
         return true;
     }
 
+    private boolean cancelsSuccessfully(Future<?> f) {
+        specify(!f.isDone());
+        specify(!f.isCancelled());
+        boolean success = f.cancel(false);
+        specify(success);
+        specify(f.isDone());
+        specify(f.isCancelled());
+        return true;
+    }
+
     // Utility methods which expect a task context (prefixed with "_")
 
     public static DummyTask _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
@@ -169,6 +179,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     }
 
     private void _saveFuture(Future<?> future) {
+        specify(future, should.not().equal(null));
         bindings.get().update("future", new DummyEntity(future));
     }
 
@@ -388,13 +399,9 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
+                    // Use each variation of scheduling when testing cancelling
                     Future<?> f = scheduler.submit(task1);
-                    specify(!f.isDone());
-                    specify(!f.isCancelled());
-                    boolean success = f.cancel(false);
-                    specify(success);
-                    specify(f.isDone());
-                    specify(f.isCancelled());
+                    specify(cancelsSuccessfully(f));
                 }
             });
         }
@@ -410,19 +417,15 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    Future<?> f = scheduler.schedule(task1, 1, TimeUnit.SECONDS);
+                    // Use each variation of scheduling when testing cancelling
+                    Future<?> f = scheduler.scheduleAtFixedRate(task1, 1, 2, TimeUnit.SECONDS);
                     _saveFuture(f);
                 }
             });
             taskContext.execute(new Runnable() {
                 public void run() {
                     Future<?> f = _loadFuture();
-                    specify(!f.isDone());
-                    specify(!f.isCancelled());
-                    boolean success = f.cancel(false);
-                    specify(success);
-                    specify(f.isDone());
-                    specify(f.isCancelled());
+                    specify(cancelsSuccessfully(f));
                 }
             });
         }
@@ -434,5 +437,30 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    // TODO: cancelling tasks
+    public class WhenARepeatingScheduledTaskIsCancelledDuringItIsExecuted {
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    // Use each variation of scheduling when testing cancelling
+                    Future<?> f = scheduler.scheduleWithFixedDelay(task1, 1, 2, TimeUnit.SECONDS);
+                    _saveFuture(f);
+                }
+            });
+            clock.addTime(1000);
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                    Future<?> f = _loadFuture();
+                    specify(cancelsSuccessfully(f));
+                }
+            });
+        }
+
+        public void theTaskIsCancelled() {
+            clock.addTime(2000);
+            specify(taskCanNotBeTakenRightNow());
+            specify(scheduler.getQueuedTasks(), should.equal(0));
+        }
+    }
 }
