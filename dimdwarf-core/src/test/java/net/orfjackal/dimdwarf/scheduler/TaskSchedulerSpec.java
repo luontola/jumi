@@ -197,7 +197,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anExecutorMayTakeTheTask() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler).value, should.equal("1"));
+                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
                 }
             });
         }
@@ -287,8 +287,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     clock.addTime(2000);
-                    specify(_takeNextTaskFrom(scheduler).value, should.equal("2"));
-                    specify(_takeNextTaskFrom(scheduler).value, should.equal("1"));
+                    specify(_takeNextTaskFrom(scheduler), should.equal(task2));
+                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
                 }
             });
         }
