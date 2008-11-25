@@ -31,23 +31,15 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import com.google.inject.*;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.modules.FakeEntityModule;
-import net.orfjackal.dimdwarf.modules.TaskContextModule;
-import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionException;
-import net.orfjackal.dimdwarf.tx.TransactionParticipant;
-import net.orfjackal.dimdwarf.tx.TransactionStatus;
+import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.tx.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * @author Esko Luontola
@@ -59,7 +51,7 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
 
     private Injector injector;
     private TaskExecutor taskExecutor;
-    private Logger logger;
+    private Logger hideTransactionFailedLogs;
 
     public void create() throws Exception {
         injector = Guice.createInjector(
@@ -68,12 +60,12 @@ public class ExecutingTransactionalTasksSpec extends Specification<Object> {
         );
         taskExecutor = injector.getInstance(TaskExecutor.class);
 
-        logger = Logger.getLogger(TransactionFilter.class.getName());
-        logger.setLevel(Level.OFF);
+        hideTransactionFailedLogs = Logger.getLogger(TransactionFilter.class.getName());
+        hideTransactionFailedLogs.setLevel(Level.OFF);
     }
 
     public void destroy() throws Exception {
-        logger.setLevel(Level.ALL);
+        hideTransactionFailedLogs.setLevel(Level.ALL);
     }
 
     private Transaction getTransaction() {

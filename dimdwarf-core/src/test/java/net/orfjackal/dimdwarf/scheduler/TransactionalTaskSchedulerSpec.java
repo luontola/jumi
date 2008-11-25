@@ -37,10 +37,13 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.BindingStorage;
 import net.orfjackal.dimdwarf.modules.*;
-import net.orfjackal.dimdwarf.tasks.TaskExecutor;
-import net.orfjackal.dimdwarf.tx.Transaction;
+import net.orfjackal.dimdwarf.tasks.*;
+import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.*;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import java.util.logging.*;
 
 /**
  * @author Esko Luontola
@@ -56,9 +59,11 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
     private Provider<Transaction> tx;
     private TaskExecutor taskContext;
     private DummyClock clock;
+    private Logger hideTransactionFailedLogs;
 
-    private DummyTask task1;
-    private DummyTask task2;
+    private DummyTask task1 = new DummyTask("1");
+    private DummyTask task2 = new DummyTask("2");
+
 
     public void create() {
         clock = new DummyClock();
@@ -77,8 +82,13 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         taskContext = injector.getInstance(TaskExecutor.class);
 
         scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
-        task1 = new DummyTask("1");
-        task2 = new DummyTask("2");
+
+        hideTransactionFailedLogs = Logger.getLogger(TransactionFilter.class.getName());
+        hideTransactionFailedLogs.setLevel(Level.OFF);
+    }
+
+    public void destroy() throws Exception {
+        hideTransactionFailedLogs.setLevel(Level.ALL);
     }
 
 
@@ -97,5 +107,42 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
+        public void theTaskIsNotQueuedIfTheTransactionRollsBack() {
+            try {
+                taskContext.execute(new Runnable() {
+                    public void run() {
+                        scheduler.submit(task1);
+                        tx.get().setRollbackOnly();
+                    }
+                });
+                fail("TransactionExpection should be thrown");
+            } catch (TransactionException e) {
+                specify(e.getCause() instanceof TransactionRolledbackException);
+            }
+            specify(scheduler.getQueuedTasks(), should.equal(0));
+        }
+
+        @SuppressWarnings("ThrowableInstanceNeverThrown")
+        public void theTaskIsNotQueuedIfTheTransactionRollsBackDuringPrepare() throws Throwable {
+            final TransactionParticipant failOnPrepare = mock(TransactionParticipant.class);
+            checking(new Expectations() {{
+                one(failOnPrepare).prepare(); will(throwException(new AssertionError("Dummy exception")));
+            }});
+            try {
+                taskContext.execute(new Runnable() {
+                    public void run() {
+                        scheduler.submit(task1);
+                        tx.get().join(failOnPrepare);
+                    }
+                });
+                fail("TransactionExpection should be thrown");
+            } catch (TransactionException e) {
+                specify(e.getCause() instanceof AssertionError);
+            }
+            specify(scheduler.getQueuedTasks(), should.equal(0));
+        }
     }
+
+
+    // TODO: if transaction (of the task which was just taken) rolls back, the task should be rescheduled
 }

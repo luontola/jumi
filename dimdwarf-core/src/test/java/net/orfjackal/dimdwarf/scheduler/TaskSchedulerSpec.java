@@ -206,9 +206,6 @@ public class TaskSchedulerSpec extends Specification<Object> {
             scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
-
-        // TODO: if transaction rolls back, the task should not be executed
-        // TODO: the task should not be executed *before* the task commits
     }
 
     public class WhenATaskIsTakenFromTheQueue {
@@ -235,8 +232,6 @@ public class TaskSchedulerSpec extends Specification<Object> {
             scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
-
-        // TODO: if transaction rolls back, the task should be rescheduled
     }
 
     public class WhenATaskIsScheduled {
