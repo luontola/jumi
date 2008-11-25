@@ -96,12 +96,43 @@ public class TaskSchedulerSpec extends Specification<Object> {
         return true;
     }
 
-    private boolean taskCanBeTakenRightNow() {
-        specify(takeNextTaskFrom(scheduler), should.not().equal(null));
+    // Utility methods which create their own task context
+
+    private boolean taskMayBeTakenRightNow() {
+        taskContext.execute(new Runnable() {
+            public void run() {
+                specify(_takeNextTaskFrom(scheduler), should.not().equal(null));
+            }
+        });
         return true;
     }
 
-    private static DummyTask takeNextTaskFrom(TaskSchedulerImpl scheduler) {
+    private boolean taskCanNotBeTakenRightNow() {
+        taskContext.execute(new Runnable() {
+            public void run() {
+                _interruptTestThreadAfter(THREAD_SYNC_DELAY);
+                specify(_takeNextTaskIsInterrupted());
+            }
+        });
+        return true;
+    }
+
+    private boolean taskCanBeTakenExactlyAfterDelay(final int delay) {
+        taskContext.execute(new Runnable() {
+            public void run() {
+                clock.addTime(delay - 1);
+                _interruptTestThreadAfter(THREAD_SYNC_DELAY);
+                specify(_takeNextTaskIsInterrupted());
+                clock.addTime(1);
+                specify(_takeNextTaskFrom(scheduler), should.not().equal(null));
+            }
+        });
+        return true;
+    }
+
+    // Utility methods which expect a task context (prefixed with "_")
+
+    private static DummyTask _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
         try {
             return (DummyTask) scheduler.takeNextTask();
         } catch (InterruptedException e) {
@@ -109,16 +140,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    private boolean taskCanBeTakenExactlyAfterDelay(int delay) {
-        clock.addTime(delay - 1);
-        interruptTestThreadAfter(THREAD_SYNC_DELAY);
-        specify(takeNextTaskIsInterrupted());
-        clock.addTime(1);
-        specify(taskCanBeTakenRightNow());
-        return true;
-    }
-
-    private static void interruptTestThreadAfter(final int delay) {
+    private static void _interruptTestThreadAfter(final int delay) {
         final Thread testThread = Thread.currentThread();
         new Thread(new Runnable() {
             public void run() {
@@ -132,7 +154,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }).start();
     }
 
-    private boolean takeNextTaskIsInterrupted() {
+    private boolean _takeNextTaskIsInterrupted() {
         specify(new Block() {
             public void run() throws Throwable {
                 scheduler.takeNextTask();
@@ -149,8 +171,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void anExecutorWillWaitUntilThereAreTasks() {
-            interruptTestThreadAfter(THREAD_SYNC_DELAY);
-            specify(takeNextTaskIsInterrupted());
+            specify(taskCanNotBeTakenRightNow());
         }
 
         public void afterRestartNoTasksAreQueued() {
@@ -176,7 +197,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anExecutorMayTakeTheTask() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(takeNextTaskFrom(scheduler).value, should.equal("1"));
+                    specify(_takeNextTaskFrom(scheduler).value, should.equal("1"));
                 }
             });
         }
@@ -198,9 +219,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
                     scheduler.submit(task1);
                 }
             });
+            specify(scheduler.getQueuedTasks(), should.equal(1));
             taskContext.execute(new Runnable() {
                 public void run() {
-                    takeNextTaskFrom(scheduler);
+                    _takeNextTaskFrom(scheduler);
                 }
             });
         }
@@ -234,18 +256,13 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void anExecutorCanNotTakeItBeforeTheDelay() {
-            interruptTestThreadAfter(THREAD_SYNC_DELAY);
-            specify(takeNextTaskIsInterrupted());
+            specify(taskCanNotBeTakenRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
         public void anExecutorMayTakeItAfterTheDelay() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    clock.addTime(1000);
-                    specify(taskCanBeTakenRightNow());
-                }
-            });
+            clock.addTime(1000);
+            specify(taskMayBeTakenRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
 
@@ -270,8 +287,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     clock.addTime(2000);
-                    specify(takeNextTaskFrom(scheduler).value, should.equal("2"));
-                    specify(takeNextTaskFrom(scheduler).value, should.equal("1"));
+                    specify(_takeNextTaskFrom(scheduler).value, should.equal("2"));
+                    specify(_takeNextTaskFrom(scheduler).value, should.equal("1"));
                 }
             });
         }
@@ -290,43 +307,19 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void theFirstExecutionIsAfterTheInitialDelay() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(1000));
-                }
-            });
+            specify(taskCanBeTakenExactlyAfterDelay(1000));
         }
 
         public void theFollowingExecutionsAreAtTheFixedRate() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(1000));
-                }
-            });
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(2000));
-                }
-            });
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(2000));
-                }
-            });
+            specify(taskCanBeTakenExactlyAfterDelay(1000));
+            specify(taskCanBeTakenExactlyAfterDelay(2000));
+            specify(taskCanBeTakenExactlyAfterDelay(2000));
         }
 
         public void whenAnExecutionIsLateThenTheDelayRateOfExecutionsIsFixed() {
             clock.addTime(1200);
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenRightNow());
-                }
-            });
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(1800));
-                }
-            });
+            specify(taskMayBeTakenRightNow());
+            specify(taskCanBeTakenExactlyAfterDelay(1800));
         }
     }
 
@@ -343,43 +336,19 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void theFirstExecutionIsAfterTheInitialDelay() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(1000));
-                }
-            });
+            specify(taskCanBeTakenExactlyAfterDelay(1000));
         }
 
         public void theFollowingExecutionsAreAfterTheFixedDelay() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(1000));
-                }
-            });
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(2000));
-                }
-            });
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(2000));
-                }
-            });
+            specify(taskCanBeTakenExactlyAfterDelay(1000));
+            specify(taskCanBeTakenExactlyAfterDelay(2000));
+            specify(taskCanBeTakenExactlyAfterDelay(2000));
         }
 
         public void whenAnExecutionIsLateThenTheDelayBetweenTaskExecutionsIsFixed() {
             clock.addTime(1200);
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenRightNow());
-                }
-            });
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(taskCanBeTakenExactlyAfterDelay(2000));
-                }
-            });
+            specify(taskMayBeTakenRightNow());
+            specify(taskCanBeTakenExactlyAfterDelay(2000));
         }
     }
 
