@@ -87,6 +87,7 @@ public class ScheduledTask implements Delayed, EntityObject, Serializable {
 
     @CheckForNull
     public ScheduledTask nextRepeatedTask() {
+        // TODO: replace with polymorphism: ScheduledOneTimeTask, ScheduledAtFixedRateTask, ScheduledWithFixedDelayTask
         if (repeatWithFixedDelay()) {
             return new ScheduledTask(task, clock.currentTimeMillis() + fixedDelay, fixedDelay, clock);
         }
