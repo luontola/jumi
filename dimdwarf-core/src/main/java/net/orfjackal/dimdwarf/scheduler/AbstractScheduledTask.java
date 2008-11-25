@@ -50,7 +50,7 @@ public abstract class AbstractScheduledTask implements EntityObject, Serializabl
 
     private final Runnable task;
     private final long scheduledTime;
-    private SchedulingControl control;
+    private final SchedulingControl control;
     private transient Clock clock;
 
     protected AbstractScheduledTask(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
@@ -58,7 +58,6 @@ public abstract class AbstractScheduledTask implements EntityObject, Serializabl
         this.scheduledTime = scheduledTime;
         this.control = control;
         this.clock = clock;
-        control.setCurrentTask(this);
     }
 
     @Inject
@@ -82,12 +81,8 @@ public abstract class AbstractScheduledTask implements EntityObject, Serializabl
         return control.isCancelled();
     }
 
-    protected SchedulingControl transferControl() {
-        try {
-            return control;
-        } finally {
-            control = null;
-        }
+    protected SchedulingControl getControl() {
+        return control;
     }
 
     protected Clock getClock() {

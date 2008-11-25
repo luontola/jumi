@@ -46,13 +46,8 @@ import java.io.Serializable;
 public class SchedulingControl implements EntityObject, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private ScheduledTask currentTask;
     private boolean done = false;
     private boolean cancelled = false;
-
-    public void setCurrentTask(ScheduledTask currentTask) {
-        this.currentTask = currentTask;
-    }
 
     public boolean isDone() {
         return done;

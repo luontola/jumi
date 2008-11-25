@@ -53,6 +53,7 @@ public class ScheduledOneTimeTask extends AbstractScheduledTask {
     }
 
     public ScheduledTask nextRepeatedTask() {
+        getControl().setDone();
         return null;
     }
 }

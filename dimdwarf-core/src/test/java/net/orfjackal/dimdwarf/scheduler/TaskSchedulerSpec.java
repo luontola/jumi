@@ -168,6 +168,15 @@ public class TaskSchedulerSpec extends Specification<Object> {
         return true;
     }
 
+    private void _saveFuture(Future<?> future) {
+        bindings.get().update("future", new DummyEntity(future));
+    }
+
+    private Future<?> _loadFuture() {
+        DummyEntity tmp = (DummyEntity) bindings.get().read("future");
+        return (Future<?>) tmp.getOther();
+    }
+
 
     public class WhenNoTasksHaveBeenSubmitted {
 
@@ -190,7 +199,18 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.submit(task1);
+                    Future<?> f = scheduler.submit(task1);
+                    _saveFuture(f);
+                }
+            });
+        }
+
+        public void theTaskIsNotDone() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Future<?> f = _loadFuture();
+                    specify(f.isDone(), should.equal(false));
+                    specify(f.isCancelled(), should.equal(false));
                 }
             });
         }
@@ -218,13 +238,24 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    scheduler.submit(task1);
+                    Future<?> f = scheduler.submit(task1);
+                    _saveFuture(f);
                 }
             });
             specify(scheduler.getQueuedTasks(), should.equal(1));
             taskContext.execute(new Runnable() {
                 public void run() {
                     _takeNextTaskFrom(scheduler);
+                }
+            });
+        }
+
+        public void theTaskIsDone() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Future<?> f = _loadFuture();
+                    specify(f.isDone());
+                    specify(f.isCancelled(), should.equal(false));
                 }
             });
         }
@@ -362,17 +393,45 @@ public class TaskSchedulerSpec extends Specification<Object> {
                     specify(!f.isCancelled());
                     boolean success = f.cancel(false);
                     specify(success);
-                    specify(f.isCancelled());
                     specify(f.isDone());
+                    specify(f.isCancelled());
                 }
             });
         }
 
-        public void theTaskIsNotQueued() {
+        public void theTaskIsCancelled() {
             specify(taskCanNotBeTakenRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
+    }
 
+    public class WhenAScheduledTaskIsCancelledBeforeItIsExecuted {
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Future<?> f = scheduler.schedule(task1, 1, TimeUnit.SECONDS);
+                    _saveFuture(f);
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Future<?> f = _loadFuture();
+                    specify(!f.isDone());
+                    specify(!f.isCancelled());
+                    boolean success = f.cancel(false);
+                    specify(success);
+                    specify(f.isDone());
+                    specify(f.isCancelled());
+                }
+            });
+        }
+
+        public void theTaskIsCancelled() {
+            clock.addTime(1000);
+            specify(taskCanNotBeTakenRightNow());
+            specify(scheduler.getQueuedTasks(), should.equal(0));
+        }
     }
 
     // TODO: cancelling tasks
