@@ -91,21 +91,21 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
         delay = unit.toMillis(delay);
         addToExecutionQueue(ScheduledOneTimeTask.create(task, delay, clock));
-        return null;
+        return null; // TODO: return a future
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         period = unit.toMillis(period);
         addToExecutionQueue(ScheduledAtFixedRateTask.create(task, initialDelay, period, clock));
-        return null;
+        return null; // TODO: return a future
     }
 
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         delay = unit.toMillis(delay);
         addToExecutionQueue(ScheduledWithFixedDelayTask.create(task, initialDelay, delay, clock));
-        return null;
+        return null; // TODO: return a future
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
