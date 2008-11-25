@@ -126,10 +126,22 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     public Runnable takeNextTask() throws InterruptedException {
-        String binding = waitingForExecution.take().getBinding();
+        final ScheduledTaskHolder holder = waitingForExecution.take();
+        String binding = holder.getBinding();
         ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
         bindings.get().delete(binding);
         repeatIfRepeatable(st);
+        tx.get().join(new TransactionParticipant() {
+            public void prepare() throws Throwable {
+            }
+
+            public void commit() {
+            }
+
+            public void rollback() {
+                waitingForExecution.add(holder);
+            }
+        });
         return st.getTask();
     }
 

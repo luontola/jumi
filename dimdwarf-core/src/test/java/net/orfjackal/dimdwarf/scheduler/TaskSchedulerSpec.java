@@ -132,7 +132,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
     // Utility methods which expect a task context (prefixed with "_")
 
-    private static DummyTask _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
+    public static DummyTask _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
         try {
             return (DummyTask) scheduler.takeNextTask();
         } catch (InterruptedException e) {
