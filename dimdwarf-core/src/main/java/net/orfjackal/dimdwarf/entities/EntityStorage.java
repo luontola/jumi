@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 
+import javax.annotation.Nonnull;
 import java.math.BigInteger;
 
 /**
@@ -41,6 +42,7 @@ import java.math.BigInteger;
  */
 public interface EntityStorage extends DatabaseTable<BigInteger, Object> {
 
+    @Nonnull
     Object read(BigInteger id) throws EntityNotFoundException;
 
     void update(BigInteger id, Object entity);

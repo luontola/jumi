@@ -41,9 +41,6 @@ import javax.annotation.Nullable;
  */
 public interface BindingStorage extends DatabaseTable<String, Object> {
 
-    /**
-     * If the binding does not exist in the current transaction, then the returned object is null.
-     */
     @Nullable
     Object read(String binding);
 

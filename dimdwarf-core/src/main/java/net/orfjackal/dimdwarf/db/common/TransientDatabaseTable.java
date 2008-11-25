@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.db.common;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +58,7 @@ public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
         this.tx = tx;
     }
 
+    @Nonnull
     public Blob read(Blob key) {
         tx.mustBeActive();
         Blob blob = updates.get(key);

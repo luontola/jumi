@@ -31,12 +31,15 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Esko Luontola
  * @since 18.8.2008
  */
 public interface DatabaseTable<K, V> extends IterableKeys<K> {
 
+    @Nullable
     V read(K key);
 
     void update(K key, V value);
