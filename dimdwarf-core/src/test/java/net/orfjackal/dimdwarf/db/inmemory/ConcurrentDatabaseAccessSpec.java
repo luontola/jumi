@@ -56,21 +56,16 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     private DatabaseTable<Blob, Blob> table2;
     private Logger txLogger;
 
-    private Blob key;
-    private Blob value1;
-    private Blob value2;
-    private Blob value3;
+    private Blob key = Blob.fromBytes(new byte[]{0});
+    private Blob value1 = Blob.fromBytes(new byte[]{1});
+    private Blob value2 = Blob.fromBytes(new byte[]{2});
+    private Blob value3 = Blob.fromBytes(new byte[]{3});
 
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
         tx1 = new TransactionImpl(txLogger);
         tx2 = new TransactionImpl(txLogger);
-
-        key = Blob.fromBytes(new byte[]{0});
-        value1 = Blob.fromBytes(new byte[]{1});
-        value2 = Blob.fromBytes(new byte[]{2});
-        value3 = Blob.fromBytes(new byte[]{3});
         specify(dbms.getOpenConnections(), should.equal(0));
     }
 
@@ -111,37 +106,6 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         tx2.rollback();
     }
 
-    public class WhenMultipleDatabaseConnectionsAreOpen {
-
-        public void create() {
-            table1 = dbms.openConnection(tx1.getTransaction()).openTable(TABLE);
-            table2 = dbms.openConnection(tx2.getTransaction()).openTable(TABLE);
-        }
-
-        public void databaseKeepsTrackOfTheNumberOfOpenConnections() {
-            specify(dbms.getOpenConnections(), should.equal(2));
-            tx1.prepareAndCommit();
-            specify(dbms.getOpenConnections(), should.equal(1));
-            tx2.prepareAndCommit();
-            specify(dbms.getOpenConnections(), should.equal(0));
-        }
-
-        public void databaseKeepsTrackOfTheCurrentRevision() {
-            specify(dbms.getCurrentRevision(), should.equal(0));
-            tx1.prepareAndCommit();
-            specify(dbms.getCurrentRevision(), should.equal(1));
-            tx2.prepareAndCommit();
-            specify(dbms.getCurrentRevision(), should.equal(2));
-        }
-
-        public void databaseKeepsTrackOfTheOldestRevisionInUse() {
-            specify(dbms.getOldestRevisionInUse(), should.equal(0));
-            tx1.prepareAndCommit();
-            specify(dbms.getOldestRevisionInUse(), should.equal(0));
-            tx2.prepareAndCommit();
-            specify(dbms.getOldestRevisionInUse(), should.equal(2));
-        }
-    }
 
     public class WhenEntryIsCreatedInATransaction {
 

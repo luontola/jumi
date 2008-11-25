@@ -33,7 +33,7 @@ package net.orfjackal.dimdwarf.db.common;
 
 import net.orfjackal.dimdwarf.db.*;
 
-import javax.annotation.CheckReturnValue;
+import javax.annotation.*;
 import java.util.Map;
 
 /**
@@ -42,6 +42,7 @@ import java.util.Map;
  */
 public interface PersistedDatabaseTable<H> extends IterableKeys<Blob> {
 
+    @Nullable
     Blob get(Blob key, H handle);
 
     @CheckReturnValue

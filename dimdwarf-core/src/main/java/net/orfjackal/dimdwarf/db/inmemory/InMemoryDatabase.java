@@ -103,6 +103,15 @@ public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {
         return revisionCounter.getNewestReadableRevision();
     }
 
+    @TestOnly
+    int getNumberOfKeys() {
+        int sum = 0;
+        for (InMemoryDatabaseTable table : tables.values()) {
+            sum += table.getNumberOfKeys();
+        }
+        return sum;
+    }
+
     public CommitHandle prepare(Collection<TransientDatabaseTable<RevisionHandle>> updates, RevisionHandle handle) {
         return new DbCommitHandle(updates, handle);
     }

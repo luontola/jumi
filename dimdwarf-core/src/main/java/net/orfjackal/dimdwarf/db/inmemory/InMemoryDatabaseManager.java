@@ -90,6 +90,11 @@ public class InMemoryDatabaseManager implements DatabaseManager {
         return db.getCurrentRevision();
     }
 
+    @TestOnly
+    int getNumberOfKeys() {
+        return db.getNumberOfKeys();
+    }
+
 
     @Immutable
     private class ConnectionCloser implements TransactionParticipant {

@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.common.*;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.concurrent.*;
 import java.util.*;
@@ -65,6 +66,11 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable<RevisionHan
 
     public void purgeRevisionsOlderThan(long revisionToKeep) {
         revisions.purgeRevisionsOlderThan(revisionToKeep);
+    }
+
+    @TestOnly
+    int getNumberOfKeys() {
+        return revisions.size();
     }
 
 
@@ -114,6 +120,9 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable<RevisionHan
 
         private void commitUpdate(Blob key, Blob value) {
             assert keysLockedForCommit.isLocked(key);
+            if (value.equals(Blob.EMPTY_BLOB)) {
+                value = null;
+            }
             revisions.put(key, value, handle.getWriteRevision());
         }
 
