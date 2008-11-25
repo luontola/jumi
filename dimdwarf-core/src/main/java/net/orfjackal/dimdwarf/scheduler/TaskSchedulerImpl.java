@@ -109,15 +109,22 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
-        final String binding = bindingFor(st);
-        final long scheduledTime = st.getScheduledTime();
+        enqueueOnCommit(toHolder(st));
+    }
+
+    private ScheduledTaskHolder toHolder(ScheduledTask st) {
+        String binding = bindingFor(st);
         bindings.get().update(binding, st);
+        return new ScheduledTaskHolder(binding, st.getScheduledTime());
+    }
+
+    private void enqueueOnCommit(final ScheduledTaskHolder holder) {
         tx.get().join(new TransactionParticipant() {
             public void prepare() throws Throwable {
             }
 
             public void commit() {
-                waitingForExecution.add(new ScheduledTaskHolder(binding, scheduledTime));
+                waitingForExecution.add(holder);
             }
 
             public void rollback() {
@@ -126,11 +133,28 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     public Runnable takeNextTask() throws InterruptedException {
-        final ScheduledTaskHolder holder = waitingForExecution.take();
+        ScheduledTaskHolder holder = waitingForExecution.take();
+        cancelTakeOnRollback(holder);
+        ScheduledTask st = fromHolder(holder);
+        repeatIfRepeatable(st);
+        return st.getTask();
+    }
+
+    private ScheduledTask fromHolder(ScheduledTaskHolder holder) {
         String binding = holder.getBinding();
         ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
         bindings.get().delete(binding);
-        repeatIfRepeatable(st);
+        return st;
+    }
+
+    private void repeatIfRepeatable(ScheduledTask st) {
+        ScheduledTask repeat = st.nextRepeatedTask();
+        if (repeat != null) {
+            addToExecutionQueue(repeat);
+        }
+    }
+
+    private void cancelTakeOnRollback(final ScheduledTaskHolder holder) {
         tx.get().join(new TransactionParticipant() {
             public void prepare() throws Throwable {
             }
@@ -142,14 +166,6 @@ public class TaskSchedulerImpl implements TaskScheduler {
                 waitingForExecution.add(holder);
             }
         });
-        return st.getTask();
-    }
-
-    private void repeatIfRepeatable(ScheduledTask st) {
-        ScheduledTask repeat = st.nextRepeatedTask();
-        if (repeat != null) {
-            addToExecutionQueue(repeat);
-        }
     }
 
     private String bindingFor(ScheduledTask st) {
