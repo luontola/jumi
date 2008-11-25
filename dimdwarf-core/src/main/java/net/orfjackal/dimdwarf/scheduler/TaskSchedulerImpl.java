@@ -38,7 +38,7 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.util.Clock;
 import org.jetbrains.annotations.TestOnly;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
 import java.math.BigInteger;
 import java.util.concurrent.*;
 
@@ -112,9 +112,9 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     public Runnable takeNextTask() throws InterruptedException {
-        ScheduledTaskHolder holder = waitingForExecution.take();
-        ScheduledTask st = (ScheduledTask) bindings.get().read(holder.binding);
-        bindings.get().delete(holder.binding);
+        String binding = waitingForExecution.take().getBinding();
+        ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
+        bindings.get().delete(binding);
         repeatIfRepeatable(st);
         return st.getTask();
     }
@@ -136,13 +136,19 @@ public class TaskSchedulerImpl implements TaskScheduler {
         return waitingForExecution.size();
     }
 
+
+    @Immutable
     private class ScheduledTaskHolder implements Delayed {
         private final String binding;
-        private long scheduledTime;
+        private final long scheduledTime;
 
         public ScheduledTaskHolder(String binding, long scheduledTime) {
             this.binding = binding;
             this.scheduledTime = scheduledTime;
+        }
+
+        public String getBinding() {
+            return binding;
         }
 
         public long getDelay(TimeUnit unit) {
