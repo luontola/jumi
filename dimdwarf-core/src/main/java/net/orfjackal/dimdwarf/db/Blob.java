@@ -36,6 +36,7 @@ import static net.orfjackal.dimdwarf.util.ByteUtil.asByteArray;
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -125,7 +126,8 @@ public final class Blob implements Comparable<Blob> {
         if (bytes.length > TO_STRING_SAFETY_LIMIT) {
             hexBytes += " ...";
         }
-        return "Blob[length=" + length() + ",bytes=[" + hexBytes + "]]";
+        String asText = new String(truncatedBytes, Charset.forName("US-ASCII"));
+        return "Blob[length=" + length() + ",bytes=[" + hexBytes + "],text=\"" + asText + "\"]";
     }
 
     private static String asHex(byte[] bytes) {
