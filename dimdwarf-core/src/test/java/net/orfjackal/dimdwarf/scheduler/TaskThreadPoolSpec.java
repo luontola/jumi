@@ -47,4 +47,6 @@ public class TaskThreadPoolSpec extends Specification<Object> {
     // TODO: sets up the task context
     // TODO: shuts down cleanly
     // TODO: knows which tasks are executing and can tell when all currently executing tasks have finished (needed for GC)
+
+    // TODO: give access to the current task's ScheduledFuture?
 }
