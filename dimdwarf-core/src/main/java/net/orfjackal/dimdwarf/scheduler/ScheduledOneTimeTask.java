@@ -34,7 +34,6 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.util.Clock;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -44,8 +43,8 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledOneTimeTask extends ScheduledTask {
     private static final long serialVersionUID = 1L;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, TimeUnit unit, Clock clock) {
-        long scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
+    public static ScheduledTask create(Runnable task, long initialDelay, Clock clock) {
+        long scheduledTime = initialDelay + clock.currentTimeMillis();
         return new ScheduledOneTimeTask(task, scheduledTime, clock);
     }
 

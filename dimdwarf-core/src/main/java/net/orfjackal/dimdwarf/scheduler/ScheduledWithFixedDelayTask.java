@@ -34,7 +34,6 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.util.Clock;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -46,9 +45,8 @@ public class ScheduledWithFixedDelayTask extends ScheduledTask {
 
     private final long delay;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long delay, TimeUnit unit, Clock clock) {
-        long scheduledTime = unit.toMillis(initialDelay) + clock.currentTimeMillis();
-        delay = unit.toMillis(delay);
+    public static ScheduledTask create(Runnable task, long initialDelay, long delay, Clock clock) {
+        long scheduledTime = initialDelay + clock.currentTimeMillis();
         return new ScheduledWithFixedDelayTask(task, scheduledTime, delay, clock);
     }
 
