@@ -56,15 +56,12 @@ import java.util.logging.*;
 public class TransactionalTaskSchedulerSpec extends Specification<Object> {
 
     private TaskSchedulerImpl scheduler;
-    private Provider<BindingStorage> bindings;
-    private Provider<EntityInfo> entities;
     private Provider<Transaction> tx;
     private TaskExecutor taskContext;
     private DummyClock clock;
     private Logger hideTransactionFailedLogs;
 
     private DummyTask task1 = new DummyTask("1");
-    private DummyTask task2 = new DummyTask("2");
 
 
     public void create() {
@@ -78,8 +75,8 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
                         bind(Clock.class).toInstance(clock);
                     }
                 });
-        bindings = injector.getProvider(BindingStorage.class);
-        entities = injector.getProvider(EntityInfo.class);
+        Provider<BindingStorage> bindings = injector.getProvider(BindingStorage.class);
+        Provider<EntityInfo> entities = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
 
