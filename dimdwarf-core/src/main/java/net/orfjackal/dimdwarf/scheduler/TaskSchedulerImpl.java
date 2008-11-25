@@ -35,6 +35,7 @@ import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.Clock;
 import org.jetbrains.annotations.TestOnly;
 
@@ -54,12 +55,14 @@ public class TaskSchedulerImpl implements TaskScheduler {
     private final BlockingQueue<ScheduledTaskHolder> waitingForExecution = new DelayQueue<ScheduledTaskHolder>();
     private final Provider<BindingStorage> bindings;
     private final Provider<EntityInfo> entities;
+    private final Provider<Transaction> tx;
     private final Clock clock;
 
     public TaskSchedulerImpl(Provider<BindingStorage> bindings, Provider<EntityInfo> entities,
-                             Clock clock, TaskExecutor taskContext) {
+                             Provider<Transaction> tx, Clock clock, TaskExecutor taskContext) {
         this.bindings = bindings;
         this.entities = entities;
+        this.tx = tx;
         this.clock = clock;
         recoverTasksFromDatabase(taskContext);
     }
@@ -106,9 +109,20 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
-        String binding = bindingFor(st);
+        final String binding = bindingFor(st);
+        final long scheduledTime = st.getScheduledTime();
         bindings.get().update(binding, st);
-        waitingForExecution.add(new ScheduledTaskHolder(binding, st.getScheduledTime()));
+        tx.get().join(new TransactionParticipant() {
+            public void prepare() throws Throwable {
+            }
+
+            public void commit() {
+                waitingForExecution.add(new ScheduledTaskHolder(binding, scheduledTime));
+            }
+
+            public void rollback() {
+            }
+        });
     }
 
     public Runnable takeNextTask() throws InterruptedException {

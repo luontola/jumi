@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
@@ -56,6 +57,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private TaskSchedulerImpl scheduler;
     private Provider<BindingStorage> bindings;
     private Provider<EntityInfo> entities;
+    private Provider<Transaction> tx;
     private TaskExecutor taskContext;
     private DummyClock clock;
 
@@ -75,10 +77,11 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 });
         bindings = injector.getProvider(BindingStorage.class);
         entities = injector.getProvider(EntityInfo.class);
+        tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
         specify(thereMayBeBindingsInOtherNamespaces());
 
-        scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+        scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
     }
@@ -151,7 +154,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -179,7 +182,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartTheTaskIsStillQueued() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
@@ -207,7 +210,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
 
@@ -247,13 +250,13 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartAnExecutorCanNotTakeItBeforeTheDelay() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorCanNotTakeItBeforeTheDelay();
         }
 
         public void afterRestartAnExecutorMayTakeItAfterTheDelay() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorMayTakeItAfterTheDelay();
         }
@@ -298,17 +301,29 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(1000));
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(2000));
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(2000));
                 }
             });
         }
 
         public void whenAnExecutionIsLateThenTheDelayRateOfExecutionsIsFixed() {
+            clock.addTime(1200);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    clock.addTime(1200);
                     specify(taskCanBeTakenRightNow());
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(1800));
                 }
             });
@@ -339,17 +354,29 @@ public class TaskSchedulerSpec extends Specification<Object> {
             taskContext.execute(new Runnable() {
                 public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(1000));
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(2000));
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(2000));
                 }
             });
         }
 
         public void whenAnExecutionIsLateThenTheDelayBetweenTaskExecutionsIsFixed() {
+            clock.addTime(1200);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    clock.addTime(1200);
                     specify(taskCanBeTakenRightNow());
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
                     specify(taskCanBeTakenExactlyAfterDelay(2000));
                 }
             });

@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.BindingStorage;
 import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
@@ -52,6 +53,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
     private TaskSchedulerImpl scheduler;
     private Provider<BindingStorage> bindings;
     private Provider<EntityInfo> entities;
+    private Provider<Transaction> tx;
     private TaskExecutor taskContext;
     private DummyClock clock;
 
@@ -71,9 +73,10 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
                 });
         bindings = injector.getProvider(BindingStorage.class);
         entities = injector.getProvider(EntityInfo.class);
+        tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
 
-        scheduler = new TaskSchedulerImpl(bindings, entities, clock, taskContext);
+        scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
     }
@@ -84,15 +87,15 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         public void create() {
         }
 
-//        public void theTaskIsNotQueuedUntilTheTransactionCommits() {
-//            taskContext.execute(new Runnable() {
-//                public void run() {
-//                    scheduler.submit(task1);
-//                    specify(scheduler.getQueuedTasks(), should.equal(0));
-//                }
-//            });
-//            specify(scheduler.getQueuedTasks(), should.equal(1));
-//        }
+        public void theTaskIsNotQueuedUntilTheTransactionCommits() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.submit(task1);
+                    specify(scheduler.getQueuedTasks(), should.equal(0));
+                }
+            });
+            specify(scheduler.getQueuedTasks(), should.equal(1));
+        }
 
     }
 }
