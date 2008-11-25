@@ -44,6 +44,7 @@ import net.orfjackal.dimdwarf.util.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 /**
@@ -105,7 +106,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
             throw new RuntimeException(t);
         }
     }
-    
+
 
     public class WhenATaskIsSubmittedInATransaction {
 
@@ -122,7 +123,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         public void theTaskIsNotQueuedIfTheTransactionRollsBack() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    
+
                     taskContext.execute(new Runnable() {
                         public void run() {
                             scheduler.submit(task1);
@@ -137,7 +138,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         public void theTaskIsNotQueuedIfTheTransactionRollsBackDuringPrepare() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    
+
                     taskContext.execute(new Runnable() {
                         public void run() {
                             scheduler.submit(task1);
@@ -177,7 +178,38 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         }
     }
 
+    public class WhenARepeatedTaskIsTakenInATransaction {
 
-    // TODO: if transaction (of the task which was just taken) rolls back, the task should be rescheduled
-    // TODO: repeated tasks should not repeat until committed
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.scheduleWithFixedDelay(task1, 1, 2, TimeUnit.SECONDS);
+                }
+            });
+            specify(scheduler.getQueuedTasks(), should.equal(1));
+        }
+
+        public void theNextExecutionIsNotScheduledIfTheTransactionRollsBack() {
+            clock.addTime(1000);
+            specify(new Block() {
+                public void run() throws Throwable {
+
+                    taskContext.execute(new Runnable() {
+                        public void run() {
+                            specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                            tx.get().setRollbackOnly();
+                        }
+                    });
+                }
+            }, should.raise(TransactionException.class));
+            specify(scheduler.getQueuedTasks(), should.equal(1)); // the first task at T1000; can be taken right away
+
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                }
+            });
+            specify(scheduler.getQueuedTasks(), should.equal(1)); // the next task at T1000+2000
+        }
+    }
 }
