@@ -31,49 +31,22 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.util.Clock;
-
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
-import java.io.Serializable;
 
 /**
  * @author Esko Luontola
- * @since 24.11.2008
+ * @since 25.11.2008
  */
-@ThreadSafe
-public abstract class ScheduledTask implements EntityObject, Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private final Runnable task;
-    private final long scheduledTime;
-    private transient Clock clock;
-
-    protected ScheduledTask(Runnable task, long scheduledTime, Clock clock) {
-        this.task = task;
-        this.scheduledTime = scheduledTime;
-        this.clock = clock;
-    }
-
-    @Inject
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
+public interface ScheduledTask {
 
     @CheckForNull
-    public abstract ScheduledTask nextRepeatedTask();
+    ScheduledTask nextRepeatedTask();
 
-    public Runnable getTask() {
-        return task;
-    }
+    Runnable getTask();
 
-    public long getScheduledTime() {
-        return scheduledTime;
-    }
+    long getScheduledTime();
 
-    protected Clock getClock() {
-        return clock;
-    }
+    boolean isDone();
+
+    boolean isCancelled();
 }

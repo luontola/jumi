@@ -40,22 +40,22 @@ import javax.annotation.concurrent.ThreadSafe;
  * @since 25.11.2008
  */
 @ThreadSafe
-public class ScheduledWithFixedDelayTask extends ScheduledTask {
+public class ScheduledWithFixedDelayTask extends AbstractScheduledTask {
     private static final long serialVersionUID = 1L;
 
     private final long delay;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long delay, Clock clock) {
+    public static ScheduledTask create(Runnable task, long initialDelay, long delay, SchedulingControl control, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledWithFixedDelayTask(task, scheduledTime, delay, clock);
+        return new ScheduledWithFixedDelayTask(task, scheduledTime, delay, control, clock);
     }
 
-    private ScheduledWithFixedDelayTask(Runnable task, long scheduledTime, long delay, Clock clock) {
-        super(task, scheduledTime, clock);
+    private ScheduledWithFixedDelayTask(Runnable task, long scheduledTime, long delay, SchedulingControl control, Clock clock) {
+        super(task, scheduledTime, control, clock);
         this.delay = delay;
     }
 
     public ScheduledTask nextRepeatedTask() {
-        return new ScheduledWithFixedDelayTask(getTask(), getClock().currentTimeMillis() + delay, delay, getClock());
+        return new ScheduledWithFixedDelayTask(getTask(), getClock().currentTimeMillis() + delay, delay, transferControl(), getClock());
     }
 }

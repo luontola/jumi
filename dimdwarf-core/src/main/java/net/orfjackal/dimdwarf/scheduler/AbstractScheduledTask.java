@@ -31,31 +31,66 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.util.Clock;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.Serializable;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 24.11.2008
  */
-@ThreadSafe
-public class ScheduledAtFixedRateTask extends AbstractScheduledTask {
+@Entity
+@NotThreadSafe
+public abstract class AbstractScheduledTask implements EntityObject, Serializable, ScheduledTask {
     private static final long serialVersionUID = 1L;
 
-    private final long period;
+    private final Runnable task;
+    private final long scheduledTime;
+    private SchedulingControl control;
+    private transient Clock clock;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long period, SchedulingControl control, Clock clock) {
-        long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledAtFixedRateTask(task, scheduledTime, period, control, clock);
+    protected AbstractScheduledTask(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
+        this.task = task;
+        this.scheduledTime = scheduledTime;
+        this.control = control;
+        this.clock = clock;
+        control.setCurrentTask(this);
     }
 
-    private ScheduledAtFixedRateTask(Runnable task, long scheduledTime, long period, SchedulingControl control, Clock clock) {
-        super(task, scheduledTime, control, clock);
-        this.period = period;
+    @Inject
+    public void setClock(Clock clock) {
+        this.clock = clock;
     }
 
-    public ScheduledTask nextRepeatedTask() {
-        return new ScheduledAtFixedRateTask(getTask(), getScheduledTime() + period, period, transferControl(), getClock());
+    public Runnable getTask() {
+        return task;
+    }
+
+    public long getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public boolean isDone() {
+        return control.isDone();
+    }
+
+    public boolean isCancelled() {
+        return control.isCancelled();
+    }
+
+    protected SchedulingControl transferControl() {
+        try {
+            return control;
+        } finally {
+            control = null;
+        }
+    }
+
+    protected Clock getClock() {
+        return clock;
     }
 }

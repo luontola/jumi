@@ -42,7 +42,7 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
@@ -84,6 +84,11 @@ public class TaskSchedulerSpec extends Specification<Object> {
         scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
+    }
+
+    public void destroy() throws Exception {
+        // clear interrupted status, in case one of the tests which use interrupts failed
+        Thread.interrupted();
     }
 
     private boolean thereMayBeBindingsInOtherNamespaces() {
@@ -345,6 +350,29 @@ public class TaskSchedulerSpec extends Specification<Object> {
             specify(taskMayBeTakenRightNow());
             specify(taskCanBeTakenExactlyAfterDelay(2000));
         }
+    }
+
+    public class WhenATaskIsCancelledImmediatelyAfterSubmittingIt {
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Future<?> f = scheduler.submit(task1);
+                    specify(!f.isDone());
+                    specify(!f.isCancelled());
+                    boolean success = f.cancel(false);
+                    specify(success);
+                    specify(f.isCancelled());
+                    specify(f.isDone());
+                }
+            });
+        }
+
+        public void theTaskIsNotQueued() {
+            specify(taskCanNotBeTakenRightNow());
+            specify(scheduler.getQueuedTasks(), should.equal(0));
+        }
+
     }
 
     // TODO: cancelling tasks

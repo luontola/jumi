@@ -31,31 +31,50 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import net.orfjackal.dimdwarf.util.Clock;
-
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
+import java.io.Serializable;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
  * @since 25.11.2008
  */
-@ThreadSafe
-public class ScheduledAtFixedRateTask extends AbstractScheduledTask {
+@Immutable
+public class SchedulingFuture implements ScheduledFuture<Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final long period;
+    private final SchedulingControl control;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long period, SchedulingControl control, Clock clock) {
-        long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledAtFixedRateTask(task, scheduledTime, period, control, clock);
+    public SchedulingFuture(SchedulingControl control) {
+        this.control = control;
     }
 
-    private ScheduledAtFixedRateTask(Runnable task, long scheduledTime, long period, SchedulingControl control, Clock clock) {
-        super(task, scheduledTime, control, clock);
-        this.period = period;
+    public long getDelay(TimeUnit unit) {
+        throw new UnsupportedOperationException();
     }
 
-    public ScheduledTask nextRepeatedTask() {
-        return new ScheduledAtFixedRateTask(getTask(), getScheduledTime() + period, period, transferControl(), getClock());
+    public int compareTo(Delayed o) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        control.setCancelled();
+        return true;
+    }
+
+    public boolean isCancelled() {
+        return control.isCancelled();
+    }
+
+    public boolean isDone() {
+        return control.isDone();
+    }
+
+    public Object get() throws InterruptedException, ExecutionException {
+        throw new UnsupportedOperationException();
+    }
+
+    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        throw new UnsupportedOperationException();
     }
 }

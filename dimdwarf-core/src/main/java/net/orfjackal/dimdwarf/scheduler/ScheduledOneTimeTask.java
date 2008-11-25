@@ -40,16 +40,16 @@ import javax.annotation.concurrent.ThreadSafe;
  * @since 25.11.2008
  */
 @ThreadSafe
-public class ScheduledOneTimeTask extends ScheduledTask {
+public class ScheduledOneTimeTask extends AbstractScheduledTask {
     private static final long serialVersionUID = 1L;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, Clock clock) {
+    public static ScheduledTask create(Runnable task, long initialDelay, SchedulingControl control, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledOneTimeTask(task, scheduledTime, clock);
+        return new ScheduledOneTimeTask(task, scheduledTime, control, clock);
     }
 
-    private ScheduledOneTimeTask(Runnable task, long scheduledTime, Clock clock) {
-        super(task, scheduledTime, clock);
+    private ScheduledOneTimeTask(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
+        super(task, scheduledTime, control, clock);
     }
 
     public ScheduledTask nextRepeatedTask() {

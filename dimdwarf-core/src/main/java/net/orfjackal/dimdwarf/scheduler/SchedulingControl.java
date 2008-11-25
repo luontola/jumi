@@ -31,31 +31,43 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import net.orfjackal.dimdwarf.util.Clock;
+import net.orfjackal.dimdwarf.api.*;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.Serializable;
 
 /**
  * @author Esko Luontola
  * @since 25.11.2008
  */
-@ThreadSafe
-public class ScheduledAtFixedRateTask extends AbstractScheduledTask {
+@Entity(ProxyType.CLASS)
+@NotThreadSafe
+public class SchedulingControl implements EntityObject, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final long period;
+    private ScheduledTask currentTask;
+    private boolean done = false;
+    private boolean cancelled = false;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long period, SchedulingControl control, Clock clock) {
-        long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledAtFixedRateTask(task, scheduledTime, period, control, clock);
+    public void setCurrentTask(ScheduledTask currentTask) {
+        this.currentTask = currentTask;
     }
 
-    private ScheduledAtFixedRateTask(Runnable task, long scheduledTime, long period, SchedulingControl control, Clock clock) {
-        super(task, scheduledTime, control, clock);
-        this.period = period;
+    public boolean isDone() {
+        return done;
     }
 
-    public ScheduledTask nextRepeatedTask() {
-        return new ScheduledAtFixedRateTask(getTask(), getScheduledTime() + period, period, transferControl(), getClock());
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setDone() {
+        done = true;
+    }
+
+    public void setCancelled() {
+        done = true;
+        cancelled = true;
     }
 }

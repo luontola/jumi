@@ -90,22 +90,28 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
         delay = unit.toMillis(delay);
-        addToExecutionQueue(ScheduledOneTimeTask.create(task, delay, clock));
-        return null; // TODO: return a future
+        SchedulingControl control = new SchedulingControl();
+        ScheduledTask st = ScheduledOneTimeTask.create(task, delay, control, clock);
+        addToExecutionQueue(st);
+        return new SchedulingFuture(control);
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         period = unit.toMillis(period);
-        addToExecutionQueue(ScheduledAtFixedRateTask.create(task, initialDelay, period, clock));
-        return null; // TODO: return a future
+        SchedulingControl control = new SchedulingControl();
+        ScheduledTask st = ScheduledAtFixedRateTask.create(task, initialDelay, period, control, clock);
+        addToExecutionQueue(st);
+        return new SchedulingFuture(control);
     }
 
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         delay = unit.toMillis(delay);
-        addToExecutionQueue(ScheduledWithFixedDelayTask.create(task, initialDelay, delay, clock));
-        return null; // TODO: return a future
+        SchedulingControl control = new SchedulingControl();
+        ScheduledTask st = ScheduledWithFixedDelayTask.create(task, initialDelay, delay, control, clock);
+        addToExecutionQueue(st);
+        return new SchedulingFuture(control);
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
@@ -133,9 +139,12 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     public Runnable takeNextTask() throws InterruptedException {
-        ScheduledTaskHolder holder = waitingForExecution.take();
-        cancelTakeOnRollback(holder);
-        ScheduledTask st = fromHolder(holder);
+        ScheduledTask st;
+        do {
+            ScheduledTaskHolder holder = waitingForExecution.take();
+            cancelTakeOnRollback(holder);
+            st = fromHolder(holder);
+        } while (st.isDone());
         repeatIfRepeatable(st);
         return st.getTask();
     }
