@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Esko Luontola
@@ -113,20 +114,33 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private boolean taskMayBeTakenRightNow() {
         taskContext.execute(new Runnable() {
             public void run() {
-                specify(_takeNextTaskFrom(scheduler), should.not().equal(null));
+                specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.not().equal(null));
             }
         });
         return true;
     }
 
-    private boolean taskCanNotBeTakenRightNow() {
+    private boolean thereAreNoExecutableTasksRightNow() {
+        _interruptTestThreadAfter(THREAD_SYNC_DELAY);
+        specify(new Block() {
+            public void run() throws Throwable {
+                TaskBootstrap bootstrap;
+                do {
+                    bootstrap = scheduler.takeNextTask();
+                } while (isNullTask(bootstrap));
+            }
+        }, should.raise(InterruptedException.class));
+        return true;
+    }
+
+    private boolean isNullTask(final TaskBootstrap bootstrap) {
+        final AtomicBoolean isNull = new AtomicBoolean();
         taskContext.execute(new Runnable() {
             public void run() {
-                _interruptTestThreadAfter(THREAD_SYNC_DELAY);
-                specify(_takeNextTaskIsInterrupted());
+                isNull.set(bootstrap.getTaskInsideTransaction() == null);
             }
         });
-        return true;
+        return isNull.get();
     }
 
     private boolean taskCanBeTakenExactlyAfterDelay(final int delay) {
@@ -136,7 +150,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 _interruptTestThreadAfter(THREAD_SYNC_DELAY);
                 specify(_takeNextTaskIsInterrupted());
                 clock.addTime(1);
-                specify(_takeNextTaskFrom(scheduler), should.not().equal(null));
+                specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.not().equal(null));
             }
         });
         return true;
@@ -154,9 +168,9 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
     // Utility methods which expect a task context (prefixed with "_")
 
-    public static DummyTask _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
+    public static TaskBootstrap _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
         try {
-            return (DummyTask) scheduler.takeNextTask();
+            return scheduler.takeNextTask();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -203,7 +217,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void anExecutorWillWaitUntilThereAreTasks() {
-            specify(taskCanNotBeTakenRightNow());
+            specify(thereAreNoExecutableTasksRightNow());
         }
 
         public void afterRestartNoTasksAreQueued() {
@@ -240,7 +254,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         public void anExecutorMayTakeTheTask() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
                 }
             });
         }
@@ -263,7 +277,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(1));
             taskContext.execute(new Runnable() {
                 public void run() {
-                    _takeNextTaskFrom(scheduler);
+                    _takeNextTaskFrom(scheduler).getTaskInsideTransaction();
                 }
             });
         }
@@ -306,7 +320,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void anExecutorCanNotTakeItBeforeTheDelay() {
-            specify(taskCanNotBeTakenRightNow());
+            specify(thereAreNoExecutableTasksRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
 
@@ -342,8 +356,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
             clock.addTime(2000);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler), should.equal(task2));
-                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task2));
+                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
                 }
             });
         }
@@ -422,7 +436,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void theTaskIsCancelled() {
             clock.addTime(1000);
-            specify(taskCanNotBeTakenRightNow());
+            specify(thereAreNoExecutableTasksRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -449,7 +463,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void theTaskIsCancelled() {
             clock.addTime(900);
-            specify(taskCanNotBeTakenRightNow());
+            specify(thereAreNoExecutableTasksRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -467,7 +481,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
             clock.addTime(1000);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
                     ScheduledFuture<?> f = _loadFuture();
                     specify(f.getDelay(TimeUnit.MILLISECONDS), should.equal(2000));
                     specify(cancelsSuccessfully(f));
@@ -477,7 +491,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void theTaskIsCancelled() {
             clock.addTime(2000);
-            specify(taskCanNotBeTakenRightNow());
+            specify(thereAreNoExecutableTasksRightNow());
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }

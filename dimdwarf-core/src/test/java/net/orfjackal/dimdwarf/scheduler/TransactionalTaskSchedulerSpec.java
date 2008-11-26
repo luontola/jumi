@@ -171,7 +171,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
 
                     taskContext.execute(new Runnable() {
                         public void run() {
-                            specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                            specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
                             tx.get().setRollbackOnly();
                         }
                     });
@@ -199,7 +199,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
 
                     taskContext.execute(new Runnable() {
                         public void run() {
-                            specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                            specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
                             tx.get().setRollbackOnly();
                         }
                     });
@@ -209,7 +209,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
 
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler), should.equal(task1));
+                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
                 }
             });
             specify(scheduler.getQueuedTasks(), should.equal(1)); // the next task at T1000+2000

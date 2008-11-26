@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.Clock;
 import org.jetbrains.annotations.TestOnly;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.*;
 import java.util.concurrent.*;
 
@@ -124,19 +125,17 @@ public class TaskSchedulerImpl implements TaskScheduler {
         });
     }
 
-    // TODO: Modify so that the next task can be taken outside a transaction.
-    // Otherwise the thread pool needs to have many transcations open while
-    // threads are waiting for new work. Have the runnable returned by this task
-    // to be responsible for starting up the transaction. Then the consumer of
-    // tasks will not need to know about tasks, but only about Runnable.
+    public TaskBootstrap takeNextTask() throws InterruptedException {
+        return waitingForExecution.take();
+    }
 
-    public Runnable takeNextTask() throws InterruptedException {
-        ScheduledTask st;
-        do {
-            ScheduledTaskHolder holder = waitingForExecution.take();
-            cancelTakeOnRollback(holder);
-            st = removeFromSaveTasks(holder);
-        } while (st.isDone());
+    @Nullable
+    private Runnable getTaskInsideTransaction0(ScheduledTaskHolder holder) {
+        cancelTakeOnRollback(holder);
+        ScheduledTask st = removeFromSaveTasks(holder);
+        if (st.isDone()) {
+            return null;
+        }
         repeatIfRepeatable(st);
         return st.getTask();
     }
@@ -173,7 +172,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
 
     @Immutable
-    private class ScheduledTaskHolder implements Delayed {
+    private class ScheduledTaskHolder implements Delayed, TaskBootstrap {
 
         private final String binding;
         private final long scheduledTime;
@@ -181,6 +180,11 @@ public class TaskSchedulerImpl implements TaskScheduler {
         public ScheduledTaskHolder(String binding, long scheduledTime) {
             this.binding = binding;
             this.scheduledTime = scheduledTime;
+        }
+
+        @Nullable
+        public Runnable getTaskInsideTransaction() {
+            return getTaskInsideTransaction0(this);
         }
 
         public String getBinding() {
