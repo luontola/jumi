@@ -47,6 +47,9 @@ public class TaskThreadPool {
     public TaskThreadPool(TaskProducer producer, TaskExecutor executor) {
         workers = Executors.newCachedThreadPool();
         consumer = new Thread(new Consumer(producer, executor));
+    }
+
+    public void start() {
         consumer.start();
     }
 

@@ -72,6 +72,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         };
 
         pool = new TaskThreadPool(producer, executor);
+        pool.start();
     }
 
 
