@@ -40,7 +40,6 @@ import net.orfjackal.dimdwarf.util.StubProvider;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Esko Luontola
@@ -49,6 +48,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TaskThreadPoolSpec extends Specification<Object> {
+
+    private static final int TEST_TIMEOUT = 50;
 
     private Context taskContext;
     private BlockingQueue<TaskBootstrap> taskQueue;
@@ -71,7 +72,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             }
         };
 
-        pool = new TaskThreadPool(producer, executor);
+        pool = new TaskThreadPool(executor, producer);
         pool.start();
     }
 
@@ -79,37 +80,38 @@ public class TaskThreadPoolSpec extends Specification<Object> {
     public class WhenTasksAreAddedToTheQueue {
 
         private CountDownLatch end = new CountDownLatch(1);
-        private AtomicBoolean taskWasExecuted = new AtomicBoolean(false);
-        private AtomicBoolean bootstrapWasInsideTaskContext = new AtomicBoolean(false);
-        private AtomicBoolean executionWasInsideTaskContext = new AtomicBoolean(false);
+
+        private volatile boolean taskWasExecuted = false;
+        private volatile boolean bootstrapWasInsideTaskContext = false;
+        private volatile boolean executionWasInsideTaskContext = false;
 
         public void create() throws InterruptedException {
             final Runnable task = new Runnable() {
                 public void run() {
-                    executionWasInsideTaskContext.set(ThreadContext.getCurrentContext() == taskContext);
-                    taskWasExecuted.set(true);
+                    executionWasInsideTaskContext = (ThreadContext.getCurrentContext() == taskContext);
+                    taskWasExecuted = true;
                     end.countDown();
                 }
             };
             taskQueue.add(new TaskBootstrap() {
                 public Runnable getTaskInsideTransaction() {
-                    bootstrapWasInsideTaskContext.set(ThreadContext.getCurrentContext() == taskContext);
+                    bootstrapWasInsideTaskContext = (ThreadContext.getCurrentContext() == taskContext);
                     return task;
                 }
             });
-            end.await(50, TimeUnit.MILLISECONDS);
+            end.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
         }
 
         public void theyAreExecuted() throws InterruptedException {
-            specify(taskWasExecuted.get());
+            specify(taskWasExecuted);
         }
 
         public void theyAreBootstrappedInsideTaskContext() {
-            specify(bootstrapWasInsideTaskContext.get());
+            specify(bootstrapWasInsideTaskContext);
         }
 
         public void theyAreExecutedInsideTaskContext() throws InterruptedException {
-            specify(executionWasInsideTaskContext.get());
+            specify(executionWasInsideTaskContext);
         }
     }
 
@@ -118,11 +120,18 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         private CountDownLatch step1 = new CountDownLatch(1);
         private CountDownLatch step2 = new CountDownLatch(1);
         private CountDownLatch step3 = new CountDownLatch(1);
+        private CountDownLatch stepEnd = new CountDownLatch(1);
 
-        public void create() {
+        private volatile Integer runningTasks0 = null;
+        private volatile Integer runningTasks1 = null;
+        private volatile Integer runningTasks2 = null;
+        private volatile Integer runningTasksEnd = null;
+
+        public void create() throws InterruptedException {
             Runnable task1 = new Runnable() {
                 public void run() {
                     try {
+                        runningTasks1 = pool.getRunningTasks();
                         step1.countDown();
                         step2.await();
                         step3.countDown();
@@ -135,21 +144,38 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                 public void run() {
                     try {
                         step1.await();
+                        runningTasks2 = pool.getRunningTasks();
                         step2.countDown();
                         step3.await();
+                        stepEnd.await();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
             };
+            runningTasks0 = pool.getRunningTasks();
             taskQueue.add(new SimpleTaskBootstrap(task1));
+
+            step1.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
             taskQueue.add(new SimpleTaskBootstrap(task2));
+
+            step3.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            runningTasksEnd = pool.getRunningTasks();
+            stepEnd.countDown();
         }
 
         public void theyAreExecutedInParallel() throws InterruptedException {
-            specify(step1.await(50, TimeUnit.MILLISECONDS));
-            specify(step2.await(50, TimeUnit.MILLISECONDS));
-            specify(step3.await(50, TimeUnit.MILLISECONDS));
+            specify(step1.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+            specify(step2.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+            specify(step3.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+        }
+
+        public void thePoolKnowsTheNumberOfRunningTasks() {
+            specify(runningTasks0, should.equal(0));
+            specify(runningTasks1, should.equal(1));
+            specify(runningTasks2, should.equal(2));
+            specify(runningTasksEnd, runningTasksEnd >= 0);
+            specify(runningTasksEnd, runningTasksEnd <= 1);
         }
     }
 

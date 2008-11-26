@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Esko Luontola
@@ -41,32 +42,34 @@ import java.util.concurrent.*;
  */
 public class TaskThreadPool {
 
-    private final ExecutorService workers;
+    private final TaskExecutor taskContext;
+    private final TaskProducer producer;
     private final Thread consumer;
+    private final ExecutorService workers;
+    private final AtomicInteger runningTasks = new AtomicInteger(0);
 
-    public TaskThreadPool(TaskProducer producer, TaskExecutor executor) {
-        workers = Executors.newCachedThreadPool();
-        consumer = new Thread(new Consumer(producer, executor));
+    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer) {
+        this.taskContext = taskContext;
+        this.producer = producer;
+        this.consumer = new Thread(new TaskConsumer());
+        this.workers = Executors.newCachedThreadPool();
     }
 
     public void start() {
         consumer.start();
     }
 
-    private class Consumer implements Runnable {
-        private final TaskProducer producer;
-        private final TaskExecutor taskContext;
+    public int getRunningTasks() {
+        return runningTasks.get();
+    }
 
-        public Consumer(TaskProducer producer, TaskExecutor taskContext) {
-            this.producer = producer;
-            this.taskContext = taskContext;
-        }
 
+    private class TaskConsumer implements Runnable {
         public void run() {
             while (!Thread.interrupted()) {
                 try {
                     TaskBootstrap bootstrap = producer.takeNextTask();
-                    workers.submit(new ExecutorWrapper(taskContext, new BootstrappingTaskRunner(bootstrap)));
+                    workers.submit(new TaskContextSetup(new Bootstrapper(bootstrap)));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -74,24 +77,24 @@ public class TaskThreadPool {
         }
     }
 
-    private static class ExecutorWrapper implements Runnable {
-        private final Executor executor;
+    private class TaskContextSetup implements Runnable {
         private final Runnable command;
 
-        public ExecutorWrapper(Executor executor, Runnable command) {
-            this.executor = executor;
+        public TaskContextSetup(Runnable command) {
             this.command = command;
         }
 
         public void run() {
-            executor.execute(command);
+            runningTasks.incrementAndGet();
+            taskContext.execute(command);
+            runningTasks.decrementAndGet();
         }
     }
 
-    private static class BootstrappingTaskRunner implements Runnable {
+    private static class Bootstrapper implements Runnable {
         private final TaskBootstrap bootstrap;
 
-        public BootstrappingTaskRunner(TaskBootstrap bootstrap) {
+        public Bootstrapper(TaskBootstrap bootstrap) {
             this.bootstrap = bootstrap;
         }
 
