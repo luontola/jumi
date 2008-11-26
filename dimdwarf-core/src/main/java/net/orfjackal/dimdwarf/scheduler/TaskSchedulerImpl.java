@@ -51,23 +51,23 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
-    private final BlockingQueue<ScheduledTaskHolder> waitingForExecution = new DelayQueue<ScheduledTaskHolder>();
-    private final RecoverableSet<ScheduledTask> savedTasks;
+    private final BlockingQueue<ScheduledTaskHolder> scheduledTasks = new DelayQueue<ScheduledTaskHolder>();
+    private final RecoverableSet<ScheduledTask> persistedTasks;
     private final Provider<Transaction> tx;
     private final Clock clock;
 
     public TaskSchedulerImpl(Provider<Transaction> tx, Clock clock, TaskExecutor taskContext, RecoverableSetFactory rsf) {
         this.tx = tx;
         this.clock = clock;
-        savedTasks = rsf.create(TASKS_PREFIX);
+        persistedTasks = rsf.create(TASKS_PREFIX);
         recoverTasksFromDatabase(taskContext);
     }
 
     private void recoverTasksFromDatabase(TaskExecutor taskContext) {
         taskContext.execute(new Runnable() {
             public void run() {
-                for (ScheduledTask st : savedTasks.getAll()) {
-                    waitingForExecution.add(new ScheduledTaskHolder(savedTasks.put(st), st.getScheduledTime()));
+                for (ScheduledTask st : persistedTasks.getAll()) {
+                    scheduledTasks.add(new ScheduledTaskHolder(persistedTasks.put(st), st.getScheduledTime()));
                 }
             }
         });
@@ -104,11 +104,11 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
-        enqueueOnCommit(putToSavedTasks(st));
+        enqueueOnCommit(saveToDatabase(st));
     }
 
-    private ScheduledTaskHolder putToSavedTasks(ScheduledTask st) {
-        return new ScheduledTaskHolder(savedTasks.put(st), st.getScheduledTime());
+    private ScheduledTaskHolder saveToDatabase(ScheduledTask st) {
+        return new ScheduledTaskHolder(persistedTasks.put(st), st.getScheduledTime());
     }
 
     private void enqueueOnCommit(final ScheduledTaskHolder holder) {
@@ -117,7 +117,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
             }
 
             public void commit() {
-                waitingForExecution.add(holder);
+                scheduledTasks.add(holder);
             }
 
             public void rollback() {
@@ -126,13 +126,13 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     }
 
     public TaskBootstrap takeNextTask() throws InterruptedException {
-        return waitingForExecution.take();
+        return scheduledTasks.take();
     }
 
     @Nullable
     private Runnable getTaskInsideTransaction0(ScheduledTaskHolder holder) {
         cancelTakeOnRollback(holder);
-        ScheduledTask st = removeFromSavedTasks(holder);
+        ScheduledTask st = takeFromDatabase(holder);
         if (st.isDone()) {
             return null;
         }
@@ -140,8 +140,8 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         return st.getTask();
     }
 
-    private ScheduledTask removeFromSavedTasks(ScheduledTaskHolder holder) {
-        return savedTasks.remove(holder.getBinding());
+    private ScheduledTask takeFromDatabase(ScheduledTaskHolder holder) {
+        return persistedTasks.remove(holder.getBinding());
     }
 
     private void repeatIfRepeatable(ScheduledTask st) {
@@ -160,14 +160,14 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
             }
 
             public void rollback() {
-                waitingForExecution.add(holder);
+                scheduledTasks.add(holder);
             }
         });
     }
 
     @TestOnly
     int getQueuedTasks() {
-        return waitingForExecution.size();
+        return scheduledTasks.size();
     }
 
 
