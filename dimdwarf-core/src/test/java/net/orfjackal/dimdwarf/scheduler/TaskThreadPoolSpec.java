@@ -164,6 +164,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             taskQueue.add(new SimpleTaskBootstrap(task2));
 
             step3.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            Thread.yield();
             runningTasksEnd = pool.getRunningTasks();
             stepEnd.countDown();
         }
@@ -178,8 +179,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             specify(runningTasks0, should.equal(0));
             specify(runningTasks1, should.equal(1));
             specify(runningTasks2, should.equal(2));
-            specify(runningTasksEnd, runningTasksEnd >= 0);
-            specify(runningTasksEnd, runningTasksEnd <= 1);
+            specify(runningTasksEnd, should.equal(1));
         }
     }
 
@@ -198,6 +198,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             };
             taskQueue.add(new SimpleTaskBootstrap(task));
             end.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            Thread.yield();
         }
 
         public Expectations theExceptionIsLogged() {
@@ -208,6 +209,32 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
         public void theNumberOfRunningTasksIsDecrementedCorrectly() {
             specify(pool.getRunningTasks(), should.equal(0));
+        }
+    }
+
+    public class WhenThePoolIsShutDown {
+
+        public void create() {
+            checking(theShutdownIsLogged());
+            pool.shutdown();
+            taskQueue.add(new SimpleTaskBootstrap(new Runnable() {
+                public void run() {
+                    specify(false);
+                }
+            }));
+            Thread.yield();
+        }
+
+        private Expectations theShutdownIsLogged() {
+            return new Expectations() {{
+                one(logger).info("Shutting down...");
+                one(logger).info(with(equal("Task consumer was interrupted")), with(aNonNull(InterruptedException.class)));
+                one(logger).info("Shutdown finished");
+            }};
+        }
+
+        public void noMoreTasksAreTakenFromTheQueue() {
+            specify(taskQueue.size(), should.equal(1));
         }
     }
 
@@ -224,8 +251,6 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         }
     }
 
-    // TODO: shuts down cleanly
     // TODO: knows which tasks are executing and can tell when all currently executing tasks have finished (needed for GC)
-
     // TODO: give access to the current task's ScheduledFuture?
 }

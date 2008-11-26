@@ -71,6 +71,18 @@ public class TaskThreadPool {
         return runningTasks.get();
     }
 
+    public void shutdown() {
+        logger.info("Shutting down...");
+        consumer.interrupt();
+        try {
+            consumer.join();
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while shutting down", e);
+        }
+        workers.shutdown();
+        logger.info("Shutdown finished");
+    }
+
 
     private class TaskConsumer implements Runnable {
         public void run() {
@@ -79,7 +91,8 @@ public class TaskThreadPool {
                     TaskBootstrap bootstrap = producer.takeNextTask();
                     workers.submit(new TaskContextSetup(new Bootstrapper(bootstrap)));
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.info("Task consumer was interrupted", e);
+                    return;
                 }
             }
         }
