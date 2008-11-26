@@ -47,7 +47,7 @@ import java.util.concurrent.*;
  * @since 24.11.2008
  */
 @ThreadSafe
-public class TaskSchedulerImpl implements TaskScheduler {
+public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
