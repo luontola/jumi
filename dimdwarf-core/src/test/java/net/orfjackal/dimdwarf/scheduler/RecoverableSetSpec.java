@@ -73,7 +73,7 @@ public class RecoverableSetSpec extends Specification<Object> {
         entities = injector.getProvider(EntityInfo.class);
         specify(thereMayBeBindingsInOtherNamespaces());
 
-        set = new RecoverableSet<StoredValue>(PREFIX, bindings, entities);
+        set = new RecoverableSetImpl<StoredValue>(PREFIX, bindings, entities);
     }
 
     private boolean thereMayBeBindingsInOtherNamespaces() {
@@ -123,7 +123,7 @@ public class RecoverableSetSpec extends Specification<Object> {
         public void afterRestartANewSetWithTheSamePrefixStillContainsThoseObjects() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    set = new RecoverableSet<StoredValue>(PREFIX, bindings, entities);
+                    set = new RecoverableSetImpl<StoredValue>(PREFIX, bindings, entities);
                     specify(set.getAll(), should.containExactly(value1, value2));
                 }
             });
