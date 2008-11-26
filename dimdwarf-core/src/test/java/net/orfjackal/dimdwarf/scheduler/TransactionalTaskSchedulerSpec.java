@@ -63,7 +63,6 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
 
     private DummyTask task1 = new DummyTask("1");
 
-
     public void create() {
         clock = new DummyClock();
         Injector injector = Guice.createInjector(
