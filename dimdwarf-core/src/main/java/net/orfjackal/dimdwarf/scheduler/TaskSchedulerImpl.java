@@ -150,7 +150,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
             ScheduledTaskHolder holder = waitingForExecution.take();
             cancelTakeOnRollback(holder);
             st = fromHolder(holder);
-        } while (st.isDone() || st.isCancelled());
+        } while (st.isDone());
         repeatIfRepeatable(st);
         return st.getTask();
     }
