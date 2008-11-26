@@ -138,6 +138,12 @@ public class TaskSchedulerImpl implements TaskScheduler {
         });
     }
 
+    // TODO: Modify so that the next task can be taken outside a transaction.
+    // Otherwise the thread pool needs to have many transcations open while
+    // threads are waiting for new work. Have the runnable returned by this task
+    // to be responsible for starting up the transaction. Then the consumer of
+    // tasks will not need to know about tasks, but only about Runnable.
+
     public Runnable takeNextTask() throws InterruptedException {
         ScheduledTask st;
         do {
