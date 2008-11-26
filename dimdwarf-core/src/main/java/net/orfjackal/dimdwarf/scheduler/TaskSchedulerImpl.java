@@ -79,7 +79,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
         delay = unit.toMillis(delay);
-        SchedulingControl control = new SchedulingControl();
+        SchedulingControl control = new SchedulingControlImpl();
         ScheduledTask st = ScheduledOneTimeTask.create(task, delay, control, clock);
         addToExecutionQueue(st);
         return new SchedulingFuture(control);
@@ -88,7 +88,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         period = unit.toMillis(period);
-        SchedulingControl control = new SchedulingControl();
+        SchedulingControl control = new SchedulingControlImpl();
         ScheduledTask st = ScheduledAtFixedRateTask.create(task, initialDelay, period, control, clock);
         addToExecutionQueue(st);
         return new SchedulingFuture(control);
@@ -97,7 +97,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         delay = unit.toMillis(delay);
-        SchedulingControl control = new SchedulingControl();
+        SchedulingControl control = new SchedulingControlImpl();
         ScheduledTask st = ScheduledWithFixedDelayTask.create(task, initialDelay, delay, control, clock);
         addToExecutionQueue(st);
         return new SchedulingFuture(control);
@@ -132,7 +132,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @Nullable
     private Runnable getTaskInsideTransaction0(ScheduledTaskHolder holder) {
         cancelTakeOnRollback(holder);
-        ScheduledTask st = removeFromSaveTasks(holder);
+        ScheduledTask st = removeFromSavedTasks(holder);
         if (st.isDone()) {
             return null;
         }
@@ -140,7 +140,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
         return st.getTask();
     }
 
-    private ScheduledTask removeFromSaveTasks(ScheduledTaskHolder holder) {
+    private ScheduledTask removeFromSavedTasks(ScheduledTaskHolder holder) {
         return savedTasks.remove(holder.getBinding());
     }
 
