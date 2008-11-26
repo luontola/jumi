@@ -106,8 +106,8 @@ public class RecoverableSetSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    key1 = set.add(value1);
-                    key2 = set.add(value2);
+                    key1 = set.put(value1);
+                    key2 = set.put(value2);
                 }
             });
         }
@@ -151,7 +151,7 @@ public class RecoverableSetSpec extends Specification<Object> {
         public void duplicateAddsAreIgnored() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    set.add(value1);
+                    set.put(value1);
                     specify(set.getAll(), should.containExactly(value1, value2));
                 }
             });

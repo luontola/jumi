@@ -31,69 +31,32 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Provider;
-import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.util.Objects;
-
-import javax.annotation.Nullable;
-import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Esko Luontola
  * @since 26.11.2008
  */
-public class RecoverableSetImpl<T> implements RecoverableSet<T> {
+public class FakeRecoverableSet<T> implements RecoverableSet<T> {
 
-    private final String prefix;
-    private final Provider<BindingStorage> bindings;
-    private final Provider<EntityInfo> entities;
-
-    public RecoverableSetImpl(String prefix, Provider<BindingStorage> bindings, Provider<EntityInfo> entities) {
-        this.prefix = prefix + SEPARATOR;
-        this.bindings = bindings;
-        this.entities = entities;
-    }
+    private Map<String, T> values = new ConcurrentHashMap<String, T>();
 
     public String put(T value) {
-        String key = keyFor(value);
-        bindings.get().update(key, value);
+        String key = String.valueOf(value.hashCode());
+        values.put(key, value);
         return key;
     }
 
-    private String keyFor(T value) {
-        BigInteger id = entities.get().getEntityId(value);
-        return prefix + id;
-    }
-
-    @Nullable
     public T remove(String key) {
-        T value = get(key);
-        bindings.get().delete(key);
-        return value;
+        return values.remove(key);
     }
 
-    @Nullable
     public T get(String key) {
-        checkKeyHasRightPrefix(key);
-        return Objects.<T>uncheckedCast(bindings.get().read(key));
-    }
-
-    private void checkKeyHasRightPrefix(String key) {
-        if (!key.startsWith(prefix)) {
-            throw new IllegalArgumentException("The key " + key + " is not prefixed " + prefix);
-        }
+        return values.get(key);
     }
 
     public Collection<T> getAll() {
-        List<T> result = new ArrayList<T>();
-        for (String key : new BindingWalker(prefix, bindings.get())) {
-            Object value = get(key);
-            if (value != null) {
-                result.add(Objects.<T>uncheckedCast(value));
-            }
-        }
-        return Collections.unmodifiableCollection(result);
+        return values.values();
     }
 }

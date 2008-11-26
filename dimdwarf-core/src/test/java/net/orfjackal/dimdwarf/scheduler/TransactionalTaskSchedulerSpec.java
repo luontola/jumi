@@ -75,12 +75,18 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
                         bind(Clock.class).toInstance(clock);
                     }
                 });
-        Provider<BindingStorage> bindings = injector.getProvider(BindingStorage.class);
-        Provider<EntityInfo> entities = injector.getProvider(EntityInfo.class);
+        final Provider<BindingStorage> bindings = injector.getProvider(BindingStorage.class);
+        final Provider<EntityInfo> entities = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
 
-        scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+        RecoverableSetFactory rsf = new RecoverableSetFactory() {
+            public <T> RecoverableSet<T> create(String prefix) {
+                return new RecoverableSetImpl<T>(prefix, bindings, entities);
+            }
+        };
+
+        scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
 
         hideTransactionFailedLogs = Logger.getLogger(TransactionFilter.class.getName());
         hideTransactionFailedLogs.setLevel(Level.OFF);

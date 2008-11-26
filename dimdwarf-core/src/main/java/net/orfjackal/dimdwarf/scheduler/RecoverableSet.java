@@ -11,7 +11,7 @@ public interface RecoverableSet<T> {
 
     String SEPARATOR = ":";
 
-    String add(T value);
+    String put(T value);
 
     @Nullable
     T remove(String key);

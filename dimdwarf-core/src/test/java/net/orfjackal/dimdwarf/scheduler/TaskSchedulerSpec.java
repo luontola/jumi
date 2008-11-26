@@ -60,6 +60,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private Provider<EntityInfo> entities;
     private Provider<Transaction> tx;
     private TaskExecutor taskContext;
+    private RecoverableSetFactory rsf;
     private DummyClock clock;
 
     private DummyTask task1;
@@ -80,9 +81,14 @@ public class TaskSchedulerSpec extends Specification<Object> {
         entities = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
+        rsf = new RecoverableSetFactory() {
+            public <T> RecoverableSet<T> create(String prefix) {
+                return new RecoverableSetImpl<T>(prefix, bindings, entities);
+            }
+        };
         specify(thereMayBeBindingsInOtherNamespaces());
 
-        scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+        scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
     }
@@ -201,7 +207,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -240,7 +246,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartTheTaskIsStillQueued() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
     }
@@ -277,7 +283,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartNoTasksAreQueued() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -311,13 +317,13 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void afterRestartAnExecutorCanNotTakeItBeforeTheDelay() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorCanNotTakeItBeforeTheDelay();
         }
 
         public void afterRestartAnExecutorMayTakeItAfterTheDelay() {
-            scheduler = new TaskSchedulerImpl(bindings, entities, tx, clock, taskContext);
+            scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorMayTakeItAfterTheDelay();
         }

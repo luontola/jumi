@@ -32,15 +32,13 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.Provider;
-import net.orfjackal.dimdwarf.api.*;
-import net.orfjackal.dimdwarf.entities.*;
+import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.Clock;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.concurrent.*;
-import java.math.BigInteger;
 import java.util.concurrent.*;
 
 /**
@@ -50,38 +48,28 @@ import java.util.concurrent.*;
 @ThreadSafe
 public class TaskSchedulerImpl implements TaskScheduler {
 
-    private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks.";
+    private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
     private final BlockingQueue<ScheduledTaskHolder> waitingForExecution = new DelayQueue<ScheduledTaskHolder>();
-    private final Provider<BindingStorage> bindings;
-    private final Provider<EntityInfo> entities;
+    private final RecoverableSet<ScheduledTask> savedTasks;
     private final Provider<Transaction> tx;
     private final Clock clock;
 
-    public TaskSchedulerImpl(Provider<BindingStorage> bindings, Provider<EntityInfo> entities,
-                             Provider<Transaction> tx, Clock clock, TaskExecutor taskContext) {
-        this.bindings = bindings;
-        this.entities = entities;
+    public TaskSchedulerImpl(Provider<Transaction> tx, Clock clock, TaskExecutor taskContext, RecoverableSetFactory rsf) {
         this.tx = tx;
         this.clock = clock;
+        savedTasks = rsf.create(TASKS_PREFIX);
         recoverTasksFromDatabase(taskContext);
     }
 
     private void recoverTasksFromDatabase(TaskExecutor taskContext) {
         taskContext.execute(new Runnable() {
             public void run() {
-                for (String binding : new BindingWalker(TASKS_PREFIX, bindings.get())) {
-                    recoverTaskFromDatabase(binding);
+                for (ScheduledTask st : savedTasks.getAll()) {
+                    waitingForExecution.add(new ScheduledTaskHolder(savedTasks.put(st), st.getScheduledTime()));
                 }
             }
         });
-    }
-
-    private void recoverTaskFromDatabase(String binding) {
-        ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
-        if (st != null) {
-            waitingForExecution.add(new ScheduledTaskHolder(binding, st.getScheduledTime()));
-        }
     }
 
     public Future<?> submit(Runnable task) {
@@ -115,13 +103,11 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private void addToExecutionQueue(ScheduledTask st) {
-        enqueueOnCommit(toHolder(st));
+        enqueueOnCommit(putToSavedTasks(st));
     }
 
-    private ScheduledTaskHolder toHolder(ScheduledTask st) {
-        String binding = bindingFor(st);
-        bindings.get().update(binding, st);
-        return new ScheduledTaskHolder(binding, st.getScheduledTime());
+    private ScheduledTaskHolder putToSavedTasks(ScheduledTask st) {
+        return new ScheduledTaskHolder(savedTasks.put(st), st.getScheduledTime());
     }
 
     private void enqueueOnCommit(final ScheduledTaskHolder holder) {
@@ -149,17 +135,14 @@ public class TaskSchedulerImpl implements TaskScheduler {
         do {
             ScheduledTaskHolder holder = waitingForExecution.take();
             cancelTakeOnRollback(holder);
-            st = fromHolder(holder);
+            st = removeFromSaveTasks(holder);
         } while (st.isDone());
         repeatIfRepeatable(st);
         return st.getTask();
     }
 
-    private ScheduledTask fromHolder(ScheduledTaskHolder holder) {
-        String binding = holder.getBinding();
-        ScheduledTask st = (ScheduledTask) bindings.get().read(binding);
-        bindings.get().delete(binding);
-        return st;
+    private ScheduledTask removeFromSaveTasks(ScheduledTaskHolder holder) {
+        return savedTasks.remove(holder.getBinding());
     }
 
     private void repeatIfRepeatable(ScheduledTask st) {
@@ -181,11 +164,6 @@ public class TaskSchedulerImpl implements TaskScheduler {
                 waitingForExecution.add(holder);
             }
         });
-    }
-
-    private String bindingFor(ScheduledTask st) {
-        BigInteger entityId = entities.get().getEntityId(st);
-        return TASKS_PREFIX + entityId;
     }
 
     @TestOnly
