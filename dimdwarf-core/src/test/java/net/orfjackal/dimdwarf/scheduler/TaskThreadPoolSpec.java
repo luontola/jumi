@@ -113,6 +113,59 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         }
     }
 
+    public class WhenManyTasksAreAddedToTheQueueConcurrently {
+
+        private CountDownLatch step1 = new CountDownLatch(1);
+        private CountDownLatch step2 = new CountDownLatch(1);
+        private CountDownLatch step3 = new CountDownLatch(1);
+
+        public void create() {
+            Runnable task1 = new Runnable() {
+                public void run() {
+                    try {
+                        step1.countDown();
+                        step2.await();
+                        step3.countDown();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            Runnable task2 = new Runnable() {
+                public void run() {
+                    try {
+                        step1.await();
+                        step2.countDown();
+                        step3.await();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            taskQueue.add(new SimpleTaskBootstrap(task1));
+            taskQueue.add(new SimpleTaskBootstrap(task2));
+        }
+
+        public void theyAreExecutedInParallel() throws InterruptedException {
+            specify(step1.await(50, TimeUnit.MILLISECONDS));
+            specify(step2.await(50, TimeUnit.MILLISECONDS));
+            specify(step3.await(50, TimeUnit.MILLISECONDS));
+        }
+    }
+
+
+    private static class SimpleTaskBootstrap implements TaskBootstrap {
+        private final Runnable task;
+
+        public SimpleTaskBootstrap(Runnable task) {
+            this.task = task;
+        }
+
+        public Runnable getTaskInsideTransaction() {
+            return task;
+        }
+    }
+
     // TODO: shuts down cleanly
     // TODO: knows which tasks are executing and can tell when all currently executing tasks have finished (needed for GC)
 

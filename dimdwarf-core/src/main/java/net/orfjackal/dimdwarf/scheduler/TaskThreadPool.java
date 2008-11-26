@@ -66,7 +66,7 @@ public class TaskThreadPool {
             while (!Thread.interrupted()) {
                 try {
                     TaskBootstrap bootstrap = producer.takeNextTask();
-                    taskContext.execute(new BootstrappingTaskRunner(bootstrap));
+                    workers.submit(new ExecutorWrapper(taskContext, new BootstrappingTaskRunner(bootstrap)));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -74,7 +74,21 @@ public class TaskThreadPool {
         }
     }
 
-    private class BootstrappingTaskRunner implements Runnable {
+    private static class ExecutorWrapper implements Runnable {
+        private final Executor executor;
+        private final Runnable command;
+
+        public ExecutorWrapper(Executor executor, Runnable command) {
+            this.executor = executor;
+            this.command = command;
+        }
+
+        public void run() {
+            executor.execute(command);
+        }
+    }
+
+    private static class BootstrappingTaskRunner implements Runnable {
         private final TaskBootstrap bootstrap;
 
         public BootstrappingTaskRunner(TaskBootstrap bootstrap) {
