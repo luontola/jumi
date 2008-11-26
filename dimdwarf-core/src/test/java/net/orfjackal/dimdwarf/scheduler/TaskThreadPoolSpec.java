@@ -31,9 +31,16 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import com.google.inject.Provider;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.context.*;
+import net.orfjackal.dimdwarf.tasks.*;
+import net.orfjackal.dimdwarf.util.StubProvider;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Esko Luontola
@@ -43,8 +50,68 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class TaskThreadPoolSpec extends Specification<Object> {
 
-    // TODO: consumes tasks from TaskScheduler
-    // TODO: sets up the task context
+    private Context taskContext;
+    private BlockingQueue<TaskBootstrap> taskQueue;
+    private TaskThreadPool pool;
+
+    public void create() throws Exception {
+        taskContext = mock(Context.class);
+        TaskExecutor executor = new TaskExecutor(
+                new StubProvider<Context>(taskContext),
+                new Provider<FilterChain>() {
+                    public FilterChain get() {
+                        return new FilterChain(new Filter[0]);
+                    }
+                });
+
+        taskQueue = new LinkedBlockingDeque<TaskBootstrap>();
+        TaskProducer producer = new TaskProducer() {
+            public TaskBootstrap takeNextTask() throws InterruptedException {
+                return taskQueue.take();
+            }
+        };
+
+        pool = new TaskThreadPool(producer, executor);
+    }
+
+
+    public class WhenTasksAreAddedToTheQueue {
+
+        private CountDownLatch end = new CountDownLatch(1);
+        private AtomicBoolean taskWasExecuted = new AtomicBoolean(false);
+        private AtomicBoolean bootstrapWasInsideTaskContext = new AtomicBoolean(false);
+        private AtomicBoolean executionWasInsideTaskContext = new AtomicBoolean(false);
+
+        public void create() throws InterruptedException {
+            final Runnable task = new Runnable() {
+                public void run() {
+                    executionWasInsideTaskContext.set(ThreadContext.getCurrentContext() == taskContext);
+                    taskWasExecuted.set(true);
+                    end.countDown();
+                }
+            };
+            taskQueue.add(new TaskBootstrap() {
+                public Runnable getTaskInsideTransaction() {
+                    bootstrapWasInsideTaskContext.set(ThreadContext.getCurrentContext() == taskContext);
+                    return task;
+                }
+            });
+            end.await(50, TimeUnit.MILLISECONDS);
+        }
+
+        public void theyAreExecuted() throws InterruptedException {
+            specify(taskWasExecuted.get());
+        }
+
+        public void theyAreBootstrappedInsideTaskContext() {
+            specify(bootstrapWasInsideTaskContext.get());
+        }
+
+        public void theyAreExecutedInsideTaskContext() throws InterruptedException {
+            specify(executionWasInsideTaskContext.get());
+        }
+    }
+
     // TODO: shuts down cleanly
     // TODO: knows which tasks are executing and can tell when all currently executing tasks have finished (needed for GC)
 
