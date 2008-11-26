@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import org.slf4j.*;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +42,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 26.11.2008
  */
 public class TaskThreadPool {
+    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TaskThreadPool.class);
+    private final Logger logger;
 
     private final TaskExecutor taskContext;
     private final TaskProducer producer;
@@ -49,10 +52,15 @@ public class TaskThreadPool {
     private final AtomicInteger runningTasks = new AtomicInteger(0);
 
     public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer) {
+        this(taskContext, producer, DEFAULT_LOGGER);
+    }
+
+    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, Logger logger) {
         this.taskContext = taskContext;
         this.producer = producer;
         this.consumer = new Thread(new TaskConsumer());
         this.workers = Executors.newCachedThreadPool();
+        this.logger = logger;
     }
 
     public void start() {
@@ -78,16 +86,21 @@ public class TaskThreadPool {
     }
 
     private class TaskContextSetup implements Runnable {
-        private final Runnable command;
+        private final Runnable task;
 
-        public TaskContextSetup(Runnable command) {
-            this.command = command;
+        public TaskContextSetup(Runnable task) {
+            this.task = task;
         }
 
         public void run() {
-            runningTasks.incrementAndGet();
-            taskContext.execute(command);
-            runningTasks.decrementAndGet();
+            try {
+                runningTasks.incrementAndGet();
+                taskContext.execute(task);
+            } catch (Throwable t) {
+                logger.error("Task threw an exception", t);
+            } finally {
+                runningTasks.decrementAndGet();
+            }
         }
     }
 

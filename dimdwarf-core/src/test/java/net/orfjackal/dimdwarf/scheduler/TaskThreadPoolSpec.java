@@ -37,7 +37,9 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.util.StubProvider;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 import java.util.concurrent.*;
 
@@ -53,6 +55,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
     private Context taskContext;
     private BlockingQueue<TaskBootstrap> taskQueue;
+    private Logger logger;
     private TaskThreadPool pool;
 
     public void create() throws Exception {
@@ -71,8 +74,9 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                 return taskQueue.take();
             }
         };
+        logger = mock(Logger.class);
 
-        pool = new TaskThreadPool(executor, producer);
+        pool = new TaskThreadPool(executor, producer, logger);
         pool.start();
     }
 
@@ -176,6 +180,34 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             specify(runningTasks2, should.equal(2));
             specify(runningTasksEnd, runningTasksEnd >= 0);
             specify(runningTasksEnd, runningTasksEnd <= 1);
+        }
+    }
+
+    public class WhenATaskFails {
+
+        private CountDownLatch end = new CountDownLatch(1);
+        private RuntimeException exception = new RuntimeException("Dummy exception");
+
+        public void create() throws InterruptedException {
+            checking(theExceptionIsLogged());
+            Runnable task = new Runnable() {
+                public void run() {
+                    end.countDown();
+                    throw exception;
+                }
+            };
+            taskQueue.add(new SimpleTaskBootstrap(task));
+            end.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+        }
+
+        public Expectations theExceptionIsLogged() {
+            return new Expectations() {{
+                one(logger).error("Task threw an exception", exception);
+            }};
+        }
+
+        public void theNumberOfRunningTasksIsDecrementedCorrectly() {
+            specify(pool.getRunningTasks(), should.equal(0));
         }
     }
 
