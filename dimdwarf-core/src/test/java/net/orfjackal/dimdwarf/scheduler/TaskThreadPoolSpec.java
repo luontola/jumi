@@ -76,7 +76,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         };
         logger = mock(Logger.class);
 
-        pool = new TaskThreadPool(executor, producer, logger);
+        pool = new TaskThreadPool(executor, producer, Executors.newCachedThreadPool(), logger);
         pool.start();
     }
 
@@ -225,6 +225,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             Thread.yield();
         }
 
+        @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
         private Expectations theShutdownIsLogged() {
             return new Expectations() {{
                 one(logger).info("Shutting down...");

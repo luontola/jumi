@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.slf4j.*;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -51,15 +51,15 @@ public class TaskThreadPool {
     private final ExecutorService workers;
     private final AtomicInteger runningTasks = new AtomicInteger(0);
 
-    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer) {
-        this(taskContext, producer, DEFAULT_LOGGER);
+    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool) {
+        this(taskContext, producer, threadPool, DEFAULT_LOGGER);
     }
 
-    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, Logger logger) {
+    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool, Logger logger) {
         this.taskContext = taskContext;
         this.producer = producer;
         this.consumer = new Thread(new TaskConsumer());
-        this.workers = Executors.newCachedThreadPool();
+        this.workers = threadPool;
         this.logger = logger;
     }
 
