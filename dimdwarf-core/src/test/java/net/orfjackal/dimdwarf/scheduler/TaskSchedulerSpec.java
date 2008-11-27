@@ -133,7 +133,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     }
 
     private boolean thereAreNoExecutableTasksRightNow() {
-        interruptTestThreadAfter(THREAD_SYNC_DELAY); // TODO: figure out a more reliable method than sleeping
+        interruptTestThreadAfter(THREAD_SYNC_DELAY); // TODO: figure out a more reliable thread synchronization method than sleeping
         specify(new Block() {
             public void run() throws Throwable {
                 TaskBootstrap bootstrap;
@@ -168,7 +168,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Thread.sleep(delay);
+                    Thread.sleep(delay); // TODO: figure out a more reliable thread synchronization method than sleeping
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
