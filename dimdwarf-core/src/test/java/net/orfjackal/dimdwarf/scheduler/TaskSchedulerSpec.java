@@ -35,6 +35,7 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
@@ -109,19 +110,30 @@ public class TaskSchedulerSpec extends Specification<Object> {
         return true;
     }
 
-    // Utility methods which create their own task context
+    // Utility methods which should be executed outside a task context.
+    // They will create their own task context when necessary.
 
     private boolean taskMayBeTakenRightNow() {
+        final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
         taskContext.execute(new Runnable() {
             public void run() {
-                specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.not().equal(null));
+                specify(bootstrap.getTaskInsideTransaction(), should.not().equal(null));
             }
         });
         return true;
     }
 
+    public static TaskBootstrap takeNextTaskFrom(TaskSchedulerImpl scheduler) {
+        assert ThreadContext.getCurrentContext() == null;
+        try {
+            return scheduler.takeNextTask();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private boolean thereAreNoExecutableTasksRightNow() {
-        _interruptTestThreadAfter(THREAD_SYNC_DELAY);
+        interruptTestThreadAfter(THREAD_SYNC_DELAY);
         specify(new Block() {
             public void run() throws Throwable {
                 TaskBootstrap bootstrap;
@@ -144,39 +156,14 @@ public class TaskSchedulerSpec extends Specification<Object> {
     }
 
     private boolean taskCanBeTakenExactlyAfterDelay(final int delay) {
-        taskContext.execute(new Runnable() {
-            public void run() {
-                clock.addTime(delay - 1);
-                _interruptTestThreadAfter(THREAD_SYNC_DELAY);
-                specify(_takeNextTaskIsInterrupted());
-                clock.addTime(1);
-                specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.not().equal(null));
-            }
-        });
+        clock.addTime(delay - 1);
+        specify(thereAreNoExecutableTasksRightNow());
+        clock.addTime(1);
+        specify(taskMayBeTakenRightNow());
         return true;
     }
 
-    private boolean cancelsSuccessfully(Future<?> f) {
-        specify(!f.isDone());
-        specify(!f.isCancelled());
-        boolean success = f.cancel(false);
-        specify(success);
-        specify(f.isDone());
-        specify(f.isCancelled());
-        return true;
-    }
-
-    // Utility methods which expect a task context (prefixed with "_")
-
-    public static TaskBootstrap _takeNextTaskFrom(TaskSchedulerImpl scheduler) {
-        try {
-            return scheduler.takeNextTask();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void _interruptTestThreadAfter(final int delay) {
+    private static void interruptTestThreadAfter(final int delay) {
         final Thread testThread = Thread.currentThread();
         new Thread(new Runnable() {
             public void run() {
@@ -190,14 +177,17 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }).start();
     }
 
-    private boolean _takeNextTaskIsInterrupted() {
-        specify(new Block() {
-            public void run() throws Throwable {
-                scheduler.takeNextTask();
-            }
-        }, should.raise(InterruptedException.class));
+    private boolean _cancelsSuccessfully(Future<?> f) {
+        specify(!f.isDone());
+        specify(!f.isCancelled());
+        boolean success = f.cancel(false);
+        specify(success);
+        specify(f.isDone());
+        specify(f.isCancelled());
         return true;
     }
+
+    // Utility methods which expect a task context (prefixed with "_")
 
     private void _saveFuture(Future<?> future) {
         specify(future, should.not().equal(null));
@@ -252,9 +242,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
         }
 
         public void anExecutorMayTakeTheTask() {
+            final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
+                    specify(bootstrap.getTaskInsideTransaction(), should.equal(task1));
                 }
             });
         }
@@ -275,9 +266,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 }
             });
             specify(scheduler.getQueuedTasks(), should.equal(1));
+            final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    _takeNextTaskFrom(scheduler).getTaskInsideTransaction();
+                    bootstrap.getTaskInsideTransaction();
                 }
             });
         }
@@ -354,10 +346,12 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 }
             });
             clock.addTime(2000);
+            final TaskBootstrap bootstrap1 = takeNextTaskFrom(scheduler);
+            final TaskBootstrap bootstrap2 = takeNextTaskFrom(scheduler);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task2));
-                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
+                    specify(bootstrap1.getTaskInsideTransaction(), should.equal(task2));
+                    specify(bootstrap2.getTaskInsideTransaction(), should.equal(task1));
                 }
             });
         }
@@ -429,7 +423,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
                     // Use each variation of scheduling when testing cancelling
                     ScheduledFuture<?> f = scheduler.schedule(task1, 1, TimeUnit.SECONDS);
                     specify(f.getDelay(TimeUnit.SECONDS), should.equal(1));
-                    specify(cancelsSuccessfully(f));
+                    specify(_cancelsSuccessfully(f));
                 }
             });
         }
@@ -456,7 +450,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 public void run() {
                     ScheduledFuture<?> f = _loadFuture();
                     specify(f.getDelay(TimeUnit.MILLISECONDS), should.equal(900));
-                    specify(cancelsSuccessfully(f));
+                    specify(_cancelsSuccessfully(f));
                 }
             });
         }
@@ -479,12 +473,13 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 }
             });
             clock.addTime(1000);
+            final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
+                    specify(bootstrap.getTaskInsideTransaction(), should.equal(task1));
                     ScheduledFuture<?> f = _loadFuture();
                     specify(f.getDelay(TimeUnit.MILLISECONDS), should.equal(2000));
-                    specify(cancelsSuccessfully(f));
+                    specify(_cancelsSuccessfully(f));
                 }
             });
         }

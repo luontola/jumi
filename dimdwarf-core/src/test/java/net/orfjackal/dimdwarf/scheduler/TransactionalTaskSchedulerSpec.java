@@ -37,7 +37,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.BindingStorage;
 import net.orfjackal.dimdwarf.modules.*;
-import static net.orfjackal.dimdwarf.scheduler.TaskSchedulerSpec._takeNextTaskFrom;
+import static net.orfjackal.dimdwarf.scheduler.TaskSchedulerSpec.takeNextTaskFrom;
 import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.*;
@@ -168,9 +168,10 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
             specify(new Block() {
                 public void run() throws Throwable {
 
+                    final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
                     taskContext.execute(new Runnable() {
                         public void run() {
-                            specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
+                            specify(bootstrap.getTaskInsideTransaction(), should.equal(task1));
                             tx.get().setRollbackOnly();
                         }
                     });
@@ -196,9 +197,10 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
             specify(new Block() {
                 public void run() throws Throwable {
 
+                    final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
                     taskContext.execute(new Runnable() {
                         public void run() {
-                            specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
+                            specify(bootstrap.getTaskInsideTransaction(), should.equal(task1));
                             tx.get().setRollbackOnly();
                         }
                     });
@@ -206,9 +208,10 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
             }, should.raise(TransactionException.class));
             specify(scheduler.getQueuedTasks(), should.equal(1)); // the first task at T1000; can be taken right away
 
+            final TaskBootstrap bootstrap = takeNextTaskFrom(scheduler);
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(_takeNextTaskFrom(scheduler).getTaskInsideTransaction(), should.equal(task1));
+                    specify(bootstrap.getTaskInsideTransaction(), should.equal(task1));
                 }
             });
             specify(scheduler.getQueuedTasks(), should.equal(1)); // the next task at T1000+2000
