@@ -133,7 +133,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     }
 
     private boolean thereAreNoExecutableTasksRightNow() {
-        interruptTestThreadAfter(THREAD_SYNC_DELAY);
+        interruptTestThreadAfter(THREAD_SYNC_DELAY); // TODO: figure out a more reliable method than sleeping
         specify(new Block() {
             public void run() throws Throwable {
                 TaskBootstrap bootstrap;
