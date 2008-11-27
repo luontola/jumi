@@ -51,8 +51,6 @@ import java.util.concurrent.*;
 @Group({"fast"})
 public class TaskThreadPoolSpec extends Specification<Object> {
 
-    private static final int TEST_TIMEOUT = 50;
-
     private Context taskContext;
     private BlockingQueue<TaskBootstrap> taskQueue;
     private Logger logger;
@@ -130,7 +128,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                     return task;
                 }
             });
-            end.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            end.await();
         }
 
         public void theyAreExecuted() throws InterruptedException {
@@ -185,18 +183,21 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             runningTasks0 = pool.getRunningTasks();
             taskQueue.add(new SimpleTaskBootstrap(task1));
 
-            step1.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            step1.await();
             taskQueue.add(new SimpleTaskBootstrap(task2));
 
-            step3.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            step3.await();
             pool.awaitForCurrentTasksToFinish();
             runningTasksEnd = pool.getRunningTasks();
         }
 
         public void theyAreExecutedInParallel() throws InterruptedException {
-            specify(step1.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
-            specify(step2.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
-            specify(step3.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
+            step1.await();
+            step2.await();
+            step3.await();
+            specify(step1.getCount(), should.equal(0));
+            specify(step2.getCount(), should.equal(0));
+            specify(step3.getCount(), should.equal(0));
         }
 
         public void thePoolKnowsTheNumberOfRunningTasks() {
@@ -242,7 +243,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                 }
             };
             taskQueue.add(new SimpleTaskBootstrap(task1));
-            firstTaskIsExecuting.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            firstTaskIsExecuting.await();
 
             executeAfterCurrentThreadIsNotRunning(new Runnable() {
                 public void run() {
@@ -285,7 +286,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                 }
             };
             taskQueue.add(new SimpleTaskBootstrap(task));
-            end.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            end.await();
             pool.awaitForCurrentTasksToFinish();
         }
 

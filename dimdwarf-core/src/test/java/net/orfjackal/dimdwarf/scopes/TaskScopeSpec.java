@@ -31,23 +31,15 @@
 
 package net.orfjackal.dimdwarf.scopes;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import com.google.inject.*;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.FakeContext;
-import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.modules.FakeEntityModule;
-import net.orfjackal.dimdwarf.modules.TaskContextModule;
+import net.orfjackal.dimdwarf.context.*;
+import net.orfjackal.dimdwarf.modules.*;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -162,7 +154,7 @@ public class TaskScopeSpec extends Specification<Object> {
             t1.start();
             t2.setDaemon(true);
             t2.start();
-            gotInstance.await(100, TimeUnit.MILLISECONDS);
+            gotInstance.await();
 
             specify(s1.get(), should.not().equal(null));
             specify(s2.get(), should.not().equal(null));
