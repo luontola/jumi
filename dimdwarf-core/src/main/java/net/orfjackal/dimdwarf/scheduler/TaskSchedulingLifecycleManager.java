@@ -32,13 +32,13 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.events.SystemStartupListener;
+import net.orfjackal.dimdwarf.events.*;
 
 /**
  * @author Esko Luontola
  * @since 28.11.2008
  */
-public class TaskSchedulingLifecycleManager implements SystemStartupListener {
+public class TaskSchedulingLifecycleManager implements SystemStartupListener, SystemShutdownListener {
 
     private final TaskSchedulerImpl taskScheduler;
     private final TaskThreadPool taskThreadPool;
@@ -52,5 +52,9 @@ public class TaskSchedulingLifecycleManager implements SystemStartupListener {
     public void onStartup() {
         taskScheduler.start();
         taskThreadPool.start();
+    }
+
+    public void onShutdown() {
+        taskThreadPool.shutdown();
     }
 }

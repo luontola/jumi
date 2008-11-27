@@ -35,13 +35,15 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
+import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
+import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
 import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.server.ServerLifecycleManager;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
@@ -51,29 +53,52 @@ import java.util.concurrent.Semaphore;
 @Group({"fast"})
 public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
+    private Injector injector;
     private TaskExecutor taskContext;
     private Provider<TaskScheduler> scheduler;
-    private TaskThreadPool pool;
     private TestSpy spy;
 
     private Provider<ServerLifecycleManager> server;
 
     public void create() throws Exception {
-        Injector injector = Guice.createInjector(new CommonModules());
-        taskContext = injector.getInstance(TaskExecutor.class);
-        scheduler = injector.getProvider(TaskScheduler.class);
-        pool = injector.getInstance(TaskThreadPool.class);
-        spy = injector.getInstance(TestSpy.class);
-
-        server = injector.getProvider(ServerLifecycleManager.class);
-        server.get().start();
+        startupTheServer(new CommonModules());
     }
 
-    public void destroy() throws Exception {
+    private void startupTheServer(Module... modules) {
+        injector = Guice.createInjector(modules);
+        server = injector.getProvider(ServerLifecycleManager.class);
+        server.get().start();
+
+        taskContext = injector.getInstance(TaskExecutor.class);
+        scheduler = injector.getProvider(TaskScheduler.class);
+        spy = injector.getInstance(TestSpy.class);
+    }
+
+    private void shutdownTheServer() {
         server.get().shutdown();
     }
 
-    public class WhenAOneTimeTasksIsScheduled {
+    private void restartTheServer() {
+        shutdownTheServer();
+        final InMemoryDatabaseManager db = injector.getInstance(InMemoryDatabaseManager.class);
+        final EntityIdFactoryImpl idFactory = injector.getInstance(EntityIdFactoryImpl.class);
+
+        startupTheServer(
+                new CommonModules(),
+                new AbstractModule() {
+                    protected void configure() {
+                        bind(InMemoryDatabaseManager.class).toInstance(db);
+                        bind(EntityIdFactoryImpl.class).toInstance(idFactory);
+                    }
+                });
+    }
+
+    public void destroy() throws Exception {
+        shutdownTheServer();
+    }
+
+
+    public class WhenAOneTimeTaskIsScheduled {
 
         public void create() throws InterruptedException {
             taskContext.execute(new Runnable() {
@@ -86,6 +111,36 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
         public void itIsExecutedOnce() {
             specify(spy.executions, should.containInOrder("A:1"));
+        }
+    }
+
+    public class WhenARepeatedTaskIsScheduled {
+
+        public void create() throws InterruptedException {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.get().scheduleAtFixedRate(new ExecutionLoggingTask("A"), 0, 0, TimeUnit.MILLISECONDS);
+                }
+            });
+            spy.executionCount.acquire(2);
+        }
+
+        public void itIsExecutedManyTimes() {
+            specify(spy.executions, should.containAll("A:1", "A:2"));
+        }
+
+        public void afterShuttingDownItIsNoMoreExecuted() throws InterruptedException {
+            shutdownTheServer();
+            spy.executions.clear();
+            Thread.sleep(10); // TODO: figure out a more reliable thread synchronization method than sleeping
+            specify(spy.executions, should.containExactly());
+        }
+
+        public void afterRestartTheExecutionIsContinued() throws InterruptedException {
+            restartTheServer();
+            spy.executionCount.acquire(1);
+            specify(spy.executions, should.not().containAny("A:1", "A:2"));
+            specify(spy.executions, should.containAny("A:3", "A:4"));
         }
     }
 
@@ -114,9 +169,9 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
         public void run() {
             myExecutionCount++;
             spy.logExecution(getDummyId(), myExecutionCount);
-            System.out.println("TaskSchedulingIntegrationSpec$ExecutionLoggingTask.run");
-            System.out.println("getDummyId() = " + getDummyId());
-            System.out.println("myExecutionCount = " + myExecutionCount);
+            System.err.println("TaskSchedulingIntegrationSpec$ExecutionLoggingTask.run");
+            System.err.println("getDummyId() = " + getDummyId());
+            System.err.println("myExecutionCount = " + myExecutionCount);
         }
     }
 

@@ -118,9 +118,11 @@ public class EntityManagerImpl implements EntityManager {
         if (state == State.FLUSHING) {
             flushQueue.add(entity);
         }
-        Object previous1 = entities.put(entity, id);
-        Object previous2 = entitiesById.put(id, entity);
-        assert previous1 == null && previous2 == null : "Registered an entity twise: " + entity + ", " + id;
+        BigInteger prevIdOfSameEntity = entities.put(entity, id);
+        EntityObject prevEntityWithSameId = entitiesById.put(id, entity);
+        assert prevIdOfSameEntity == null && prevEntityWithSameId == null : ""
+                + "Registered an entity twise: " + entity + ", " + id
+                + " (Previous was: " + prevEntityWithSameId + ", " + prevIdOfSameEntity + ")";
     }
 
     public BigInteger firstKey() {

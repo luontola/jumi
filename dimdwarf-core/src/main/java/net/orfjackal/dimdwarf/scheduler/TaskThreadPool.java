@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Inject;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.slf4j.*;
 
@@ -43,7 +43,7 @@ import java.util.concurrent.*;
  * @author Esko Luontola
  * @since 26.11.2008
  */
-//@Singleton // TODO: a test must fail first
+@Singleton
 @ThreadSafe
 public class TaskThreadPool {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TaskThreadPool.class);
@@ -77,7 +77,7 @@ public class TaskThreadPool {
     }
 
     public void shutdown() {
-        logger.info("Shutting down...");
+        logger.info("Shutting down {}...", getClass().getSimpleName());
         consumer.interrupt();
         try {
             consumer.join();
@@ -85,7 +85,7 @@ public class TaskThreadPool {
             logger.error("Interrupted while shutting down", e);
         }
         workers.shutdown();
-        logger.info("Shutdown finished");
+        logger.info("{} has been shut down", getClass().getSimpleName());
     }
 
     @SuppressWarnings({"ToArrayCallWithZeroLengthArrayArgument"})
@@ -129,7 +129,7 @@ public class TaskThreadPool {
                 runningTasks.add(taskHasFinished);
                 taskContext.execute(task);
             } catch (Throwable t) {
-                logger.error("Task threw an exception", t);
+                logger.warn("Task threw an exception", t);
             } finally {
                 runningTasks.remove(taskHasFinished);
                 taskHasFinished.countDown();

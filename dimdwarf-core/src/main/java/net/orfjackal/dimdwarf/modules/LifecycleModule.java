@@ -56,8 +56,10 @@ public class LifecycleModule extends AbstractModule {
     }
 
     private static class SystemShutdownListenerProvider implements Provider<SystemShutdownListener[]> {
+        @Inject public TaskSchedulingLifecycleManager listener1;
+
         public SystemShutdownListener[] get() {
-            return new SystemShutdownListener[0];
+            return new SystemShutdownListener[]{listener1};
         }
     }
 }

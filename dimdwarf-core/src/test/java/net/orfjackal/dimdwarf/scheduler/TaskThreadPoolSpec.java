@@ -81,7 +81,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void destroy() throws Exception {
         checking(new Expectations() {{
-            allowing(logger).info(with(any(String.class)));
+            allowing(logger).info(with(any(String.class)), with(any(Object.class)));
             allowing(logger).info(with(any(String.class)), with(any(Throwable.class)));
         }});
         pool.shutdown();
@@ -292,7 +292,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
         public Expectations theExceptionIsLogged() {
             return new Expectations() {{
-                one(logger).error("Task threw an exception", exception);
+                one(logger).warn("Task threw an exception", exception);
             }};
         }
 
@@ -317,9 +317,9 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
         private Expectations theShutdownIsLogged() {
             return new Expectations() {{
-                one(logger).info("Shutting down...");
+                one(logger).info("Shutting down {}...", "TaskThreadPool");
                 allowing(logger).info(with(equal("Task consumer was interrupted")), with(aNonNull(InterruptedException.class)));
-                one(logger).info("Shutdown finished");
+                one(logger).info("{} has been shut down", "TaskThreadPool");
             }};
         }
 
