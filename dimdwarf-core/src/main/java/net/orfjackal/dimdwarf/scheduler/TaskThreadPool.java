@@ -34,8 +34,8 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.slf4j.*;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
@@ -49,7 +49,7 @@ public class TaskThreadPool {
     private final TaskProducer producer;
     private final Thread consumer;
     private final ExecutorService workers;
-    private final AtomicInteger runningTasks = new AtomicInteger(0);
+    private final Set<CountDownLatch> runningTasks = Collections.synchronizedSet(new HashSet<CountDownLatch>());
 
     public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool) {
         this(taskContext, producer, threadPool, DEFAULT_LOGGER);
@@ -58,7 +58,7 @@ public class TaskThreadPool {
     public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool, Logger logger) {
         this.taskContext = taskContext;
         this.producer = producer;
-        this.consumer = new Thread(new TaskConsumer());
+        this.consumer = new Thread(new TaskConsumer(), "TaskConsumer");
         this.workers = threadPool;
         this.logger = logger;
     }
@@ -68,7 +68,7 @@ public class TaskThreadPool {
     }
 
     public int getRunningTasks() {
-        return runningTasks.get();
+        return runningTasks.size();
     }
 
     public void shutdown() {
@@ -81,6 +81,19 @@ public class TaskThreadPool {
         }
         workers.shutdown();
         logger.info("Shutdown finished");
+    }
+
+    @SuppressWarnings({"ToArrayCallWithZeroLengthArrayArgument"})
+    public void awaitForCurrentTasksToFinish() throws InterruptedException {
+        // It would be dangerous to pass an array larger than 0 to the toArray() method,
+        // because there is a small chance that between the calls to size() and toArray()
+        // an entry is removed from the collection, and the returned array would be too
+        // big and would contain a null entry (toArray() does not shrink the array parameter
+        // if it's too big).
+        CountDownLatch[] snapshotOfRunningTasks = runningTasks.toArray(new CountDownLatch[0]);
+        for (CountDownLatch taskHasFinished : snapshotOfRunningTasks) {
+            taskHasFinished.await();
+        }
     }
 
 
@@ -106,13 +119,15 @@ public class TaskThreadPool {
         }
 
         public void run() {
+            CountDownLatch taskHasFinished = new CountDownLatch(1);
             try {
-                runningTasks.incrementAndGet();
+                runningTasks.add(taskHasFinished);
                 taskContext.execute(task);
             } catch (Throwable t) {
                 logger.error("Task threw an exception", t);
             } finally {
-                runningTasks.decrementAndGet();
+                runningTasks.remove(taskHasFinished);
+                taskHasFinished.countDown();
             }
         }
     }
