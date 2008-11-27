@@ -88,7 +88,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
 
         hideTransactionFailedLogs = Logger.getLogger(TransactionFilter.class.getName());
-        hideTransactionFailedLogs.setLevel(Level.OFF);
+        hideTransactionFailedLogs.setLevel(Level.SEVERE);
     }
 
     public void destroy() throws Exception {
