@@ -31,15 +31,14 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
-import org.jmock.Expectations;
-import org.jmock.Sequence;
+import org.jmock.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Esko Luontola
@@ -54,6 +53,8 @@ public class TransactionSpec extends Specification<TransactionImpl> {
     private TransactionParticipant participant2;
     private Logger txLogger;
 
+    private CountDownLatch testHasEnded = new CountDownLatch(1);
+
     public void create() throws Exception {
         txLogger = mock(Logger.class);
         tx = new TransactionImpl(txLogger);
@@ -61,6 +62,18 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         participant2 = mock(TransactionParticipant.class, "participant2");
     }
 
+    public void destroy() throws Exception {
+        testHasEnded.countDown();
+    }
+
+    private void waitUntilTestHasEnded() {
+        try {
+            testHasEnded.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     private Expectations allParticipantsArePrepared() {
         try {
             return new Expectations() {{
@@ -195,20 +208,22 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             }, should.raise(IllegalStateException.class));
         }
 
-        public void canNotPrepareTwiseConcurrently() {
+        public void canNotPrepareTwiseConcurrently() throws InterruptedException {
             checking(allParticipantsArePrepared());
-            Blocker blocker = new Blocker() {
-                public void prepare() {
-                    waitHere();
-                }
-            };
-            tx.join(blocker);
 
-            Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
+            final CountDownLatch prepareIsInProgress = new CountDownLatch(1);
+            tx.join(new DummyTransactionParticipant() {
+                public void prepare() {
+                    prepareIsInProgress.countDown();
+                    waitUntilTestHasEnded();
+                }
+            });
+            new Thread(new Runnable() {
                 public void run() {
                     tx.prepare();
                 }
-            });
+            }).start();
+            prepareIsInProgress.await();
 
             specify(tx.getStatus(), should.equal(PREPARING));
             specify(new Block() {
@@ -216,7 +231,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                     tx.prepare();
                 }
             }, should.raise(IllegalStateException.class));
-            t.interrupt();
         }
 
         public void canNotCommitBeforePrepare() {
@@ -285,21 +299,23 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             }, should.raise(IllegalStateException.class));
         }
 
-        public void canNotCommitTwiseConcurrently() {
+        public void canNotCommitTwiseConcurrently() throws InterruptedException {
             tx = new TransactionImpl(txLogger);
-            Blocker blocker = new Blocker() {
-                public void commit() {
-                    waitHere();
-                }
-            };
-            tx.join(blocker);
-            tx.prepare();
 
-            Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
-                public void run() {
-                    tx.commit();
+            final CountDownLatch commitIsInProgress = new CountDownLatch(1);
+            tx.join(new DummyTransactionParticipant() {
+                public void commit() {
+                    commitIsInProgress.countDown();
+                    waitUntilTestHasEnded();
                 }
             });
+            new Thread(new Runnable() {
+                public void run() {
+                    tx.prepare();
+                    tx.commit();
+                }
+            }).start();
+            commitIsInProgress.await();
 
             specify(tx.getStatus(), should.equal(COMMITTING));
             specify(new Block() {
@@ -307,7 +323,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                     tx.commit();
                 }
             }, should.raise(IllegalStateException.class));
-            t.interrupt();
         }
     }
 
@@ -352,20 +367,22 @@ public class TransactionSpec extends Specification<TransactionImpl> {
             }, should.raise(IllegalStateException.class));
         }
 
-        public void canNotRollbackTwiseConcurrently() {
+        public void canNotRollbackTwiseConcurrently() throws InterruptedException {
             checking(allParticipantsAreRolledBack());
-            Blocker blocker = new Blocker() {
-                public void rollback() {
-                    waitHere();
-                }
-            };
-            tx.join(blocker);
 
-            Thread t = blocker.waitUntilBlockerBeginsWaiting(new Runnable() {
+            final CountDownLatch rollbackIsInProgress = new CountDownLatch(1);
+            tx.join(new DummyTransactionParticipant() {
+                public void rollback() {
+                    rollbackIsInProgress.countDown();
+                    waitUntilTestHasEnded();
+                }
+            });
+            new Thread(new Runnable() {
                 public void run() {
                     tx.rollback();
                 }
-            });
+            }).start();
+            rollbackIsInProgress.await();
 
             specify(tx.getStatus(), should.equal(ROLLING_BACK));
             specify(new Block() {
@@ -373,7 +390,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
                     tx.rollback();
                 }
             }, should.raise(IllegalStateException.class));
-            t.interrupt();
         }
 
         public void mayRollbackWhenActive() {
@@ -462,30 +478,6 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         }
     }
 
-
-    private static class Blocker extends DummyTransactionParticipant {
-
-        private volatile boolean isReached = false;
-
-        protected void waitHere() {
-            isReached = true;
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // ignore; test has ended
-            }
-        }
-
-        public Thread waitUntilBlockerBeginsWaiting(Runnable r) {
-            Thread t = new Thread(r);
-            t.setDaemon(true);
-            t.start();
-            while (t.isAlive() && !isReached) {
-                Thread.yield();
-            }
-            return t;
-        }
-    }
 
     private static class DummyTransactionParticipant implements TransactionParticipant {
 
