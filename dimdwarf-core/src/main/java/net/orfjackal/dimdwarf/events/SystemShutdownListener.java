@@ -29,35 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.scheduler;
-
-import java.io.Serializable;
+package net.orfjackal.dimdwarf.events;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 28.11.2008
  */
-public class DummyTask implements Runnable, Serializable {
-    private static final long serialVersionUID = 1L;
+public interface SystemShutdownListener {
 
-    private final String dummyId;
-
-    public DummyTask(String dummyId) {
-        this.dummyId = dummyId;
-    }
-
-    public String getDummyId() {
-        return dummyId;
-    }
-
-    public void run() {
-    }
-
-    public boolean equals(Object obj) {
-        if (obj instanceof DummyTask) {
-            DummyTask other = (DummyTask) obj;
-            return dummyId.equals(other.dummyId);
-        }
-        return false;
-    }
+    public void onShutdown();
 }

@@ -86,6 +86,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         };
 
         scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+        scheduler.start();
 
         hideTransactionFailedLogs = Logger.getLogger(TransactionFilter.class.getName());
         hideTransactionFailedLogs.setLevel(Level.SEVERE);

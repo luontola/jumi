@@ -69,6 +69,8 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private DummyTask task2;
 
     public void create() {
+        clearInterruptedStatus();
+
         clock = new DummyClock();
         Injector injector = Guice.createInjector(
                 new EntityModule(),
@@ -91,11 +93,16 @@ public class TaskSchedulerSpec extends Specification<Object> {
         specify(thereMayBeBindingsInOtherNamespaces());
 
         scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+        scheduler.start();
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
     }
 
     public void destroy() throws Exception {
+        clearInterruptedStatus();
+    }
+
+    private static void clearInterruptedStatus() {
         // clear interrupted status, in case one of the tests which use interrupts failed
         Thread.interrupted();
     }
@@ -212,6 +219,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void afterRestartNoTasksAreQueued() {
             scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+            scheduler.start();
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -252,6 +260,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void afterRestartTheTaskIsStillQueued() {
             scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+            scheduler.start();
             specify(scheduler.getQueuedTasks(), should.equal(1));
         }
     }
@@ -290,6 +299,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void afterRestartNoTasksAreQueued() {
             scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+            scheduler.start();
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
     }
@@ -324,12 +334,14 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
         public void afterRestartAnExecutorCanNotTakeItBeforeTheDelay() {
             scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+            scheduler.start();
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorCanNotTakeItBeforeTheDelay();
         }
 
         public void afterRestartAnExecutorMayTakeItAfterTheDelay() {
             scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
+            scheduler.start();
             specify(scheduler.getQueuedTasks(), should.equal(1));
             anExecutorMayTakeItAfterTheDelay();
         }

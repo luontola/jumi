@@ -29,35 +29,44 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.scheduler;
+package net.orfjackal.dimdwarf.modules;
 
-import java.io.Serializable;
+import com.google.inject.*;
+import net.orfjackal.dimdwarf.api.*;
+import net.orfjackal.dimdwarf.entities.BindingStorage;
+import net.orfjackal.dimdwarf.scheduler.*;
+import net.orfjackal.dimdwarf.util.*;
+
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 27.11.2008
  */
-public class DummyTask implements Runnable, Serializable {
-    private static final long serialVersionUID = 1L;
+public class TaskSchedulingModule extends AbstractModule {
 
-    private final String dummyId;
+    protected void configure() {
 
-    public DummyTask(String dummyId) {
-        this.dummyId = dummyId;
+        bind(TaskScheduler.class).to(TaskSchedulerImpl.class);
+        bind(TaskProducer.class).to(TaskSchedulerImpl.class);
+
+        bind(RecoverableSetFactory.class).to(RecoverableSetFactoryImpl.class);
+        bind(Clock.class).to(SystemClock.class);
+        bind(ExecutorService.class).toProvider(new ExecutorServiceProvider());
     }
 
-    public String getDummyId() {
-        return dummyId;
-    }
+    private static class RecoverableSetFactoryImpl implements RecoverableSetFactory {
+        @Inject public Provider<BindingStorage> bindings;
+        @Inject public Provider<EntityInfo> entities;
 
-    public void run() {
-    }
-
-    public boolean equals(Object obj) {
-        if (obj instanceof DummyTask) {
-            DummyTask other = (DummyTask) obj;
-            return dummyId.equals(other.dummyId);
+        public <T> RecoverableSet<T> create(String prefix) {
+            return new RecoverableSetImpl<T>(prefix, bindings, entities);
         }
-        return false;
+    }
+
+    private static class ExecutorServiceProvider implements Provider<ExecutorService> {
+        public ExecutorService get() {
+            return Executors.newCachedThreadPool();
+        }
     }
 }

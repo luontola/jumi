@@ -29,35 +29,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.scheduler;
+package net.orfjackal.dimdwarf.server;
 
-import java.io.Serializable;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.events.*;
+import org.slf4j.*;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 28.11.2008
  */
-public class DummyTask implements Runnable, Serializable {
-    private static final long serialVersionUID = 1L;
+public class ServerLifecycleManager {
+    private static final Logger logger = LoggerFactory.getLogger(ServerLifecycleManager.class);
 
-    private final String dummyId;
+    private final SystemStartupListener[] startupListeners;
+    private final SystemShutdownListener[] shutdownListeners;
 
-    public DummyTask(String dummyId) {
-        this.dummyId = dummyId;
+    @Inject
+    public ServerLifecycleManager(SystemStartupListener[] startupListeners, SystemShutdownListener[] shutdownListeners) {
+        this.startupListeners = startupListeners;
+        this.shutdownListeners = shutdownListeners;
     }
 
-    public String getDummyId() {
-        return dummyId;
-    }
-
-    public void run() {
-    }
-
-    public boolean equals(Object obj) {
-        if (obj instanceof DummyTask) {
-            DummyTask other = (DummyTask) obj;
-            return dummyId.equals(other.dummyId);
+    public void start() {
+        logger.info("Startup sequence initiated");
+        for (SystemStartupListener listener : startupListeners) {
+            try {
+                listener.onStartup();
+            } catch (Throwable t) {
+                logger.error("Exception on startup", t);
+            }
         }
-        return false;
+        logger.info("Startup done");
+    }
+
+    public void shutdown() {
+        logger.info("Shutdown sequence initiated");
+        for (SystemShutdownListener listener : shutdownListeners) {
+            try {
+                listener.onShutdown();
+            } catch (Throwable t) {
+                logger.error("Exception on shutdown", t);
+            }
+        }
+        logger.info("Shutdown done");
     }
 }

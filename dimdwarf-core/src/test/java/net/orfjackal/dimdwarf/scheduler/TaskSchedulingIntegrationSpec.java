@@ -31,9 +31,17 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.TaskScheduler;
+import net.orfjackal.dimdwarf.modules.CommonModules;
+import net.orfjackal.dimdwarf.server.ServerLifecycleManager;
+import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
+
+import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author Esko Luontola
@@ -42,6 +50,75 @@ import org.junit.runner.RunWith;
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TaskSchedulingIntegrationSpec extends Specification<Object> {
+
+    private TaskExecutor taskContext;
+    private Provider<TaskScheduler> scheduler;
+    private TaskThreadPool pool;
+    private TestSpy spy;
+
+    private Provider<ServerLifecycleManager> server;
+
+    public void create() throws Exception {
+        Injector injector = Guice.createInjector(new CommonModules());
+        taskContext = injector.getInstance(TaskExecutor.class);
+        scheduler = injector.getProvider(TaskScheduler.class);
+        pool = injector.getInstance(TaskThreadPool.class);
+        spy = injector.getInstance(TestSpy.class);
+
+        server = injector.getProvider(ServerLifecycleManager.class);
+        server.get().start();
+    }
+
+    public void destroy() throws Exception {
+        server.get().shutdown();
+    }
+
+    public class WhenAOneTimeTasksIsScheduled {
+
+        public void create() throws InterruptedException {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    scheduler.get().submit(new ExecutionLoggingTask("A"));
+                }
+            });
+            spy.executionCount.acquire(1);
+        }
+
+        public void itIsExecutedOnce() {
+            specify(spy.executions, should.containInOrder("A:1"));
+        }
+    }
+
+
+    @Singleton
+    public static class TestSpy {
+
+        public final Semaphore executionCount = new Semaphore(0);
+        public final List<String> executions = Collections.synchronizedList(new ArrayList<String>());
+
+        public void logExecution(String dummyId, int count) {
+            executions.add(dummyId + ":" + count);
+            executionCount.release();
+        }
+    }
+
+    private static class ExecutionLoggingTask extends DummyTask {
+
+        @Inject public transient TestSpy spy;
+        private int myExecutionCount = 0;
+
+        public ExecutionLoggingTask(String dummyId) {
+            super(dummyId);
+        }
+
+        public void run() {
+            myExecutionCount++;
+            spy.logExecution(getDummyId(), myExecutionCount);
+            System.out.println("TaskSchedulingIntegrationSpec$ExecutionLoggingTask.run");
+            System.out.println("getDummyId() = " + getDummyId());
+            System.out.println("myExecutionCount = " + myExecutionCount);
+        }
+    }
 
     // TODO: configure Guice modules
     // TODO: to monitor tests, use a dummy object in @Singleton scope - the tasks can have it injected to them

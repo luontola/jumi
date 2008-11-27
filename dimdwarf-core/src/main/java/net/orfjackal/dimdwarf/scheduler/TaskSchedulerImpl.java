@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Provider;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.tx.*;
@@ -46,6 +46,7 @@ import java.util.concurrent.*;
  * @author Esko Luontola
  * @since 24.11.2008
  */
+@Singleton
 @ThreadSafe
 public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
@@ -53,17 +54,24 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
     private final BlockingQueue<ScheduledTaskHolder> scheduledTasks = new DelayQueue<ScheduledTaskHolder>();
     private final RecoverableSet<ScheduledTask> persistedTasks;
+
     private final Provider<Transaction> tx;
     private final Clock clock;
+    private final TaskExecutor taskContext;
 
+    @Inject
     public TaskSchedulerImpl(Provider<Transaction> tx, Clock clock, TaskExecutor taskContext, RecoverableSetFactory rsf) {
         this.tx = tx;
         this.clock = clock;
-        persistedTasks = rsf.create(TASKS_PREFIX);
-        recoverTasksFromDatabase(taskContext);
+        this.taskContext = taskContext;
+        this.persistedTasks = rsf.create(TASKS_PREFIX);
     }
 
-    private void recoverTasksFromDatabase(TaskExecutor taskContext) {
+    public void start() {
+        recoverTasksFromDatabase();
+    }
+
+    private void recoverTasksFromDatabase() {
         taskContext.execute(new Runnable() {
             public void run() {
                 for (ScheduledTask st : persistedTasks.getAll()) {

@@ -29,35 +29,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.scheduler;
+package net.orfjackal.dimdwarf.modules;
 
-import java.io.Serializable;
+import com.google.inject.*;
+import net.orfjackal.dimdwarf.events.*;
+import net.orfjackal.dimdwarf.scheduler.TaskSchedulingLifecycleManager;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 28.11.2008
  */
-public class DummyTask implements Runnable, Serializable {
-    private static final long serialVersionUID = 1L;
+public class LifecycleModule extends AbstractModule {
 
-    private final String dummyId;
+    protected void configure() {
 
-    public DummyTask(String dummyId) {
-        this.dummyId = dummyId;
+        bind(SystemStartupListener[].class).toProvider(SystemStartupListenerProvider.class);
+        bind(SystemShutdownListener[].class).toProvider(SystemShutdownListenerProvider.class);
     }
 
-    public String getDummyId() {
-        return dummyId;
-    }
+    private static class SystemStartupListenerProvider implements Provider<SystemStartupListener[]> {
+        @Inject public TaskSchedulingLifecycleManager listener1;
 
-    public void run() {
-    }
-
-    public boolean equals(Object obj) {
-        if (obj instanceof DummyTask) {
-            DummyTask other = (DummyTask) obj;
-            return dummyId.equals(other.dummyId);
+        public SystemStartupListener[] get() {
+            return new SystemStartupListener[]{listener1};
         }
-        return false;
+    }
+
+    private static class SystemShutdownListenerProvider implements Provider<SystemShutdownListener[]> {
+        public SystemShutdownListener[] get() {
+            return new SystemShutdownListener[0];
+        }
     }
 }

@@ -31,9 +31,11 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.slf4j.*;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -41,6 +43,8 @@ import java.util.concurrent.*;
  * @author Esko Luontola
  * @since 26.11.2008
  */
+//@Singleton // TODO: a test must fail first
+@ThreadSafe
 public class TaskThreadPool {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TaskThreadPool.class);
     private final Logger logger;
@@ -51,6 +55,7 @@ public class TaskThreadPool {
     private final ExecutorService workers;
     private final Set<CountDownLatch> runningTasks = Collections.synchronizedSet(new HashSet<CountDownLatch>());
 
+    @Inject
     public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool) {
         this(taskContext, producer, threadPool, DEFAULT_LOGGER);
     }
@@ -58,7 +63,7 @@ public class TaskThreadPool {
     public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool, Logger logger) {
         this.taskContext = taskContext;
         this.producer = producer;
-        this.consumer = new Thread(new TaskConsumer(), "TaskConsumer");
+        this.consumer = new Thread(new TaskConsumer(), "Consume Scheduled Tasks");
         this.workers = threadPool;
         this.logger = logger;
     }

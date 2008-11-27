@@ -31,33 +31,26 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import java.io.Serializable;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.events.SystemStartupListener;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 28.11.2008
  */
-public class DummyTask implements Runnable, Serializable {
-    private static final long serialVersionUID = 1L;
+public class TaskSchedulingLifecycleManager implements SystemStartupListener {
 
-    private final String dummyId;
+    private final TaskSchedulerImpl taskScheduler;
+    private final TaskThreadPool taskThreadPool;
 
-    public DummyTask(String dummyId) {
-        this.dummyId = dummyId;
+    @Inject
+    public TaskSchedulingLifecycleManager(TaskSchedulerImpl taskScheduler, TaskThreadPool taskThreadPool) {
+        this.taskScheduler = taskScheduler;
+        this.taskThreadPool = taskThreadPool;
     }
 
-    public String getDummyId() {
-        return dummyId;
-    }
-
-    public void run() {
-    }
-
-    public boolean equals(Object obj) {
-        if (obj instanceof DummyTask) {
-            DummyTask other = (DummyTask) obj;
-            return dummyId.equals(other.dummyId);
-        }
-        return false;
+    public void onStartup() {
+        taskScheduler.start();
+        taskThreadPool.start();
     }
 }

@@ -43,5 +43,7 @@ public class CommonModules extends AbstractModule {
         install(new TaskContextModule());
         install(new DatabaseModule());
         install(new EntityModule());
+        install(new TaskSchedulingModule());
+        install(new LifecycleModule());
     }
 }
