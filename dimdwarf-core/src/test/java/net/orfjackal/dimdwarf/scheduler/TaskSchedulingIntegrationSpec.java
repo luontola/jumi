@@ -98,6 +98,7 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
     }
 
     private void restartTheServer() {
+        // TODO: add support for storing the database to a file (or byte array in here), and do not recycle these database objects
         final InMemoryDatabaseManager dbBackup = injector.getInstance(InMemoryDatabaseManager.class);
         final EntityIdFactoryImpl idFactoryBackup = injector.getInstance(EntityIdFactoryImpl.class);
         startupTheServer(
