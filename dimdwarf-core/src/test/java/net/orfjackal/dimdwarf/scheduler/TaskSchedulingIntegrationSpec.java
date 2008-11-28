@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.*;
 
 /**
  * @author Esko Luontola
@@ -57,15 +58,33 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
     private TaskExecutor taskContext;
     private Provider<TaskScheduler> scheduler;
     private TestSpy spy;
+    private Logger[] hideLifecycleInfoLogs;
 
     private Provider<ServerLifecycleManager> server;
 
     public void create() throws Exception {
+        hideLifecycleInfoLogs = new Logger[]{
+                Logger.getLogger(ServerLifecycleManager.class.getName()),
+                Logger.getLogger(TaskThreadPool.class.getName()),
+        };
+        for (Logger logger : hideLifecycleInfoLogs) {
+            logger.setLevel(Level.WARNING);
+        }
+
         startupTheServer(new CommonModules());
+    }
+
+    public void destroy() throws Exception {
+        shutdownTheServer();
+
+        for (Logger logger : hideLifecycleInfoLogs) {
+            logger.setLevel(Level.ALL);
+        }
     }
 
     private void startupTheServer(Module... modules) {
         injector = Guice.createInjector(modules);
+
         server = injector.getProvider(ServerLifecycleManager.class);
         server.get().start();
 
@@ -79,22 +98,16 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
     }
 
     private void restartTheServer() {
-        shutdownTheServer();
-        final InMemoryDatabaseManager db = injector.getInstance(InMemoryDatabaseManager.class);
-        final EntityIdFactoryImpl idFactory = injector.getInstance(EntityIdFactoryImpl.class);
-
+        final InMemoryDatabaseManager dbBackup = injector.getInstance(InMemoryDatabaseManager.class);
+        final EntityIdFactoryImpl idFactoryBackup = injector.getInstance(EntityIdFactoryImpl.class);
         startupTheServer(
                 new CommonModules(),
                 new AbstractModule() {
                     protected void configure() {
-                        bind(InMemoryDatabaseManager.class).toInstance(db);
-                        bind(EntityIdFactoryImpl.class).toInstance(idFactory);
+                        bind(InMemoryDatabaseManager.class).toInstance(dbBackup);
+                        bind(EntityIdFactoryImpl.class).toInstance(idFactoryBackup);
                     }
                 });
-    }
-
-    public void destroy() throws Exception {
-        shutdownTheServer();
     }
 
 
@@ -137,10 +150,19 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
         }
 
         public void afterRestartTheExecutionIsContinued() throws InterruptedException {
+            shutdownTheServer();
+
+            List<String> executedBeforeRestart = new ArrayList<String>(spy.executions);
+            specify(executedBeforeRestart, executedBeforeRestart.size() >= 2);
+
             restartTheServer();
             spy.executionCount.acquire(1);
-            specify(spy.executions, should.not().containAny("A:1", "A:2"));
-            specify(spy.executions, should.containAny("A:3", "A:4"));
+
+            // If there were some executions and none of the two first executions are included
+            // (i.e. the execution count was correctly reset on shutdown), then the server must
+            // have continued execution after restart from where it was left.
+            specify(spy.executions, spy.executions.size() >= 1);
+            specify(spy.executions, should.not().containAny(executedBeforeRestart));
         }
     }
 
@@ -169,12 +191,9 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
         public void run() {
             myExecutionCount++;
             spy.logExecution(getDummyId(), myExecutionCount);
-            System.err.println("TaskSchedulingIntegrationSpec$ExecutionLoggingTask.run");
-            System.err.println("getDummyId() = " + getDummyId());
-            System.err.println("myExecutionCount = " + myExecutionCount);
+//            System.err.println("*** TaskSchedulingIntegrationSpec$ExecutionLoggingTask.run");
+//            System.err.println("*** getDummyId() = " + getDummyId());
+//            System.err.println("*** myExecutionCount = " + myExecutionCount);
         }
     }
-
-    // TODO: configure Guice modules
-    // TODO: to monitor tests, use a dummy object in @Singleton scope - the tasks can have it injected to them
 }

@@ -78,14 +78,31 @@ public class TaskThreadPool {
 
     public void shutdown() {
         logger.info("Shutting down {}...", getClass().getSimpleName());
+        shutdownConsumer();
+        shutdownWorkers();
+        logger.info("{} has been shut down", getClass().getSimpleName());
+    }
+
+    private void shutdownConsumer() {
         consumer.interrupt();
         try {
             consumer.join();
         } catch (InterruptedException e) {
             logger.error("Interrupted while shutting down", e);
+            throw new RuntimeException(e);
         }
+    }
+
+    private void shutdownWorkers() {
         workers.shutdown();
-        logger.info("{} has been shut down", getClass().getSimpleName());
+        try {
+            awaitForCurrentTasksToFinish();
+            workers.awaitTermination(10, TimeUnit.SECONDS);
+            workers.shutdownNow();
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while shutting down", e);
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings({"ToArrayCallWithZeroLengthArrayArgument"})
