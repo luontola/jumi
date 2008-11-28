@@ -31,15 +31,11 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
-import jdave.Group;
-import jdave.Specification;
+import com.google.inject.*;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -155,4 +151,6 @@ public class EntityIntegrationSpec extends Specification<Object> {
             });
         }
     }
+
+    // TODO: check that entities from one task are not passed on to another task (using AOP)
 }
