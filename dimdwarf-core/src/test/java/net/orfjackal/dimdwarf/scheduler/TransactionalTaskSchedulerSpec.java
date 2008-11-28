@@ -218,4 +218,8 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(1)); // the next task at T1000+2000
         }
     }
+
+    // TODO: retry limits for repatedly failing tasks
+    // TODO: retry executing tasks in exclusive (single-threaded) mode (ReentrantReadWriteLock?)
+    // TODO: do not retry when the exception is not because of transaction conflict
 }
