@@ -149,7 +149,7 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
             specify(spy.executions, should.containExactly());
         }
 
-        public void afterRestartTheExecutionIsContinued() throws InterruptedException {
+        public void afterRestartTheExecutionIsContinuedFromWhereItWasLeft() throws InterruptedException {
             shutdownTheServer();
 
             List<String> executedBeforeRestart = new ArrayList<String>(spy.executions);
@@ -160,9 +160,16 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
             // If there were some executions and none of the two first executions are included
             // (i.e. the execution count was correctly reset on shutdown), then the server must
-            // have continued execution after restart from where it was left.
+            // have continued execution after restart.
             specify(spy.executions, spy.executions.size() >= 1);
             specify(spy.executions, should.not().containAny(executedBeforeRestart));
+
+            // If the sequence of execution numbers has no holes, then the server must have
+            // continued execution exactly from where it was left.
+            String lastBeforeRestart = executedBeforeRestart.get(executedBeforeRestart.size() - 1);
+            int lastCountBeforeRestart = Integer.parseInt(lastBeforeRestart.split(":")[1]);
+            String firstAfterRestart = spy.executions.get(0);
+            specify(firstAfterRestart, should.equal("A:" + (lastCountBeforeRestart + 1)));
         }
     }
 
