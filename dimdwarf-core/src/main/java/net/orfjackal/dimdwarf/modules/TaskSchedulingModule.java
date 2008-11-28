@@ -52,7 +52,7 @@ public class TaskSchedulingModule extends AbstractModule {
 
         bind(RecoverableSetFactory.class).to(RecoverableSetFactoryImpl.class);
         bind(Clock.class).to(SystemClock.class);
-        bind(ExecutorService.class).toProvider(new ExecutorServiceProvider());
+        bind(ExecutorService.class).toProvider(ExecutorServiceProvider.class);
     }
 
     private static class RecoverableSetFactoryImpl implements RecoverableSetFactory {

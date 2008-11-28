@@ -52,26 +52,27 @@ public class ServerLifecycleManager {
     }
 
     public void start() {
-        logger.info("Startup sequence initiated");
+        logger.info("Startup sequence initiated...");
         for (SystemStartupListener listener : startupListeners) {
             try {
                 listener.onStartup();
             } catch (Throwable t) {
-                logger.error("Exception on startup", t);
+                logger.error("Exception during startup sequence", t);
+                throw new RuntimeException(t);
             }
         }
-        logger.info("Startup done");
+        logger.info("Started up.");
     }
 
     public void shutdown() {
-        logger.info("Shutdown sequence initiated");
+        logger.info("Shutdown sequence initiated...");
         for (SystemShutdownListener listener : shutdownListeners) {
             try {
                 listener.onShutdown();
             } catch (Throwable t) {
-                logger.error("Exception on shutdown", t);
+                logger.error("Exception during shutdown sequence", t);
             }
         }
-        logger.info("Shutdown done");
+        logger.info("Shutting down.");
     }
 }

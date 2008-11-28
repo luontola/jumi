@@ -33,13 +33,10 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import net.orfjackal.dimdwarf.util.Clock;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * @author Esko Luontola
  * @since 25.11.2008
  */
-@ThreadSafe
 public class ScheduledAtFixedRateTask extends AbstractScheduledTask {
     private static final long serialVersionUID = 1L;
 

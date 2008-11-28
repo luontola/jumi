@@ -37,6 +37,7 @@ import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.util.Objects;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -44,6 +45,7 @@ import java.util.*;
  * @author Esko Luontola
  * @since 26.11.2008
  */
+@ThreadSafe
 public class RecoverableSetImpl<T> implements RecoverableSet<T> {
 
     private final String prefix;

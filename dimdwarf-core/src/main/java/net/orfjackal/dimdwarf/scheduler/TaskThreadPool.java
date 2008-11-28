@@ -72,10 +72,6 @@ public class TaskThreadPool {
         consumer.start();
     }
 
-    public int getRunningTasks() {
-        return runningTasks.size();
-    }
-
     public void shutdown() {
         logger.info("Shutting down {}...", getClass().getSimpleName());
         shutdownConsumer();
@@ -103,6 +99,10 @@ public class TaskThreadPool {
             logger.error("Interrupted while shutting down", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public int getRunningTasks() {
+        return runningTasks.size();
     }
 
     @SuppressWarnings({"ToArrayCallWithZeroLengthArrayArgument"})

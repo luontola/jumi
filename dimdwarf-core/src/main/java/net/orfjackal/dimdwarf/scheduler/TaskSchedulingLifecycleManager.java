@@ -34,10 +34,13 @@ package net.orfjackal.dimdwarf.scheduler;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.events.*;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
  * @author Esko Luontola
  * @since 28.11.2008
  */
+@Immutable
 public class TaskSchedulingLifecycleManager implements SystemStartupListener, SystemShutdownListener {
 
     private final TaskSchedulerImpl taskScheduler;

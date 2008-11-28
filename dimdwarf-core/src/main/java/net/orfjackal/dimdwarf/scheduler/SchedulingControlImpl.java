@@ -34,7 +34,6 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +42,6 @@ import java.util.concurrent.TimeUnit;
  * @since 25.11.2008
  */
 @Entity
-@NotThreadSafe
 public class SchedulingControlImpl implements EntityObject, Serializable, SchedulingControl {
     private static final long serialVersionUID = 1L;
 

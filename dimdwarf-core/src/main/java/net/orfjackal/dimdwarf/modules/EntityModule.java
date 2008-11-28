@@ -31,17 +31,11 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.entities.tref.EntityInfoImpl;
-import net.orfjackal.dimdwarf.entities.tref.ReplaceEntitiesWithTransparentReferences;
-import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactory;
-import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactoryImpl;
-import static net.orfjackal.dimdwarf.modules.DatabaseModule.databaseTable;
-import static net.orfjackal.dimdwarf.modules.DatabaseModule.databaseTableConnection;
+import net.orfjackal.dimdwarf.entities.tref.*;
+import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 import net.orfjackal.dimdwarf.serial.*;
 
 import java.math.BigInteger;

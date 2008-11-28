@@ -31,19 +31,12 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.entities.EntityFlushingFilter;
-import net.orfjackal.dimdwarf.scopes.TaskScope;
-import net.orfjackal.dimdwarf.scopes.TaskScoped;
-import net.orfjackal.dimdwarf.scopes.TaskScopedContext;
-import net.orfjackal.dimdwarf.tasks.Filter;
-import net.orfjackal.dimdwarf.tasks.TransactionFilter;
-import net.orfjackal.dimdwarf.tx.Transaction;
-import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
-import net.orfjackal.dimdwarf.tx.TransactionImpl;
+import net.orfjackal.dimdwarf.scopes.*;
+import net.orfjackal.dimdwarf.tasks.*;
+import net.orfjackal.dimdwarf.tx.*;
 
 /**
  * @author Esko Luontola

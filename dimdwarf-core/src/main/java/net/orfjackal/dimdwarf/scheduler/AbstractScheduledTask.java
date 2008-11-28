@@ -36,7 +36,6 @@ import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.util.Clock;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +44,6 @@ import java.util.concurrent.TimeUnit;
  * @since 24.11.2008
  */
 @Entity
-@NotThreadSafe
 public abstract class AbstractScheduledTask implements EntityObject, Serializable, ScheduledTask {
     private static final long serialVersionUID = 1L;
 
