@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.gc;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
@@ -61,21 +62,16 @@ public class MockGraph implements Graph<String> {
         nodes.put(node, new MockNode());
     }
 
-    public void createRootNode(String node) {
-        createNode(node);
-        root.edges.add(node);
-    }
-
     public void removeNode(String node) {
         nodes.remove(node);
         root.edges.remove(node);
     }
 
-    public void createDirectedEdge(String from, String to) {
+    public void createDirectedEdge(@Nullable String from, String to) {
         getNode(from).edges.add(to);
     }
 
-    public void removeDirectedEdge(String from, String to) {
+    public void removeDirectedEdge(@Nullable String from, String to) {
         getNode(from).edges.remove(to);
     }
 
@@ -87,7 +83,10 @@ public class MockGraph implements Graph<String> {
         getNode(node).status = status;
     }
 
-    private MockNode getNode(String node) {
+    private MockNode getNode(@Nullable String node) {
+        if (node == null) {
+            return root;
+        }
         MockNode n = nodes.get(node);
         if (n == null) {
             n = new MockNode();

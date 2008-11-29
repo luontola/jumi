@@ -85,7 +85,8 @@ public class MockGraphSpec extends Specification<Object> {
     public class WhenARootNodeIsCreated {
 
         public void create() {
-            graph.createRootNode("A");
+            graph.createNode("A");
+            graph.createDirectedEdge(null, "A");
         }
 
         public void theGraphContainsThatNode() {
