@@ -46,4 +46,8 @@ public interface Graph<T> {
     Iterable<T> getConnectedNodesOf(T node);
 
     void removeNode(T node);
+
+    long getStatus(T node);
+
+    void setStatus(T node, long status);
 }

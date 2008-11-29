@@ -29,74 +29,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc;
+package net.orfjackal.dimdwarf.gc.cms;
 
-import javax.annotation.concurrent.ThreadSafe;
-import java.util.*;
-import java.util.concurrent.*;
+import jdave.Group;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
+import org.junit.runner.RunWith;
 
 /**
  * @author Esko Luontola
  * @since 29.11.2008
  */
-@ThreadSafe
-public class MockGraph implements Graph<String> {
-
-    private final Map<String, MockNode> nodes = new ConcurrentHashMap<String, MockNode>();
-    private final MockNode root = new MockNode();
-
-    public Iterable<String> getAllNodes() {
-        return Collections.unmodifiableCollection(nodes.keySet());
-    }
-
-    public Iterable<String> getRootNodes() {
-        return Collections.unmodifiableCollection(root.edges);
-    }
-
-    public Iterable<String> getConnectedNodesOf(String node) {
-        return Collections.unmodifiableCollection(getNode(node).edges);
-    }
-
-    public void createNode(String node) {
-        nodes.put(node, new MockNode());
-    }
-
-    public void createRootNode(String node) {
-        createNode(node);
-        root.edges.add(node);
-    }
-
-    public void removeNode(String node) {
-        nodes.remove(node);
-        root.edges.remove(node);
-    }
-
-    public void createDirectedEdge(String from, String to) {
-        getNode(from).edges.add(to);
-    }
-
-    public void removeDirectedEdge(String from, String to) {
-        getNode(from).edges.remove(to);
-    }
-
-    public long getStatus(String node) {
-        return getNode(node).status;
-    }
-
-    public void setStatus(String node, long status) {
-        getNode(node).status = status;
-    }
-
-    private MockNode getNode(String node) {
-        MockNode n = nodes.get(node);
-        if (n == null) {
-            n = new MockNode();
-        }
-        return n;
-    }
-
-    private class MockNode {
-        public long status = NULL_STATUS;
-        public final List<String> edges = new CopyOnWriteArrayList<String>();
-    }
+@RunWith(JDaveRunner.class)
+@Group({"fast"})
+public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 }
