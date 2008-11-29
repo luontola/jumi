@@ -108,6 +108,8 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
     public class InTheFirstStage {
 
+        // TODO: It would be possible to get rid of this first stage by reversing black and white. This would require the collector listening all object creations.  
+
         public void create() {
             stage1 = executeManySteps(stage1, STAGE_1_STEPS);
         }
