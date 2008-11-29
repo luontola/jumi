@@ -37,6 +37,8 @@ package net.orfjackal.dimdwarf.gc;
  */
 public interface Graph<T> {
 
+    long NULL_STATUS = 0L;
+
     Iterable<T> getAllNodes();
 
     Iterable<T> getRootNodes();

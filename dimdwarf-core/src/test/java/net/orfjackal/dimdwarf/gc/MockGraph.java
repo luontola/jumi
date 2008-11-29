@@ -45,6 +45,7 @@ public class MockGraph implements Graph<String> {
     private final Set<String> nodes = new CopyOnWriteArraySet<String>();
     private final Set<String> roots = new CopyOnWriteArraySet<String>();
     private final Map<String, List<String>> edges = new ConcurrentHashMap<String, List<String>>();
+    private final Map<String, Long> statuses = new ConcurrentHashMap<String, Long>();
 
     public Iterable<String> getAllNodes() {
         return Collections.unmodifiableCollection(nodes);
@@ -71,6 +72,7 @@ public class MockGraph implements Graph<String> {
         nodes.remove(node);
         roots.remove(node);
         edges.remove(node);
+        statuses.remove(node);
     }
 
     public void createDirectedEdge(String from, String to) {
@@ -88,5 +90,17 @@ public class MockGraph implements Graph<String> {
             edges.put(node, connected);
         }
         return connected;
+    }
+
+    public long getStatus(String node) {
+        Long status = statuses.get(node);
+        if (status == null) {
+            status = NULL_STATUS;
+        }
+        return status;
+    }
+
+    public void setStatus(String node, long status) {
+        statuses.put(node, status);
     }
 }

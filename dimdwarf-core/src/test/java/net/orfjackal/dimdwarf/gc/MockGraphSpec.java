@@ -167,4 +167,26 @@ public class MockGraphSpec extends Specification<Object> {
             specify(graph.getConnectedNodesOf("A"), should.containExactly("B"));
         }
     }
+
+    public class WhenTheStatusOfANodeIsSet {
+
+        public void create() {
+            graph.createNode("A");
+            graph.createNode("B");
+            graph.setStatus("A", 1L);
+        }
+
+        public void itHasThatStatus() {
+            specify(graph.getStatus("A"), should.equal(1L));
+        }
+
+        public void theStatusOfOtherNodesIsUnaffected() {
+            specify(graph.getStatus("B"), should.equal(Graph.NULL_STATUS));
+        }
+
+        public void afterNodeRemovalTheStatusIsRemoved() {
+            graph.removeNode("A");
+            specify(graph.getStatus("A"), should.equal(Graph.NULL_STATUS));
+        }
+    }
 }
