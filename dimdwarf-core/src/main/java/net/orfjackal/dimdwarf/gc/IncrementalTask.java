@@ -31,71 +31,13 @@
 
 package net.orfjackal.dimdwarf.gc;
 
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
 
 /**
  * @author Esko Luontola
  * @since 29.11.2008
  */
-@ThreadSafe
-public class MockGraph implements Graph<String> {
+public interface IncrementalTask {
 
-    private final Map<String, MockNode> nodes = new ConcurrentSkipListMap<String, MockNode>();
-    private final MockNode root = new MockNode();
-
-    public Iterable<String> getAllNodes() {
-        return Collections.unmodifiableCollection(nodes.keySet());
-    }
-
-    public Iterable<String> getRootNodes() {
-        return Collections.unmodifiableCollection(root.edges);
-    }
-
-    public Iterable<String> getConnectedNodesOf(String node) {
-        return Collections.unmodifiableCollection(getNode(node).edges);
-    }
-
-    public void createNode(String node) {
-        nodes.put(node, new MockNode());
-    }
-
-    public void removeNode(String node) {
-        nodes.remove(node);
-        root.edges.remove(node);
-    }
-
-    public void createDirectedEdge(@Nullable String from, String to) {
-        getNode(from).edges.add(to);
-    }
-
-    public void removeDirectedEdge(@Nullable String from, String to) {
-        getNode(from).edges.remove(to);
-    }
-
-    public long getStatus(String node) {
-        return getNode(node).status;
-    }
-
-    public void setStatus(String node, long status) {
-        getNode(node).status = status;
-    }
-
-    private MockNode getNode(@Nullable String node) {
-        if (node == null) {
-            return root;
-        }
-        MockNode n = nodes.get(node);
-        if (n == null) {
-            n = new MockNode();
-        }
-        return n;
-    }
-
-    private class MockNode {
-        public long status = NULL_STATUS;
-        public final List<String> edges = new CopyOnWriteArrayList<String>();
-    }
+    Collection<? extends IncrementalTask> step();
 }

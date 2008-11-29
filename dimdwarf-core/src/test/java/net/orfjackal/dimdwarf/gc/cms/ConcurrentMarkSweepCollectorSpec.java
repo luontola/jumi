@@ -31,10 +31,13 @@
 
 package net.orfjackal.dimdwarf.gc.cms;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.gc.*;
+import static net.orfjackal.dimdwarf.gc.cms.Color.*;
 import org.junit.runner.RunWith;
+
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -43,4 +46,142 @@ import org.junit.runner.RunWith;
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
+
+    private static final int STAGE_1_STEPS = 5;
+    private static final int STAGE_2_STEPS = 5;
+    private static final int STAGE_3_STEPS = 5;
+
+    private MockGraph graph;
+    private ConcurrentMarkSweepCollector<String> collector;
+
+    private Collection<? extends IncrementalTask> stage1;
+    private Collection<? extends IncrementalTask> stage2;
+    private Collection<? extends IncrementalTask> stage3;
+
+    public void create() throws Exception {
+        graph = new MockGraph();
+        collector = new ConcurrentMarkSweepCollector<String>(graph);
+
+        graph.createNode("A");
+        graph.createNode("B");
+        graph.createNode("C");
+        graph.createNode("D");
+        graph.createDirectedEdge(null, "A");
+        graph.createDirectedEdge("A", "B");
+        graph.createDirectedEdge("B", "A");
+        graph.createDirectedEdge("B", "C");
+
+        Iterator<? extends IncrementalTask> stages = collector.collectorStagesToExecute().iterator();
+        stage1 = Arrays.asList(stages.next());
+        stage2 = Arrays.asList(stages.next());
+        stage3 = Arrays.asList(stages.next());
+        specify(stages.hasNext(), should.equal(false));
+    }
+
+    private static Collection<IncrementalTask> executeManySteps(Collection<? extends IncrementalTask> tasks, int count) {
+        Collection<IncrementalTask> tmp = new ArrayList<IncrementalTask>();
+        tmp.addAll(tasks);
+        for (int i = 0; i < count; i++) {
+            tmp = executeOneStep(tmp);
+        }
+        return tmp;
+    }
+
+    private static Collection<IncrementalTask> executeOneStep(Collection<? extends IncrementalTask> tasks) {
+        Collection<IncrementalTask> nextStep = new ArrayList<IncrementalTask>();
+        for (IncrementalTask task : tasks) {
+            nextStep.addAll(task.step());
+        }
+        return nextStep;
+    }
+
+
+    public class WhenCollectorHasNotBeenRun {
+
+        public void newNodesAreByDefaultBlack() {
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(BLACK));
+            specify(collector.getColor("C"), should.equal(BLACK));
+            specify(collector.getColor("D"), should.equal(BLACK));
+        }
+    }
+
+    public class InTheFirstStage {
+
+        public void create() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+        }
+
+        public void allNodesAreMarkedWhite() {
+            specify(collector.getColor("A"), should.equal(WHITE));
+            specify(collector.getColor("B"), should.equal(WHITE));
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("D"), should.equal(WHITE));
+        }
+
+        public void thenTheStageEnds() {
+            specify(stage1, should.containExactly());
+        }
+    }
+
+    public class InTheSecondStage {
+
+        public void create() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+            stage2 = executeOneStep(stage2);
+        }
+
+        public void theReachableNodesAreMarkedBlackStartingFromTheRoots() {
+            specify(collector.getColor("A"), should.equal(BLACK));
+        }
+
+        public void nodesWhichAreSeenFromAReachedNodeAreAreMarkedGray() {
+            specify(collector.getColor("B"), should.equal(GRAY));
+        }
+
+        public void currentlyUnseenNodesRemainWhite() {
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("D"), should.equal(WHITE));
+        }
+
+        public void theAlgorithmProceedsRecursivelyToUnseenNodes() {
+            stage2 = executeOneStep(stage2);
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(BLACK));
+            specify(collector.getColor("C"), should.equal(GRAY));
+            specify(collector.getColor("D"), should.equal(WHITE));
+        }
+
+        public void finallyAllReachableNodesAreBlackAndUnreachableNodesAreWhite() {
+            stage2 = executeManySteps(stage2, STAGE_2_STEPS - 1);
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(BLACK));
+            specify(collector.getColor("C"), should.equal(BLACK));
+            specify(collector.getColor("D"), should.equal(WHITE));
+        }
+
+        public void thenTheStageEnds() {
+            stage2 = executeManySteps(stage2, STAGE_2_STEPS - 1);
+            specify(stage2, should.containExactly());
+        }
+    }
+
+    public class InTheThirdStage {
+
+        public void create() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+            stage2 = executeManySteps(stage2, STAGE_2_STEPS);
+            stage3 = executeManySteps(stage3, STAGE_3_STEPS);
+        }
+
+        public void allWhiteNodesAreRemoved() {
+            specify(graph.getAllNodes(), should.containExactly("A", "B", "C"));
+        }
+
+        public void thenTheStageEnds() {
+            specify(stage3, should.containExactly());
+        }
+    }
+
+    // TODO: concurrent workers
 }

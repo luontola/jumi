@@ -31,9 +31,123 @@
 
 package net.orfjackal.dimdwarf.gc.cms;
 
+import net.orfjackal.dimdwarf.gc.*;
+
+import java.util.*;
+
 /**
  * @author Esko Luontola
  * @since 29.11.2008
  */
-public class ConcurrentMarkSweepCollector {
+public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
+
+    private final Graph<T> graph;
+
+    public ConcurrentMarkSweepCollector(Graph<T> graph) {
+        this.graph = graph;
+    }
+
+    public List<? extends IncrementalTask> collectorStagesToExecute() {
+        return Arrays.asList(
+                new MarkAllNodesWhite(graph.getAllNodes().iterator()),
+                new MarkReachableNodesBlack(graph.getRootNodes().iterator()),
+                new RemoveUnreachableWhiteNodes(graph.getAllNodes().iterator())
+        );
+    }
+
+    public Color getColor(T node) {
+        return Color.fromStatus(graph.getStatus(node));
+    }
+
+    private void setColor(T node, Color color) {
+        graph.setStatus(node, color.toStatus());
+    }
+
+
+    private class MarkAllNodesWhite implements IncrementalTask {
+        private final Iterator<T> nodes;
+
+        public MarkAllNodesWhite(Iterator<T> nodes) {
+            this.nodes = nodes;
+        }
+
+        public Collection<? extends IncrementalTask> step() {
+            if (!nodes.hasNext()) {
+                return Collections.emptyList();
+            }
+            T current = nodes.next();
+            setColor(current, Color.WHITE);
+            return Arrays.asList(
+                    new MarkAllNodesWhite(nodes)
+            );
+        }
+    }
+
+    private class MarkReachableNodesBlack implements IncrementalTask {
+        private final Iterator<T> nodes;
+
+        public MarkReachableNodesBlack(Iterator<T> nodes) {
+            this.nodes = nodes;
+        }
+
+        public Collection<? extends IncrementalTask> step() {
+            if (!nodes.hasNext()) {
+                return Collections.emptyList();
+            }
+            T current = nodes.next();
+            if (getColor(current).equals(Color.BLACK)) {
+                return alreadyReachedAndMarkedBlack();
+            } else {
+                return markReachedNodeBlack(current);
+            }
+        }
+
+        private Collection<? extends IncrementalTask> alreadyReachedAndMarkedBlack() {
+            return Arrays.asList(
+                    new MarkReachableNodesBlack(nodes)
+            );
+        }
+
+        private Collection<? extends IncrementalTask> markReachedNodeBlack(T current) {
+            setColor(current, Color.BLACK);
+            markUnseenConnectedNodesGray(current);
+            return Arrays.asList(
+                    new MarkReachableNodesBlack(nodes),
+                    new MarkReachableNodesBlack(graph.getConnectedNodesOf(current).iterator())
+            );
+        }
+
+        private void markUnseenConnectedNodesGray(T current) {
+            for (T connected : graph.getConnectedNodesOf(current)) {
+                if (getColor(connected).equals(Color.WHITE)) {
+                    setColor(connected, Color.GRAY);
+                }
+            }
+        }
+    }
+
+    private class RemoveUnreachableWhiteNodes implements IncrementalTask {
+        private final Iterator<T> nodes;
+
+        public RemoveUnreachableWhiteNodes(Iterator<T> nodes) {
+            this.nodes = nodes;
+        }
+
+        public Collection<? extends IncrementalTask> step() {
+            if (!nodes.hasNext()) {
+                return Collections.emptyList();
+            }
+            T current = nodes.next();
+            removeNodeIfUnreachable(current);
+            return Arrays.asList(
+                    new RemoveUnreachableWhiteNodes(nodes)
+            );
+        }
+
+        private void removeNodeIfUnreachable(T current) {
+            if (getColor(current).equals(Color.WHITE)) {
+                graph.removeNode(current);
+            }
+        }
+    }
 }
