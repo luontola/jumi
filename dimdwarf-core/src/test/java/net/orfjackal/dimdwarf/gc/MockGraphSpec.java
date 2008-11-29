@@ -93,7 +93,7 @@ public class MockGraphSpec extends Specification<Object> {
             specify(graph.getAllNodes(), should.containExactly("A"));
         }
 
-        public void thatNodeIsRootNode() {
+        public void thatNodeIsARootNode() {
             specify(graph.getRootNodes(), should.containExactly("A"));
         }
 

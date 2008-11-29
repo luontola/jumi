@@ -133,11 +133,11 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
             stage2 = executeOneStep(stage2);
         }
 
-        public void theReachableNodesAreMarkedBlackStartingFromTheRoots() {
+        public void nodesReachableFromTheRootsAreMarkedBlack() {
             specify(collector.getColor("A"), should.equal(BLACK));
         }
 
-        public void nodesWhichAreSeenFromAReachedNodeAreAreMarkedGray() {
+        public void nodesWhichAreSeenFromTheReachedNodeAreMarkedGray() {
             specify(collector.getColor("B"), should.equal(GRAY));
         }
 
@@ -146,7 +146,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
             specify(collector.getColor("D"), should.equal(WHITE));
         }
 
-        public void theAlgorithmProceedsRecursivelyToUnseenNodes() {
+        public void theAlgorithmProceedsRecursivelyToNotYetReachedNodes() {
             stage2 = executeOneStep(stage2);
             specify(collector.getColor("A"), should.equal(BLACK));
             specify(collector.getColor("B"), should.equal(BLACK));

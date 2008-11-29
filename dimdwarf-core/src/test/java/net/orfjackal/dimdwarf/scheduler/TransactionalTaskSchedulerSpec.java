@@ -154,7 +154,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    public class WhenATaskIsTakenInATransaction {
+    public class WhenATaskIsBootstrappedInATransaction {
 
         public void create() {
             taskContext.execute(new Runnable() {
@@ -182,7 +182,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    public class WhenARepeatedTaskIsTakenInATransaction {
+    public class WhenARepeatedTaskIsBootstrappedInATransaction {
 
         public void create() {
             taskContext.execute(new Runnable() {

@@ -157,7 +157,7 @@ public class RecoverableSetSpec extends Specification<Object> {
             });
         }
 
-        public void tryingToAccessObjectsUnderADifferentPrefixIsNotAllwed() {
+        public void tryingToAccessObjectsUnderADifferentPrefixIsNotAllowed() {
             final String invalidKey = "otherPrefix" + RecoverableSet.SEPARATOR + "1";
             specify(new Block() {
                 public void run() throws Throwable {
