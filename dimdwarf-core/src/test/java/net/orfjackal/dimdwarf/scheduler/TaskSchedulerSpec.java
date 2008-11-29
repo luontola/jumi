@@ -145,7 +145,10 @@ public class TaskSchedulerSpec extends Specification<Object> {
             public void run() throws Throwable {
                 TaskBootstrap bootstrap;
                 do {
-                    // XXX: Sometimes blocks here when stress testing. Maybe the interrupt disappears somewhere? (WhenATaskIsScheduledWithFixedDelay.theFollowingExecutionsAreAfterTheFixedDelay)
+                    // FIXME: Sometimes blocks here when stress testing. Maybe the interrupt disappears somewhere?
+                    // At least these tests are affected:
+                    // WhenATaskIsScheduledWithFixedDelay.theFollowingExecutionsAreAfterTheFixedDelay
+                    // WhenATaskIsScheduledAtFixedRate.theFirstExecutionIsAfterTheInitialDelay
                     bootstrap = scheduler.takeNextTask();
                 } while (isNullTask(bootstrap));
             }
