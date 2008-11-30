@@ -47,4 +47,6 @@ public interface BindingStorage extends DatabaseTable<String, Object> {
     void update(String binding, Object entity);
 
     void delete(String binding);
+
+    // TODO: make BindingStorage a low-level DatabaseTable<String,BigInteger> object and introduce a public EntityBindings API similar to this class
 }
