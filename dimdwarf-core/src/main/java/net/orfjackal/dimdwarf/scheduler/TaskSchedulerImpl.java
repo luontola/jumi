@@ -137,6 +137,10 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         return scheduledTasks.take();
     }
 
+    public TaskBootstrap pollNextTask() {
+        return scheduledTasks.poll();
+    }
+
     @Nullable
     private Runnable getTaskInsideTransaction0(ScheduledTaskHolder holder) {
         cancelTakeOnRollback(holder);

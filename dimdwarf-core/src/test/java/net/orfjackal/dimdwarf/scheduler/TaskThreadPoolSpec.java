@@ -68,8 +68,13 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
         taskQueue = new LinkedBlockingDeque<TaskBootstrap>();
         TaskProducer producer = new TaskProducer() {
+
             public TaskBootstrap takeNextTask() throws InterruptedException {
                 return taskQueue.take();
+            }
+
+            public TaskBootstrap pollNextTask() {
+                return taskQueue.poll();
             }
         };
         logger = mock(Logger.class);

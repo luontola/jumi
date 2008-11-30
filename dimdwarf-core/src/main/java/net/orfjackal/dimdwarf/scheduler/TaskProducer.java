@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Esko Luontola
  * @since 26.11.2008
@@ -38,4 +40,7 @@ package net.orfjackal.dimdwarf.scheduler;
 public interface TaskProducer {
 
     TaskBootstrap takeNextTask() throws InterruptedException;
+
+    @Nullable
+    TaskBootstrap pollNextTask();
 }

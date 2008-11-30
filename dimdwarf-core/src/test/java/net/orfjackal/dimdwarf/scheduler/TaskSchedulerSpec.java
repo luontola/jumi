@@ -55,8 +55,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Group({"fast"})
 public class TaskSchedulerSpec extends Specification<Object> {
 
-    private static final int THREAD_SYNC_DELAY = 5;
-
     private TaskSchedulerImpl scheduler;
     private Provider<BindingStorage> bindings;
     private Provider<EntityInfo> info;
@@ -140,20 +138,14 @@ public class TaskSchedulerSpec extends Specification<Object> {
     }
 
     private boolean thereAreNoExecutableTasksRightNow() {
-        interruptTestThreadAfter(THREAD_SYNC_DELAY); // TODO: figure out a more reliable thread synchronization method than sleeping
-        specify(new Block() {
-            public void run() throws Throwable {
-                TaskBootstrap bootstrap;
-                do {
-                    // FIXME: Sometimes blocks here when stress testing. Maybe the interrupt disappears somewhere?
-                    // At least these tests are affected:
-                    // WhenATaskIsScheduledWithFixedDelay.theFollowingExecutionsAreAfterTheFixedDelay
-                    // WhenATaskIsScheduledAtFixedRate.theFirstExecutionIsAfterTheInitialDelay
-                    bootstrap = scheduler.takeNextTask();
-                } while (isNullTask(bootstrap));
+        while (true) {
+            TaskBootstrap bootstrap = scheduler.pollNextTask();
+            if (bootstrap == null) {
+                return true; // no expired tasks in queue
+            } else {
+                specify(isNullTask(bootstrap)); // current task is cancelled, but there might still be more
             }
-        }, should.raise(InterruptedException.class));
-        return true;
+        }
     }
 
     private boolean isNullTask(final TaskBootstrap bootstrap) {
@@ -172,20 +164,6 @@ public class TaskSchedulerSpec extends Specification<Object> {
         clock.addTime(1);
         specify(taskMayBeTakenRightNow());
         return true;
-    }
-
-    private static void interruptTestThreadAfter(final int delay) {
-        final Thread testThread = Thread.currentThread();
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(delay); // TODO: figure out a more reliable thread synchronization method than sleeping
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                testThread.interrupt();
-            }
-        }).start();
     }
 
     private boolean _cancelsSuccessfully(Future<?> f) {
