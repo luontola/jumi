@@ -185,5 +185,5 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         }
     }
 
-    // TODO: concurrent workers
+    // TODO: concurrent mutators
 }
