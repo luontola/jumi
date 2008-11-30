@@ -36,7 +36,7 @@ package net.orfjackal.dimdwarf.gc.cms;
  * @since 29.11.2008
  */
 public enum Color {
-    BLACK(0L), GRAY(1L), WHITE(2L);
+    WHITE(0L), GRAY(1L), BLACK(2L);
 
     private final long status;
 

@@ -36,6 +36,9 @@ import net.orfjackal.dimdwarf.gc.*;
 import java.util.*;
 
 /**
+ * Uses the mark-sweep collector algorithm presented in <a href="http://portal.acm.org/citation.cfm?id=359642.359655">
+ * On-the-fly garbage collection: an exercise in cooperation</a> (Dijkstra et al. 1977)
+ *
  * @author Esko Luontola
  * @since 29.11.2008
  */
@@ -49,9 +52,9 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
 
     public List<? extends IncrementalTask> collectorStagesToExecute() {
         return Arrays.asList(
-                new MarkAllNodesWhite(graph.getAllNodes().iterator()),
+                new MarkAllRootNodesGray(graph.getRootNodes().iterator()),
                 new MarkReachableNodesBlack(graph.getRootNodes().iterator()),
-                new RemoveUnreachableWhiteNodes(graph.getAllNodes().iterator())
+                new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(graph.getAllNodes().iterator())
         );
     }
 
@@ -64,21 +67,21 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
     }
 
 
-    private class MarkAllNodesWhite implements IncrementalTask {
-        private final Iterator<T> nodes;
+    private class MarkAllRootNodesGray implements IncrementalTask {
+        private final Iterator<T> rootNodes;
 
-        public MarkAllNodesWhite(Iterator<T> nodes) {
-            this.nodes = nodes;
+        public MarkAllRootNodesGray(Iterator<T> rootNodes) {
+            this.rootNodes = rootNodes;
         }
 
         public Collection<? extends IncrementalTask> step() {
-            if (!nodes.hasNext()) {
+            if (!rootNodes.hasNext()) {
                 return Collections.emptyList();
             }
-            T current = nodes.next();
-            setColor(current, Color.WHITE);
+            T current = rootNodes.next();
+            setColor(current, Color.GRAY);
             return Arrays.asList(
-                    new MarkAllNodesWhite(nodes)
+                    new MarkAllRootNodesGray(rootNodes)
             );
         }
     }
@@ -126,10 +129,10 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
         }
     }
 
-    private class RemoveUnreachableWhiteNodes implements IncrementalTask {
+    private class RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite implements IncrementalTask {
         private final Iterator<T> nodes;
 
-        public RemoveUnreachableWhiteNodes(Iterator<T> nodes) {
+        public RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(Iterator<T> nodes) {
             this.nodes = nodes;
         }
 
@@ -138,16 +141,22 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
                 return Collections.emptyList();
             }
             T current = nodes.next();
-            removeNodeIfUnreachable(current);
+            if (isUnreachableGarbageNode(current)) {
+                graph.removeNode(current);
+            } else {
+                resetColorToWhite(current);
+            }
             return Arrays.asList(
-                    new RemoveUnreachableWhiteNodes(nodes)
+                    new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(nodes)
             );
         }
 
-        private void removeNodeIfUnreachable(T current) {
-            if (getColor(current).equals(Color.WHITE)) {
-                graph.removeNode(current);
-            }
+        private boolean isUnreachableGarbageNode(T current) {
+            return getColor(current).equals(Color.WHITE);
+        }
+
+        private void resetColorToWhite(T current) {
+            setColor(current, Color.WHITE);
         }
     }
 }

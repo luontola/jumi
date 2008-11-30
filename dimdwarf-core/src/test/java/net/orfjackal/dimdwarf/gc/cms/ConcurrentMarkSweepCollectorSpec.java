@@ -47,7 +47,7 @@ import java.util.*;
 @Group({"fast"})
 public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
-    private static final int STAGE_1_STEPS = 5;
+    private static final int STAGE_1_STEPS = 2;
     private static final int STAGE_2_STEPS = 5;
     private static final int STAGE_3_STEPS = 5;
 
@@ -98,24 +98,22 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
     public class WhenCollectorHasNotBeenRun {
 
-        public void newNodesAreByDefaultBlack() {
-            specify(collector.getColor("A"), should.equal(BLACK));
-            specify(collector.getColor("B"), should.equal(BLACK));
-            specify(collector.getColor("C"), should.equal(BLACK));
-            specify(collector.getColor("D"), should.equal(BLACK));
+        public void newNodesAreByDefaultWhite() {
+            specify(collector.getColor("A"), should.equal(WHITE));
+            specify(collector.getColor("B"), should.equal(WHITE));
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("D"), should.equal(WHITE));
         }
     }
 
     public class InTheFirstStage {
 
-        // TODO: It would be possible to get rid of this first stage by reversing black and white. This would require the collector listening all object creations.  
-
         public void create() {
             stage1 = executeManySteps(stage1, STAGE_1_STEPS);
         }
 
-        public void allNodesAreMarkedWhite() {
-            specify(collector.getColor("A"), should.equal(WHITE));
+        public void allRootNodesAreMarkedGray() {
+            specify(collector.getColor("A"), should.equal(GRAY));
             specify(collector.getColor("B"), should.equal(WHITE));
             specify(collector.getColor("C"), should.equal(WHITE));
             specify(collector.getColor("D"), should.equal(WHITE));
@@ -133,15 +131,15 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
             stage2 = executeOneStep(stage2);
         }
 
-        public void nodesReachableFromTheRootsAreMarkedBlack() {
+        public void grayNodesAreMarkedBlack() {
             specify(collector.getColor("A"), should.equal(BLACK));
         }
 
-        public void nodesWhichAreSeenFromTheReachedNodeAreMarkedGray() {
+        public void nodesReachableFromBlackNodesAreMarkedGray() {
             specify(collector.getColor("B"), should.equal(GRAY));
         }
 
-        public void currentlyUnseenNodesRemainWhite() {
+        public void notYetReachedNodesRemainWhite() {
             specify(collector.getColor("C"), should.equal(WHITE));
             specify(collector.getColor("D"), should.equal(WHITE));
         }
@@ -178,6 +176,12 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
         public void allWhiteNodesAreRemoved() {
             specify(graph.getAllNodes(), should.containExactly("A", "B", "C"));
+        }
+
+        public void theRemainingNodesAreMarkedWhite() {
+            specify(collector.getColor("A"), should.equal(WHITE));
+            specify(collector.getColor("B"), should.equal(WHITE));
+            specify(collector.getColor("C"), should.equal(WHITE));
         }
 
         public void thenTheStageEnds() {
