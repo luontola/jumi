@@ -31,8 +31,11 @@
 
 package net.orfjackal.dimdwarf.gc;
 
+import net.orfjackal.dimdwarf.util.Objects;
+
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.event.EventListenerList;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -45,6 +48,7 @@ public class MockGraph implements Graph<String> {
 
     private final Map<String, MockNode> nodes = new ConcurrentSkipListMap<String, MockNode>();
     private final MockNode root = new MockNode();
+    private final EventListenerList listeners = new EventListenerList();
 
     public Iterable<String> getAllNodes() {
         return Collections.unmodifiableCollection(nodes.keySet());
@@ -69,10 +73,16 @@ public class MockGraph implements Graph<String> {
 
     public void createDirectedEdge(@Nullable String source, String target) {
         getNode(source).edges.add(target);
+        for (MutatorListener<String> listener : getMutatorListeners()) {
+            listener.onReferenceCreated(source, target);
+        }
     }
 
     public void removeDirectedEdge(@Nullable String source, String target) {
         getNode(source).edges.remove(target);
+        for (MutatorListener<String> listener : getMutatorListeners()) {
+            listener.onReferenceRemoved(source, target);
+        }
     }
 
     public long getStatus(String node) {
@@ -92,6 +102,14 @@ public class MockGraph implements Graph<String> {
             n = new MockNode();
         }
         return n;
+    }
+
+    public void addMutatorListener(MutatorListener<String> listener) {
+        listeners.add(MutatorListener.class, listener);
+    }
+
+    private MutatorListener<String>[] getMutatorListeners() {
+        return Objects.uncheckedCast(listeners.getListeners(MutatorListener.class));
     }
 
     private class MockNode {

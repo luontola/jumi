@@ -33,6 +33,8 @@ package net.orfjackal.dimdwarf.gc;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.util.Objects;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 /**
@@ -44,9 +46,12 @@ import org.junit.runner.RunWith;
 public class MockGraphSpec extends Specification<Object> {
 
     private MockGraph graph;
+    private MutatorListener<String> listener;
 
     public void create() throws Exception {
+        listener = Objects.uncheckedCast(mock(MutatorListener.class));
         graph = new MockGraph();
+        graph.addMutatorListener(listener);
     }
 
 
@@ -85,6 +90,9 @@ public class MockGraphSpec extends Specification<Object> {
     public class WhenARootNodeIsCreated {
 
         public void create() {
+            checking(new Expectations() {{
+                one(listener).onReferenceCreated(null, "A");
+            }});
             graph.createNode("A");
             graph.createDirectedEdge(null, "A");
         }
@@ -107,6 +115,9 @@ public class MockGraphSpec extends Specification<Object> {
     public class WhenNodesAreConnectedWithADirectedEdge {
 
         public void create() {
+            checking(new Expectations() {{
+                one(listener).onReferenceCreated("A", "B");
+            }});
             graph.createNode("A");
             graph.createNode("B");
             graph.createDirectedEdge("A", "B");
@@ -126,6 +137,9 @@ public class MockGraphSpec extends Specification<Object> {
         }
 
         public void afterEdgeRemovalTheEdgeDoesNotExist() {
+            checking(new Expectations() {{
+                one(listener).onReferenceRemoved("A", "B");
+            }});
             graph.removeDirectedEdge("A", "B");
             specify(graph.getConnectedNodesOf("A"), should.containExactly());
         }
@@ -134,6 +148,10 @@ public class MockGraphSpec extends Specification<Object> {
     public class WhenANodeIsConnectedToManyOtherNodes {
 
         public void create() {
+            checking(new Expectations() {{
+                one(listener).onReferenceCreated("A", "B");
+                one(listener).onReferenceCreated("A", "C");
+            }});
             graph.createNode("A");
             graph.createNode("B");
             graph.createDirectedEdge("A", "B");
@@ -145,6 +163,9 @@ public class MockGraphSpec extends Specification<Object> {
         }
 
         public void afterRemovalOfOneEdgeTheOtherEdgesStillExist() {
+            checking(new Expectations() {{
+                one(listener).onReferenceRemoved("A", "B");
+            }});
             graph.removeDirectedEdge("A", "B");
             specify(graph.getConnectedNodesOf("A"), should.containExactly("C"));
         }
@@ -153,6 +174,9 @@ public class MockGraphSpec extends Specification<Object> {
     public class WhenANodeIsConnectedToAnotherNodeManyTimes {
 
         public void create() {
+            checking(new Expectations() {{
+                exactly(2).of(listener).onReferenceCreated("A", "B");
+            }});
             graph.createNode("A");
             graph.createNode("B");
             graph.createDirectedEdge("A", "B");
@@ -164,6 +188,9 @@ public class MockGraphSpec extends Specification<Object> {
         }
 
         public void afterRemovalOfOneEdgeTheOtherEdgesStillExist() {
+            checking(new Expectations() {{
+                one(listener).onReferenceRemoved("A", "B");
+            }});
             graph.removeDirectedEdge("A", "B");
             specify(graph.getConnectedNodesOf("A"), should.containExactly("B"));
         }
