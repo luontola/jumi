@@ -29,12 +29,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc.cms;
+package net.orfjackal.dimdwarf.gc.dijkstra1978;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.gc.*;
-import static net.orfjackal.dimdwarf.gc.cms.Color.*;
+import static net.orfjackal.dimdwarf.gc.dijkstra1978.Color.*;
 import org.junit.runner.RunWith;
 
 import java.util.*;
