@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.events.*;
+import net.orfjackal.dimdwarf.events.SystemLifecycleListener;
 import net.orfjackal.dimdwarf.scheduler.TaskSchedulingLifecycleManager;
 
 /**
@@ -43,23 +43,14 @@ public class LifecycleModule extends AbstractModule {
 
     protected void configure() {
 
-        bind(SystemStartupListener[].class).toProvider(SystemStartupListenerProvider.class);
-        bind(SystemShutdownListener[].class).toProvider(SystemShutdownListenerProvider.class);
+        bind(SystemLifecycleListener[].class).toProvider(SystemLifecycleListenerProvider.class);
     }
 
-    private static class SystemStartupListenerProvider implements Provider<SystemStartupListener[]> {
+    private static class SystemLifecycleListenerProvider implements Provider<SystemLifecycleListener[]> {
         @Inject public TaskSchedulingLifecycleManager listener1;
 
-        public SystemStartupListener[] get() {
-            return new SystemStartupListener[]{listener1};
-        }
-    }
-
-    private static class SystemShutdownListenerProvider implements Provider<SystemShutdownListener[]> {
-        @Inject public TaskSchedulingLifecycleManager listener1;
-
-        public SystemShutdownListener[] get() {
-            return new SystemShutdownListener[]{listener1};
+        public SystemLifecycleListener[] get() {
+            return new SystemLifecycleListener[]{listener1};
         }
     }
 }

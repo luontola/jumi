@@ -37,7 +37,9 @@ import java.util.EventListener;
  * @author Esko Luontola
  * @since 28.11.2008
  */
-public interface SystemStartupListener extends EventListener {
+public interface SystemLifecycleListener extends EventListener {
 
     public void onStartup();
+
+    public void onShutdown();
 }

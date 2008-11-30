@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.events.*;
+import net.orfjackal.dimdwarf.events.SystemLifecycleListener;
 import org.slf4j.*;
 
 /**
@@ -42,18 +42,16 @@ import org.slf4j.*;
 public class ServerLifecycleManager {
     private static final Logger logger = LoggerFactory.getLogger(ServerLifecycleManager.class);
 
-    private final SystemStartupListener[] startupListeners;
-    private final SystemShutdownListener[] shutdownListeners;
+    private final SystemLifecycleListener[] listeners;
 
     @Inject
-    public ServerLifecycleManager(SystemStartupListener[] startupListeners, SystemShutdownListener[] shutdownListeners) {
-        this.startupListeners = startupListeners;
-        this.shutdownListeners = shutdownListeners;
+    public ServerLifecycleManager(SystemLifecycleListener[] listeners) {
+        this.listeners = listeners;
     }
 
     public void start() {
         logger.info("Startup sequence initiated...");
-        for (SystemStartupListener listener : startupListeners) {
+        for (SystemLifecycleListener listener : listeners) {
             try {
                 listener.onStartup();
             } catch (Throwable t) {
@@ -66,7 +64,7 @@ public class ServerLifecycleManager {
 
     public void shutdown() {
         logger.info("Shutdown sequence initiated...");
-        for (SystemShutdownListener listener : shutdownListeners) {
+        for (SystemLifecycleListener listener : listeners) { // TODO: send shutdown events in reverse order?
             try {
                 listener.onShutdown();
             } catch (Throwable t) {
