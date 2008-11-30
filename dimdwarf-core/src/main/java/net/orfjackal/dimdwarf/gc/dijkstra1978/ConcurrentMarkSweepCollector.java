@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.gc.dijkstra1978;
 
 import net.orfjackal.dimdwarf.gc.*;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -42,7 +43,7 @@ import java.util.*;
  * @author Esko Luontola
  * @since 29.11.2008
  */
-public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
+public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, MutatorListener<T> {
 
     private final Graph<T> graph;
 
@@ -64,6 +65,15 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
 
     private void setColor(T node, Color color) {
         graph.setStatus(node, color.toStatus());
+    }
+
+    public void onReferenceCreated(@Nullable T source, T target) {
+        if (getColor(target).equals(Color.WHITE)) {
+            setColor(target, Color.GRAY);
+        }
+    }
+
+    public void onReferenceRemoved(@Nullable T source, T target) {
     }
 
 
@@ -159,4 +169,6 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
             setColor(current, Color.WHITE);
         }
     }
+
+    // TODO: The tasks need to be static and serializable. Integration tests are needed.
 }

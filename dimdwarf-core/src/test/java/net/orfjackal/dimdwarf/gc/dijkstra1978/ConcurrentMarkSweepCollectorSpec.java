@@ -60,8 +60,6 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
     public void create() throws Exception {
         graph = new MockGraph();
-        collector = new ConcurrentMarkSweepCollector<String>(graph);
-
         graph.createNode("A");
         graph.createNode("B");
         graph.createNode("C");
@@ -70,6 +68,9 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         graph.createDirectedEdge("A", "B");
         graph.createDirectedEdge("B", "A");
         graph.createDirectedEdge("B", "C");
+
+        collector = new ConcurrentMarkSweepCollector<String>(graph);
+        graph.addMutatorListener(collector);
 
         Iterator<? extends IncrementalTask> stages = collector.collectorStagesToExecute().iterator();
         stage1 = Arrays.asList(stages.next());
@@ -189,5 +190,68 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         }
     }
 
-    // TODO: concurrent mutators
+    public class WhenMutatorsCreateANewReference {
+
+        public void whiteTargetNodeBecomesGray() {
+            specify(collector.getColor("A"), should.equal(WHITE));
+            specify(collector.getColor("C"), should.equal(WHITE));
+            graph.createDirectedEdge("A", "C");
+            specify(collector.getColor("A"), should.equal(WHITE));
+            specify(collector.getColor("C"), should.equal(GRAY));
+        }
+
+        public void grayTargetNodeRemainsGray() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("A"), should.equal(GRAY));
+            graph.createDirectedEdge("C", "A");
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("A"), should.equal(GRAY));
+        }
+
+        public void blackTargetNodeRemainsBlack() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+            stage2 = executeOneStep(stage2);
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("A"), should.equal(BLACK));
+            graph.createDirectedEdge("C", "A");
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("A"), should.equal(BLACK));
+        }
+
+        public void theSourceNodeColorIsNotChanged() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+            stage2 = executeOneStep(stage2);
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(GRAY));
+            specify(collector.getColor("C"), should.equal(WHITE));
+            graph.createNode("E");
+            graph.createDirectedEdge("A", "E");
+            graph.createDirectedEdge("B", "E");
+            graph.createDirectedEdge("C", "E");
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(GRAY));
+            specify(collector.getColor("C"), should.equal(WHITE));
+        }
+    }
+
+    public class WhenMutatorsRemoveAReference {
+
+        public void theNodeColorsAreNotChanged() {
+            stage1 = executeManySteps(stage1, STAGE_1_STEPS);
+            stage2 = executeOneStep(stage2);
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(GRAY));
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("D"), should.equal(WHITE));
+            graph.removeDirectedEdge("B", "C");
+            graph.removeDirectedEdge("B", "A");
+            graph.removeDirectedEdge("A", "B");
+            graph.removeDirectedEdge(null, "A");
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("B"), should.equal(GRAY));
+            specify(collector.getColor("C"), should.equal(WHITE));
+            specify(collector.getColor("D"), should.equal(WHITE));
+        }
+    }
 }
