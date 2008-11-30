@@ -177,5 +177,8 @@ public class EntityGraphSpec extends Specification<Object> {
         }
     }
 
+    // TODO: browsing connected nodes
+    // TODO: removing nodes
+    // TODO: reading and updating status
     // TODO: create fakes of BindingsStorage, EntityStorage and EntityInfo
 }
