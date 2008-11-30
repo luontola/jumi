@@ -70,9 +70,9 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         graph.createDirectedEdge("B", "C");
 
         collector = new ConcurrentMarkSweepCollector<String>(graph);
-        graph.addMutatorListener(collector);
+        graph.addMutatorListener(collector.getMutatorListener());
 
-        Iterator<? extends IncrementalTask> stages = collector.collectorStagesToExecute().iterator();
+        Iterator<? extends IncrementalTask> stages = collector.getCollectorStagesToExecute().iterator();
         stage1 = Arrays.asList(stages.next());
         stage2 = Arrays.asList(stages.next());
         stage3 = Arrays.asList(stages.next());

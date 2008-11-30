@@ -43,7 +43,7 @@ import java.util.*;
  * @author Esko Luontola
  * @since 29.11.2008
  */
-public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, MutatorListener<T> {
+public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
 
     private final Graph<T> graph;
 
@@ -51,12 +51,26 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Mut
         this.graph = graph;
     }
 
-    public List<? extends IncrementalTask> collectorStagesToExecute() {
+    public List<? extends IncrementalTask> getCollectorStagesToExecute() {
         return Arrays.asList(
                 new MarkAllRootNodesGray(graph.getRootNodes().iterator()),
                 new MarkReachableNodesBlack(graph.getRootNodes().iterator()),
                 new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(graph.getAllNodes().iterator())
         );
+    }
+
+    public MutatorListener<T> getMutatorListener() {
+        return new MutatorListener<T>() {
+
+            public void onReferenceCreated(@Nullable T source, T target) {
+                if (getColor(target).equals(Color.WHITE)) {
+                    setColor(target, Color.GRAY);
+                }
+            }
+
+            public void onReferenceRemoved(@Nullable T source, T target) {
+            }
+        };
     }
 
     public Color getColor(T node) {
@@ -65,15 +79,6 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Mut
 
     private void setColor(T node, Color color) {
         graph.setStatus(node, color.toStatus());
-    }
-
-    public void onReferenceCreated(@Nullable T source, T target) {
-        if (getColor(target).equals(Color.WHITE)) {
-            setColor(target, Color.GRAY);
-        }
-    }
-
-    public void onReferenceRemoved(@Nullable T source, T target) {
     }
 
 

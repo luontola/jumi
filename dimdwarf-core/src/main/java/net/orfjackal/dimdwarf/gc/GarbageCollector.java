@@ -39,7 +39,9 @@ import java.util.List;
  */
 public interface GarbageCollector<T> {
 
-    List<? extends IncrementalTask> collectorStagesToExecute();
+    List<? extends IncrementalTask> getCollectorStagesToExecute();
+
+    MutatorListener<T> getMutatorListener();
 
     Enum<?> getColor(T node);
 }
