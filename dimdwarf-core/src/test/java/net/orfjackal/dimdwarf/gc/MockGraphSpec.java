@@ -112,11 +112,11 @@ public class MockGraphSpec extends Specification<Object> {
             graph.createDirectedEdge("A", "B");
         }
 
-        public void theFirstNodeConnectsToTheSecondNode() {
+        public void theSourceNodeConnectsToTheTargetNode() {
             specify(graph.getConnectedNodesOf("A"), should.containExactly("B"));
         }
 
-        public void theSecondNodeDoesNotConnectToTheFirstNode() {
+        public void theTargetNodeDoesNotConnectToTheSourceNode() {
             specify(graph.getConnectedNodesOf("B"), should.containExactly());
         }
 

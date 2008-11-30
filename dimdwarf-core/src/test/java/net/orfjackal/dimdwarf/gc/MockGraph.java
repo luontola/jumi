@@ -67,12 +67,12 @@ public class MockGraph implements Graph<String> {
         root.edges.remove(node);
     }
 
-    public void createDirectedEdge(@Nullable String from, String to) {
-        getNode(from).edges.add(to);
+    public void createDirectedEdge(@Nullable String source, String target) {
+        getNode(source).edges.add(target);
     }
 
-    public void removeDirectedEdge(@Nullable String from, String to) {
-        getNode(from).edges.remove(to);
+    public void removeDirectedEdge(@Nullable String source, String target) {
+        getNode(source).edges.remove(target);
     }
 
     public long getStatus(String node) {
