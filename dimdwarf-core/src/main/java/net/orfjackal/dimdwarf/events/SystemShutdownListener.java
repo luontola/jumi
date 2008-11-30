@@ -31,11 +31,13 @@
 
 package net.orfjackal.dimdwarf.events;
 
+import java.util.EventListener;
+
 /**
  * @author Esko Luontola
  * @since 28.11.2008
  */
-public interface SystemShutdownListener {
+public interface SystemShutdownListener extends EventListener {
 
     public void onShutdown();
 }
