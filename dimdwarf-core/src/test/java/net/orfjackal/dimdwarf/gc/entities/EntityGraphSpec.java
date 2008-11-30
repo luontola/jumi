@@ -34,8 +34,13 @@ package net.orfjackal.dimdwarf.gc.entities;
 import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
+
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -45,7 +50,11 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class EntityGraphSpec extends Specification<Object> {
 
-    private EntityGraph graph;
+    private Provider<EntityGraph> graph;
+
+    private TaskExecutor taskContext;
+    private Provider<EntityInfo> info;
+    private Provider<BindingStorage> bindings;
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
@@ -53,21 +62,91 @@ public class EntityGraphSpec extends Specification<Object> {
                 new DatabaseModule(),
                 new TaskContextModule()
         );
-        graph = new EntityGraph();
+        taskContext = injector.getInstance(TaskExecutor.class);
+        info = injector.getProvider(EntityInfo.class);
+        bindings = injector.getProvider(BindingStorage.class);
+
+        graph = injector.getProvider(EntityGraph.class);
     }
 
 
     public class WhenThereAreNoEntities {
 
         public void thereAreNoNodes() {
-            specify(graph.getAllNodes(), should.containExactly());
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getAllNodes(), should.containExactly());
+                }
+            });
         }
 
         public void thereAreNoRootNodes() {
-            specify(graph.getRootNodes(), should.containExactly());
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getRootNodes(), should.containExactly());
+                }
+            });
         }
     }
 
-    
+    public class WhenAnEntityIsCreated {
 
+        private BigInteger entityId;
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity e = new DummyEntity();
+                    entityId = info.get().getEntityId(e);
+                }
+            });
+        }
+
+        public void aNodeExists() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getAllNodes(), should.containExactly(entityId));
+                }
+            });
+        }
+
+        public void itIsNotARootNode() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getRootNodes(), should.containExactly());
+                }
+            });
+        }
+    }
+
+    public class WhenABindingIsCreated {
+
+        private BigInteger entityId;
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity e = new DummyEntity();
+                    entityId = info.get().getEntityId(e);
+                    bindings.get().update("binding", e);
+                }
+            });
+        }
+
+        public void aNodeExists() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getAllNodes(), should.containExactly(entityId));
+                }
+            });
+        }
+
+        public void itIsARootNode() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getRootNodes(), should.containExactly(entityId));
+                }
+            });
+        }
+    }
 }

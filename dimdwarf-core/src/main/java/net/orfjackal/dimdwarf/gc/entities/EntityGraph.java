@@ -31,10 +31,13 @@
 
 package net.orfjackal.dimdwarf.gc.entities;
 
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.gc.Graph;
 
 import java.math.BigInteger;
-import java.util.Collections;
+import java.util.ArrayList;
 
 /**
  * @author Esko Luontola
@@ -42,12 +45,33 @@ import java.util.Collections;
  */
 public class EntityGraph implements Graph<BigInteger> {
 
+    private final EntityStorage entities;
+    private final BindingStorage bindings;
+    private final EntityInfo info;
+
+    @Inject
+    public EntityGraph(EntityStorage entities, BindingStorage bindings, EntityInfo info) {
+        this.entities = entities;
+        this.bindings = bindings;
+        this.info = info;
+    }
+
     public Iterable<BigInteger> getAllNodes() {
-        return Collections.emptyList();
+        ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
+        for (BigInteger id = entities.firstKey(); id != null; id = entities.nextKeyAfter(id)) {
+            nodes.add(id);
+        }
+        return nodes;
     }
 
     public Iterable<BigInteger> getRootNodes() {
-        return Collections.emptyList();
+        ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
+        for (String binding = bindings.firstKey(); binding != null; binding = bindings.nextKeyAfter(binding)) {
+            Object entity = bindings.read(binding); // TODO: check for null (need a test)
+            BigInteger id = info.getEntityId(entity);
+            nodes.add(id);
+        }
+        return nodes;
     }
 
     public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {
