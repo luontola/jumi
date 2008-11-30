@@ -67,9 +67,11 @@ public class EntityGraph implements Graph<BigInteger> {
     public Iterable<BigInteger> getRootNodes() {
         ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
         for (String binding = bindings.firstKey(); binding != null; binding = bindings.nextKeyAfter(binding)) {
-            Object entity = bindings.read(binding); // TODO: check for null (need a test)
-            BigInteger id = info.getEntityId(entity);
-            nodes.add(id);
+            Object entity = bindings.read(binding);
+            if (entity != null) {
+                BigInteger id = info.getEntityId(entity);
+                nodes.add(id);
+            }
         }
         return nodes;
     }

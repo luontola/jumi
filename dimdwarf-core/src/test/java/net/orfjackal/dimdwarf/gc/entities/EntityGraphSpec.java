@@ -41,6 +41,7 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Esko Luontola
@@ -148,5 +149,33 @@ public class EntityGraphSpec extends Specification<Object> {
                 }
             });
         }
+
+        public void entitiesNotVisibleInTheCurrentTransactionDoNotCauseAFailure() {
+            final CountDownLatch bindingCreated = new CountDownLatch(1);
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+
+                            taskContext.execute(new Runnable() {
+                                public void run() {
+                                    bindings.get().update("canNotSeeThisEntity", new DummyEntity());
+                                    bindingCreated.countDown();
+                                }
+                            });
+                        }
+                    });
+                    t.start();
+                    try {
+                        bindingCreated.await();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    specify(graph.get().getRootNodes(), should.containExactly(entityId));
+                }
+            });
+        }
     }
+
+    // TODO: create fakes of BindingsStorage, EntityStorage and EntityInfo
 }
