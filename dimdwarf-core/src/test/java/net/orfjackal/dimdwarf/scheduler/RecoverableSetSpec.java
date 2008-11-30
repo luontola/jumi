@@ -55,7 +55,7 @@ public class RecoverableSetSpec extends Specification<Object> {
 
     private TaskExecutor taskContext;
     private Provider<BindingStorage> bindings;
-    private Provider<EntityInfo> entities;
+    private Provider<EntityInfo> info;
 
     private RecoverableSet<StoredValue> set;
 
@@ -70,10 +70,10 @@ public class RecoverableSetSpec extends Specification<Object> {
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         bindings = injector.getProvider(BindingStorage.class);
-        entities = injector.getProvider(EntityInfo.class);
+        info = injector.getProvider(EntityInfo.class);
         specify(thereMayBeBindingsInOtherNamespaces());
 
-        set = new RecoverableSetImpl<StoredValue>(PREFIX, bindings, entities);
+        set = new RecoverableSetImpl<StoredValue>(PREFIX, bindings, info);
     }
 
     private boolean thereMayBeBindingsInOtherNamespaces() {
@@ -123,7 +123,7 @@ public class RecoverableSetSpec extends Specification<Object> {
         public void afterRestartANewSetWithTheSamePrefixStillContainsThoseObjects() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    set = new RecoverableSetImpl<StoredValue>(PREFIX, bindings, entities);
+                    set = new RecoverableSetImpl<StoredValue>(PREFIX, bindings, info);
                     specify(set.getAll(), should.containExactly(value1, value2));
                 }
             });

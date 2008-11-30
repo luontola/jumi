@@ -50,12 +50,12 @@ public class RecoverableSetImpl<T> implements RecoverableSet<T> {
 
     private final String prefix;
     private final Provider<BindingStorage> bindings;
-    private final Provider<EntityInfo> entities;
+    private final Provider<EntityInfo> info;
 
-    public RecoverableSetImpl(String prefix, Provider<BindingStorage> bindings, Provider<EntityInfo> entities) {
+    public RecoverableSetImpl(String prefix, Provider<BindingStorage> bindings, Provider<EntityInfo> info) {
         this.prefix = prefix + SEPARATOR;
         this.bindings = bindings;
-        this.entities = entities;
+        this.info = info;
     }
 
     public String put(T value) {
@@ -65,7 +65,7 @@ public class RecoverableSetImpl<T> implements RecoverableSet<T> {
     }
 
     private String keyFor(T value) {
-        BigInteger id = entities.get().getEntityId(value);
+        BigInteger id = info.get().getEntityId(value);
         return prefix + id;
     }
 

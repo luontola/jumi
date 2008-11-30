@@ -59,7 +59,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
 
     private TaskSchedulerImpl scheduler;
     private Provider<BindingStorage> bindings;
-    private Provider<EntityInfo> entities;
+    private Provider<EntityInfo> info;
     private Provider<Transaction> tx;
     private TaskExecutor taskContext;
     private RecoverableSetFactory rsf;
@@ -82,12 +82,12 @@ public class TaskSchedulerSpec extends Specification<Object> {
                     }
                 });
         bindings = injector.getProvider(BindingStorage.class);
-        entities = injector.getProvider(EntityInfo.class);
+        info = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
         rsf = new RecoverableSetFactory() {
             public <T> RecoverableSet<T> create(String prefix) {
-                return new RecoverableSetImpl<T>(prefix, bindings, entities);
+                return new RecoverableSetImpl<T>(prefix, bindings, info);
             }
         };
         specify(thereMayBeBindingsInOtherNamespaces());

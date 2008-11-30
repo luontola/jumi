@@ -57,10 +57,10 @@ public class TaskSchedulingModule extends AbstractModule {
 
     private static class RecoverableSetFactoryImpl implements RecoverableSetFactory {
         @Inject public Provider<BindingStorage> bindings;
-        @Inject public Provider<EntityInfo> entities;
+        @Inject public Provider<EntityInfo> info;
 
         public <T> RecoverableSet<T> create(String prefix) {
-            return new RecoverableSetImpl<T>(prefix, bindings, entities);
+            return new RecoverableSetImpl<T>(prefix, bindings, info);
         }
     }
 

@@ -75,13 +75,13 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
                     }
                 });
         final Provider<BindingStorage> bindings = injector.getProvider(BindingStorage.class);
-        final Provider<EntityInfo> entities = injector.getProvider(EntityInfo.class);
+        final Provider<EntityInfo> info = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);
 
         RecoverableSetFactory rsf = new RecoverableSetFactory() {
             public <T> RecoverableSet<T> create(String prefix) {
-                return new RecoverableSetImpl<T>(prefix, bindings, entities);
+                return new RecoverableSetImpl<T>(prefix, bindings, info);
             }
         };
 

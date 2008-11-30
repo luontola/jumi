@@ -81,17 +81,17 @@ public class EntityIntegrationSpec extends Specification<Object> {
         }
 
         public void entityIdsAreUniqueOverAllTasks() {
-            final Provider<EntityInfo> entityInfo = injector.getProvider(EntityInfo.class);
+            final Provider<EntityInfo> info = injector.getProvider(EntityInfo.class);
             final AtomicReference<BigInteger> idInFirstTask = new AtomicReference<BigInteger>();
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BigInteger id1 = entityInfo.get().getEntityId(new DummyEntity());
+                    BigInteger id1 = info.get().getEntityId(new DummyEntity());
                     idInFirstTask.set(id1);
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BigInteger id2 = entityInfo.get().getEntityId(new DummyEntity());
+                    BigInteger id2 = info.get().getEntityId(new DummyEntity());
                     BigInteger id1 = idInFirstTask.get();
                     specify(id2, should.not().equal(id1));
                     specify(id2, should.equal(id1.add(BigInteger.ONE)));
