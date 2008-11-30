@@ -107,6 +107,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                 command.run();
             }
         });
+        t.setPriority(Thread.MIN_PRIORITY);
         t.start();
     }
 

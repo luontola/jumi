@@ -152,19 +152,19 @@ public class EntityGraphSpec extends Specification<Object> {
 
         public void entitiesNotVisibleInTheCurrentTransactionDoNotCauseAFailure() {
             final CountDownLatch bindingCreated = new CountDownLatch(1);
-            taskContext.execute(new Runnable() {
+            final Runnable otherTransaction = new Runnable() {
                 public void run() {
-                    Thread t = new Thread(new Runnable() {
+                    taskContext.execute(new Runnable() {
                         public void run() {
-
-                            taskContext.execute(new Runnable() {
-                                public void run() {
-                                    bindings.get().update("canNotSeeThisEntity", new DummyEntity());
-                                    bindingCreated.countDown();
-                                }
-                            });
+                            bindings.get().update("canNotSeeThisEntity", new DummyEntity());
+                            bindingCreated.countDown();
                         }
                     });
+                }
+            };
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    Thread t = new Thread(otherTransaction);
                     t.start();
                     try {
                         bindingCreated.await();

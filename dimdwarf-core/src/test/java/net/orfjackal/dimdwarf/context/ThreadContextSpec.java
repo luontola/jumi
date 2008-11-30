@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.context;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.entities.DummyInterface;
 import org.junit.runner.RunWith;
@@ -60,13 +58,14 @@ public class ThreadContextSpec extends Specification<Object> {
         }
     }
 
-    private void specifyContextIsDisabled() {
+    private boolean contextIsDisabled() {
         specify(ThreadContext.getCurrentContext(), should.equal(null));
         specify(new Block() {
             public void run() throws Throwable {
                 ThreadContext.get(MyService.class);
             }
         }, should.raise(IllegalStateException.class));
+        return true;
     }
 
 
@@ -90,13 +89,13 @@ public class ThreadContextSpec extends Specification<Object> {
         }
 
         public void isDisabledBeforeSetup() {
-            specifyContextIsDisabled();
+            specify(contextIsDisabled());
         }
 
         public void isDiabledAfterTearingDown() {
             ThreadContext.setUp(myContext);
             ThreadContext.tearDown();
-            specifyContextIsDisabled();
+            specify(contextIsDisabled());
         }
 
         public void canNotBeSetUpTwise() {
@@ -117,7 +116,7 @@ public class ThreadContextSpec extends Specification<Object> {
                     ThreadContext.tearDown();
                 }
             }, should.raise(IllegalStateException.class));
-            specifyContextIsDisabled();
+            specify(contextIsDisabled());
         }
 
         public void isSpecificToTheCurrentThread() throws InterruptedException {
@@ -128,7 +127,7 @@ public class ThreadContextSpec extends Specification<Object> {
             });
             t.start();
             t.join();
-            specifyContextIsDisabled();
+            specify(contextIsDisabled());
         }
 
 
@@ -141,7 +140,7 @@ public class ThreadContextSpec extends Specification<Object> {
                 }
             });
             specify(wasExecuted);
-            specifyContextIsDisabled();
+            specify(contextIsDisabled());
         }
 
         public void theHelperMethodDoesTearDownEvenWhenExceptionsAreThrown() {
@@ -155,7 +154,7 @@ public class ThreadContextSpec extends Specification<Object> {
                     ThreadContext.runInContext(myContext, maliciousTask);
                 }
             }, should.raise(InternalError.class, "dummy exception"));
-            specifyContextIsDisabled();
+            specify(contextIsDisabled());
         }
     }
 

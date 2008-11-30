@@ -54,6 +54,7 @@ public class TaskThreadPool {
     private final Thread consumer;
     private final ExecutorService workers;
     private final Set<CountDownLatch> runningTasks = Collections.synchronizedSet(new HashSet<CountDownLatch>());
+    private volatile boolean shutdown = false;
 
     @Inject
     public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool) {
@@ -80,6 +81,7 @@ public class TaskThreadPool {
     }
 
     private void shutdownConsumer() {
+        shutdown = true;
         consumer.interrupt();
         try {
             consumer.join();
@@ -121,7 +123,7 @@ public class TaskThreadPool {
 
     private class TaskConsumer implements Runnable {
         public void run() {
-            while (!Thread.interrupted()) {
+            while (!shutdown) {
                 try {
                     TaskBootstrap bootstrap = producer.takeNextTask();
                     workers.submit(new TaskContextSetup(new Bootstrapper(bootstrap)));

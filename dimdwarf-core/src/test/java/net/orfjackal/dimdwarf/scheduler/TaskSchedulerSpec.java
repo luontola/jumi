@@ -67,8 +67,6 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private DummyTask task2;
 
     public void create() {
-        clearInterruptedStatus();
-
         clock = new DummyClock();
         Injector injector = Guice.createInjector(
                 new EntityModule(),
@@ -94,15 +92,6 @@ public class TaskSchedulerSpec extends Specification<Object> {
         scheduler.start();
         task1 = new DummyTask("1");
         task2 = new DummyTask("2");
-    }
-
-    public void destroy() throws Exception {
-        clearInterruptedStatus();
-    }
-
-    private static void clearInterruptedStatus() {
-        // clear interrupted status, in case one of the tests which use interrupts failed
-        Thread.interrupted();
     }
 
     private boolean thereMayBeBindingsInOtherNamespaces() {
@@ -195,8 +184,21 @@ public class TaskSchedulerSpec extends Specification<Object> {
             specify(scheduler.getQueuedTasks(), should.equal(0));
         }
 
-        public void anExecutorWillWaitUntilThereAreTasks() {
-            specify(thereAreNoExecutableTasksRightNow());
+        public void anExecutorWillWaitUntilThereAreTasks() throws InterruptedException {
+            final Runnable submitATask = new Runnable() {
+                public void run() {
+                    scheduler.submit(task1);
+                }
+            };
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Thread.yield();
+                    taskContext.execute(submitATask);
+                }
+            });
+            t.setPriority(Thread.MIN_PRIORITY);
+            t.start();
+            specify(scheduler.takeNextTask(), should.not().equal(null));
         }
 
         public void afterRestartNoTasksAreQueued() {
