@@ -204,4 +204,6 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 //            System.err.println("*** myExecutionCount = " + myExecutionCount);
         }
     }
+
+    // TODO: repeated tasks should not create more entities. otherwise the garbage collector would produce more garbage than it collects.
 }
