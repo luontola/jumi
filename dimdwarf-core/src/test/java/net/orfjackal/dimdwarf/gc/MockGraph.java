@@ -108,6 +108,10 @@ public class MockGraph implements Graph<String> {
         listeners.add(MutatorListener.class, listener);
     }
 
+    public void removeMutatorListener(MutatorListener<String> listener) {
+        listeners.remove(MutatorListener.class, listener);
+    }
+
     private MutatorListener<String>[] getMutatorListeners() {
         return Objects.uncheckedCast(listeners.getListeners(MutatorListener.class));
     }
