@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.gc.entities;
 import net.orfjackal.dimdwarf.gc.Graph;
 
 import java.math.BigInteger;
+import java.util.Collections;
 
 /**
  * @author Esko Luontola
@@ -42,11 +43,11 @@ import java.math.BigInteger;
 public class EntityGraph implements Graph<BigInteger> {
 
     public Iterable<BigInteger> getAllNodes() {
-        return null;
+        return Collections.emptyList();
     }
 
     public Iterable<BigInteger> getRootNodes() {
-        return null;
+        return Collections.emptyList();
     }
 
     public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {

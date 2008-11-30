@@ -31,8 +31,10 @@
 
 package net.orfjackal.dimdwarf.gc.entities;
 
+import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.modules.*;
 import org.junit.runner.RunWith;
 
 /**
@@ -43,5 +45,29 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class EntityGraphSpec extends Specification<Object> {
 
-    // TODO
+    private EntityGraph graph;
+
+    public void create() throws Exception {
+        Injector injector = Guice.createInjector(
+                new EntityModule(),
+                new DatabaseModule(),
+                new TaskContextModule()
+        );
+        graph = new EntityGraph();
+    }
+
+
+    public class WhenThereAreNoEntities {
+
+        public void thereAreNoNodes() {
+            specify(graph.getAllNodes(), should.containExactly());
+        }
+
+        public void thereAreNoRootNodes() {
+            specify(graph.getRootNodes(), should.containExactly());
+        }
+    }
+
+    
+
 }
