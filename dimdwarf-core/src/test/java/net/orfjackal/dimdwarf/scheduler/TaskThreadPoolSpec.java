@@ -92,25 +92,6 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         pool.shutdown();
     }
 
-    private static void executeAfterCurrentThreadIsWaiting(final Runnable command) {
-        final Thread currentThread = Thread.currentThread();
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                Thread.State state = currentThread.getState();
-                if (state.equals(Thread.State.RUNNABLE)) {
-                    try {
-                        Thread.sleep(100); // TODO: figure out a more reliable thread synchronization method than sleeping
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                command.run();
-            }
-        });
-        t.setPriority(Thread.MIN_PRIORITY);
-        t.start();
-    }
-
 
     public class WhenTasksAreAddedToTheQueue {
 
@@ -251,13 +232,17 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             taskQueue.add(new SimpleTaskBootstrap(task1));
             firstTaskIsExecuting.await();
 
-            executeAfterCurrentThreadIsWaiting(new Runnable() {
+            Thread t = new Thread(new Runnable() {
                 public void run() {
-                    // Let's hope that this gets executed *after* the client begins waiting.
-                    // There is no guarantee that this thread won't be executed first...
+                    while (pool.getWaitingForCurrentTasksToFinishCount() == 0) {
+                        Thread.yield();
+                    }
                     clientIsWaitingForTasksToFinish.countDown();
                 }
             });
+            t.setPriority(Thread.MIN_PRIORITY);
+            t.start();
+
             pool.awaitForCurrentTasksToFinish();
         }
 

@@ -33,11 +33,13 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import org.jetbrains.annotations.TestOnly;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Esko Luontola
@@ -54,6 +56,7 @@ public class TaskThreadPool {
     private final Thread consumer;
     private final ExecutorService workers;
     private final Set<CountDownLatch> runningTasks = Collections.synchronizedSet(new HashSet<CountDownLatch>());
+    private final AtomicInteger waitingForCurrentTasksToFinish = new AtomicInteger(0);
     private volatile boolean shutdown = false;
 
     @Inject
@@ -115,9 +118,19 @@ public class TaskThreadPool {
         // big and would contain a null entry (toArray() does not shrink the array parameter
         // if it's too big).
         CountDownLatch[] snapshotOfRunningTasks = runningTasks.toArray(new CountDownLatch[0]);
-        for (CountDownLatch taskHasFinished : snapshotOfRunningTasks) {
-            taskHasFinished.await();
+        waitingForCurrentTasksToFinish.incrementAndGet();
+        try {
+            for (CountDownLatch taskHasFinished : snapshotOfRunningTasks) {
+                taskHasFinished.await();
+            }
+        } finally {
+            waitingForCurrentTasksToFinish.decrementAndGet();
         }
+    }
+
+    @TestOnly
+    int getWaitingForCurrentTasksToFinishCount() {
+        return waitingForCurrentTasksToFinish.get();
     }
 
 
