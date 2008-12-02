@@ -37,9 +37,9 @@ package net.orfjackal.dimdwarf.db;
  */
 public interface DatabaseTableWithMetadata<K, V> extends DatabaseTable<K, V> {
 
-    Blob readMetadata(K key, String property);
+    V readMetadata(K key, String metaKey);
 
-    void updateMetadata(K key, String property, Blob value);
+    void updateMetadata(K key, String metaKey, V metaValue);
 
-    void deleteMetadata(K key, String property);
+    void deleteMetadata(K key, String metaKey);
 }

@@ -31,10 +31,13 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
  * @author Esko Luontola
  * @since 2.12.2008
  */
+@ThreadSafe
 public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMetadata<K, V> {
 
     private final Database<K, V> db;
@@ -49,16 +52,33 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
         return db.openTable(tableName);
     }
 
-    public Blob readMetadata(K key, String property) {
-        throw new IllegalArgumentException("No such key: " + key);
+    private DatabaseTable<K, V> getMetaTable(String metaKey) {
+        return db.openTable(tableName + "$" + metaKey);
     }
 
-    public void updateMetadata(K key, String property, Blob value) {
-        throw new IllegalArgumentException("No such key: " + key);
+    public V readMetadata(K key, String metaKey) {
+        checkEntryExists(key);
+        return getMetaTable(metaKey).read(key);
     }
 
-    public void deleteMetadata(K key, String property) {
-        throw new IllegalArgumentException("No such key: " + key);
+    public void updateMetadata(K key, String metaKey, V metaValue) {
+        checkEntryExists(key);
+        getMetaTable(metaKey).update(key, metaValue);
+    }
+
+    public void deleteMetadata(K key, String metaKey) {
+        checkEntryExists(key);
+        getMetaTable(metaKey).delete(key);
+    }
+
+    private void checkEntryExists(K key) {
+        if (!exists(key)) {
+            throw new IllegalArgumentException("No such key: " + key);
+        }
+    }
+
+    public boolean exists(K key) {
+        return getDataTable().exists(key);
     }
 
     public V read(K key) {

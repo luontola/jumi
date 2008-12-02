@@ -52,8 +52,10 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
     private Logger txLogger;
     private TransactionCoordinator tx;
     private Database<Blob, Blob> db;
-    private DatabaseTable<Blob, Blob> realTable;
-    private DatabaseTableWithMetadata<Blob, Blob> metaTable;
+
+    private DatabaseTable<Blob, Blob> backingDataTable;
+    private DatabaseTable<Blob, Blob> backingMetaTable;
+    private DatabaseTableWithMetadata<Blob, Blob> table;
 
     private Blob key = Blob.fromBytes(new byte[]{0x10});
     private Blob value1 = Blob.fromBytes(new byte[]{0x11});
@@ -70,8 +72,9 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
 
         tx = new TransactionImpl(txLogger);
         db = dbms.openConnection(tx.getTransaction());
-        realTable = db.openTable(TABLE);
-        metaTable = new DatabaseTableWithMetadataImpl<Blob, Blob>(db, TABLE);
+        backingDataTable = db.openTable(TABLE);
+        backingMetaTable = db.openTable(TABLE + "$" + propKey);
+        table = new DatabaseTableWithMetadataImpl<Blob, Blob>(db, TABLE);
     }
 
     private void updateInNewTransaction(String table, Blob key, Blob value) {
@@ -84,10 +87,14 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
     public class WhenAnEntryDoesNotExist {
         private Blob noSuchKey = Blob.fromBytes(new byte[]{0x20});
 
+        public void theEntryDoesNotExist() {
+            specify(table.exists(noSuchKey), should.equal(false));
+        }
+
         public void itsMetadataCanNotBeRead() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    metaTable.readMetadata(noSuchKey, propKey);
+                    table.readMetadata(noSuchKey, propKey);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -95,7 +102,7 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         public void itsMetadataCanNotBeUpdated() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    metaTable.updateMetadata(noSuchKey, propKey, propValue1);
+                    table.updateMetadata(noSuchKey, propKey, propValue1);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -103,7 +110,7 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         public void itsMetadataCanNotBeDeleted() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    metaTable.deleteMetadata(noSuchKey, propKey);
+                    table.deleteMetadata(noSuchKey, propKey);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -111,24 +118,61 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
 
     public class WhenAnEntryExists {
 
+        public void theEntryExists() {
+            specify(table.exists(key), should.equal(true));
+        }
+
         public void theEntryMayBeRead() {
-            specify(metaTable.read(key), should.equal(value1));
+            specify(table.read(key), should.equal(value1));
         }
 
         public void theEntryMayBeUpdated() {
-            metaTable.update(key, value2);
-            specify(realTable.read(key), should.equal(value2));
+            table.update(key, value2);
+            specify(backingDataTable.read(key), should.equal(value2));
         }
 
         public void theEntryMayBeDeleted() {
-            metaTable.delete(key);
-            specify(realTable.read(key), should.equal(Blob.EMPTY_BLOB));
+            table.delete(key);
+            specify(backingDataTable.read(key), should.equal(Blob.EMPTY_BLOB));
         }
 
         public void tableKeysMayBeIterated() {
-            specify(metaTable.firstKey(), should.equal(key));
-            specify(metaTable.nextKeyAfter(Blob.EMPTY_BLOB), should.equal(key));
-            specify(metaTable.nextKeyAfter(key), should.equal(null));
+            specify(table.firstKey(), should.equal(key));
+            specify(table.nextKeyAfter(Blob.EMPTY_BLOB), should.equal(key));
+            specify(table.nextKeyAfter(key), should.equal(null));
         }
+    }
+
+    public class WhenAnEntryHasNoMetadata {
+
+        public void itHasNoMetadata() {
+            specify(table.readMetadata(key, propKey), should.equal(Blob.EMPTY_BLOB));
+        }
+    }
+
+    public class WhenAnEntryHasSomeMetadata {
+
+        public void create() {
+            backingMetaTable.update(key, propValue1);
+        }
+
+        public void theMetadataMayBeRead() {
+            specify(table.readMetadata(key, propKey), should.equal(propValue1));
+        }
+
+        public void theMetadataMayBeUpdated() {
+            table.updateMetadata(key, propKey, propValue2);
+            specify(backingMetaTable.read(key), should.equal(propValue2));
+        }
+
+        public void theMetadataMayBeDeleted() {
+            table.deleteMetadata(key, propKey);
+            specify(backingMetaTable.read(key), should.equal(Blob.EMPTY_BLOB));
+        }
+
+//        public void whenEntryIsDeletedAlsoItsMetadataIsDeleted() {
+//            table.delete(key);
+//            specify(backingMetaTable.read(key), should.equal(Blob.EMPTY_BLOB));
+//        }
     }
 }
