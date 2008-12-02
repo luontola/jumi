@@ -37,6 +37,8 @@ package net.orfjackal.dimdwarf.db;
  */
 public interface DatabaseTableWithMetadata<K, V> extends DatabaseTable<K, V> {
 
+    String META_SEPARATOR = "$";
+
     V readMetadata(K key, String metaKey);
 
     void updateMetadata(K key, String metaKey, V metaValue);

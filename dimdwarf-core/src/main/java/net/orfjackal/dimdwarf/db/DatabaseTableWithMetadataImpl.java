@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.db;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -42,18 +43,26 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
 
     private final Database<K, V> db;
     private final String tableName;
+    private final DatabaseTable<K, V> dataTable;
 
     public DatabaseTableWithMetadataImpl(Database<K, V> db, String tableName) {
-        this.tableName = tableName;
         this.db = db;
-    }
-
-    private DatabaseTable<K, V> getDataTable() {
-        return db.openTable(tableName);
+        this.tableName = tableName;
+        this.dataTable = db.openTable(tableName);
     }
 
     private DatabaseTable<K, V> getMetaTable(String metaKey) {
-        return db.openTable(tableName + "$" + metaKey);
+        return db.openTable(tableName + META_SEPARATOR + metaKey);
+    }
+
+    private List<DatabaseTable<K, V>> getAllMetaTables() {
+        List<DatabaseTable<K, V>> metaTables = new ArrayList<DatabaseTable<K, V>>();
+        for (String s : db.getTableNames()) {
+            if (s.startsWith(tableName + META_SEPARATOR)) {
+                metaTables.add(db.openTable(s));
+            }
+        }
+        return metaTables;
     }
 
     public V readMetadata(K key, String metaKey) {
@@ -78,26 +87,29 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
     }
 
     public boolean exists(K key) {
-        return getDataTable().exists(key);
+        return dataTable.exists(key);
     }
 
     public V read(K key) {
-        return getDataTable().read(key);
+        return dataTable.read(key);
     }
 
     public void update(K key, V value) {
-        getDataTable().update(key, value);
+        dataTable.update(key, value);
     }
 
     public void delete(K key) {
-        getDataTable().delete(key);
+        for (DatabaseTable<K, V> metaTable : getAllMetaTables()) {
+            metaTable.delete(key);
+        }
+        dataTable.delete(key);
     }
 
     public K firstKey() {
-        return getDataTable().firstKey();
+        return dataTable.firstKey();
     }
 
     public K nextKeyAfter(K currentKey) {
-        return getDataTable().nextKeyAfter(currentKey);
+        return dataTable.nextKeyAfter(currentKey);
     }
 }

@@ -50,9 +50,8 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
 
     private DatabaseManager dbms;
     private Logger txLogger;
-    private TransactionCoordinator tx;
-    private Database<Blob, Blob> db;
 
+    private Database<Blob, Blob> db;
     private DatabaseTable<Blob, Blob> backingDataTable;
     private DatabaseTable<Blob, Blob> backingMetaTable;
     private DatabaseTableWithMetadata<Blob, Blob> table;
@@ -60,6 +59,7 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
     private Blob key = Blob.fromBytes(new byte[]{0x10});
     private Blob value1 = Blob.fromBytes(new byte[]{0x11});
     private Blob value2 = Blob.fromBytes(new byte[]{0x12});
+    private Blob otherKey = Blob.fromBytes(new byte[]{0x20});
 
     private String propKey = "prop";
     private Blob propValue1 = Blob.fromBytes(new byte[]{0x01});
@@ -70,10 +70,10 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         txLogger = mock(Logger.class);
         updateInNewTransaction(TABLE, key, value1);
 
-        tx = new TransactionImpl(txLogger);
+        TransactionCoordinator tx = new TransactionImpl(txLogger);
         db = dbms.openConnection(tx.getTransaction());
         backingDataTable = db.openTable(TABLE);
-        backingMetaTable = db.openTable(TABLE + "$" + propKey);
+        backingMetaTable = db.openTable(TABLE + DatabaseTableWithMetadata.META_SEPARATOR + propKey);
         table = new DatabaseTableWithMetadataImpl<Blob, Blob>(db, TABLE);
     }
 
@@ -85,16 +85,15 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
 
 
     public class WhenAnEntryDoesNotExist {
-        private Blob noSuchKey = Blob.fromBytes(new byte[]{0x20});
 
         public void theEntryDoesNotExist() {
-            specify(table.exists(noSuchKey), should.equal(false));
+            specify(table.exists(otherKey), should.equal(false));
         }
 
         public void itsMetadataCanNotBeRead() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    table.readMetadata(noSuchKey, propKey);
+                    table.readMetadata(otherKey, propKey);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -102,7 +101,7 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         public void itsMetadataCanNotBeUpdated() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    table.updateMetadata(noSuchKey, propKey, propValue1);
+                    table.updateMetadata(otherKey, propKey, propValue1);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -110,7 +109,7 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         public void itsMetadataCanNotBeDeleted() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    table.deleteMetadata(noSuchKey, propKey);
+                    table.deleteMetadata(otherKey, propKey);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -169,10 +168,30 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
             table.deleteMetadata(key, propKey);
             specify(backingMetaTable.read(key), should.equal(Blob.EMPTY_BLOB));
         }
+    }
 
-//        public void whenEntryIsDeletedAlsoItsMetadataIsDeleted() {
-//            table.delete(key);
-//            specify(backingMetaTable.read(key), should.equal(Blob.EMPTY_BLOB));
-//        }
+    public class WhenAnEntryIsDeleted {
+        private DatabaseTable<Blob, Blob> otherTable;
+
+        public void create() {
+            backingMetaTable.update(key, propValue1);
+            backingDataTable.update(otherKey, value2);
+            backingMetaTable.update(otherKey, propValue2);
+            otherTable = db.openTable("otherTable");
+            otherTable.update(key, value1);
+            table.delete(key);
+        }
+
+        public void itsMetadataIsAlsoDeleted() {
+            specify(backingMetaTable.read(key), should.equal(Blob.EMPTY_BLOB));
+        }
+
+        public void theMetadataOfOtherKeysIsUnaffected() {
+            specify(backingMetaTable.read(otherKey), should.equal(propValue2));
+        }
+
+        public void entriesWithTheSameKeyInOtherTablesAreUnaffected() {
+            specify(otherTable.read(key), should.equal(value1));
+        }
     }
 }
