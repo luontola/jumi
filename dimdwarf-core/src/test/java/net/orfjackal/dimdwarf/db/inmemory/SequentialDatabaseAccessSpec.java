@@ -54,19 +54,15 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     private DatabaseTable<Blob, Blob> table;
     private TransactionCoordinator tx;
 
-    private Blob key;
-    private Blob value;
-    private Blob otherValue;
+    private Blob key = Blob.fromBytes(new byte[]{1});
+    private Blob value = Blob.fromBytes(new byte[]{2});
+    private Blob otherValue = Blob.fromBytes(new byte[]{3});
 
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         tx = new TransactionImpl(mock(Logger.class));
         db = dbms.openConnection(tx.getTransaction());
         table = db.openTable(TABLE);
-        
-        key = Blob.fromBytes(new byte[]{1});
-        value = Blob.fromBytes(new byte[]{2});
-        otherValue = Blob.fromBytes(new byte[]{3});
     }
 
     private void canNotBeUsed(final Database<Blob, Blob> db, final DatabaseTable<Blob, Blob> table) {
