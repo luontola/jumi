@@ -47,34 +47,47 @@ import org.slf4j.Logger;
 public class DatabaseEntryMetadataSpec extends Specification<Object> {
 
     private static final String TABLE = "test";
-    private static final String PROPERTY = "prop";
 
     private DatabaseManager dbms;
-    private Database<Blob, Blob> db;
-    private DatabaseTableWithMetadata<Blob, Blob> table;
+    private Logger txLogger;
     private TransactionCoordinator tx;
+    private Database<Blob, Blob> db;
+    private DatabaseTable<Blob, Blob> realTable;
+    private DatabaseTableWithMetadata<Blob, Blob> metaTable;
 
-    private Blob key;
-    private Blob value;
-    private Blob otherValue;
+    private Blob key = Blob.fromBytes(new byte[]{0x10});
+    private Blob value1 = Blob.fromBytes(new byte[]{0x11});
+    private Blob value2 = Blob.fromBytes(new byte[]{0x12});
+
+    private String propKey = "prop";
+    private Blob propValue1 = Blob.fromBytes(new byte[]{0x01});
+    private Blob propValue2 = Blob.fromBytes(new byte[]{0x02});
 
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
-        tx = new TransactionImpl(mock(Logger.class));
-        db = dbms.openConnection(tx.getTransaction());
-        table = new DatabaseTableWithMetadataImpl<Blob, Blob>(dbms, tx.getTransaction());
+        txLogger = mock(Logger.class);
+        updateInNewTransaction(TABLE, key, value1);
 
-        key = Blob.fromBytes(new byte[]{1});
-        value = Blob.fromBytes(new byte[]{2});
-        otherValue = Blob.fromBytes(new byte[]{3});
+        tx = new TransactionImpl(txLogger);
+        db = dbms.openConnection(tx.getTransaction());
+        realTable = db.openTable(TABLE);
+        metaTable = new DatabaseTableWithMetadataImpl<Blob, Blob>(db, TABLE);
     }
 
+    private void updateInNewTransaction(String table, Blob key, Blob value) {
+        TransactionCoordinator tx = new TransactionImpl(txLogger);
+        dbms.openConnection(tx.getTransaction()).openTable(table).update(key, value);
+        tx.prepareAndCommit();
+    }
+
+
     public class WhenAnEntryDoesNotExist {
+        private Blob noSuchKey = Blob.fromBytes(new byte[]{0x20});
 
         public void itsMetadataCanNotBeRead() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    table.readMetadata(key, PROPERTY);
+                    metaTable.readMetadata(noSuchKey, propKey);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -82,7 +95,7 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         public void itsMetadataCanNotBeUpdated() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    table.updateMetadata(key, PROPERTY, value);
+                    metaTable.updateMetadata(noSuchKey, propKey, propValue1);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -90,9 +103,32 @@ public class DatabaseEntryMetadataSpec extends Specification<Object> {
         public void itsMetadataCanNotBeDeleted() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    table.deleteMetadata(key, PROPERTY);
+                    metaTable.deleteMetadata(noSuchKey, propKey);
                 }
             }, should.raise(IllegalArgumentException.class));
+        }
+    }
+
+    public class WhenAnEntryExists {
+
+        public void theEntryMayBeRead() {
+            specify(metaTable.read(key), should.equal(value1));
+        }
+
+        public void theEntryMayBeUpdated() {
+            metaTable.update(key, value2);
+            specify(realTable.read(key), should.equal(value2));
+        }
+
+        public void theEntryMayBeDeleted() {
+            metaTable.delete(key);
+            specify(realTable.read(key), should.equal(Blob.EMPTY_BLOB));
+        }
+
+        public void tableKeysMayBeIterated() {
+            specify(metaTable.firstKey(), should.equal(key));
+            specify(metaTable.nextKeyAfter(Blob.EMPTY_BLOB), should.equal(key));
+            specify(metaTable.nextKeyAfter(key), should.equal(null));
         }
     }
 }

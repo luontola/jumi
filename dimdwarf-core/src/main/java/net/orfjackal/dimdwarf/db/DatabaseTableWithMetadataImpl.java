@@ -31,20 +31,22 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import net.orfjackal.dimdwarf.tx.Transaction;
-
 /**
  * @author Esko Luontola
  * @since 2.12.2008
  */
 public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMetadata<K, V> {
 
-    private final DatabaseManager dbms;
-    private final Transaction tx;
+    private final Database<K, V> db;
+    private final String tableName;
 
-    public DatabaseTableWithMetadataImpl(DatabaseManager dbms, Transaction tx) {
-        this.dbms = dbms;
-        this.tx = tx;
+    public DatabaseTableWithMetadataImpl(Database<K, V> db, String tableName) {
+        this.tableName = tableName;
+        this.db = db;
+    }
+
+    private DatabaseTable<K, V> getDataTable() {
+        return db.openTable(tableName);
     }
 
     public Blob readMetadata(K key, String property) {
@@ -60,20 +62,22 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
     }
 
     public V read(K key) {
-        return null;
+        return getDataTable().read(key);
     }
 
     public void update(K key, V value) {
+        getDataTable().update(key, value);
     }
 
     public void delete(K key) {
+        getDataTable().delete(key);
     }
 
     public K firstKey() {
-        return null;
+        return getDataTable().firstKey();
     }
 
     public K nextKeyAfter(K currentKey) {
-        return null;
+        return getDataTable().nextKeyAfter(currentKey);
     }
 }
