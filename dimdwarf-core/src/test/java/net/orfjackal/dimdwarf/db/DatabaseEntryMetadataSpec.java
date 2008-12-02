@@ -33,7 +33,10 @@ package net.orfjackal.dimdwarf.db;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
+import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 /**
  * @author Esko Luontola
@@ -43,5 +46,53 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class DatabaseEntryMetadataSpec extends Specification<Object> {
 
-    // TODO
+    private static final String TABLE = "test";
+    private static final String PROPERTY = "prop";
+
+    private DatabaseManager dbms;
+    private Database<Blob, Blob> db;
+    private DatabaseTableWithMetadata<Blob, Blob> table;
+    private TransactionCoordinator tx;
+
+    private Blob key;
+    private Blob value;
+    private Blob otherValue;
+
+    public void create() throws Exception {
+        dbms = new InMemoryDatabaseManager();
+        tx = new TransactionImpl(mock(Logger.class));
+        db = dbms.openConnection(tx.getTransaction());
+        table = new DatabaseTableWithMetadataImpl<Blob, Blob>(dbms, tx.getTransaction());
+
+        key = Blob.fromBytes(new byte[]{1});
+        value = Blob.fromBytes(new byte[]{2});
+        otherValue = Blob.fromBytes(new byte[]{3});
+    }
+
+    public class WhenAnEntryDoesNotExist {
+
+        public void itsMetadataCanNotBeRead() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    table.readMetadata(key, PROPERTY);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+
+        public void itsMetadataCanNotBeUpdated() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    table.updateMetadata(key, PROPERTY, value);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+
+        public void itsMetadataCanNotBeDeleted() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    table.deleteMetadata(key, PROPERTY);
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+    }
 }
