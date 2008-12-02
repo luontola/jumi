@@ -45,11 +45,9 @@ import java.math.BigInteger;
 public class BindingStorageImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingStorage {
 
     @Inject
-    public BindingStorageImpl(@BindingsTable DatabaseTable<Blob, Blob> bindings,
-                              NoConversion<String> keys1,
-                              ConvertStringToBytes keys2,
-                              ConvertEntityToEntityId values1,
-                              ConvertBigIntegerToBytes values2) {
-        super(new DatabaseTableAdapter<String, BigInteger, Blob, Blob>(bindings, keys2, values2), keys1, values1);
+    public BindingStorageImpl(BindingsDatabaseTable bindings,
+                              NoConversion<String> keys,
+                              ConvertEntityToEntityId values) {
+        super(bindings, keys, values);
     }
 }

@@ -29,60 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc.entities;
+package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.gc.Graph;
+import net.orfjackal.dimdwarf.db.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 
 /**
  * @author Esko Luontola
- * @since 30.11.2008
+ * @since 2.12.2008
  */
-public class EntityGraph implements Graph<BigInteger> {
-
-    private final EntitiesDatabaseTable entities;
-    private final BindingsDatabaseTable bindings;
+public class EntitiesDatabaseTable
+        extends DatabaseTableWithMetadataAdapter<BigInteger, Blob, Blob, Blob>
+        implements DatabaseTableWithMetadata<BigInteger, Blob> {
 
     @Inject
-    public EntityGraph(EntitiesDatabaseTable entities, BindingsDatabaseTable bindings) {
-        this.entities = entities;
-        this.bindings = bindings;
-    }
-
-    public Iterable<BigInteger> getAllNodes() {
-        ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
-        for (BigInteger id = entities.firstKey(); id != null; id = entities.nextKeyAfter(id)) {
-            nodes.add(id);
-        }
-        return nodes;
-    }
-
-    public Iterable<BigInteger> getRootNodes() {
-        ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
-        for (String binding = bindings.firstKey(); binding != null; binding = bindings.nextKeyAfter(binding)) {
-            BigInteger id = bindings.read(binding);
-            if (id != null) {
-                nodes.add(id);
-            }
-        }
-        return nodes;
-    }
-
-    public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {
-        return null;
-    }
-
-    public void removeNode(BigInteger node) {
-    }
-
-    public long getStatus(BigInteger node) {
-        return 0;
-    }
-
-    public void setStatus(BigInteger node, long status) {
+    public EntitiesDatabaseTable(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
+                                 ConvertBigIntegerToBytes keys,
+                                 NoConversion<Blob> values) {
+        super(parent, keys, values);
     }
 }

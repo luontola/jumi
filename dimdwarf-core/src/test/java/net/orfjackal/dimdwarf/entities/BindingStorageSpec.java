@@ -72,19 +72,21 @@ public class BindingStorageSpec extends Specification<Object> {
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
                         new EntityStorageImpl(
-                                new EntityDatabaseTable(
+                                new EntitiesDatabaseTable(
                                         entitiesTable,
                                         new ConvertBigIntegerToBytes(),
                                         new NoConversion<Blob>()),
                                 new NoConversion<BigInteger>(),
                                 new ConvertEntityToBytes(new ObjectSerializerImpl())));
 
-        bindings = new BindingStorageImpl(
-                bindingsTable,
-                new NoConversion<String>(),
-                new ConvertStringToBytes(),
-                new ConvertEntityToEntityId(entityManager),
-                new ConvertBigIntegerToBytes());
+        bindings =
+                new BindingStorageImpl(
+                        new BindingsDatabaseTable(
+                                bindingsTable,
+                                new ConvertStringToBytes(),
+                                new ConvertBigIntegerToBytes()),
+                        new NoConversion<String>(),
+                        new ConvertEntityToEntityId(entityManager));
     }
 
     private void endTask() {

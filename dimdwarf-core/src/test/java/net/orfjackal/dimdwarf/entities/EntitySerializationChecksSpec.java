@@ -65,7 +65,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         replacer = new DelegatingSerializationReplacer();
         ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
         storage = new EntityStorageImpl(
-                new EntityDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
+                new EntitiesDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
                 new NoConversion<BigInteger>(),
                 new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();

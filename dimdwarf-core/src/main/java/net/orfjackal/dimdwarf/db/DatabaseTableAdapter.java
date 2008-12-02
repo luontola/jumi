@@ -44,7 +44,9 @@ public class DatabaseTableAdapter<K1, V1, K2, V2> implements DatabaseTable<K1, V
     private final Converter<K1, K2> keys;
     private final Converter<V1, V2> values;
 
-    public DatabaseTableAdapter(DatabaseTable<K2, V2> parent, Converter<K1, K2> keys, Converter<V1, V2> values) {
+    public DatabaseTableAdapter(DatabaseTable<K2, V2> parent,
+                                Converter<K1, K2> keys,
+                                Converter<V1, V2> values) {
         this.parent = parent;
         this.keys = keys;
         this.values = values;

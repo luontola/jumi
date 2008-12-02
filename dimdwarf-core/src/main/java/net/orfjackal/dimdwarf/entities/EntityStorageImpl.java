@@ -45,7 +45,7 @@ import java.math.BigInteger;
 public class EntityStorageImpl extends DatabaseTableAdapter<BigInteger, Object, BigInteger, Blob> implements EntityStorage {
 
     @Inject
-    public EntityStorageImpl(EntityDatabaseTable entities,
+    public EntityStorageImpl(EntitiesDatabaseTable entities,
                              NoConversion<BigInteger> keys,
                              ConvertEntityToBytes values) {
         super(entities, keys, values);

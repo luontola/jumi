@@ -62,7 +62,7 @@ public class EntityStorageSpec extends Specification<Object> {
         db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         serializer = mock(ObjectSerializer.class);
         storage = new EntityStorageImpl(
-                new EntityDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
+                new EntitiesDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
                 new NoConversion<BigInteger>(),
                 new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();

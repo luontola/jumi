@@ -29,25 +29,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
-
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.db.*;
-
-import java.math.BigInteger;
+package net.orfjackal.dimdwarf.db;
 
 /**
  * @author Esko Luontola
  * @since 2.12.2008
  */
-public class EntityDatabaseTable
-        extends DatabaseTableAdapterWithMetadata<BigInteger, Blob, Blob, Blob>
-        implements DatabaseTableWithMetadata<BigInteger, Blob> {
+public class DatabaseTableWithMetadataAdapter<K1, V1, K2, V2>
+        extends DatabaseTableAdapter<K1, V1, K2, V2>
+        implements DatabaseTableWithMetadata<K1, V1> {
 
-    @Inject
-    public EntityDatabaseTable(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
-                               ConvertBigIntegerToBytes keys,
-                               NoConversion<Blob> values) {
+    private final DatabaseTableWithMetadata<K2, V2> parent;
+    private final Converter<K1, K2> keys;
+    private final Converter<V1, V2> values;
+
+    public DatabaseTableWithMetadataAdapter(DatabaseTableWithMetadata<K2, V2> parent,
+                                            Converter<K1, K2> keys,
+                                            Converter<V1, V2> values) {
         super(parent, keys, values);
+        this.parent = parent;
+        this.keys = keys;
+        this.values = values;
+    }
+
+    public V1 readMetadata(K1 key, String metaKey) {
+        return values.back(parent.readMetadata(keys.forth(key), metaKey));
+    }
+
+    public void updateMetadata(K1 key, String metaKey, V1 metaValue) {
+        parent.updateMetadata(keys.forth(key), metaKey, values.forth(metaValue));
+    }
+
+    public void deleteMetadata(K1 key, String metaKey) {
+        parent.deleteMetadata(keys.forth(key), metaKey);
     }
 }
