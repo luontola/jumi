@@ -50,6 +50,10 @@ public class DatabaseTableAdapter<K1, V1, K2, V2> implements DatabaseTable<K1, V
         this.values = values;
     }
 
+    public boolean exists(K1 key) {
+        return parent.exists(keys.forth(key));
+    }
+
     public V1 read(K1 key) {
         return values.back(parent.read(keys.forth(key)));
     }

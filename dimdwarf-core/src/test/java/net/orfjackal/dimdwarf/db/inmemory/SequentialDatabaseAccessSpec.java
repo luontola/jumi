@@ -73,6 +73,11 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         }, should.raise(TransactionRequiredException.class));
         specify(new Block() {
             public void run() throws Throwable {
+                table.exists(key);
+            }
+        }, should.raise(TransactionRequiredException.class));
+        specify(new Block() {
+            public void run() throws Throwable {
                 table.read(key);
             }
         }, should.raise(TransactionRequiredException.class));
@@ -138,6 +143,10 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
     public class WhenEntryDoesNotExist {
 
         public void itDoesNotExist() {
+            specify(table.exists(key), should.equal(false));
+        }
+
+        public void itHasAnEmptyValue() {
             specify(table.read(key), should.equal(EMPTY_BLOB));
         }
     }
@@ -148,7 +157,11 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
             table.update(key, value);
         }
 
-        public void theValueCanBeRead() {
+        public void theEntryExists() {
+            specify(table.exists(key));
+        }
+
+        public void itsValueCanBeRead() {
             specify(table.read(key), should.equal(value));
         }
     }
@@ -160,7 +173,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
             table.update(key, otherValue);
         }
 
-        public void theLatestValueCanBeRead() {
+        public void itsLatestValueCanBeRead() {
             specify(table.read(key), should.equal(otherValue));
         }
     }
@@ -173,6 +186,10 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         }
 
         public void itDoesNotExistAnymore() {
+            specify(table.exists(key), should.equal(false));
+        }
+
+        public void itHasAnEmptyValue() {
             specify(table.read(key), should.equal(EMPTY_BLOB));
         }
     }

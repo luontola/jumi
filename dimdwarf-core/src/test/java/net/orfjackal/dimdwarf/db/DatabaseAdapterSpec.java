@@ -31,8 +31,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
@@ -40,8 +39,7 @@ import org.junit.runner.RunWith;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -96,6 +94,13 @@ public class DatabaseAdapterSpec extends Specification<Object> {
                 one(db).openTable("test"); will(returnValue(table));
             }});
             tableAdapter = dbAdapter.openTable("test");
+        }
+
+        public void convertsExistenceChecks() {
+            checking(new Expectations() {{
+                one(table).exists(keyBytes); will(returnValue(true));
+            }});
+            specify(tableAdapter.exists(key), should.equal(true));
         }
 
         public void convertsReads() {

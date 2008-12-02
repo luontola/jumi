@@ -39,6 +39,8 @@ import javax.annotation.Nullable;
  */
 public interface DatabaseTable<K, V> extends IterableKeys<K> {
 
+    boolean exists(K key);
+
     @Nullable
     V read(K key);
 

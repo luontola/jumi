@@ -58,6 +58,10 @@ public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
         this.tx = tx;
     }
 
+    public boolean exists(Blob key) {
+        return read(key).length() > 0;
+    }
+
     @Nonnull
     public Blob read(Blob key) {
         tx.mustBeActive();
