@@ -49,10 +49,10 @@ import java.util.*;
 public class RecoverableSetImpl<T> implements RecoverableSet<T> {
 
     private final String prefix;
-    private final Provider<BindingStorage> bindings;
+    private final Provider<BindingRepository> bindings;
     private final Provider<EntityInfo> info;
 
-    public RecoverableSetImpl(String prefix, Provider<BindingStorage> bindings, Provider<EntityInfo> info) {
+    public RecoverableSetImpl(String prefix, Provider<BindingRepository> bindings, Provider<EntityInfo> info) {
         this.prefix = prefix + SEPARATOR;
         this.bindings = bindings;
         this.info = info;

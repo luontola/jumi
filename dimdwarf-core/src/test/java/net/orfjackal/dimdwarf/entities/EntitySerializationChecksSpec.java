@@ -52,7 +52,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private DatabaseTableWithMetadata<Blob, Blob> db;
-    private EntityStorageImpl storage;
+    private EntityRepositoryImpl repository;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
@@ -64,10 +64,15 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         };
         replacer = new DelegatingSerializationReplacer();
         ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
-        storage = new EntityStorageImpl(
-                new EntitiesDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
-                new NoConversion<BigInteger>(),
-                new ConvertEntityToBytes(serializer));
+
+        repository =
+                new EntityRepositoryImpl(
+                        new EntityDao(
+                                db,
+                                new ConvertBigIntegerToBytes(),
+                                new NoConversion<Blob>()),
+                        new NoConversion<BigInteger>(),
+                        new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();
     }
 
@@ -82,7 +87,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
             entity.other = new DummyEntity();
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.update(ENTITY_ID, entity);
+                    repository.update(ENTITY_ID, entity);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -92,7 +97,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
                 one(db).update(with(equal(asBytes(ENTITY_ID))), with(aNonNull(Blob.class)));
             }});
             entity.other = new EntityReferenceImpl<DummyEntity>(BigInteger.valueOf(123), new DummyEntity());
-            storage.update(ENTITY_ID, entity);
+            repository.update(ENTITY_ID, entity);
         }
 
         public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
@@ -107,7 +112,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
             };
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.update(ENTITY_ID, entity);
+                    repository.update(ENTITY_ID, entity);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -124,7 +129,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
             entity.other = newAnonymousClassInstance();
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.update(ENTITY_ID, entity);
+                    repository.update(ENTITY_ID, entity);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -133,7 +138,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
             entity.other = newLocalClassInstance();
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.update(ENTITY_ID, entity);
+                    repository.update(ENTITY_ID, entity);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
@@ -143,7 +148,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
                 one(db).update(with(equal(asBytes(ENTITY_ID))), with(aNonNull(Blob.class)));
             }});
             entity.other = new StaticMemberClass();
-            storage.update(ENTITY_ID, entity);
+            repository.update(ENTITY_ID, entity);
         }
 
         public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
@@ -158,7 +163,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
             };
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.update(ENTITY_ID, entity);
+                    repository.update(ENTITY_ID, entity);
                 }
             }, should.raise(IllegalArgumentException.class));
         }

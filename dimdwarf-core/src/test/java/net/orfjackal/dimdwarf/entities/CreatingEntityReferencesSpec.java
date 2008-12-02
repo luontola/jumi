@@ -31,11 +31,9 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -50,15 +48,15 @@ import java.math.BigInteger;
 public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     private EntityIdFactory idFactory;
-    private EntityStorage storage;
+    private EntityRepository repository;
     private EntityManagerImpl manager;
     private ReferenceFactory refFactory;
     private EntityObject entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
-        storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(idFactory, storage);
+        repository = mock(EntityRepository.class);
+        manager = new EntityManagerImpl(idFactory, repository);
         refFactory = new ReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }

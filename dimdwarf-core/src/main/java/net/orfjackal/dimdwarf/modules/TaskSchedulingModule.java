@@ -33,7 +33,7 @@ package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.*;
-import net.orfjackal.dimdwarf.entities.BindingStorage;
+import net.orfjackal.dimdwarf.entities.BindingRepository;
 import net.orfjackal.dimdwarf.scheduler.*;
 import net.orfjackal.dimdwarf.util.*;
 
@@ -56,7 +56,7 @@ public class TaskSchedulingModule extends AbstractModule {
     }
 
     private static class RecoverableSetFactoryImpl implements RecoverableSetFactory {
-        @Inject public Provider<BindingStorage> bindings;
+        @Inject public Provider<BindingRepository> bindings;
         @Inject public Provider<EntityInfo> info;
 
         public <T> RecoverableSet<T> create(String prefix) {

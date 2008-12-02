@@ -48,23 +48,27 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class EntityStorageSpec extends Specification<Object> {
+public class EntityRepositorySpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private DatabaseTableWithMetadata<Blob, Blob> db;
     private ObjectSerializer serializer;
-    private EntityStorageImpl storage;
+    private EntityRepositoryImpl repository;
     private EntityObject entity;
     private Blob serialized;
 
     public void create() throws Exception {
         db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         serializer = mock(ObjectSerializer.class);
-        storage = new EntityStorageImpl(
-                new EntitiesDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
-                new NoConversion<BigInteger>(),
-                new ConvertEntityToBytes(serializer));
+        repository =
+                new EntityRepositoryImpl(
+                        new EntityDao(
+                                db,
+                                new ConvertBigIntegerToBytes(),
+                                new NoConversion<Blob>()),
+                        new NoConversion<BigInteger>(),
+                        new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();
         serialized = Blob.fromBytes(new byte[]{1, 2, 3});
     }
@@ -74,14 +78,14 @@ public class EntityStorageSpec extends Specification<Object> {
     }
 
 
-    public class AnEntityStorage {
+    public class AnEntityRepository {
 
         public void readsEntitiesFromDatabase() {
             checking(new Expectations() {{
                 one(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
                 one(serializer).deserialize(serialized); will(returnValue(entity));
             }});
-            specify(storage.read(ENTITY_ID), should.equal(entity));
+            specify(repository.read(ENTITY_ID), should.equal(entity));
         }
 
         public void canNotReadNonexistentEntities() {
@@ -90,7 +94,7 @@ public class EntityStorageSpec extends Specification<Object> {
             }});
             specify(new Block() {
                 public void run() throws Throwable {
-                    storage.read(ENTITY_ID);
+                    repository.read(ENTITY_ID);
                 }
             }, should.raise(EntityNotFoundException.class));
         }
@@ -100,14 +104,14 @@ public class EntityStorageSpec extends Specification<Object> {
                 one(serializer).serialize(entity); will(returnValue(serialized));
                 one(db).update(asBytes(ENTITY_ID), serialized);
             }});
-            storage.update(ENTITY_ID, entity);
+            repository.update(ENTITY_ID, entity);
         }
 
         public void deletesEntitiesFromDatabase() {
             checking(new Expectations() {{
                 one(db).delete(asBytes(ENTITY_ID));
             }});
-            storage.delete(ENTITY_ID);
+            repository.delete(ENTITY_ID);
         }
     }
 

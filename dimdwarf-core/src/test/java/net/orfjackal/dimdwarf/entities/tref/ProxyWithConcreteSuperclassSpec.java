@@ -31,14 +31,10 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.ProxyType;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.*;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
@@ -102,7 +98,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
                     new ReferenceFactoryImpl(
                             new EntityManagerImpl(
                                     mock(EntityIdFactory.class),
-                                    mock(EntityStorage.class)));
+                                    mock(EntityRepository.class)));
             specify(new Block() {
                 public void run() throws Throwable {
                     factory.createReference(proxy);

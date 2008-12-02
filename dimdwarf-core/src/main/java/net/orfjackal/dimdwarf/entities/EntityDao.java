@@ -34,20 +34,20 @@ package net.orfjackal.dimdwarf.entities;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.*;
 
-import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 12.9.2008
+ * @since 2.12.2008
  */
-@Immutable
-public class BindingStorageImpl extends DatabaseTableAdapter<String, Object, String, BigInteger> implements BindingStorage {
+public class EntityDao
+        extends DatabaseTableWithMetadataAdapter<BigInteger, Blob, Blob, Blob>
+        implements DatabaseTableWithMetadata<BigInteger, Blob> {
 
     @Inject
-    public BindingStorageImpl(BindingsDatabaseTable bindings,
-                              NoConversion<String> keys,
-                              ConvertEntityToEntityId values) {
-        super(bindings, keys, values);
+    public EntityDao(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
+                     ConvertBigIntegerToBytes keys,
+                     NoConversion<Blob> values) {
+        super(parent, keys, values);
     }
 }

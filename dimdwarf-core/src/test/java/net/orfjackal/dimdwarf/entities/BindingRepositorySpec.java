@@ -48,9 +48,9 @@ import java.math.BigInteger;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class BindingStorageSpec extends Specification<Object> {
+public class BindingRepositorySpec extends Specification<Object> {
 
-    private BindingStorage bindings;
+    private BindingRepository repository;
     private DatabaseManager dbms;
     private TransactionCoordinator tx;
     private EntityManagerImpl entityManager;
@@ -71,17 +71,17 @@ public class BindingStorageSpec extends Specification<Object> {
         entityManager =
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
-                        new EntityStorageImpl(
-                                new EntitiesDatabaseTable(
+                        new EntityRepositoryImpl(
+                                new EntityDao(
                                         entitiesTable,
                                         new ConvertBigIntegerToBytes(),
                                         new NoConversion<Blob>()),
                                 new NoConversion<BigInteger>(),
                                 new ConvertEntityToBytes(new ObjectSerializerImpl())));
 
-        bindings =
-                new BindingStorageImpl(
-                        new BindingsDatabaseTable(
+        repository =
+                new BindingRepositoryImpl(
+                        new BindingDao(
                                 bindingsTable,
                                 new ConvertStringToBytes(),
                                 new ConvertBigIntegerToBytes()),
@@ -102,26 +102,26 @@ public class BindingStorageSpec extends Specification<Object> {
         }
 
         public void whenBindingHasNotBeenCreatedItDoesNotExist() {
-            specify(bindings.read("foo"), should.equal(null));
+            specify(repository.read("foo"), should.equal(null));
         }
 
         public void whenBindingIsCreatedItDoesExist() {
-            bindings.update("foo", new DummyEntity());
-            specify(bindings.read("foo"), should.not().equal(null));
+            repository.update("foo", new DummyEntity());
+            specify(repository.read("foo"), should.not().equal(null));
         }
 
         public void whenBindingIsUpdatedItIsChanged() {
             DummyEntity d1 = new DummyEntity("1");
             DummyEntity d2 = new DummyEntity("2");
-            bindings.update("foo", d1);
-            bindings.update("foo", d2);
-            specify(bindings.read("foo"), should.equal(d2));
+            repository.update("foo", d1);
+            repository.update("foo", d2);
+            specify(repository.read("foo"), should.equal(d2));
         }
 
         public void whenBindingIsDeletedItDoesNotExist() {
-            bindings.update("foo", new DummyEntity());
-            bindings.delete("foo");
-            specify(bindings.read("foo"), should.equal(null));
+            repository.update("foo", new DummyEntity());
+            repository.delete("foo");
+            specify(repository.read("foo"), should.equal(null));
         }
     }
 
@@ -131,27 +131,27 @@ public class BindingStorageSpec extends Specification<Object> {
             beginTask();
             DummyEntity foo = new DummyEntity();
             foo.setOther("foo");
-            bindings.update("foo", foo);
-            bindings.update("foo.2", new DummyEntity());
-            bindings.update("foo.1", new DummyEntity());
-            bindings.update("bar.x", new DummyEntity());
-            bindings.update("bar.y", new DummyEntity());
+            repository.update("foo", foo);
+            repository.update("foo.2", new DummyEntity());
+            repository.update("foo.1", new DummyEntity());
+            repository.update("bar.x", new DummyEntity());
+            repository.update("bar.y", new DummyEntity());
             endTask();
             beginTask();
         }
 
         public void bindingsAreInAlphabeticalOrder() {
-            specify(bindings.firstKey(), should.equal("bar.x"));
+            specify(repository.firstKey(), should.equal("bar.x"));
         }
 
         public void whenBindingsHaveTheSamePrefixTheShortestBindingIsFirst() {
-            specify(bindings.nextKeyAfter("foo"), should.equal("foo.1"));
-            specify(bindings.nextKeyAfter("foo.1"), should.equal("foo.2"));
-            specify(bindings.nextKeyAfter("foo.2"), should.equal(null));
+            specify(repository.nextKeyAfter("foo"), should.equal("foo.1"));
+            specify(repository.nextKeyAfter("foo.1"), should.equal("foo.2"));
+            specify(repository.nextKeyAfter("foo.2"), should.equal(null));
         }
 
         public void entitiesCanBeAccessedByTheBindingName() {
-            DummyEntity entity = (DummyEntity) bindings.read("foo");
+            DummyEntity entity = (DummyEntity) repository.read("foo");
             specify(entity.getOther(), should.equal("foo"));
         }
     }

@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
@@ -50,15 +48,15 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class FlushingEntitiesSpec extends Specification<Object> {
 
-    private EntityStorage storage;
+    private EntityRepository repository;
     private EntityManagerImpl manager;
     private ReferenceFactory refFactory;
     private DummyEntity entity;
     private DummyEntity newEntity;
 
     public void create() throws Exception {
-        storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), storage);
+        repository = mock(EntityRepository.class);
+        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), repository);
         refFactory = new ReferenceFactoryImpl(manager);
 
         entity = new DummyEntity();
@@ -70,14 +68,14 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
-                one(storage).update(BigInteger.ONE, entity);
+                one(repository).update(BigInteger.ONE, entity);
             }});
             manager.flushAllEntitiesToDatabase();
         }
 
         public void flushingTwiseIsNotAllowed() {
             checking(new Expectations() {{
-                one(storage).update(BigInteger.ONE, entity);
+                one(repository).update(BigInteger.ONE, entity);
             }});
             manager.flushAllEntitiesToDatabase();
             specify(new Block() {
@@ -89,7 +87,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theEntityManagerCanNotBeUsedAfterFlushHasEnded() {
             checking(new Expectations() {{
-                one(storage).update(BigInteger.ONE, entity);
+                one(repository).update(BigInteger.ONE, entity);
             }});
             manager.flushAllEntitiesToDatabase();
 
@@ -126,8 +124,8 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
-                one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
-                one(storage).update(BigInteger.valueOf(2), newEntity);
+                one(repository).update(BigInteger.ONE, entity); will(new RegisterEntity(newEntity));
+                one(repository).update(BigInteger.valueOf(2), newEntity);
             }});
             manager.flushAllEntitiesToDatabase();
         }
@@ -137,7 +135,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theyAreStoredInDatabaseOnlyOnce() {
             checking(new Expectations() {{
-                one(storage).update(BigInteger.ONE, entity); will(new RegisterEntity(entity));
+                one(repository).update(BigInteger.ONE, entity); will(new RegisterEntity(entity));
             }});
             manager.flushAllEntitiesToDatabase();
         }

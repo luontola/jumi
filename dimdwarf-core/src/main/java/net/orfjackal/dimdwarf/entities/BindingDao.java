@@ -31,21 +31,23 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.db.DatabaseTable;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.db.*;
 
-import javax.annotation.Nonnull;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 31.8.2008
+ * @since 2.12.2008
  */
-public interface EntityStorage extends DatabaseTable<BigInteger, Object> {
+public class BindingDao
+        extends DatabaseTableAdapter<String, BigInteger, Blob, Blob>
+        implements DatabaseTable<String, BigInteger> {
 
-    @Nonnull
-    Object read(BigInteger id) throws EntityNotFoundException;
-
-    void update(BigInteger id, Object entity);
-
-    void delete(BigInteger id);
+    @Inject
+    public BindingDao(@BindingsTable DatabaseTable<Blob, Blob> parent,
+                      ConvertStringToBytes keys,
+                      ConvertBigIntegerToBytes values) {
+        super(parent, keys, values);
+    }
 }

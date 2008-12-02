@@ -55,7 +55,7 @@ public class EntityGraphSpec extends Specification<Object> {
 
     private TaskExecutor taskContext;
     private Provider<EntityInfo> info;
-    private Provider<BindingStorage> bindings;
+    private Provider<BindingRepository> bindings;
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
@@ -65,7 +65,7 @@ public class EntityGraphSpec extends Specification<Object> {
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         info = injector.getProvider(EntityInfo.class);
-        bindings = injector.getProvider(BindingStorage.class);
+        bindings = injector.getProvider(BindingRepository.class);
 
         graph = injector.getProvider(EntityGraph.class);
     }
@@ -180,5 +180,5 @@ public class EntityGraphSpec extends Specification<Object> {
     // TODO: browsing connected nodes
     // TODO: removing nodes
     // TODO: reading and updating status
-    // TODO: create fakes of BindingsStorage, EntityStorage and EntityInfo
+    // TODO: create fakes of BindingRepository, EntityRepository and EntityInfo
 }

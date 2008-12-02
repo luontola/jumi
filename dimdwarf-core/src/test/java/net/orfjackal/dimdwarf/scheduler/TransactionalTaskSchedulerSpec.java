@@ -35,7 +35,7 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
-import net.orfjackal.dimdwarf.entities.BindingStorage;
+import net.orfjackal.dimdwarf.entities.BindingRepository;
 import net.orfjackal.dimdwarf.modules.*;
 import static net.orfjackal.dimdwarf.scheduler.TaskSchedulerSpec.takeNextTaskFrom;
 import net.orfjackal.dimdwarf.tasks.*;
@@ -74,7 +74,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
                         bind(Clock.class).toInstance(clock);
                     }
                 });
-        final Provider<BindingStorage> bindings = injector.getProvider(BindingStorage.class);
+        final Provider<BindingRepository> bindings = injector.getProvider(BindingRepository.class);
         final Provider<EntityInfo> info = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);

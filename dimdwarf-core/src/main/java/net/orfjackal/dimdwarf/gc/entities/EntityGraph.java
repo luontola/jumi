@@ -44,11 +44,11 @@ import java.util.ArrayList;
  */
 public class EntityGraph implements Graph<BigInteger> {
 
-    private final EntitiesDatabaseTable entities;
-    private final BindingsDatabaseTable bindings;
+    private final EntityDao entities;
+    private final BindingDao bindings;
 
     @Inject
-    public EntityGraph(EntitiesDatabaseTable entities, BindingsDatabaseTable bindings) {
+    public EntityGraph(EntityDao entities, BindingDao bindings) {
         this.entities = entities;
         this.bindings = bindings;
     }

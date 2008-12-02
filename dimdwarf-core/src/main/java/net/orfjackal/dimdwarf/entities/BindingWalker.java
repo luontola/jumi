@@ -42,9 +42,9 @@ import java.util.Iterator;
 public class BindingWalker implements Iterable<String> {
 
     private final String prefix;
-    private final BindingStorage bindings;
+    private final BindingRepository bindings;
 
-    public BindingWalker(String prefix, BindingStorage bindings) {
+    public BindingWalker(String prefix, BindingRepository bindings) {
         this.prefix = prefix;
         this.bindings = bindings;
     }

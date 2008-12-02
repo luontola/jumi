@@ -31,22 +31,25 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.db.DatabaseTable;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.db.*;
 
-import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 12.9.2008
  */
-public interface BindingStorage extends DatabaseTable<String, Object> {
+@Immutable
+public class BindingRepositoryImpl
+        extends DatabaseTableAdapter<String, Object, String, BigInteger>
+        implements BindingRepository {
 
-    @Nullable
-    Object read(String binding);
-
-    void update(String binding, Object entity);
-
-    void delete(String binding);
-
-    // TODO: make BindingStorage a low-level DatabaseTable<String,BigInteger> object and introduce a public EntityBindings API similar to this class
+    @Inject
+    public BindingRepositoryImpl(BindingDao bindings,
+                                 NoConversion<String> keys,
+                                 ConvertEntityToEntityId values) {
+        super(bindings, keys, values);
+    }
 }

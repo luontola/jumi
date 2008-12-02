@@ -50,7 +50,7 @@ import java.util.*;
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityIdFactory idFactory;
-    private final EntityStorage storage;
+    private final EntityRepository repository;
 
     private final Map<EntityObject, BigInteger> entities = new IdentityHashMap<EntityObject, BigInteger>();
     private final Map<BigInteger, EntityObject> entitiesById = new HashMap<BigInteger, EntityObject>();
@@ -58,9 +58,9 @@ public class EntityManagerImpl implements EntityManager {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManagerImpl(EntityIdFactory idFactory, EntityStorage storage) {
+    public EntityManagerImpl(EntityIdFactory idFactory, EntityRepository repository) {
         this.idFactory = idFactory;
-        this.storage = storage;
+        this.repository = repository;
     }
 
     @TestOnly
@@ -109,7 +109,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private EntityObject loadEntityFromDatabase(BigInteger id) {
-        EntityObject entity = (EntityObject) storage.read(id);
+        EntityObject entity = (EntityObject) repository.read(id);
         register(entity, id);
         return entity;
     }
@@ -127,12 +127,12 @@ public class EntityManagerImpl implements EntityManager {
 
     public BigInteger firstKey() {
         checkStateIs(State.ACTIVE);
-        return storage.firstKey();
+        return repository.firstKey();
     }
 
     public BigInteger nextKeyAfter(BigInteger currentKey) {
         checkStateIs(State.ACTIVE);
-        return storage.nextKeyAfter(currentKey);
+        return repository.nextKeyAfter(currentKey);
     }
 
     /**
@@ -155,7 +155,7 @@ public class EntityManagerImpl implements EntityManager {
         EntityObject entity;
         while ((entity = flushQueue.poll()) != null) {
             BigInteger id = entities.get(entity);
-            storage.update(id, entity);
+            repository.update(id, entity);
         }
     }
 

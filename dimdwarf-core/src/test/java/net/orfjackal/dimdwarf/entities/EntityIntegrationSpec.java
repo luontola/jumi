@@ -102,13 +102,13 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void entityBindingsCreatedInOneTaskCanBeReadInTheNextTask() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
                     bindings.update("bar", new DummyEntity("foo"));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
                     specify(bindings.firstKey(), should.equal("bar"));
                     specify(bindings.nextKeyAfter("bar"), should.equal(null));
                     DummyEntity entity = (DummyEntity) bindings.read("bar");
@@ -120,13 +120,13 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void transparentReferencesAreCreatedAutomatically() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
                     bindings.update("foo", new DummyEntity(new DummyEntity("other")));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingStorage bindings = injector.getInstance(BindingStorage.class);
+                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
                     DummyEntity entity = (DummyEntity) bindings.read("foo");
                     DummyInterface other = (DummyInterface) entity.getOther();
                     specify(other.getOther(), should.equal("other"));

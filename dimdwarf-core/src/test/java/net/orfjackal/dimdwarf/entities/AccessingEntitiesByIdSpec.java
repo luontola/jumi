@@ -31,8 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -47,7 +46,7 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
-    private EntityStorage storage;
+    private EntityRepository repository;
     private EntityManager manager;
 
     private DummyEntity entity1 = new DummyEntity();
@@ -55,13 +54,13 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
     private BigInteger id2 = BigInteger.valueOf(2);
 
     public void create() throws Exception {
-        storage = mock(EntityStorage.class);
-        manager = new EntityManagerImpl(mock(EntityIdFactory.class), storage);
+        repository = mock(EntityRepository.class);
+        manager = new EntityManagerImpl(mock(EntityIdFactory.class), repository);
     }
 
-    private Expectations loadsFromStorage(final BigInteger id, final DummyEntity entity) {
+    private Expectations loadsFromRepository(final BigInteger id, final DummyEntity entity) {
         return new Expectations() {{
-            one(storage).read(id); will(returnValue(entity));
+            one(repository).read(id); will(returnValue(entity));
         }};
     }
 
@@ -69,12 +68,12 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
     public class WhenThereAreEntitiesInTheDatabase {
 
         public void entitiesCanBeLoadedById() {
-            checking(loadsFromStorage(id1, entity1));
+            checking(loadsFromRepository(id1, entity1));
             specify(manager.getEntityById(id1), should.equal(entity1));
         }
 
         public void entitiesAreRegisteredOnLoadById() {
-            checking(loadsFromStorage(id1, entity1));
+            checking(loadsFromRepository(id1, entity1));
             Object load1 = manager.getEntityById(id1);
             Object load2 = manager.getEntityById(id1);
             specify(load1 == load2);
@@ -82,8 +81,8 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
         public void entitiesCanBeIteratedById() {
             checking(new Expectations() {{
-                one(storage).firstKey(); will(returnValue(id1));
-                one(storage).nextKeyAfter(id1); will(returnValue(id2));
+                one(repository).firstKey(); will(returnValue(id1));
+                one(repository).nextKeyAfter(id1); will(returnValue(id2));
             }});
             specify(manager.firstKey(), should.equal(id1));
             specify(manager.nextKeyAfter(id1), should.equal(id2));
