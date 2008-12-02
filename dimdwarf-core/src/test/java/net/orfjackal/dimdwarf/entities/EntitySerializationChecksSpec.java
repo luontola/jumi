@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.serial.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;

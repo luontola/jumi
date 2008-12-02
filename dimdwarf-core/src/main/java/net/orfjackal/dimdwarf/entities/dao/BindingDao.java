@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.entities.dao;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.*;

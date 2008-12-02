@@ -35,6 +35,7 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
+import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;

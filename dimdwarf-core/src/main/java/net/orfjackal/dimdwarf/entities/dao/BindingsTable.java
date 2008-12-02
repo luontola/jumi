@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.entities.dao;
 
 import com.google.inject.BindingAnnotation;
 
@@ -42,5 +42,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @BindingAnnotation
-public @interface EntitiesTable {
+public @interface BindingsTable {
 }

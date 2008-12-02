@@ -29,25 +29,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.entities.dao;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.db.*;
+import com.google.inject.BindingAnnotation;
 
-import java.math.BigInteger;
+import java.lang.annotation.*;
 
 /**
  * @author Esko Luontola
- * @since 2.12.2008
+ * @since 13.9.2008
  */
-public class EntityDao
-        extends DatabaseTableWithMetadataAdapter<BigInteger, Blob, Blob, Blob>
-        implements DatabaseTableWithMetadata<BigInteger, Blob> {
-
-    @Inject
-    public EntityDao(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
-                     ConvertBigIntegerToBytes keys,
-                     NoConversion<Blob> values) {
-        super(parent, keys, values);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@BindingAnnotation
+public @interface EntitiesTable {
 }

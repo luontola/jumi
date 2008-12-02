@@ -29,18 +29,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+@ParametersAreNonnullByDefault package net.orfjackal.dimdwarf.entities.dao;
 
-import com.google.inject.BindingAnnotation;
-
-import java.lang.annotation.*;
-
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
-@BindingAnnotation
-public @interface BindingsTable {
-}
+import javax.annotation.ParametersAreNonnullByDefault;

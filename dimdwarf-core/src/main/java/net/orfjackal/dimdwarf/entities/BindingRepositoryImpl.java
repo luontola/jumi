@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.entities.dao.BindingDao;
 
 import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
