@@ -38,4 +38,6 @@ package net.orfjackal.dimdwarf.util;
 public interface Clock {
 
     long currentTimeMillis();
+
+    // TODO: implement ApplicationClock - https://sgs-server.dev.java.net/issues/show_bug.cgi?id=40
 }
