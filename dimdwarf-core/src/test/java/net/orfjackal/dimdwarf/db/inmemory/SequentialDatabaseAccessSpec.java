@@ -63,6 +63,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
         tx = new TransactionImpl(mock(Logger.class));
         db = dbms.openConnection(tx.getTransaction());
         table = db.openTable(TABLE);
+        
         key = Blob.fromBytes(new byte[]{1});
         value = Blob.fromBytes(new byte[]{2});
         otherValue = Blob.fromBytes(new byte[]{3});
