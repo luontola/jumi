@@ -34,20 +34,20 @@ package net.orfjackal.dimdwarf.entities;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.*;
 
-import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 2.12.2008
  */
-@Immutable
-public class EntityStorageImpl extends DatabaseTableAdapter<BigInteger, Object, BigInteger, Blob> implements EntityStorage {
+public class EntityDatabaseTable
+        extends DatabaseTableAdapterWithMetadata<BigInteger, Blob, Blob, Blob>
+        implements DatabaseTableWithMetadata<BigInteger, Blob> {
 
     @Inject
-    public EntityStorageImpl(EntityDatabaseTable entities,
-                             NoConversion<BigInteger> keys,
-                             ConvertEntityToBytes values) {
-        super(entities, keys, values);
+    public EntityDatabaseTable(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
+                               ConvertBigIntegerToBytes keys,
+                               NoConversion<Blob> values) {
+        super(parent, keys, values);
     }
 }

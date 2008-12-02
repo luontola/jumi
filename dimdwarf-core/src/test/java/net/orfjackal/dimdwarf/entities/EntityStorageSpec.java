@@ -61,7 +61,10 @@ public class EntityStorageSpec extends Specification<Object> {
     public void create() throws Exception {
         db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         serializer = mock(ObjectSerializer.class);
-        storage = new EntityStorageImpl(db, new ConvertBigIntegerToBytes(), new ConvertEntityToBytes(serializer));
+        storage = new EntityStorageImpl(
+                new EntityDatabaseTable(db, new ConvertBigIntegerToBytes(), new NoConversion<Blob>()),
+                new NoConversion<BigInteger>(),
+                new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();
         serialized = Blob.fromBytes(new byte[]{1, 2, 3});
     }
