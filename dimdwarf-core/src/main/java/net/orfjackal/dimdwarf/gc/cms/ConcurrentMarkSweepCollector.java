@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc.dijkstra1978;
+package net.orfjackal.dimdwarf.gc.cms;
 
 import net.orfjackal.dimdwarf.gc.*;
 
@@ -38,7 +38,7 @@ import java.util.*;
 
 /**
  * Uses the mark-sweep collector algorithm presented in <a href="http://portal.acm.org/citation.cfm?id=359642.359655">
- * On-the-fly garbage collection: an exercise in cooperation</a> (Dijkstra et al. 1977)
+ * On-the-fly garbage collection: an exercise in cooperation</a> (Dijkstra et al. 1978)
  *
  * @author Esko Luontola
  * @since 29.11.2008

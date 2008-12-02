@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc.dijkstra1978;
+package net.orfjackal.dimdwarf.gc.cms;
 
 /**
  * @author Esko Luontola
