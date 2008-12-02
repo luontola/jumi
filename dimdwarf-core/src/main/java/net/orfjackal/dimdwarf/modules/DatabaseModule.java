@@ -73,4 +73,18 @@ public class DatabaseModule extends AbstractModule {
             }
         };
     }
+
+    public static TypeLiteral<DatabaseTableWithMetadata<Blob, Blob>> databaseTableConnectionWithMetadata() {
+        return new TypeLiteral<DatabaseTableWithMetadata<Blob, Blob>>() {};
+    }
+
+    public static Provider<DatabaseTableWithMetadata<Blob, Blob>> databaseTableWithMetadata(final String name) {
+        return new Provider<DatabaseTableWithMetadata<Blob, Blob>>() {
+            @Inject public Provider<Database<Blob, Blob>> db;
+
+            public DatabaseTableWithMetadata<Blob, Blob> get() {
+                return new DatabaseTableWithMetadataImpl<Blob, Blob>(db.get(), name);
+            }
+        };
+    }
 }

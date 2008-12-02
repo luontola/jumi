@@ -59,9 +59,9 @@ public class EntityModule extends AbstractModule {
                 .toInstance(BigInteger.ZERO); // TODO: import from database
 
         bind(EntityStorage.class).to(EntityStorageImpl.class);
-        bind(databaseTableConnection())
+        bind(databaseTableConnectionWithMetadata())
                 .annotatedWith(EntitiesTable.class)
-                .toProvider(databaseTable("entities"));
+                .toProvider(databaseTableWithMetadata("entities"));
 
         bind(BindingStorage.class).to(BindingStorageImpl.class);
         bind(databaseTableConnection())

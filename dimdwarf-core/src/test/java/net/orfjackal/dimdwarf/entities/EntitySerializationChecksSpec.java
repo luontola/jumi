@@ -31,13 +31,9 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.ConvertBigIntegerToBytes;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.serial.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
@@ -55,13 +51,13 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
-    private DatabaseTable<Blob, Blob> db;
+    private DatabaseTableWithMetadata<Blob, Blob> db;
     private EntityStorageImpl storage;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
     public void create() throws Exception {
-        db = uncheckedCast(mock(DatabaseTable.class));
+        db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         SerializationListener[] listeners = {
                 new CheckDirectlyReferredEntitySerialized(),
                 new CheckInnerClassSerialized()

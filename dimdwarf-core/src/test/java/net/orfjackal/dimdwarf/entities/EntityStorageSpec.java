@@ -31,14 +31,10 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.db.ConvertBigIntegerToBytes;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
@@ -56,14 +52,14 @@ public class EntityStorageSpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
-    private DatabaseTable<Blob, Blob> db;
+    private DatabaseTableWithMetadata<Blob, Blob> db;
     private ObjectSerializer serializer;
     private EntityStorageImpl storage;
     private EntityObject entity;
     private Blob serialized;
 
     public void create() throws Exception {
-        db = uncheckedCast(mock(DatabaseTable.class));
+        db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         serializer = mock(ObjectSerializer.class);
         storage = new EntityStorageImpl(db, new ConvertBigIntegerToBytes(), new ConvertEntityToBytes(serializer));
         entity = new DummyEntity();
