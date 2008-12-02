@@ -58,6 +58,7 @@ public class EntityGraph implements Graph<BigInteger> {
         for (BigInteger id = entities.firstKey(); id != null; id = entities.nextKeyAfter(id)) {
             nodes.add(id);
         }
+        // TODO: return a dynamic iterator instead of building a complete list inside this method
         return nodes;
     }
 
@@ -69,6 +70,7 @@ public class EntityGraph implements Graph<BigInteger> {
                 nodes.add(id);
             }
         }
+        // TODO: return a dynamic iterator instead of building a complete list inside this method
         return nodes;
     }
 
