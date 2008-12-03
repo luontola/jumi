@@ -42,6 +42,7 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Esko Luontola
@@ -57,6 +58,8 @@ public class EntityGraphSpec extends Specification<Object> {
     private Provider<EntityInfo> info;
     private Provider<BindingRepository> bindings;
 
+    private BigInteger entityId;
+
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
                 new EntityModule(),
@@ -68,6 +71,17 @@ public class EntityGraphSpec extends Specification<Object> {
         bindings = injector.getProvider(BindingRepository.class);
 
         graph = injector.getProvider(EntityGraph.class);
+    }
+
+    private BigInteger createDummyEntity() {
+        final AtomicReference<BigInteger> entityId = new AtomicReference<BigInteger>();
+        taskContext.execute(new Runnable() {
+            public void run() {
+                DummyEntity e = new DummyEntity();
+                entityId.set(info.get().getEntityId(e));
+            }
+        });
+        return entityId.get();
     }
 
 
@@ -92,15 +106,8 @@ public class EntityGraphSpec extends Specification<Object> {
 
     public class WhenAnEntityIsCreated {
 
-        private BigInteger entityId;
-
         public void create() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    DummyEntity e = new DummyEntity();
-                    entityId = info.get().getEntityId(e);
-                }
-            });
+            entityId = createDummyEntity();
         }
 
         public void aNodeExists() {
@@ -118,11 +125,17 @@ public class EntityGraphSpec extends Specification<Object> {
                 }
             });
         }
+
+        public void itHasDefaultStatus() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getStatus(entityId), should.equal(0L));
+                }
+            });
+        }
     }
 
     public class WhenABindingIsCreated {
-
-        private BigInteger entityId;
 
         public void create() {
             taskContext.execute(new Runnable() {
@@ -150,7 +163,8 @@ public class EntityGraphSpec extends Specification<Object> {
             });
         }
 
-        public void entitiesNotVisibleInTheCurrentTransactionDoNotCauseAFailure() {
+        public void entitiesNotVisibleInTheCurrentTransactionDoNotCauseAFailureInBrowsingRootNodes() {
+            // TODO: fix the binding browsing so that unseen bindings to not show up
             final CountDownLatch bindingCreated = new CountDownLatch(1);
             final Runnable otherTransaction = new Runnable() {
                 public void run() {
@@ -177,8 +191,47 @@ public class EntityGraphSpec extends Specification<Object> {
         }
     }
 
+    public class WhenANodeIsRemovedFromTheGraph {
+
+        public void create() {
+            entityId = createDummyEntity();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getAllNodes(), should.containExactly(entityId));
+                    graph.get().removeNode(entityId);
+                }
+            });
+        }
+
+        public void theNodeDoesNotExistAnymore() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getAllNodes(), should.containExactly());
+                }
+            });
+        }
+    }
+
+    public class WhenTheStatusOfANodeIsSet {
+
+        public void create() {
+            entityId = createDummyEntity();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    graph.get().setStatus(entityId, 1L);
+                }
+            });
+        }
+
+        public void theNodeHasThatStatus() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getStatus(entityId), should.equal(1L));
+                }
+            });
+        }
+    }
+
     // TODO: browsing connected nodes
-    // TODO: removing nodes
-    // TODO: reading and updating status
     // TODO: create fakes of BindingRepository, EntityRepository and EntityInfo
 }

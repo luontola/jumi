@@ -32,10 +32,12 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.gc.Graph;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
@@ -79,12 +81,19 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public void removeNode(BigInteger node) {
+        entities.delete(node);
     }
 
     public long getStatus(BigInteger node) {
-        return 0;
+        Blob status = entities.readMetadata(node, "gc-status");
+        if (status.length() == 0) {
+            return 0L;
+        }
+        return status.getByteBuffer().asLongBuffer().get();
     }
 
     public void setStatus(BigInteger node, long status) {
+        ByteBuffer buf = (ByteBuffer) ByteBuffer.allocate(8).putLong(status).flip();
+        entities.updateMetadata(node, "gc-status", Blob.fromByteBuffer(buf));
     }
 }
