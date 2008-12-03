@@ -48,12 +48,12 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable<RevisionHan
     private final RevisionMap<Blob, Blob> revisions = new RevisionMap<Blob, Blob>();
     private final GroupLock<Blob> keysLockedForCommit = new GroupLock<Blob>();
 
-    public Blob firstKey() {
-        return revisions.firstKey();
+    public Blob firstKey(RevisionHandle handle) {
+        return revisions.firstKey(handle.getReadRevision());
     }
 
-    public Blob nextKeyAfter(Blob currentKey) {
-        return revisions.nextKeyAfter(currentKey);
+    public Blob nextKeyAfter(Blob currentKey, RevisionHandle handle) {
+        return revisions.nextKeyAfter(currentKey, handle.getReadRevision());
     }
 
     public Blob get(Blob key, RevisionHandle handle) {

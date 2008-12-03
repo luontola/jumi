@@ -59,9 +59,6 @@ public class RecoverableSetSpec extends Specification<Object> {
 
     private RecoverableSet<StoredValue> set;
 
-    private StoredValue value1 = new StoredValue("1");
-    private StoredValue value2 = new StoredValue("2");
-
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
                 new EntityModule(),
@@ -100,6 +97,8 @@ public class RecoverableSetSpec extends Specification<Object> {
 
     public class WhenARecoverableSetContainsSomeObjects {
 
+        private StoredValue value1 = new StoredValue("1");
+        private StoredValue value2 = new StoredValue("2");
         private String key1;
         private String key2;
 
@@ -151,7 +150,7 @@ public class RecoverableSetSpec extends Specification<Object> {
         public void duplicateAddsAreIgnored() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    set.put(value1);
+                    set.put(set.get(key1));
                     specify(set.getAll(), should.containExactly(value1, value2));
                 }
             });
@@ -187,6 +186,10 @@ public class RecoverableSetSpec extends Specification<Object> {
                 return value.equals(other.value);
             }
             return false;
+        }
+
+        public String toString() {
+            return getClass().getSimpleName() + "[" + value + "]";
         }
     }
 }

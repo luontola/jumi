@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.db.common;
 
-import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.Blob;
 
 import javax.annotation.*;
 import java.util.Map;
@@ -40,7 +40,13 @@ import java.util.Map;
  * @author Esko Luontola
  * @since 18.11.2008
  */
-public interface PersistedDatabaseTable<H> extends IterableKeys<Blob> {
+public interface PersistedDatabaseTable<H> {
+
+    @Nullable
+    Blob firstKey(H handle);
+
+    @Nullable
+    Blob nextKeyAfter(Blob currentKey, H handle);
 
     @Nullable
     Blob get(Blob key, H handle);

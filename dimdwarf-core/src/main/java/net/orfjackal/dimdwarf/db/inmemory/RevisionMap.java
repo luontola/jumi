@@ -54,24 +54,6 @@ public class RevisionMap<K, V> {
     private final Set<K> hasOldRevisions = new HashSet<K>();
     private final Object writeLock = new Object();
 
-    @Nullable
-    public K firstKey(long readRevision) {
-        K key = SortedMapUtil.firstKey(map);
-        if (key != null && !exists(key, readRevision)) {
-            key = nextKeyAfter(key, readRevision);
-        }
-        return key;
-    }
-
-    @Nullable
-    public K nextKeyAfter(K currentKey, long readRevision) {
-        K next = currentKey;
-        do {
-            next = SortedMapUtil.nextKeyAfter(next, map);
-        } while (next != null && !exists(next, readRevision));
-        return next;
-    }
-
     public boolean exists(K key, long readRevision) {
         RevisionList<V> revs = map.get(key);
         return revs != null && revs.get(readRevision) != null;
@@ -104,6 +86,24 @@ public class RevisionMap<K, V> {
 
     public void remove(K key, long writeRevision) {
         put(key, null, writeRevision);
+    }
+
+    @Nullable
+    public K firstKey(long readRevision) {
+        K first = SortedMapUtil.firstKey(map);
+        if (first != null && !exists(first, readRevision)) {
+            first = nextKeyAfter(first, readRevision);
+        }
+        return first;
+    }
+
+    @Nullable
+    public K nextKeyAfter(K currentKey, long readRevision) {
+        K next = currentKey;
+        do {
+            next = SortedMapUtil.nextKeyAfter(next, map);
+        } while (next != null && !exists(next, readRevision));
+        return next;
     }
 
     public long getLatestRevisionForKey(K key) {

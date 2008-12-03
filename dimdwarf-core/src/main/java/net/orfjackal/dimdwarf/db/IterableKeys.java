@@ -48,7 +48,6 @@ public interface IterableKeys<K> {
 
     /**
      * Returns the next key after {@code currentKey} in the map, or null if the end of the map is reached.
-     * The key given as a parameter does not need to exist.
      */
     @Nullable
     K nextKeyAfter(K currentKey);

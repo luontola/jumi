@@ -32,12 +32,13 @@
 package net.orfjackal.dimdwarf.db.common;
 
 import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.inmemory.SortedMapUtil;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
-import javax.annotation.Nonnull;
+import javax.annotation.*;
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.SortedMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @author Esko Luontola
@@ -46,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ThreadSafe
 public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
 
-    private final Map<Blob, Blob> updates = new ConcurrentHashMap<Blob, Blob>();
+    private final SortedMap<Blob, Blob> updates = new ConcurrentSkipListMap<Blob, Blob>();
     private final PersistedDatabaseTable<H> dbTable;
     private final H dbHandle;
     private final Transaction tx;
@@ -85,16 +86,41 @@ public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
         updates.put(key, Blob.EMPTY_BLOB);
     }
 
-    // TODO: 'firstKey' and 'nextKeyAfter' do not see keys which were created during this transaction
-
     public Blob firstKey() {
         tx.mustBeActive();
-        return dbTable.firstKey();
+        Blob key1 = SortedMapUtil.firstKey(updates);
+        Blob key2 = dbTable.firstKey(dbHandle);
+        Blob first = min(key1, key2);
+        if (first != null && !exists(first)) {
+            first = nextKeyAfter(first);
+        }
+        return first;
     }
 
     public Blob nextKeyAfter(Blob currentKey) {
         tx.mustBeActive();
-        return dbTable.nextKeyAfter(currentKey);
+        Blob next = currentKey;
+        do {
+            Blob key1 = SortedMapUtil.nextKeyAfter(next, updates);
+            Blob key2 = dbTable.nextKeyAfter(next, dbHandle);
+            next = min(key1, key2);
+        } while (next != null && !exists(next));
+        return next;
+    }
+
+    @Nullable
+    private static <T extends Comparable<T>> T min(@Nullable T a, @Nullable T b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        if (a.compareTo(b) < 0) {
+            return a;
+        } else {
+            return b;
+        }
     }
 
     public void prepare() {
