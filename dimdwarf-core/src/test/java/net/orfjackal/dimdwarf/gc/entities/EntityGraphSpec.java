@@ -216,13 +216,13 @@ public class EntityGraphSpec extends Specification<Object> {
             });
         }
 
-//        public void thatNodeIsConnectedToTheOtherNodes() {
-//            taskContext.execute(new Runnable() {
-//                public void run() {
-//                    specify(graph.get().getConnectedNodesOf(entityId1), should.containExactly(entityId2));
-//                }
-//            });
-//        }
+        public void thatNodeIsConnectedToTheOtherNodes() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getConnectedNodesOf(entityId1), should.containExactly(entityId2));
+                }
+            });
+        }
     }
 
     public class WhenANodeIsRemovedFromTheGraph {
@@ -266,6 +266,5 @@ public class EntityGraphSpec extends Specification<Object> {
         }
     }
 
-    // TODO: browsing connected nodes
     // TODO: create fakes of BindingRepository, EntityRepository and EntityInfo
 }
