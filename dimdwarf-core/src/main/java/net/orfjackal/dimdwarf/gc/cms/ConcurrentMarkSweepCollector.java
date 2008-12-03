@@ -45,6 +45,8 @@ import java.util.*;
  */
 public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
 
+    private static final String COLOR_KEY = "cms-color";
+
     private final Graph<T> graph;
 
     public ConcurrentMarkSweepCollector(Graph<T> graph) {
@@ -74,11 +76,16 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
     }
 
     public Color getColor(T node) {
-        return Color.fromStatus(graph.getStatus(node));
+        byte[] value = graph.getMetadata(node, COLOR_KEY);
+        if (value.length == 0) {
+            return Color.WHITE;
+        }
+        return Color.parseIndex(value[0]);
     }
 
     private void setColor(T node, Color color) {
-        graph.setStatus(node, color.toStatus());
+        byte[] value = {(byte) color.getIndex()};
+        graph.setMetadata(node, COLOR_KEY, value);
     }
 
 

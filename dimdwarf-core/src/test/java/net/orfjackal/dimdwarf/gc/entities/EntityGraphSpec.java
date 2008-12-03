@@ -139,10 +139,10 @@ public class EntityGraphSpec extends Specification<Object> {
             });
         }
 
-        public void itHasDefaultStatus() {
+        public void itHasNoMetadata() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(graph.get().getStatus(entityId), should.equal(0L));
+                    specify(graph.get().getMetadata(entityId, "metadata"), should.containInOrder(new byte[0]));
                 }
             });
         }
@@ -286,21 +286,21 @@ public class EntityGraphSpec extends Specification<Object> {
         }
     }
 
-    public class WhenTheStatusOfANodeIsSet {
+    public class WhenANodeHasSomeMetadata {
 
         public void create() {
             entityId = createDummyEntity();
             taskContext.execute(new Runnable() {
                 public void run() {
-                    graph.get().setStatus(entityId, 1L);
+                    graph.get().setMetadata(entityId, "metadata", new byte[]{0x01});
                 }
             });
         }
 
-        public void theNodeHasThatStatus() {
+        public void theNodeHasThatMetadata() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(graph.get().getStatus(entityId), should.equal(1L));
+                    specify(graph.get().getMetadata(entityId, "metadata"), should.containInOrder(new byte[]{0x01}));
                 }
             });
         }

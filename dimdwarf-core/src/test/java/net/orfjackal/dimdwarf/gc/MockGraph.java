@@ -85,12 +85,13 @@ public class MockGraph implements Graph<String> {
         }
     }
 
-    public long getStatus(String node) {
-        return getNode(node).status;
+    public byte[] getMetadata(String node, String metaKey) {
+        byte[] bytes = getNode(node).metadata.get(metaKey);
+        return bytes != null ? bytes.clone() : new byte[0];
     }
 
-    public void setStatus(String node, long status) {
-        getNode(node).status = status;
+    public void setMetadata(String node, String metaKey, byte[] metaValue) {
+        getNode(node).metadata.put(metaKey, metaValue.clone());
     }
 
     private MockNode getNode(@Nullable String node) {
@@ -116,8 +117,8 @@ public class MockGraph implements Graph<String> {
         return Objects.uncheckedCast(listeners.getListeners(MutatorListener.class));
     }
 
-    private class MockNode {
-        public long status = NULL_STATUS;
+    private static class MockNode {
+        public final Map<String, byte[]> metadata = new ConcurrentHashMap<String, byte[]>();
         public final List<String> edges = new CopyOnWriteArrayList<String>();
     }
 }

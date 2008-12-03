@@ -36,24 +36,24 @@ package net.orfjackal.dimdwarf.gc.cms;
  * @since 29.11.2008
  */
 public enum Color {
-    WHITE(0L), GRAY(1L), BLACK(2L);
+    WHITE(0), GRAY(1), BLACK(2);
 
-    private final long status;
+    private final int index;
 
-    Color(long status) {
-        this.status = status;
+    Color(int index) {
+        this.index = index;
     }
 
-    public long toStatus() {
-        return status;
+    public long getIndex() {
+        return index;
     }
 
-    public static Color fromStatus(long status) {
+    public static Color parseIndex(int index) {
         for (Color color : values()) {
-            if (color.status == status) {
+            if (color.index == index) {
                 return color;
             }
         }
-        throw new IllegalArgumentException("No such status: " + status);
+        throw new IllegalArgumentException("Invalid index: " + index);
     }
 }

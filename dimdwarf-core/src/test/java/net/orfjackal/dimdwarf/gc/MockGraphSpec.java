@@ -196,25 +196,31 @@ public class MockGraphSpec extends Specification<Object> {
         }
     }
 
-    public class WhenTheStatusOfANodeIsSet {
+    public class WhenTheMetadataOfANodeIsSet {
+        private byte[] value = {0x01};
+        private byte[] nullValue = {};
 
         public void create() {
             graph.createNode("A");
             graph.createNode("B");
-            graph.setStatus("A", 1L);
+            graph.setMetadata("A", "status", value);
         }
 
-        public void itHasThatStatus() {
-            specify(graph.getStatus("A"), should.equal(1L));
+        public void itHasThatMetadata() {
+            specify(graph.getMetadata("A", "status"), should.containInOrder(value));
         }
 
-        public void theStatusOfOtherNodesIsUnaffected() {
-            specify(graph.getStatus("B"), should.equal(Graph.NULL_STATUS));
+        public void anyOtherMetadataItMayHaveIsUnaffected() {
+            specify(graph.getMetadata("A", "foobar"), should.containInOrder(nullValue));
         }
 
-        public void afterNodeRemovalTheStatusIsRemoved() {
+        public void theMetadataOfOtherNodesIsUnaffected() {
+            specify(graph.getMetadata("B", "status"), should.containInOrder(nullValue));
+        }
+
+        public void afterNodeRemovalTheMetadataIsRemoved() {
             graph.removeNode("A");
-            specify(graph.getStatus("A"), should.equal(Graph.NULL_STATUS));
+            specify(graph.getMetadata("A", "status"), should.containInOrder(nullValue));
         }
     }
 }

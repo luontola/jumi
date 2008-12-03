@@ -37,8 +37,6 @@ package net.orfjackal.dimdwarf.gc;
  */
 public interface Graph<T> {
 
-    long NULL_STATUS = 0L;
-
     Iterable<T> getAllNodes();
 
     Iterable<T> getRootNodes();
@@ -47,7 +45,7 @@ public interface Graph<T> {
 
     void removeNode(T node);
 
-    long getStatus(T node);
+    byte[] getMetadata(T node, String metaKey);
 
-    void setStatus(T node, long status);
+    void setMetadata(T node, String metaKey, byte[] metaValue);
 }

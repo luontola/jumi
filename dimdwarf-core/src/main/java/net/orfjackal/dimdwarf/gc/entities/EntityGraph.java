@@ -40,7 +40,6 @@ import net.orfjackal.dimdwarf.serial.*;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -91,18 +90,12 @@ public class EntityGraph implements Graph<BigInteger> {
         entities.delete(node);
     }
 
-    // TODO: give direct access to metadata, allow any keys and bytes
-    public long getStatus(BigInteger node) {
-        Blob status = entities.readMetadata(node, "gc-status");
-        if (status.length() == 0) {
-            return 0L;
-        }
-        return status.getByteBuffer().asLongBuffer().get();
+    public byte[] getMetadata(BigInteger node, String metaKey) {
+        return entities.readMetadata(node, metaKey).getByteArray();
     }
 
-    public void setStatus(BigInteger node, long status) {
-        ByteBuffer buf = (ByteBuffer) ByteBuffer.allocate(8).putLong(status).flip();
-        entities.updateMetadata(node, "gc-status", Blob.fromByteBuffer(buf));
+    public void setMetadata(BigInteger node, String metaKey, byte[] metaValue) {
+        entities.updateMetadata(node, metaKey, Blob.fromBytes(metaValue));
     }
 
 
