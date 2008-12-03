@@ -31,8 +31,6 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.IterableKeys;
-
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
@@ -50,11 +48,34 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * @since 20.8.2008
  */
 @ThreadSafe
-public class RevisionMap<K, V> implements IterableKeys<K> {
+public class RevisionMap<K, V> {
 
     private final SortedMap<K, RevisionList<V>> map = new ConcurrentSkipListMap<K, RevisionList<V>>();
     private final Set<K> hasOldRevisions = new HashSet<K>();
     private final Object writeLock = new Object();
+
+    @Nullable
+    public K firstKey(long readRevision) {
+        K key = SortedMapUtil.firstKey(map);
+        if (key != null && !exists(key, readRevision)) {
+            key = nextKeyAfter(key, readRevision);
+        }
+        return key;
+    }
+
+    @Nullable
+    public K nextKeyAfter(K currentKey, long readRevision) {
+        K next = currentKey;
+        do {
+            next = SortedMapUtil.nextKeyAfter(next, map);
+        } while (next != null && !exists(next, readRevision));
+        return next;
+    }
+
+    public boolean exists(K key, long readRevision) {
+        RevisionList<V> revs = map.get(key);
+        return revs != null && revs.get(readRevision) != null;
+    }
 
     @Nullable
     public V get(K key, long readRevision) {
@@ -116,19 +137,6 @@ public class RevisionMap<K, V> implements IterableKeys<K> {
 
     public int size() {
         return map.size();
-    }
-
-    public K firstKey() {
-        return map.isEmpty() ? null : map.firstKey();
-    }
-
-    public K nextKeyAfter(K currentKey) {
-        Iterator<K> it = map.tailMap(currentKey).keySet().iterator();
-        K next;
-        do {
-            next = it.hasNext() ? it.next() : null;
-        } while (next != null && next.equals(currentKey));
-        return next;
     }
 
     public String toString() {

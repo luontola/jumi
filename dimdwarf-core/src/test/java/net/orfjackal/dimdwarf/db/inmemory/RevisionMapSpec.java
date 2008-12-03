@@ -92,15 +92,33 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void theValueExistsOnCurrentRevision() {
+            specify(map.exists("key", afterAdd));
             specify(map.get("key", afterAdd), should.equal("value"));
         }
 
         public void theValueExistsOnFutureRevisions() {
+            specify(map.exists("key", afterAdd + 1));
             specify(map.get("key", afterAdd + 1), should.equal("value"));
         }
 
         public void theValueDoesNotExistOnPreviousRevisions() {
+            specify(!map.exists("key", beforeAdd));
             specify(map.get("key", beforeAdd), should.equal(null));
+        }
+
+        public void theKeyExistsOnCurrentRevision() {
+            specify(map.firstKey(afterAdd), should.equal("key"));
+            specify(map.nextKeyAfter("a", afterAdd), should.equal("key"));
+        }
+
+        public void theKeyExistsOnFutureRevisions() {
+            specify(map.firstKey(afterAdd + 1), should.equal("key"));
+            specify(map.nextKeyAfter("a", afterAdd + 1), should.equal("key"));
+        }
+
+        public void theKeyDoesNotExistOnPreviousRevisions() {
+            specify(map.firstKey(beforeAdd), should.equal(null));
+            specify(map.nextKeyAfter("a", beforeAdd), should.equal(null));
         }
 
         public void theOnlyRevisionOfAValueCanNotBePurged() {
@@ -184,11 +202,23 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void theValueDoesNotExistInTheCurrentRevision() {
+            specify(!map.exists("key", afterRemove));
             specify(map.get("key", afterRemove), should.equal(null));
         }
 
         public void theValueStillExistsInThePreviousRevision() {
+            specify(map.exists("key", beforeRemove));
             specify(map.get("key", beforeRemove), should.equal("value"));
+        }
+
+        public void theKeyDoesNotExistInTheCurrentRevision() {
+            specify(map.firstKey(afterRemove), should.equal(null));
+            specify(map.nextKeyAfter("a", afterRemove), should.equal(null));
+        }
+
+        public void theKeyStillExistsInThePreviousRevision() {
+            specify(map.firstKey(beforeRemove), should.equal("key"));
+            specify(map.nextKeyAfter("a", beforeRemove), should.equal("key"));
         }
 
         public void theWholeEntryCanBePurged() {
@@ -211,28 +241,28 @@ public class RevisionMapSpec extends Specification<Object> {
         }
 
         public void firstKey() {
-            specify(map.firstKey(), should.equal("a"));
+            specify(map.firstKey(writeRevision), should.equal("a"));
         }
 
         public void firstKeyOfEmptySet() {
             map = new RevisionMap<String, String>();
-            specify(map.firstKey(), should.equal(null));
+            specify(map.firstKey(writeRevision), should.equal(null));
         }
 
         public void nextKeyAfterExistingKey() {
-            specify(map.nextKeyAfter("a"), should.equal("c"));
+            specify(map.nextKeyAfter("a", writeRevision), should.equal("c"));
         }
 
         public void nextKeyAfterNonexistentKey() {
-            specify(map.nextKeyAfter("b"), should.equal("c"));
+            specify(map.nextKeyAfter("b", writeRevision), should.equal("c"));
         }
 
         public void nextKeyAfterLastKey() {
-            specify(map.nextKeyAfter("c"), should.equal(null));
+            specify(map.nextKeyAfter("c", writeRevision), should.equal(null));
         }
 
         public void nextKeyAfterNonexistentKeyAfterLastKey() {
-            specify(map.nextKeyAfter("d"), should.equal(null));
+            specify(map.nextKeyAfter("d", writeRevision), should.equal(null));
         }
     }
 }
