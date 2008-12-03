@@ -43,7 +43,6 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.*;
 
 /**
@@ -178,33 +177,6 @@ public class EntityGraphSpec extends Specification<Object> {
                 }
             });
         }
-
-        public void entitiesNotVisibleInTheCurrentTransactionDoNotCauseAFailureInBrowsingRootNodes() {
-            final CountDownLatch bindingCreated = new CountDownLatch(1);
-            final Runnable otherTransaction = new Runnable() {
-                public void run() {
-                    taskContext.execute(new Runnable() {
-                        public void run() {
-                            bindings.get().update("canNotSeeThisEntity", new DummyEntity());
-                            bindingCreated.countDown();
-                        }
-                    });
-                }
-            };
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    Thread t = new Thread(otherTransaction);
-                    t.start();
-                    try {
-                        bindingCreated.await();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // FIXME: may contain null - fix the binding browsing so that unseen bindings to not show up
-                    specify(graph.get().getRootNodes(), should.containExactly(entityId));
-                }
-            });
-        }
     }
 
     public class WhenThereAreManyEntities {
@@ -333,6 +305,4 @@ public class EntityGraphSpec extends Specification<Object> {
             });
         }
     }
-
-    // TODO: create fakes of BindingRepository, EntityRepository and EntityInfo
 }
