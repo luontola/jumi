@@ -59,36 +59,19 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public Iterable<BigInteger> getAllNodes() {
-        // TODO: return a dynamic iterator instead of building a complete list inside this method
-//        return new Iterable<BigInteger>() {
-//            public Iterator<BigInteger> iterator() {
-//                return new AllNodesIterator(entities);
-//            }
-//        };
-
-        ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
-        for (BigInteger id = entities.firstKey(); id != null; id = entities.nextKeyAfter(id)) {
-            nodes.add(id);
-        }
-        return nodes;
+        return new Iterable<BigInteger>() {
+            public Iterator<BigInteger> iterator() {
+                return new AllNodesIterator(entities);
+            }
+        };
     }
 
     public Iterable<BigInteger> getRootNodes() {
-        // TODO: return a dynamic iterator instead of building a complete list inside this method
-//        return new Iterable<BigInteger>() {
-//            public Iterator<BigInteger> iterator() {
-//                return new RootNodesIterator(bindings);
-//            }
-//        };
-
-        ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
-        for (String binding = bindings.firstKey(); binding != null; binding = bindings.nextKeyAfter(binding)) {
-            BigInteger id = bindings.read(binding);
-            if (id != null) {
-                nodes.add(id);
+        return new Iterable<BigInteger>() {
+            public Iterator<BigInteger> iterator() {
+                return new RootNodesIterator(bindings);
             }
-        }
-        return nodes;
+        };
     }
 
     public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {

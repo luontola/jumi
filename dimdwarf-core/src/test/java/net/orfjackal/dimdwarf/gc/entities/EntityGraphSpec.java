@@ -38,11 +38,13 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.util.Objects;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.*;
 
 /**
  * @author Esko Luontola
@@ -79,6 +81,18 @@ public class EntityGraphSpec extends Specification<Object> {
             public void run() {
                 DummyEntity e = new DummyEntity();
                 entityId.set(info.get().getEntityId(e));
+            }
+        });
+        return entityId.get();
+    }
+
+    private BigInteger createBoundDummyEntity(final String binding) {
+        final AtomicReference<BigInteger> entityId = new AtomicReference<BigInteger>();
+        taskContext.execute(new Runnable() {
+            public void run() {
+                DummyEntity e = new DummyEntity();
+                entityId.set(info.get().getEntityId(e));
+                bindings.get().update(binding, e);
             }
         });
         return entityId.get();
@@ -146,13 +160,7 @@ public class EntityGraphSpec extends Specification<Object> {
     public class WhenThereIsABindingToTheEntity {
 
         public void create() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    DummyEntity e = new DummyEntity();
-                    entityId = info.get().getEntityId(e);
-                    bindings.get().update("binding", e);
-                }
-            });
+            entityId = createBoundDummyEntity("binding");
         }
 
         public void aNodeExists() {
@@ -201,10 +209,62 @@ public class EntityGraphSpec extends Specification<Object> {
 
     public class WhenThereAreManyEntities {
 
+        private BigInteger entityId1;
+        private BigInteger entityId2;
+        private BigInteger entityId3;
+
         public void create() {
-            // TODO
+            entityId1 = createBoundDummyEntity("binding1");
+            entityId2 = createBoundDummyEntity("binding2");
+            entityId3 = createDummyEntity();
         }
 
+        public void iteratingAllNodesCanBeDividedToTasks() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    setIterator(graph.get().getAllNodes().iterator());
+                }
+            });
+            specify(iterateInSeparateTasks(), should.containExactly(entityId1, entityId2, entityId3));
+        }
+
+        public void iteratingRootNodesCanBeDividedToTasks() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    setIterator(graph.get().getRootNodes().iterator());
+                }
+            });
+            specify(iterateInSeparateTasks(), should.containExactly(entityId1, entityId2));
+        }
+
+        private List<BigInteger> iterateInSeparateTasks() {
+            final AtomicBoolean hasNext = new AtomicBoolean();
+            final List<BigInteger> nodes = new ArrayList<BigInteger>();
+            do {
+                taskContext.execute(new Runnable() {
+                    public void run() {
+                        Iterator<BigInteger> it = getIterator();
+                        hasNext.set(it.hasNext());
+                        if (it.hasNext()) {
+                            nodes.add(it.next());
+                        }
+                    }
+                });
+            } while (hasNext.get());
+            return nodes;
+        }
+
+        private Iterator<BigInteger> getIterator() {
+            return Objects.uncheckedCast(getHolder().getOther());
+        }
+
+        private void setIterator(Iterator<BigInteger> iter) {
+            getHolder().setOther(iter);
+        }
+
+        private DummyEntity getHolder() {
+            return (DummyEntity) bindings.get().read("binding1");
+        }
     }
 
     public class WhenTheEntityHasReferencesToOtherEntities {
