@@ -172,7 +172,6 @@ public class EntityGraphSpec extends Specification<Object> {
         }
 
         public void entitiesNotVisibleInTheCurrentTransactionDoNotCauseAFailureInBrowsingRootNodes() {
-            // TODO: fix the binding browsing so that unseen bindings to not show up
             final CountDownLatch bindingCreated = new CountDownLatch(1);
             final Runnable otherTransaction = new Runnable() {
                 public void run() {
@@ -193,10 +192,19 @@ public class EntityGraphSpec extends Specification<Object> {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+                    // FIXME: may contain null - fix the binding browsing so that unseen bindings to not show up
                     specify(graph.get().getRootNodes(), should.containExactly(entityId));
                 }
             });
         }
+    }
+
+    public class WhenThereAreManyEntities {
+
+        public void create() {
+            // TODO
+        }
+
     }
 
     public class WhenTheEntityHasReferencesToOtherEntities {

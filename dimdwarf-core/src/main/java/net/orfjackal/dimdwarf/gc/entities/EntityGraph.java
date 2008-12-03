@@ -33,11 +33,12 @@ package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.gc.Graph;
 import net.orfjackal.dimdwarf.serial.*;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -58,15 +59,28 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public Iterable<BigInteger> getAllNodes() {
+        // TODO: return a dynamic iterator instead of building a complete list inside this method
+//        return new Iterable<BigInteger>() {
+//            public Iterator<BigInteger> iterator() {
+//                return new AllNodesIterator(entities);
+//            }
+//        };
+
         ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
         for (BigInteger id = entities.firstKey(); id != null; id = entities.nextKeyAfter(id)) {
             nodes.add(id);
         }
-        // TODO: return a dynamic iterator instead of building a complete list inside this method
         return nodes;
     }
 
     public Iterable<BigInteger> getRootNodes() {
+        // TODO: return a dynamic iterator instead of building a complete list inside this method
+//        return new Iterable<BigInteger>() {
+//            public Iterator<BigInteger> iterator() {
+//                return new RootNodesIterator(bindings);
+//            }
+//        };
+
         ArrayList<BigInteger> nodes = new ArrayList<BigInteger>();
         for (String binding = bindings.firstKey(); binding != null; binding = bindings.nextKeyAfter(binding)) {
             BigInteger id = bindings.read(binding);
@@ -74,7 +88,6 @@ public class EntityGraph implements Graph<BigInteger> {
                 nodes.add(id);
             }
         }
-        // TODO: return a dynamic iterator instead of building a complete list inside this method
         return nodes;
     }
 
@@ -95,6 +108,7 @@ public class EntityGraph implements Graph<BigInteger> {
         entities.delete(node);
     }
 
+    // TODO: give direct access to metadata, allow any keys and bytes
     public long getStatus(BigInteger node) {
         Blob status = entities.readMetadata(node, "gc-status");
         if (status.length() == 0) {
@@ -108,7 +122,65 @@ public class EntityGraph implements Graph<BigInteger> {
         entities.updateMetadata(node, "gc-status", Blob.fromByteBuffer(buf));
     }
 
-    // TODO: give direct access to metadata, allow any keys and bytes
+
+    private static class AllNodesIterator implements Iterator<BigInteger>, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final DatabaseKeyIterator<BigInteger> iterator;
+
+        public AllNodesIterator(EntityDao entities) {
+            iterator = new DatabaseKeyIterator<BigInteger>(entities.firstKey());
+            setEntityDao(entities);
+        }
+
+        @Inject
+        public void setEntityDao(EntityDao entities) {
+            iterator.setTable(entities);
+        }
+
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        public BigInteger next() {
+            return iterator.next();
+        }
+
+        public void remove() {
+            iterator.remove();
+        }
+    }
+
+    private static class RootNodesIterator implements Iterator<BigInteger>, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final DatabaseKeyIterator<String> iterator;
+        private transient BindingDao bindings;
+
+        public RootNodesIterator(BindingDao bindings) {
+            iterator = new DatabaseKeyIterator<String>(bindings.firstKey());
+            setBindingDao(bindings);
+        }
+
+        @Inject
+        public void setBindingDao(BindingDao bindings) {
+            this.bindings = bindings;
+            iterator.setTable(bindings);
+        }
+
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        public BigInteger next() {
+            String binding = iterator.next();
+            return bindings.read(binding);
+        }
+
+        public void remove() {
+            iterator.remove();
+        }
+    }
 
     private static class EntityReferenceListener extends SerializationAdapter {
 
