@@ -104,7 +104,7 @@ public class EntityGraphSpec extends Specification<Object> {
         }
     }
 
-    public class WhenAnEntityIsCreated {
+    public class WhenThereIsAnEntity {
 
         public void create() {
             entityId = createDummyEntity();
@@ -133,9 +133,17 @@ public class EntityGraphSpec extends Specification<Object> {
                 }
             });
         }
+
+        public void itHasNoConnectedNodes() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(graph.get().getConnectedNodesOf(entityId), should.containExactly());
+                }
+            });
+        }
     }
 
-    public class WhenABindingIsCreated {
+    public class WhenThereIsABindingToTheEntity {
 
         public void create() {
             taskContext.execute(new Runnable() {
@@ -189,6 +197,32 @@ public class EntityGraphSpec extends Specification<Object> {
                 }
             });
         }
+    }
+
+    public class WhenTheEntityHasReferencesToOtherEntities {
+
+        private BigInteger entityId1;
+        private BigInteger entityId2;
+
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity e1 = new DummyEntity();
+                    DummyEntity e2 = new DummyEntity();
+                    e1.setOther(e2);
+                    entityId1 = info.get().getEntityId(e1);
+                    entityId2 = info.get().getEntityId(e2);
+                }
+            });
+        }
+
+//        public void thatNodeIsConnectedToTheOtherNodes() {
+//            taskContext.execute(new Runnable() {
+//                public void run() {
+//                    specify(graph.get().getConnectedNodesOf(entityId1), should.containExactly(entityId2));
+//                }
+//            });
+//        }
     }
 
     public class WhenANodeIsRemovedFromTheGraph {

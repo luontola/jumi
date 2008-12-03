@@ -77,7 +77,7 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {
-        return null;
+        return new ArrayList<BigInteger>();
     }
 
     public void removeNode(BigInteger node) {
@@ -96,4 +96,6 @@ public class EntityGraph implements Graph<BigInteger> {
         ByteBuffer buf = (ByteBuffer) ByteBuffer.allocate(8).putLong(status).flip();
         entities.updateMetadata(node, "gc-status", Blob.fromByteBuffer(buf));
     }
+
+    // TODO: give direct access to metadata, allow any keys and bytes
 }
