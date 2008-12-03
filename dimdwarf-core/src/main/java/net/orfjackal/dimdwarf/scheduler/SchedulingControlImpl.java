@@ -45,6 +45,12 @@ import java.util.concurrent.TimeUnit;
 public class SchedulingControlImpl implements EntityObject, Serializable, SchedulingControl {
     private static final long serialVersionUID = 1L;
 
+    // TODO: Change SchedulingControl to be the top-level object, so that the bindings in TaskSchedulerImpl point to it.
+    // This should avoid the need to create new entities on every run.
+    // Have implementations of AbstractScheduledTask be contained inside SchedulingControl.
+    // Rename ScheduledTask to Run - one run instance of a series of scheduled runs. Make it a value object.
+    // Rename SchedulingControl to ScheduledTask.
+
     private ScheduledTask currentTask;
     private boolean done = false;
     private boolean cancelled = false;
