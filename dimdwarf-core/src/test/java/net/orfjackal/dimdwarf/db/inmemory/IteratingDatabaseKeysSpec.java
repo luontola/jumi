@@ -53,22 +53,16 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
     private DatabaseTable<Blob, Blob> table;
     private Logger txLogger;
 
-    private Blob key1;
-    private Blob key2;
-    private Blob key3;
-    private Blob key4;
-    private Blob value;
+    private Blob key1 = Blob.fromBytes(new byte[]{1});
+    private Blob key2 = Blob.fromBytes(new byte[]{2});
+    private Blob key3 = Blob.fromBytes(new byte[]{3});
+    private Blob key4 = Blob.fromBytes(new byte[]{4});
+    private Blob value = Blob.fromBytes(new byte[]{42});
 
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
         beginNewTransaction();
-
-        key1 = Blob.fromBytes(new byte[]{1});
-        key2 = Blob.fromBytes(new byte[]{2});
-        key3 = Blob.fromBytes(new byte[]{3});
-        key4 = Blob.fromBytes(new byte[]{4});
-        value = Blob.fromBytes(new byte[]{42});
     }
 
     private void beginNewTransaction() {

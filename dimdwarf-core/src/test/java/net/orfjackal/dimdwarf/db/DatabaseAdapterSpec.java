@@ -54,8 +54,8 @@ public class DatabaseAdapterSpec extends Specification<Object> {
     private Database<String, BigInteger> dbAdapter;
     private DatabaseTable<String, BigInteger> tableAdapter;
 
-    private String key;
-    private BigInteger value;
+    private String key = "key";
+    private BigInteger value = BigInteger.TEN;
     private Blob keyBytes;
     private Blob valueBytes;
 
@@ -64,8 +64,6 @@ public class DatabaseAdapterSpec extends Specification<Object> {
         table = uncheckedCast(mock(DatabaseTable.class));
         dbAdapter = new DatabaseAdapter<String, BigInteger, Blob, Blob>(db, new ConvertStringToBytes(), new ConvertBigIntegerToBytes());
 
-        key = "key";
-        value = BigInteger.TEN;
         keyBytes = Blob.fromBytes(key.getBytes("UTF-8"));
         valueBytes = new ConvertBigIntegerToBytes().forth(value);
     }

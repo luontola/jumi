@@ -56,24 +56,18 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     private DatabaseTable<Blob, Blob> table2;
     private Logger txLogger;
 
-    private Blob key;
-    private Blob value1;
-    private Blob value2;
-    private Blob value3;
+    private Blob key = Blob.fromBytes(new byte[]{0});
+    private Blob value1 = Blob.fromBytes(new byte[]{1});
+    private Blob value2 = Blob.fromBytes(new byte[]{2});
+    private Blob value3 = Blob.fromBytes(new byte[]{3});
 
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
-
         txLogger = mock(Logger.class);
         tx = new TransactionImpl(txLogger);
         db = dbms.openConnection(tx.getTransaction());
         table1 = db.openTable(TABLE1);
         table2 = db.openTable(TABLE2);
-
-        key = Blob.fromBytes(new byte[]{0});
-        value1 = Blob.fromBytes(new byte[]{1});
-        value2 = Blob.fromBytes(new byte[]{2});
-        value3 = Blob.fromBytes(new byte[]{3});
     }
 
     private Blob readInNewTransaction(String table, Blob key) {
