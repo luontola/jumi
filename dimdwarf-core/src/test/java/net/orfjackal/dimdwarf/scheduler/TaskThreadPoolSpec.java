@@ -294,7 +294,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
     public class WhenThePoolIsShutDown {
 
-        public void create() throws InterruptedException {
+        public void create() {
             checking(theShutdownIsLogged());
             pool.shutdown();
             taskQueue.add(new SimpleTaskBootstrap(new Runnable() {
@@ -302,7 +302,6 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                     specify(false);
                 }
             }));
-            Thread.yield(); // TODO: figure out a more reliable thread synchronization method than sleeping
         }
 
         @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -314,7 +313,8 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             }};
         }
 
-        public void noMoreTasksAreTakenFromTheQueue() {
+        public void noMoreTasksAreTakenFromTheQueue() throws InterruptedException {
+            Thread.sleep(10);
             specify(taskQueue.size(), should.equal(1));
         }
     }

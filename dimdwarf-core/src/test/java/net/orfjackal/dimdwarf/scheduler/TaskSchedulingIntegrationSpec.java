@@ -146,7 +146,7 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
         public void afterShuttingDownItIsNoMoreExecuted() throws InterruptedException {
             shutdownTheServer();
             spy.executions.clear();
-            Thread.sleep(10); // TODO: figure out a more reliable thread synchronization method than sleeping
+            Thread.sleep(10);
             specify(spy.executions, should.containExactly());
         }
 
