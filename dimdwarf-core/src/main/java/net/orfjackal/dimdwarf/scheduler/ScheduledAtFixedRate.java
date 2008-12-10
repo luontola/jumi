@@ -42,18 +42,18 @@ public class ScheduledAtFixedRate extends AbstractSchedulingStrategy {
 
     private final long period;
 
-    public static SchedulingStrategy create(Runnable task, long initialDelay, long period, SchedulingControl control, Clock clock) {
+    public static SchedulingStrategy create(long initialDelay, long period, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledAtFixedRate(task, scheduledTime, period, control, clock);
+        return new ScheduledAtFixedRate(scheduledTime, period, clock);
     }
 
-    private ScheduledAtFixedRate(Runnable task, long scheduledTime, long period, SchedulingControl control, Clock clock) {
-        super(task, scheduledTime, control, clock);
+    private ScheduledAtFixedRate(long scheduledTime, long period, Clock clock) {
+        super(scheduledTime, clock);
         this.period = period;
     }
 
     public SchedulingStrategy nextRepeatedRun() {
         long nextScheduledTime = getScheduledTime() + period;
-        return new ScheduledAtFixedRate(getTask(), nextScheduledTime, period, getControl(), getClock());
+        return new ScheduledAtFixedRate(nextScheduledTime, period, getClock());
     }
 }

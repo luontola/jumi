@@ -42,18 +42,18 @@ public class ScheduledWithFixedDelay extends AbstractSchedulingStrategy {
 
     private final long delay;
 
-    public static SchedulingStrategy create(Runnable task, long initialDelay, long delay, SchedulingControl control, Clock clock) {
+    public static SchedulingStrategy create(long initialDelay, long delay, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledWithFixedDelay(task, scheduledTime, delay, control, clock);
+        return new ScheduledWithFixedDelay(scheduledTime, delay, clock);
     }
 
-    private ScheduledWithFixedDelay(Runnable task, long scheduledTime, long delay, SchedulingControl control, Clock clock) {
-        super(task, scheduledTime, control, clock);
+    private ScheduledWithFixedDelay(long scheduledTime, long delay, Clock clock) {
+        super(scheduledTime, clock);
         this.delay = delay;
     }
 
     public SchedulingStrategy nextRepeatedRun() {
         long nextScheduledTime = getClock().currentTimeMillis() + delay;
-        return new ScheduledWithFixedDelay(getTask(), nextScheduledTime, delay, getControl(), getClock());
+        return new ScheduledWithFixedDelay(nextScheduledTime, delay, getClock());
     }
 }

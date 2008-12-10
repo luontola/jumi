@@ -47,26 +47,17 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractSchedulingStrategy implements EntityObject, Serializable, SchedulingStrategy {
     private static final long serialVersionUID = 1L;
 
-    private final Runnable task;
     private final long scheduledTime;
-    private final SchedulingControl control;
     private transient Clock clock;
 
-    protected AbstractSchedulingStrategy(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
-        this.task = task;
+    protected AbstractSchedulingStrategy(long scheduledTime, Clock clock) {
         this.scheduledTime = scheduledTime;
-        this.control = control;
         this.clock = clock;
-        control.setCurrentTask(this);
     }
 
     @Inject
     public void setClock(Clock clock) {
         this.clock = clock;
-    }
-
-    public Runnable getTask() {
-        return task;
     }
 
     public long getScheduledTime() {
@@ -75,18 +66,6 @@ public abstract class AbstractSchedulingStrategy implements EntityObject, Serial
 
     public long getDelay(TimeUnit unit) {
         return unit.convert(scheduledTime - clock.currentTimeMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    public boolean isDone() {
-        return control.isDone();
-    }
-
-    public boolean isCancelled() {
-        return control.isCancelled();
-    }
-
-    protected SchedulingControl getControl() {
-        return control;
     }
 
     protected Clock getClock() {

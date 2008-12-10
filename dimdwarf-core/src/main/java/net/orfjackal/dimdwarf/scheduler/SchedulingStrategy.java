@@ -43,13 +43,7 @@ public interface SchedulingStrategy {
     @CheckForNull
     SchedulingStrategy nextRepeatedRun();
 
-    Runnable getTask();
-
     long getScheduledTime();
 
     long getDelay(TimeUnit unit);
-
-    boolean isDone();
-
-    boolean isCancelled();
 }

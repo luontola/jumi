@@ -40,17 +40,16 @@ import net.orfjackal.dimdwarf.util.Clock;
 public class ScheduledOneTimeRun extends AbstractSchedulingStrategy {
     private static final long serialVersionUID = 1L;
 
-    public static SchedulingStrategy create(Runnable task, long initialDelay, SchedulingControl control, Clock clock) {
+    public static SchedulingStrategy create(long initialDelay, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledOneTimeRun(task, scheduledTime, control, clock);
+        return new ScheduledOneTimeRun(scheduledTime, clock);
     }
 
-    private ScheduledOneTimeRun(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
-        super(task, scheduledTime, control, clock);
+    private ScheduledOneTimeRun(long scheduledTime, Clock clock) {
+        super(scheduledTime, clock);
     }
 
     public SchedulingStrategy nextRepeatedRun() {
-        getControl().setDone();
         return null;
     }
 }

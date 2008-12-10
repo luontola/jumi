@@ -39,15 +39,19 @@ import java.util.concurrent.TimeUnit;
  */
 public interface SchedulingControl {
 
-    void setCurrentTask(SchedulingStrategy currentTask);
-
     long getDelay(TimeUnit unit);
 
     boolean isDone();
 
     boolean isCancelled();
 
-    void setDone();
-
     void setCancelled();
+
+    long getScheduledTime();
+
+    Runnable getTask();
+
+    void beginNewRun();
+
+    boolean willRepeatAfterCurrentRun();
 }
