@@ -32,64 +32,46 @@
 package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.events.SystemLifecycleListener;
-import org.slf4j.*;
+import static net.orfjackal.dimdwarf.server.ServerLifecycleManager.State.STARTED;
 
-import javax.annotation.concurrent.NotThreadSafe;
+import java.util.*;
+import java.util.logging.*;
 
 /**
  * @author Esko Luontola
- * @since 28.11.2008
+ * @since 10.12.2008
  */
-@Singleton
-@NotThreadSafe
-public class ServerLifecycleManager {
-    private static final Logger logger = LoggerFactory.getLogger(ServerLifecycleManager.class);
+public class TestServer {
 
-    private final SystemLifecycleListener[] listeners;
-    private State state = State.NOT_STARTED;
+    private final Injector injector;
+    private final ServerLifecycleManager server;
+    private final List<Logger> logsToReset = new ArrayList<Logger>();
 
-    @Inject
-    public ServerLifecycleManager(SystemLifecycleListener[] listeners) {
-        this.listeners = listeners;
+    public TestServer(Module... modules) {
+        injector = Guice.createInjector(modules);
+        server = injector.getInstance(ServerLifecycleManager.class);
     }
 
-    public State getState() {
-        return state;
+    public Injector getInjector() {
+        return injector;
+    }
+
+    public void changeLoggingLevel(Class<?> clazz, Level level) {
+        Logger logger = Logger.getLogger(clazz.getName());
+        logger.setLevel(level);
+        logsToReset.add(logger);
     }
 
     public void start() {
-        assert state.equals(State.NOT_STARTED) : "was " + state;
-        state = State.STARTED;
-
-        logger.info("Startup sequence initiated...");
-        for (SystemLifecycleListener listener : listeners) {
-            try {
-                listener.onStartup();
-            } catch (Throwable t) {
-                logger.error("Exception during startup sequence", t);
-                throw new RuntimeException(t);
-            }
-        }
-        logger.info("Started up.");
+        server.start();
     }
 
-    public void shutdown() {
-        assert state.equals(State.STARTED) : "was " + state;
-        state = State.SHUT_DOWN;
-
-        logger.info("Shutdown sequence initiated...");
-        for (SystemLifecycleListener listener : listeners) { // TODO: send shutdown events in reverse order?
-            try {
-                listener.onShutdown();
-            } catch (Throwable t) {
-                logger.error("Exception during shutdown sequence", t);
-            }
+    public void shutdownIfRunning() {
+        if (server.getState().equals(STARTED)) {
+            server.shutdown();
         }
-        logger.info("Shutting down.");
-    }
-
-    public enum State {
-        NOT_STARTED, STARTED, SHUT_DOWN
+        for (Logger logger : logsToReset) {
+            logger.setLevel(Level.ALL);
+        }
     }
 }

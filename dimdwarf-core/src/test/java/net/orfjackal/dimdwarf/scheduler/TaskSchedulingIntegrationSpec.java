@@ -38,13 +38,13 @@ import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
 import net.orfjackal.dimdwarf.modules.CommonModules;
-import net.orfjackal.dimdwarf.server.ServerLifecycleManager;
+import net.orfjackal.dimdwarf.server.*;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 /**
  * @author Esko Luontola
@@ -58,43 +58,30 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
     private TaskExecutor taskContext;
     private Provider<TaskScheduler> scheduler;
     private TestSpy spy;
-    private Logger[] hideLifecycleInfoLogs;
-
-    private Provider<ServerLifecycleManager> server;
+    private TestServer server;
 
     public void create() throws Exception {
-        hideLifecycleInfoLogs = new Logger[]{
-                Logger.getLogger(ServerLifecycleManager.class.getName()),
-                Logger.getLogger(TaskThreadPool.class.getName()),
-        };
-        for (Logger logger : hideLifecycleInfoLogs) {
-            logger.setLevel(Level.WARNING);
-        }
-
         startupTheServer(new CommonModules());
     }
 
     public void destroy() throws Exception {
         shutdownTheServer();
-
-        for (Logger logger : hideLifecycleInfoLogs) {
-            logger.setLevel(Level.ALL);
-        }
     }
 
     private void startupTheServer(Module... modules) {
-        injector = Guice.createInjector(modules);
+        server = new TestServer(modules);
+        server.changeLoggingLevel(ServerLifecycleManager.class, Level.WARNING);
+        server.changeLoggingLevel(TaskThreadPool.class, Level.WARNING);
+        server.start();
 
-        server = injector.getProvider(ServerLifecycleManager.class);
-        server.get().start();
-
+        injector = server.getInjector();
         taskContext = injector.getInstance(TaskExecutor.class);
         scheduler = injector.getProvider(TaskScheduler.class);
         spy = injector.getInstance(TestSpy.class);
     }
 
     private void shutdownTheServer() {
-        server.get().shutdown();
+        server.shutdownIfRunning();
     }
 
     private void restartTheServer() {
