@@ -53,7 +53,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
     private final BlockingQueue<ScheduledTaskHolder> scheduledTasks = new DelayQueue<ScheduledTaskHolder>();
-    private final RecoverableSet<SchedulingControl> persistedTasks;
+    private final RecoverableSet<ScheduledTask> persistedTasks;
 
     private final Provider<Transaction> tx;
     private final Clock clock;
@@ -74,9 +74,9 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     private void recoverTasksFromDatabase() {
         taskContext.execute(new Runnable() {
             public void run() {
-                for (SchedulingControl control : persistedTasks.getAll()) {
-                    String binding = persistedTasks.put(control);
-                    long scheduledTime = control.getScheduledTime();
+                for (ScheduledTask st : persistedTasks.getAll()) {
+                    String binding = persistedTasks.put(st);
+                    long scheduledTime = st.getScheduledTime();
                     scheduledTasks.add(new ScheduledTaskHolder(binding, scheduledTime));
                 }
             }
@@ -89,33 +89,36 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
         delay = unit.toMillis(delay);
-        SchedulingControl control = new SchedulingControlImpl(task, ScheduledOneTimeRun.create(delay, clock));
-        addToExecutionQueue(control);
-        return new SchedulingFuture(control);
+        ScheduledTask st = new ScheduledTaskImpl(task, ScheduledOneTimeRun.create(delay, clock));
+        addToExecutionQueue(st);
+        return new SchedulingFuture(st);
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         period = unit.toMillis(period);
-        SchedulingControl control = new SchedulingControlImpl(task, ScheduledAtFixedRate.create(initialDelay, period, clock));
-        addToExecutionQueue(control);
-        return new SchedulingFuture(control);
+        ScheduledTask st = new ScheduledTaskImpl(task, ScheduledAtFixedRate.create(initialDelay, period, clock));
+        addToExecutionQueue(st);
+        return new SchedulingFuture(st);
     }
 
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
         initialDelay = unit.toMillis(initialDelay);
         delay = unit.toMillis(delay);
-        SchedulingControl control = new SchedulingControlImpl(task, ScheduledWithFixedDelay.create(initialDelay, delay, clock));
-        addToExecutionQueue(control);
-        return new SchedulingFuture(control);
+        ScheduledTask st = new ScheduledTaskImpl(task, ScheduledWithFixedDelay.create(initialDelay, delay, clock));
+        addToExecutionQueue(st);
+        return new SchedulingFuture(st);
     }
 
-    private void addToExecutionQueue(SchedulingControl control) {
-        enqueueOnCommit(saveToDatabase(control));
+    private void addToExecutionQueue(ScheduledTask st) {
+        ScheduledTaskHolder h = saveToDatabase(st);
+        enqueueOnCommit(h);
     }
 
-    private ScheduledTaskHolder saveToDatabase(SchedulingControl control) {
-        return new ScheduledTaskHolder(persistedTasks.put(control), control.getScheduledTime());
+    private ScheduledTaskHolder saveToDatabase(ScheduledTask st) {
+        String binding = persistedTasks.put(st);
+        long scheduledTime = st.getScheduledTime();
+        return new ScheduledTaskHolder(binding, scheduledTime);
     }
 
     private void enqueueOnCommit(final ScheduledTaskHolder holder) {
@@ -143,18 +146,18 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     @Nullable
     private Runnable getTaskInsideTransaction0(ScheduledTaskHolder holder) {
         cancelTakeOnRollback(holder);
-        SchedulingControl control = takeFromDatabase(holder);
-        if (control.isDone()) {
+        ScheduledTask task = takeFromDatabase(holder);
+        if (task.isDone()) {
             return null;
         }
-        control.beginNewRun();
-        if (control.willRepeatAfterCurrentRun()) {
-            addToExecutionQueue(control);
+        Runnable run = task.startScheduledRun();
+        if (!task.isDone()) {
+            addToExecutionQueue(task);
         }
-        return control.getTask();
+        return run;
     }
 
-    private SchedulingControl takeFromDatabase(ScheduledTaskHolder holder) {
+    private ScheduledTask takeFromDatabase(ScheduledTaskHolder holder) {
         return persistedTasks.remove(holder.getBinding());
     }
 

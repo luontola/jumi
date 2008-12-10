@@ -31,64 +31,23 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-
-import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
- * @since 25.11.2008
+ * @since 26.11.2008
  */
-@Entity
-public class SchedulingControlImpl implements EntityObject, Serializable, SchedulingControl {
-    private static final long serialVersionUID = 1L;
+public interface ScheduledTask {
 
-    // TODO: Change SchedulingControl to be the top-level object, so that the bindings in TaskSchedulerImpl point to it.
-    // This should avoid the need to create new entities on every run.
-    // Have implementations of AbstractScheduledTask be contained inside SchedulingControl.
-    // Rename ScheduledTask to Run - one run instance of a series of scheduled runs. Make it a value object.
-    // Rename SchedulingControl to ScheduledTask.
+    Runnable startScheduledRun();
 
-    private final Runnable task;
-    private SchedulingStrategy nextRun;
-    private boolean cancelled = false;
+    long getScheduledTime();
 
-    public SchedulingControlImpl(Runnable task, SchedulingStrategy nextRun) {
-        this.task = task;
-        this.nextRun = nextRun;
-    }
+    long getDelay(TimeUnit unit);
 
-    public long getDelay(TimeUnit unit) {
-        return nextRun.getDelay(unit);
-    }
+    boolean isDone();
 
-    public boolean isDone() {
-        return nextRun == null || cancelled;
-    }
+    boolean isCancelled();
 
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    public void setCancelled() {
-        cancelled = true;
-    }
-
-    public long getScheduledTime() {
-        return nextRun.getScheduledTime();
-    }
-
-    public Runnable getTask() {
-        return task;
-    }
-
-    public void beginNewRun() {
-        nextRun = nextRun.nextRepeatedRun();
-    }
-
-    public boolean willRepeatAfterCurrentRun() {
-        return nextRun != null;
-    }
+    void setCancelled();
 }

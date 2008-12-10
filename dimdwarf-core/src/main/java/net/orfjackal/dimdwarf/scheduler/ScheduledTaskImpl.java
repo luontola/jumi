@@ -31,27 +31,53 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
- * @since 26.11.2008
+ * @since 25.11.2008
  */
-public interface SchedulingControl {
+@Entity
+public class ScheduledTaskImpl implements EntityObject, Serializable, ScheduledTask {
+    private static final long serialVersionUID = 1L;
 
-    long getDelay(TimeUnit unit);
+    private final Runnable task;
+    private SchedulingStrategy nextRun;
+    private boolean cancelled = false;
 
-    boolean isDone();
+    public ScheduledTaskImpl(Runnable task, SchedulingStrategy nextRun) {
+        this.task = task;
+        this.nextRun = nextRun;
+    }
 
-    boolean isCancelled();
+    public Runnable startScheduledRun() {
+        assert !isCancelled();
+        assert !isDone();
+        nextRun = nextRun.nextRepeatedRun();
+        return task;
+    }
 
-    void setCancelled();
+    public long getScheduledTime() {
+        return nextRun.getScheduledTime();
+    }
 
-    long getScheduledTime();
+    public long getDelay(TimeUnit unit) {
+        return nextRun.getDelay(unit);
+    }
 
-    Runnable getTask();
+    public boolean isDone() {
+        return nextRun == null || cancelled;
+    }
 
-    void beginNewRun();
+    public boolean isCancelled() {
+        return cancelled;
+    }
 
-    boolean willRepeatAfterCurrentRun();
+    public void setCancelled() {
+        cancelled = true;
+    }
 }

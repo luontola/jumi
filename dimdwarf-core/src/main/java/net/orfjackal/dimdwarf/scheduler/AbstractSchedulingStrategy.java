@@ -32,8 +32,6 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.util.Clock;
 
 import java.io.Serializable;
@@ -43,8 +41,7 @@ import java.util.concurrent.TimeUnit;
  * @author Esko Luontola
  * @since 24.11.2008
  */
-@Entity
-public abstract class AbstractSchedulingStrategy implements EntityObject, Serializable, SchedulingStrategy {
+public abstract class AbstractSchedulingStrategy implements Serializable, SchedulingStrategy {
     private static final long serialVersionUID = 1L;
 
     private final long scheduledTime;

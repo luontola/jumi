@@ -43,14 +43,14 @@ import java.util.concurrent.*;
 public class SchedulingFuture implements ScheduledFuture<Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final SchedulingControl control;
+    private final ScheduledTask task;
 
-    public SchedulingFuture(SchedulingControl control) {
-        this.control = control;
+    public SchedulingFuture(ScheduledTask task) {
+        this.task = task;
     }
 
     public long getDelay(TimeUnit unit) {
-        return control.getDelay(unit);
+        return task.getDelay(unit);
     }
 
     public int compareTo(Delayed other) {
@@ -60,16 +60,16 @@ public class SchedulingFuture implements ScheduledFuture<Object>, Serializable {
     }
 
     public boolean cancel(boolean mayInterruptIfRunning) {
-        control.setCancelled();
+        task.setCancelled();
         return true;
     }
 
     public boolean isCancelled() {
-        return control.isCancelled();
+        return task.isCancelled();
     }
 
     public boolean isDone() {
-        return control.isDone();
+        return task.isDone();
     }
 
     public Object get() throws InterruptedException, ExecutionException {
