@@ -53,7 +53,8 @@ public class CmsCollectorManager implements GarbageCollectorManager {
     private final Provider<ConcurrentMarkSweepCollector<BigInteger>> cms;
     private final Provider<TaskScheduler> scheduler;
     private final TaskExecutor taskContext;
-    private final Lock lock = new ReentrantLock();
+
+    private final Lock lock = new ReentrantLock(true);
     private final Condition collectionFinished = lock.newCondition();
 
     @Inject
