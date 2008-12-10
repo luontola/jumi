@@ -38,13 +38,12 @@ import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
 import net.orfjackal.dimdwarf.modules.CommonModules;
-import net.orfjackal.dimdwarf.server.*;
+import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
 
 /**
  * @author Esko Luontola
@@ -70,8 +69,7 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
     private void startupTheServer(Module... modules) {
         server = new TestServer(modules);
-        server.changeLoggingLevel(ServerLifecycleManager.class, Level.WARNING);
-        server.changeLoggingLevel(TaskThreadPool.class, Level.WARNING);
+        server.hideStartupShutdownLogs();
         server.start();
 
         injector = server.getInjector();

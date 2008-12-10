@@ -32,6 +32,7 @@
 package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.*;
+import net.orfjackal.dimdwarf.scheduler.TaskThreadPool;
 import static net.orfjackal.dimdwarf.server.ServerLifecycleManager.State.STARTED;
 
 import java.util.*;
@@ -54,6 +55,11 @@ public class TestServer {
 
     public Injector getInjector() {
         return injector;
+    }
+
+    public void hideStartupShutdownLogs() {
+        changeLoggingLevel(ServerLifecycleManager.class, Level.WARNING);
+        changeLoggingLevel(TaskThreadPool.class, Level.WARNING);
     }
 
     public void changeLoggingLevel(Class<?> clazz, Level level) {

@@ -36,15 +36,13 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.modules.CommonModules;
-import net.orfjackal.dimdwarf.scheduler.TaskThreadPool;
-import net.orfjackal.dimdwarf.server.*;
+import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
 
 /**
  * @author Esko Luontola
@@ -61,8 +59,7 @@ public class IncrementalTaskSpec extends Specification<Object> {
 
     public void create() throws Exception {
         server = new TestServer(new CommonModules());
-        server.changeLoggingLevel(ServerLifecycleManager.class, Level.WARNING);
-        server.changeLoggingLevel(TaskThreadPool.class, Level.WARNING);
+        server.hideStartupShutdownLogs();
         server.start();
 
         Injector injector = server.getInjector();
