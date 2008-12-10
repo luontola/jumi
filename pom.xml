@@ -237,6 +237,10 @@
                             <name>jdave.tools.specdox.dir</name>
                             <value>target/jdave</value>
                         </property>
+                        <property>
+                            <name>sun.io.serialization.extendedDebugInfo</name>
+                            <value>true</value>
+                        </property>
                     </systemProperties>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
