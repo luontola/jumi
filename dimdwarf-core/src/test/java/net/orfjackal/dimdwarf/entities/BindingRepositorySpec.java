@@ -36,6 +36,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.entities.dao.*;
+import net.orfjackal.dimdwarf.entities.tref.EntityInfoImpl;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
@@ -87,7 +88,9 @@ public class BindingRepositorySpec extends Specification<Object> {
                                 new ConvertStringToBytes(),
                                 new ConvertBigIntegerToBytes()),
                         new NoConversion<String>(),
-                        new ConvertEntityToEntityId(entityManager));
+                        new ConvertEntityToEntityId(
+                                entityManager,
+                                new EntityInfoImpl(entityManager)));
     }
 
     private void endTask() {

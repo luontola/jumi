@@ -53,10 +53,12 @@ public class EntityIntegrationSpec extends Specification<Object> {
 
     private Injector injector;
     private TaskExecutor taskExecutor;
+    private Provider<BindingRepository> bindings;
 
     public void create() throws Exception {
         injector = Guice.createInjector(new CommonModules());
         taskExecutor = injector.getInstance(TaskExecutor.class);
+        bindings = injector.getProvider(BindingRepository.class);
     }
 
 
@@ -102,16 +104,14 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void entityBindingsCreatedInOneTaskCanBeReadInTheNextTask() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
-                    bindings.update("bar", new DummyEntity("foo"));
+                    bindings.get().update("bar", new DummyEntity("foo"));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
-                    specify(bindings.firstKey(), should.equal("bar"));
-                    specify(bindings.nextKeyAfter("bar"), should.equal(null));
-                    DummyEntity entity = (DummyEntity) bindings.read("bar");
+                    specify(bindings.get().firstKey(), should.equal("bar"));
+                    specify(bindings.get().nextKeyAfter("bar"), should.equal(null));
+                    DummyEntity entity = (DummyEntity) bindings.get().read("bar");
                     specify(entity.getOther(), should.equal("foo"));
                 }
             });
@@ -120,14 +120,12 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void transparentReferencesAreCreatedAutomatically() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
-                    bindings.update("foo", new DummyEntity(new DummyEntity("other")));
+                    bindings.get().update("foo", new DummyEntity(new DummyEntity("other")));
                 }
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    BindingRepository bindings = injector.getInstance(BindingRepository.class);
-                    DummyEntity entity = (DummyEntity) bindings.read("foo");
+                    DummyEntity entity = (DummyEntity) bindings.get().read("foo");
                     DummyInterface other = (DummyInterface) entity.getOther();
                     specify(other.getOther(), should.equal("other"));
                     specify(Entities.isEntity(entity));
@@ -147,6 +145,34 @@ public class EntityIntegrationSpec extends Specification<Object> {
 
                     DummyEntity loaded = (DummyEntity) manager.getEntityById(ref.getEntityId());
                     specify(loaded, should.equal(entity));
+                }
+            });
+        }
+    }
+
+    public class BindingRepositoryBugfix {
+
+        public void bindingsCanBeCreatedForTransparentReferenceProxies() {
+            // TODO: move this test to a better place, maybe the tests of the future EntityBindings in public API
+            // (the bug was in ConvertEntityToEntityId - it used EntityManager.getEntityId instead of EntityInfo.getEntityId
+            // - check that the new tests will notice that bug)
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    bindings.get().update("root", new DummyEntity(new DummyEntity("x")));
+                }
+            });
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    DummyEntity root = (DummyEntity) bindings.get().read("root");
+                    DummyInterface tref = (DummyInterface) root.getOther();
+                    specify(Entities.isTransparentReference(tref));
+                    bindings.get().update("tref", tref);
+                }
+            });
+            taskExecutor.execute(new Runnable() {
+                public void run() {
+                    DummyEntity e = (DummyEntity) bindings.get().read("tref");
+                    specify(e.getOther(), should.equal("x"));
                 }
             });
         }
