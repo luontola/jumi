@@ -37,6 +37,7 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.gc.Graph;
 import net.orfjackal.dimdwarf.serial.*;
+import net.orfjackal.dimdwarf.util.SerializableIterable;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -83,7 +84,7 @@ public class EntityGraph implements Graph<BigInteger> {
                 new SerializationListener[]{listener},
                 new SerializationReplacer[0]
         ).deserialize(entity);
-        return listener.getReferences();
+        return new SerializableIterable<BigInteger>(listener.getReferences());
     }
 
     public void removeNode(BigInteger node) {
@@ -170,7 +171,7 @@ public class EntityGraph implements Graph<BigInteger> {
         }
 
         public List<BigInteger> getReferences() {
-            return Collections.unmodifiableList(references);
+            return new ArrayList<BigInteger>(references);
         }
     }
 }
