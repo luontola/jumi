@@ -37,6 +37,7 @@ import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.concurrent.locks.*;
@@ -46,51 +47,45 @@ import java.util.concurrent.locks.*;
  * @since 10.12.2008
  */
 @Singleton
+@ThreadSafe
 public class CmsCollectorManager implements GarbageCollectorManager {
-
-    private static final int STEPS_PER_TASK = 10;
 
     private final Provider<ConcurrentMarkSweepCollector<BigInteger>> cms;
     private final Provider<TaskScheduler> scheduler;
     private final TaskExecutor taskContext;
     private final Lock lock = new ReentrantLock();
-    private final Condition gcFinished = lock.newCondition();
+    private final Condition collectionFinished = lock.newCondition();
 
     @Inject
     public CmsCollectorManager(Provider<ConcurrentMarkSweepCollector<BigInteger>> cms,
                                Provider<TaskScheduler> scheduler,
                                TaskExecutor taskContext) {
         this.cms = cms;
-        this.taskContext = taskContext;
         this.scheduler = scheduler;
+        this.taskContext = taskContext;
     }
 
     public void runGarbageCollector() throws InterruptedException {
-        // XXX: MultiStepIncrementalTask is needed because running the collector generates more garbage than it uses.
-        // A better solution would be to avoid using the TaskScheduler, because each scheduled task creates at least one new entity.
-
         lock.lock();
         try {
             taskContext.execute(new Runnable() {
                 public void run() {
                     scheduler.get().submit(
                             new IncrementalTaskRunner(
-                                    new MultiStepIncrementalTask(
-                                            new IncrementalTaskSequence(cms.get().getCollectorStagesToExecute()),
-                                            STEPS_PER_TASK),
+                                    new IncrementalTaskSequence(cms.get().getCollectorStagesToExecute()),
                                     new OnCollectionFinished()));
                 }
             });
-            gcFinished.await();
+            collectionFinished.await();
         } finally {
             lock.unlock();
         }
     }
 
-    private void notifyCollectionFinished() {
+    private void signalCollectionFinished() {
         lock.lock();
         try {
-            gcFinished.signal();
+            collectionFinished.signal();
         } finally {
             lock.unlock();
         }
@@ -102,7 +97,7 @@ public class CmsCollectorManager implements GarbageCollectorManager {
         @Inject public transient CmsCollectorManager manager;
 
         public void run() {
-            manager.notifyCollectionFinished();
+            manager.signalCollectionFinished();
         }
     }
 }

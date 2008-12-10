@@ -47,7 +47,9 @@ import java.util.*;
  * @since 29.11.2008
  */
 public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
+    private static final int MAX_NODES_TO_REMOVE_PER_TASK = 100;
     private static final String COLOR_KEY = "cms-color";
 
     private final Graph<T> graph;
@@ -61,8 +63,9 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
         return Arrays.asList(
                 new MarkAllRootNodesGray(graph.getRootNodes().iterator()),
                 new MarkReachableNodesBlack(graph.getRootNodes().iterator()),
-                new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(graph.getAllNodes().iterator())
-        );
+                new MultiStepIncrementalTask(
+                        new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(graph.getAllNodes().iterator()),
+                        MAX_NODES_TO_REMOVE_PER_TASK));
     }
 
     public MutatorListener<T> getMutatorListener() {
@@ -94,6 +97,8 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
 
 
     private class MarkAllRootNodesGray implements IncrementalTask, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final Iterator<T> rootNodes;
 
         public MarkAllRootNodesGray(Iterator<T> rootNodes) {
@@ -113,6 +118,8 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     }
 
     private class MarkReachableNodesBlack implements IncrementalTask, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final Iterator<T> nodes;
 
         public MarkReachableNodesBlack(Iterator<T> nodes) {
@@ -156,6 +163,8 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     }
 
     private class RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite implements IncrementalTask, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final Iterator<T> nodes;
 
         public RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(Iterator<T> nodes) {
