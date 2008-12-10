@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.scheduler;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +47,7 @@ public class ScheduledTaskImpl implements EntityObject, Serializable, ScheduledT
     private static final long serialVersionUID = 1L;
 
     private final Runnable task;
-    private SchedulingStrategy nextRun;
+    @Nullable private SchedulingStrategy nextRun;
     private boolean cancelled = false;
 
     public ScheduledTaskImpl(Runnable task, SchedulingStrategy nextRun) {
@@ -70,7 +71,7 @@ public class ScheduledTaskImpl implements EntityObject, Serializable, ScheduledT
     }
 
     public boolean isDone() {
-        return nextRun == null || cancelled;
+        return nextRun == null || isCancelled();
     }
 
     public boolean isCancelled() {

@@ -31,6 +31,7 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
+import javax.annotation.CheckReturnValue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ScheduledTask {
 
+    @CheckReturnValue
     Runnable startScheduledRun();
 
     long getScheduledTime();
