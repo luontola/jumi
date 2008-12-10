@@ -31,24 +31,28 @@
 
 package net.orfjackal.dimdwarf.gc.cms;
 
+import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.gc.*;
 
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.*;
 
 /**
- * Uses the mark-sweep collector algorithm presented in <a href="http://portal.acm.org/citation.cfm?id=359642.359655">
- * On-the-fly garbage collection: an exercise in cooperation</a> (Dijkstra et al. 1978)
+ * Uses a variation of the mark-sweep collector algorithm presented in
+ * <a href="http://portal.acm.org/citation.cfm?id=359642.359655">On-the-fly garbage collection: an exercise in
+ * cooperation</a> (Dijkstra et al. 1978)
  *
  * @author Esko Luontola
  * @since 29.11.2008
  */
-public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
+public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Serializable {
 
     private static final String COLOR_KEY = "cms-color";
 
     private final Graph<T> graph;
 
+    @Inject
     public ConcurrentMarkSweepCollector(Graph<T> graph) {
         this.graph = graph;
     }
@@ -78,7 +82,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
     public Color getColor(T node) {
         byte[] value = graph.getMetadata(node, COLOR_KEY);
         if (value.length == 0) {
-            return Color.WHITE;
+            return Color.WHITE; // TODO: introduce 'undefined' - equals black or white depending on the CMS stage
         }
         return Color.parseIndex(value[0]);
     }
@@ -89,7 +93,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
     }
 
 
-    private class MarkAllRootNodesGray implements IncrementalTask {
+    private class MarkAllRootNodesGray implements IncrementalTask, Serializable {
         private final Iterator<T> rootNodes;
 
         public MarkAllRootNodesGray(Iterator<T> rootNodes) {
@@ -108,7 +112,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
         }
     }
 
-    private class MarkReachableNodesBlack implements IncrementalTask {
+    private class MarkReachableNodesBlack implements IncrementalTask, Serializable {
         private final Iterator<T> nodes;
 
         public MarkReachableNodesBlack(Iterator<T> nodes) {
@@ -151,7 +155,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T> {
         }
     }
 
-    private class RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite implements IncrementalTask {
+    private class RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite implements IncrementalTask, Serializable {
         private final Iterator<T> nodes;
 
         public RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(Iterator<T> nodes) {
