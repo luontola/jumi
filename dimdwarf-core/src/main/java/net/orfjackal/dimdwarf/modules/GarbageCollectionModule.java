@@ -47,7 +47,7 @@ public class GarbageCollectionModule extends AbstractModule {
     protected void configure() {
         bind(new Key<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
         bind(new Key<ConcurrentMarkSweepCollector<BigInteger>>() {}).toProvider(ConcurrentMarkSweepCollectorProvider.class);
-        
+
         bind(GarbageCollectorManager.class).to(CmsCollectorManager.class);
     }
 
@@ -58,4 +58,7 @@ public class GarbageCollectionModule extends AbstractModule {
             return new ConcurrentMarkSweepCollector<BigInteger>(graph);
         }
     }
+
+    // TODO: reference counting collector
+    // TODO: run the CMS collector periodically
 }
