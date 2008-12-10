@@ -53,7 +53,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
     private final BlockingQueue<ScheduledTaskHolder> scheduledTasks = new DelayQueue<ScheduledTaskHolder>();
-    private final RecoverableSet<ScheduledTask> persistedTasks;
+    private final RecoverableSet<SchedulingStrategy> persistedTasks;
 
     private final Provider<Transaction> tx;
     private final Clock clock;
@@ -74,7 +74,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     private void recoverTasksFromDatabase() {
         taskContext.execute(new Runnable() {
             public void run() {
-                for (ScheduledTask st : persistedTasks.getAll()) {
+                for (SchedulingStrategy st : persistedTasks.getAll()) {
                     scheduledTasks.add(new ScheduledTaskHolder(persistedTasks.put(st), st.getScheduledTime()));
                 }
             }
@@ -88,7 +88,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
         delay = unit.toMillis(delay);
         SchedulingControl control = new SchedulingControlImpl();
-        ScheduledTask st = ScheduledOneTimeTask.create(task, delay, control, clock);
+        SchedulingStrategy st = ScheduledOneTimeRun.create(task, delay, control, clock);
         addToExecutionQueue(st);
         return new SchedulingFuture(control);
     }
@@ -97,7 +97,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         initialDelay = unit.toMillis(initialDelay);
         period = unit.toMillis(period);
         SchedulingControl control = new SchedulingControlImpl();
-        ScheduledTask st = ScheduledAtFixedRateTask.create(task, initialDelay, period, control, clock);
+        SchedulingStrategy st = ScheduledAtFixedRate.create(task, initialDelay, period, control, clock);
         addToExecutionQueue(st);
         return new SchedulingFuture(control);
     }
@@ -106,16 +106,16 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         initialDelay = unit.toMillis(initialDelay);
         delay = unit.toMillis(delay);
         SchedulingControl control = new SchedulingControlImpl();
-        ScheduledTask st = ScheduledWithFixedDelayTask.create(task, initialDelay, delay, control, clock);
+        SchedulingStrategy st = ScheduledWithFixedDelay.create(task, initialDelay, delay, control, clock);
         addToExecutionQueue(st);
         return new SchedulingFuture(control);
     }
 
-    private void addToExecutionQueue(ScheduledTask st) {
+    private void addToExecutionQueue(SchedulingStrategy st) {
         enqueueOnCommit(saveToDatabase(st));
     }
 
-    private ScheduledTaskHolder saveToDatabase(ScheduledTask st) {
+    private ScheduledTaskHolder saveToDatabase(SchedulingStrategy st) {
         return new ScheduledTaskHolder(persistedTasks.put(st), st.getScheduledTime());
     }
 
@@ -144,7 +144,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     @Nullable
     private Runnable getTaskInsideTransaction0(ScheduledTaskHolder holder) {
         cancelTakeOnRollback(holder);
-        ScheduledTask st = takeFromDatabase(holder);
+        SchedulingStrategy st = takeFromDatabase(holder);
         if (st.isDone()) {
             return null;
         }
@@ -152,12 +152,12 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         return st.getTask();
     }
 
-    private ScheduledTask takeFromDatabase(ScheduledTaskHolder holder) {
+    private SchedulingStrategy takeFromDatabase(ScheduledTaskHolder holder) {
         return persistedTasks.remove(holder.getBinding());
     }
 
-    private void repeatIfRepeatable(ScheduledTask st) {
-        ScheduledTask repeat = st.nextRepeatedTask();
+    private void repeatIfRepeatable(SchedulingStrategy st) {
+        SchedulingStrategy repeat = st.nextRepeatedRun();
         if (repeat != null) {
             addToExecutionQueue(repeat);
         }

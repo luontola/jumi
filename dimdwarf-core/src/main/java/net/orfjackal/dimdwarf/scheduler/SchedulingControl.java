@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface SchedulingControl {
 
-    void setCurrentTask(ScheduledTask currentTask);
+    void setCurrentTask(SchedulingStrategy currentTask);
 
     long getDelay(TimeUnit unit);
 

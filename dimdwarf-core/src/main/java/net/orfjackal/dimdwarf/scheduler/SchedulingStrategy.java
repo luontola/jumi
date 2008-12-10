@@ -31,65 +31,25 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.util.Clock;
-
-import java.io.Serializable;
+import javax.annotation.CheckForNull;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
- * @since 24.11.2008
+ * @since 25.11.2008
  */
-@Entity
-public abstract class AbstractScheduledTask implements EntityObject, Serializable, ScheduledTask {
-    private static final long serialVersionUID = 1L;
+public interface SchedulingStrategy {
 
-    private final Runnable task;
-    private final long scheduledTime;
-    private final SchedulingControl control;
-    private transient Clock clock;
+    @CheckForNull
+    SchedulingStrategy nextRepeatedRun();
 
-    protected AbstractScheduledTask(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
-        this.task = task;
-        this.scheduledTime = scheduledTime;
-        this.control = control;
-        this.clock = clock;
-        control.setCurrentTask(this);
-    }
+    Runnable getTask();
 
-    @Inject
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
+    long getScheduledTime();
 
-    public Runnable getTask() {
-        return task;
-    }
+    long getDelay(TimeUnit unit);
 
-    public long getScheduledTime() {
-        return scheduledTime;
-    }
+    boolean isDone();
 
-    public long getDelay(TimeUnit unit) {
-        return unit.convert(scheduledTime - clock.currentTimeMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    public boolean isDone() {
-        return control.isDone();
-    }
-
-    public boolean isCancelled() {
-        return control.isCancelled();
-    }
-
-    protected SchedulingControl getControl() {
-        return control;
-    }
-
-    protected Clock getClock() {
-        return clock;
-    }
+    boolean isCancelled();
 }

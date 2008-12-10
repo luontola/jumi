@@ -51,11 +51,11 @@ public class SchedulingControlImpl implements EntityObject, Serializable, Schedu
     // Rename ScheduledTask to Run - one run instance of a series of scheduled runs. Make it a value object.
     // Rename SchedulingControl to ScheduledTask.
 
-    private ScheduledTask currentTask;
+    private SchedulingStrategy currentTask;
     private boolean done = false;
     private boolean cancelled = false;
 
-    public void setCurrentTask(ScheduledTask currentTask) {
+    public void setCurrentTask(SchedulingStrategy currentTask) {
         this.currentTask = currentTask;
     }
 

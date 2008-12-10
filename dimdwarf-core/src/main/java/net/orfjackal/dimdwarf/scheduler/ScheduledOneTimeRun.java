@@ -37,19 +37,19 @@ import net.orfjackal.dimdwarf.util.Clock;
  * @author Esko Luontola
  * @since 25.11.2008
  */
-public class ScheduledOneTimeTask extends AbstractScheduledTask {
+public class ScheduledOneTimeRun extends AbstractSchedulingStrategy {
     private static final long serialVersionUID = 1L;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, SchedulingControl control, Clock clock) {
+    public static SchedulingStrategy create(Runnable task, long initialDelay, SchedulingControl control, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledOneTimeTask(task, scheduledTime, control, clock);
+        return new ScheduledOneTimeRun(task, scheduledTime, control, clock);
     }
 
-    private ScheduledOneTimeTask(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
+    private ScheduledOneTimeRun(Runnable task, long scheduledTime, SchedulingControl control, Clock clock) {
         super(task, scheduledTime, control, clock);
     }
 
-    public ScheduledTask nextRepeatedTask() {
+    public SchedulingStrategy nextRepeatedRun() {
         getControl().setDone();
         return null;
     }

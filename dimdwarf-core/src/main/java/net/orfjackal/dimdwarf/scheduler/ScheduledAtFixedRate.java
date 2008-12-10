@@ -37,23 +37,23 @@ import net.orfjackal.dimdwarf.util.Clock;
  * @author Esko Luontola
  * @since 25.11.2008
  */
-public class ScheduledWithFixedDelayTask extends AbstractScheduledTask {
+public class ScheduledAtFixedRate extends AbstractSchedulingStrategy {
     private static final long serialVersionUID = 1L;
 
-    private final long delay;
+    private final long period;
 
-    public static ScheduledTask create(Runnable task, long initialDelay, long delay, SchedulingControl control, Clock clock) {
+    public static SchedulingStrategy create(Runnable task, long initialDelay, long period, SchedulingControl control, Clock clock) {
         long scheduledTime = initialDelay + clock.currentTimeMillis();
-        return new ScheduledWithFixedDelayTask(task, scheduledTime, delay, control, clock);
+        return new ScheduledAtFixedRate(task, scheduledTime, period, control, clock);
     }
 
-    private ScheduledWithFixedDelayTask(Runnable task, long scheduledTime, long delay, SchedulingControl control, Clock clock) {
+    private ScheduledAtFixedRate(Runnable task, long scheduledTime, long period, SchedulingControl control, Clock clock) {
         super(task, scheduledTime, control, clock);
-        this.delay = delay;
+        this.period = period;
     }
 
-    public ScheduledTask nextRepeatedTask() {
-        long nextScheduledTime = getClock().currentTimeMillis() + delay;
-        return new ScheduledWithFixedDelayTask(getTask(), nextScheduledTime, delay, getControl(), getClock());
+    public SchedulingStrategy nextRepeatedRun() {
+        long nextScheduledTime = getScheduledTime() + period;
+        return new ScheduledAtFixedRate(getTask(), nextScheduledTime, period, getControl(), getClock());
     }
 }
