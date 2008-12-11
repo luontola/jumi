@@ -85,7 +85,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     public Color getColor(T node) {
         byte[] value = graph.getMetadata(node, COLOR_KEY);
         if (value.length == 0) {
-            return Color.BLACK;
+            return Color.WHITE;
             // TODO: introduce 'undefined' - equals black or white depending on the CMS stage
             // (or is it enough that MutatorListener colors nodes which are created during GC?)
         }
