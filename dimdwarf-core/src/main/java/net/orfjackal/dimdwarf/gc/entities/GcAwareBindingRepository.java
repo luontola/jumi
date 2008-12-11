@@ -65,37 +65,34 @@ public class GcAwareBindingRepository implements BindingRepository {
     }
 
     public Object read(String binding) {
-        return entityFromId(bindings.read(binding));
-    }
-
-    private Object entityFromId(BigInteger id) {
-        return entityToId.back(id);
+        BigInteger oldTarget = bindings.read(binding);
+        return entityToId.back(oldTarget);
     }
 
     public void update(String binding, Object entity) {
-        BigInteger prevId = bindings.read(binding);
-        BigInteger nextId = idFromEntity(entity);
-        bindings.update(binding, nextId);
-        fireBindingChanged(prevId, nextId);
+        BigInteger oldTarget = bindings.read(binding);
+        BigInteger newTarget = entityToId.forth(entity);
+        bindings.update(binding, newTarget);
+        fireBindingUpdated(oldTarget, newTarget);
     }
 
-    private BigInteger idFromEntity(Object entity) {
-        return entityToId.forth(entity);
+    private void fireBindingUpdated(@Nullable BigInteger oldTarget, @Nullable BigInteger newTarget) {
+        if (oldTarget != null) {
+            listener.onReferenceRemoved(null, oldTarget);
+        }
+        if (newTarget != null) {
+            listener.onReferenceCreated(null, newTarget);
+        }
     }
 
     public void delete(String binding) {
-        BigInteger prevId = bindings.read(binding);
+        BigInteger oldTarget = bindings.read(binding);
         bindings.delete(binding);
-        fireBindingChanged(prevId, null);
+        fireBindingDeleted(oldTarget);
     }
 
-    private void fireBindingChanged(@Nullable BigInteger prevId, @Nullable BigInteger nextId) {
-        if (prevId != null) {
-            listener.onReferenceRemoved(null, prevId);
-        }
-        if (nextId != null) {
-            listener.onReferenceCreated(null, nextId);
-        }
+    private void fireBindingDeleted(BigInteger oldTarget) {
+        fireBindingUpdated(oldTarget, null);
     }
 
     public String firstKey() {
