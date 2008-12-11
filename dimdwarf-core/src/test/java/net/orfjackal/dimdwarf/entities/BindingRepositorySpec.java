@@ -46,6 +46,9 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class BindingRepositorySpec extends Specification<Object> {
 
+    private static final String BINDING = "binding";
+    private static final String INVALID_BINDING = "no-such-binding";
+
     private TaskExecutor taskContext;
     private Provider<BindingRepository> bindings;
 
@@ -63,14 +66,11 @@ public class BindingRepositorySpec extends Specification<Object> {
 
     public class ABindingRepository {
 
-        private static final String BINDING = "binding";
-        private static final String INVALID_BINDING = "no-such-binding";
-
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    DummyInterface e = new DummyEntity("A");
-                    bindings.get().update(BINDING, e);
+                    specify(bindings.get().exists(BINDING), should.equal(false));
+                    bindings.get().update(BINDING, new DummyEntity("A"));
                 }
             });
         }
@@ -112,7 +112,7 @@ public class BindingRepositorySpec extends Specification<Object> {
             });
         }
 
-        public void canNotReadNonexistantBindings() {
+        public void canNotReadNonexistentBindings() {
             taskContext.execute(new Runnable() {
                 public void run() {
                     specify(bindings.get().exists(INVALID_BINDING), should.equal(false));

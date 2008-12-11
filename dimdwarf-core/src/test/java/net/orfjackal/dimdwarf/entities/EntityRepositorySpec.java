@@ -73,12 +73,19 @@ public class EntityRepositorySpec extends Specification<Object> {
                 public void run() {
                     specify(entities.get().exists(ENTITY_ID), should.equal(false));
                     entities.get().update(ENTITY_ID, new DummyEntity("A"));
-                    specify(entities.get().exists(ENTITY_ID), should.equal(true));
                 }
             });
         }
 
-        public void readsEntitiesFromDatabase() {
+        public void createsEntities() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(entities.get().exists(ENTITY_ID));
+                }
+            });
+        }
+
+        public void readsEntities() {
             taskContext.execute(new Runnable() {
                 public void run() {
                     DummyInterface e = (DummyInterface) entities.get().read(ENTITY_ID);
@@ -87,7 +94,7 @@ public class EntityRepositorySpec extends Specification<Object> {
             });
         }
 
-        public void updatesEntitiesInDatabase() {
+        public void updatesEntities() {
             taskContext.execute(new Runnable() {
                 public void run() {
                     entities.get().update(ENTITY_ID, new DummyEntity("B"));
@@ -97,12 +104,16 @@ public class EntityRepositorySpec extends Specification<Object> {
             });
         }
 
-        public void deletesEntitiesFromDatabase() {
+        public void deletesEntities() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(entities.get().exists(ENTITY_ID), should.equal(true));
                     entities.get().delete(ENTITY_ID);
                     specify(entities.get().exists(ENTITY_ID), should.equal(false));
+                    specify(new Block() {
+                        public void run() throws Throwable {
+                            entities.get().read(ENTITY_ID);
+                        }
+                    }, should.raise(EntityNotFoundException.class));
                 }
             });
         }
@@ -110,7 +121,6 @@ public class EntityRepositorySpec extends Specification<Object> {
         public void canNotReadNonexistentEntities() {
             taskContext.execute(new Runnable() {
                 public void run() {
-
                     specify(entities.get().exists(INVALID_ENTITY_ID), should.equal(false));
                     specify(new Block() {
                         public void run() throws Throwable {
