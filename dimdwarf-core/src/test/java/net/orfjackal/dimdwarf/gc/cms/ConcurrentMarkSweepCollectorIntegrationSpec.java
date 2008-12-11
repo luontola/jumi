@@ -162,4 +162,6 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
             specify(entityExists(garbageCycleId2), should.equal(false));
         }
     }
+
+    // TODO: MutatorListener
 }
