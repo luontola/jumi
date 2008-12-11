@@ -34,7 +34,6 @@ package net.orfjackal.dimdwarf.gc.entities;
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.gc.*;
-import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -48,9 +47,9 @@ import java.util.concurrent.locks.*;
  */
 @Singleton
 @ThreadSafe
-public class CmsCollectorManager implements GarbageCollectorManager {
+public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
 
-    private final Provider<ConcurrentMarkSweepCollector<BigInteger>> cms;
+    private final Provider<GarbageCollector<BigInteger>> collector;
     private final Provider<TaskScheduler> scheduler;
     private final TaskExecutor taskContext;
 
@@ -58,10 +57,10 @@ public class CmsCollectorManager implements GarbageCollectorManager {
     private final Condition collectionFinished = lock.newCondition();
 
     @Inject
-    public CmsCollectorManager(Provider<ConcurrentMarkSweepCollector<BigInteger>> cms,
+    public GarbageCollectorManagerImpl(Provider<GarbageCollector<BigInteger>> collector,
                                Provider<TaskScheduler> scheduler,
                                TaskExecutor taskContext) {
-        this.cms = cms;
+        this.collector = collector;
         this.scheduler = scheduler;
         this.taskContext = taskContext;
     }
@@ -73,7 +72,7 @@ public class CmsCollectorManager implements GarbageCollectorManager {
                 public void run() {
                     scheduler.get().submit(
                             new IncrementalTaskRunner(
-                                    new IncrementalTaskSequence(cms.get().getCollectorStagesToExecute()),
+                                    new IncrementalTaskSequence(collector.get().getCollectorStagesToExecute()),
                                     new OnCollectionFinished()));
                 }
             });
@@ -95,7 +94,7 @@ public class CmsCollectorManager implements GarbageCollectorManager {
     private static class OnCollectionFinished implements Runnable, Serializable {
         private static final long serialVersionUID = 1L;
 
-        @Inject public transient CmsCollectorManager manager;
+        @Inject public transient GarbageCollectorManagerImpl manager;
 
         public void run() {
             manager.signalCollectionFinished();

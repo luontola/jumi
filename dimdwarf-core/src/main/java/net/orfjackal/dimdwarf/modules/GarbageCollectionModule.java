@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.gc.Graph;
+import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
 import net.orfjackal.dimdwarf.gc.entities.*;
 
@@ -46,15 +46,15 @@ public class GarbageCollectionModule extends AbstractModule {
 
     protected void configure() {
         bind(new Key<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
-        bind(new Key<ConcurrentMarkSweepCollector<BigInteger>>() {}).toProvider(ConcurrentMarkSweepCollectorProvider.class);
+        bind(new Key<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
 
-        bind(GarbageCollectorManager.class).to(CmsCollectorManager.class);
+        bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);
     }
 
-    private static class ConcurrentMarkSweepCollectorProvider implements Provider<ConcurrentMarkSweepCollector<BigInteger>> {
+    private static class GarbageCollectorProvider implements Provider<GarbageCollector<BigInteger>> {
         @Inject public Graph<BigInteger> graph;
 
-        public ConcurrentMarkSweepCollector<BigInteger> get() {
+        public GarbageCollector<BigInteger> get() {
             return new ConcurrentMarkSweepCollector<BigInteger>(graph);
         }
     }
