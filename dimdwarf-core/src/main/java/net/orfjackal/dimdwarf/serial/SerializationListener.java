@@ -39,11 +39,11 @@ import java.util.EventListener;
  */
 public interface SerializationListener extends EventListener {
 
-    void beforeReplace(Object rootObject, Object obj);
+    void beforeReplace(Object rootObject, Object obj, MetadataBuilder meta);
 
-    void beforeSerialize(Object rootObject, Object obj);
+    void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta);
 
-    void afterDeserialize(Object obj);
+    void afterDeserialize(Object obj, MetadataBuilder meta);
 
-    void afterResolve(Object obj);
+    void afterResolve(Object obj, MetadataBuilder meta);
 }

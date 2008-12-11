@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import net.orfjackal.dimdwarf.serial.SerializationAdapter;
+import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -42,7 +42,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class CheckInnerClassSerialized extends SerializationAdapter {
 
-    public void beforeSerialize(Object rootObject, Object obj) {
+    @Override
+    public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
         // Serializing anonymous and local classes is dangerous, because their class names are
         // generated automatically ($1, $2 etc.), which means that the next time that such an
         // object is deserialized from database, the class name might have changed because of

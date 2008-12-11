@@ -31,30 +31,19 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import jdave.Block;
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.api.internal.TransparentReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
-import net.orfjackal.dimdwarf.serial.SerializationListener;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import net.orfjackal.dimdwarf.serial.*;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -192,8 +181,8 @@ public class TransparentReferenceSpec extends Specification<Object> {
                     new ReplaceEntitiesWithTransparentReferences(proxyFactory)
             });
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
-            Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject()));
-            deserialized = (SerializationTestEntity) serializer.deserialize(data);
+            Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject())).getSerializedBytes();
+            deserialized = (SerializationTestEntity) serializer.deserialize(data).getDeserializedObject();
         }
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {

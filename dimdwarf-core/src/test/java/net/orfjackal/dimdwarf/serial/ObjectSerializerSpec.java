@@ -55,8 +55,8 @@ public class ObjectSerializerSpec extends Specification<Object> {
 
         public void create() {
             ObjectSerializer os = new ObjectSerializerImpl();
-            serialized = os.serialize(obj);
-            deserialized = (DummyEntity) os.deserialize(serialized);
+            serialized = os.serialize(obj).getSerializedBytes();
+            deserialized = (DummyEntity) os.deserialize(serialized).getDeserializedObject();
         }
 
         public void serializesObjects() {
@@ -76,29 +76,29 @@ public class ObjectSerializerSpec extends Specification<Object> {
         private Blob serialized;
 
         public void create() {
-            serialized = new ObjectSerializerImpl().serialize(obj);
+            serialized = new ObjectSerializerImpl().serialize(obj).getSerializedBytes();
             listener = mock(SerializationListener.class);
             os = new ObjectSerializerImpl(new SerializationListener[]{listener}, new SerializationReplacer[0]);
         }
 
         public void areNotifiedOfAllSerializedObjects() {
             checking(new Expectations() {{
-                one(listener).beforeReplace(obj, obj);
-                one(listener).beforeReplace(obj, "A");
-                one(listener).beforeSerialize(obj, obj);
-                one(listener).beforeSerialize(obj, "A");
+                one(listener).beforeReplace(with(same(obj)), with(same(obj)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).beforeReplace(with(same(obj)), with(equal("A")), with(aNonNull(MetadataBuilder.class)));
+                one(listener).beforeSerialize(with(same(obj)), with(same(obj)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).beforeSerialize(with(same(obj)), with(equal("A")), with(aNonNull(MetadataBuilder.class)));
             }});
-            os.serialize(obj);
+            os.serialize(obj).getSerializedBytes();
         }
 
         public void areNotifiedOfAllDeserializedObjects() {
             checking(new Expectations() {{
-                one(listener).afterDeserialize(with(a(DummyEntity.class)));
-                one(listener).afterDeserialize("A");
-                one(listener).afterResolve(with(a(DummyEntity.class)));
-                one(listener).afterResolve("A");
+                one(listener).afterDeserialize(with(a(DummyEntity.class)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).afterDeserialize(with(equal("A")), with(aNonNull(MetadataBuilder.class)));
+                one(listener).afterResolve(with(a(DummyEntity.class)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).afterResolve(with(equal("A")), with(aNonNull(MetadataBuilder.class)));
             }});
-            os.deserialize(serialized);
+            os.deserialize(serialized).getDeserializedObject();
         }
     }
 
@@ -108,17 +108,18 @@ public class ObjectSerializerSpec extends Specification<Object> {
         private Blob serialized;
 
         public void create() {
-            serialized = new ObjectSerializerImpl().serialize(obj);
+            serialized = new ObjectSerializerImpl().serialize(obj).getSerializedBytes();
             listener = mock(SerializationListener.class);
             SerializationReplacer replacer = new SerializationReplacer() {
-                public Object replaceSerialized(Object rootObject, Object obj) {
+
+                public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
                     if (obj.equals("A")) {
                         return "B";
                     }
                     return obj;
                 }
 
-                public Object resolveDeserialized(Object obj) {
+                public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
                     if (obj.equals("A")) {
                         return "C";
                     }
@@ -132,27 +133,88 @@ public class ObjectSerializerSpec extends Specification<Object> {
 
         public void canReplaceObjectsOnSerialization() {
             checking(new Expectations() {{
-                one(listener).beforeReplace(obj, obj);
-                one(listener).beforeReplace(obj, "A");
-                one(listener).beforeSerialize(obj, obj);
-                one(listener).beforeSerialize(obj, "B");
+                one(listener).beforeReplace(with(same(obj)), with(same(obj)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).beforeReplace(with(same(obj)), with(equal("A")), with(aNonNull(MetadataBuilder.class)));
+                one(listener).beforeSerialize(with(same(obj)), with(same(obj)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).beforeSerialize(with(same(obj)), with(equal("B")), with(aNonNull(MetadataBuilder.class)));
             }});
-            Blob bytes = os.serialize(obj);
-            DummyEntity serialized = (DummyEntity) new ObjectSerializerImpl().deserialize(bytes);
+            Blob bytes = os.serialize(obj).getSerializedBytes();
+            DummyEntity serialized = (DummyEntity) new ObjectSerializerImpl().deserialize(bytes).getDeserializedObject();
             specify(obj.other, should.equal("A"));
             specify(serialized.other, should.equal("B"));
         }
 
         public void canResolveObjectsOnDeserialization() {
             checking(new Expectations() {{
-                one(listener).afterDeserialize(with(a(DummyEntity.class)));
-                one(listener).afterDeserialize("A");
-                one(listener).afterResolve(with(a(DummyEntity.class)));
-                one(listener).afterResolve("C");
+                one(listener).afterDeserialize(with(a(DummyEntity.class)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).afterDeserialize(with(equal("A")), with(aNonNull(MetadataBuilder.class)));
+                one(listener).afterResolve(with(a(DummyEntity.class)), with(aNonNull(MetadataBuilder.class)));
+                one(listener).afterResolve(with(equal("C")), with(aNonNull(MetadataBuilder.class)));
             }});
-            DummyEntity deserialized = (DummyEntity) os.deserialize(serialized);
+            DummyEntity deserialized = (DummyEntity) os.deserialize(serialized).getDeserializedObject();
             specify(obj.other, should.equal("A"));
             specify(deserialized.other, should.equal("C"));
+        }
+    }
+
+    public class MetadataAboutTheSerializationProcess {
+        private SerializationResult ser;
+        private DeserializationResult deser;
+
+        public void create() {
+            SerializationListener listener = new SerializationListener() {
+                public void beforeReplace(Object rootObject, Object obj, MetadataBuilder meta) {
+                    meta.append(SerializationListener.class, "beforeReplace");
+                }
+
+                public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
+                    meta.append(SerializationListener.class, "beforeSerialize");
+                }
+
+                public void afterDeserialize(Object obj, MetadataBuilder meta) {
+                    meta.append(SerializationListener.class, "afterDeserialize");
+                }
+
+                public void afterResolve(Object obj, MetadataBuilder meta) {
+                    meta.append(SerializationListener.class, "afterResolve");
+                }
+            };
+            SerializationReplacer replacer = new SerializationReplacer() {
+                public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
+                    meta.append(SerializationReplacer.class, "replaceSerialized");
+                    return obj;
+                }
+
+                public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
+                    meta.append(SerializationReplacer.class, "resolveDeserialized");
+                    return obj;
+                }
+            };
+            ObjectSerializer os = new ObjectSerializerImpl(
+                    new SerializationListener[]{listener},
+                    new SerializationReplacer[]{replacer});
+            ser = os.serialize("X");
+            deser = os.deserialize(ser.getSerializedBytes());
+        }
+
+        public void isCollectedByTheListenersDuringSerialization() {
+            specify(ser.getMetadata().get(SerializationListener.class),
+                    should.containInOrder("beforeReplace", "beforeSerialize"));
+        }
+
+        public void isCollectedByTheListenersDuringDeserialization() {
+            specify(deser.getMetadata().get(SerializationListener.class),
+                    should.containInOrder("afterDeserialize", "afterResolve"));
+        }
+
+        public void isCollectedByTheReplacersDuringSerialization() {
+            specify(ser.getMetadata().get(SerializationReplacer.class),
+                    should.containInOrder("replaceSerialized"));
+        }
+
+        public void isCollectedByTheReplacersDuringDeserialization() {
+            specify(deser.getMetadata().get(SerializationReplacer.class),
+                    should.containInOrder("resolveDeserialized"));
         }
     }
 }

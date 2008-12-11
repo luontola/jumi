@@ -39,7 +39,7 @@ import java.util.EventListener;
  */
 public interface SerializationReplacer extends EventListener {
 
-    Object replaceSerialized(Object rootObject, Object obj);
+    Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta);
 
-    Object resolveDeserialized(Object obj);
+    Object resolveDeserialized(Object obj, MetadataBuilder meta);
 }

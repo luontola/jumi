@@ -49,7 +49,8 @@ public class InjectObjectsOnDeserialization extends SerializationAdapter {
         this.injector = injector;
     }
 
-    public void afterResolve(Object obj) {
+    @Override
+    public void afterResolve(Object obj, MetadataBuilder meta) {
         injector.injectMembers(obj);
     }
 }

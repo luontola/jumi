@@ -106,8 +106,9 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
         public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
             entity.other = "tmp";
-            replacer.delegate = new SerializationReplacerAdapter(){
-                public Object replaceSerialized(Object rootObject, Object obj) {
+            replacer.delegate = new SerializationReplacerAdapter() {
+                @Override
+                public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
                     if (obj.equals("tmp")) {
                         return new DummyEntity();
                     }
@@ -124,7 +125,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
     /**
      * <a href="http://java.sun.com/javase/6/docs/platform/serialization/spec/serial-arch.html#4539">Java Object
-     * Serialization Specification</a> says that serialization of inner classes (i.e., nested classes that are not 
+     * Serialization Specification</a> says that serialization of inner classes (i.e., nested classes that are not
      * static member classes), including local and anonymous classes, is strongly discouraged.
      */
     public class ReferringInnerClasses {
@@ -158,7 +159,8 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
             entity.other = "tmp";
             replacer.delegate = new SerializationReplacerAdapter() {
-                public Object replaceSerialized(Object rootObject, Object obj) {
+                @Override
+                public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
                     if (obj.equals("tmp")) {
                         return newAnonymousClassInstance();
                     }
@@ -191,16 +193,16 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private static class DelegatingSerializationReplacer implements SerializationReplacer {
         private SerializationReplacer delegate = null;
 
-        public Object replaceSerialized(Object rootObject, Object obj) {
+        public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
             if (delegate != null) {
-                return delegate.replaceSerialized(rootObject, obj);
+                return delegate.replaceSerialized(rootObject, obj, meta);
             }
             return obj;
         }
 
-        public Object resolveDeserialized(Object obj) {
+        public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
             if (delegate != null) {
-                return delegate.resolveDeserialized(obj);
+                return delegate.resolveDeserialized(obj, meta);
             }
             return obj;
         }

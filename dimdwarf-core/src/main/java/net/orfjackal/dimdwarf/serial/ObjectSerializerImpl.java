@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.db.Blob;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -57,19 +58,22 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         this.replacers = replacers;
     }
 
-    public Blob serialize(Object obj) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        serializeToStream(bytes, obj);
-        return Blob.fromBytes(bytes.toByteArray());
+    public SerializationResult serialize(Object obj) {
+        ByteArrayOutputStream serialized = new ByteArrayOutputStream();
+        MyMetadataBuilder meta = new MyMetadataBuilder();
+        serializeToStream(serialized, obj, meta);
+        return new SerializationResult(Blob.fromBytes(serialized.toByteArray()), meta.getMetadata());
     }
 
-    public Object deserialize(Blob serialized) {
-        return deserializeFromStream(serialized.getInputStream());
+    public DeserializationResult deserialize(Blob serialized) {
+        MyMetadataBuilder meta = new MyMetadataBuilder();
+        Object deserialized = deserializeFromStream(serialized.getInputStream(), meta);
+        return new DeserializationResult(deserialized, meta.getMetadata());
     }
 
-    private void serializeToStream(OutputStream target, Object obj) {
+    private void serializeToStream(OutputStream target, Object obj, MetadataBuilder meta) {
         try {
-            ObjectOutputStream out = new MyObjectOutputStream(target, obj);
+            ObjectOutputStream out = new MyObjectOutputStream(target, obj, meta);
             out.writeObject(obj);
             out.close();
         } catch (IOException e) {
@@ -77,9 +81,9 @@ public class ObjectSerializerImpl implements ObjectSerializer {
         }
     }
 
-    private Object deserializeFromStream(InputStream source) {
+    private Object deserializeFromStream(InputStream source, MetadataBuilder meta) {
         try {
-            ObjectInputStream in = new MyObjectInputStream(source);
+            ObjectInputStream in = new MyObjectInputStream(source, meta);
             Object obj = in.readObject();
             in.close();
             return obj;
@@ -93,45 +97,66 @@ public class ObjectSerializerImpl implements ObjectSerializer {
 
     private class MyObjectOutputStream extends ObjectOutputStream {
         private final Object rootObject;
+        private final MetadataBuilder meta;
 
-        public MyObjectOutputStream(OutputStream out, Object rootObject) throws IOException {
+        public MyObjectOutputStream(OutputStream out, Object rootObject, MetadataBuilder meta) throws IOException {
             super(out);
             this.rootObject = rootObject;
+            this.meta = meta;
             enableReplaceObject(true);
         }
 
         protected Object replaceObject(Object obj) throws IOException {
             for (SerializationListener listener : listeners) {
-                listener.beforeReplace(rootObject, obj);
+                listener.beforeReplace(rootObject, obj, meta);
             }
             for (SerializationReplacer replacer : replacers) {
-                obj = replacer.replaceSerialized(rootObject, obj);
+                obj = replacer.replaceSerialized(rootObject, obj, meta);
             }
             for (SerializationListener listener : listeners) {
-                listener.beforeSerialize(rootObject, obj);
+                listener.beforeSerialize(rootObject, obj, meta);
             }
             return obj;
         }
     }
 
     private class MyObjectInputStream extends ObjectInputStream {
+        private final MetadataBuilder meta;
 
-        public MyObjectInputStream(InputStream in) throws IOException {
+        public MyObjectInputStream(InputStream in, MetadataBuilder meta) throws IOException {
             super(in);
+            this.meta = meta;
             enableResolveObject(true);
         }
 
         protected Object resolveObject(Object obj) throws IOException {
             for (SerializationListener listener : listeners) {
-                listener.afterDeserialize(obj);
+                listener.afterDeserialize(obj, meta);
             }
             for (SerializationReplacer replacer : replacers) {
-                obj = replacer.resolveDeserialized(obj);
+                obj = replacer.resolveDeserialized(obj, meta);
             }
             for (SerializationListener listener : listeners) {
-                listener.afterResolve(obj);
+                listener.afterResolve(obj, meta);
             }
             return obj;
+        }
+    }
+
+    private static class MyMetadataBuilder implements MetadataBuilder {
+        private final HashMap<Class<?>, List<Object>> metadata = new HashMap<Class<?>, List<Object>>();
+
+        public void append(Class<?> key, Object value) {
+            List<Object> list = metadata.get(key);
+            if (list == null) {
+                list = new ArrayList<Object>();
+                metadata.put(key, list);
+            }
+            list.add(value);
+        }
+
+        public Map<Class<?>, List<Object>> getMetadata() {
+            return metadata;
         }
     }
 }

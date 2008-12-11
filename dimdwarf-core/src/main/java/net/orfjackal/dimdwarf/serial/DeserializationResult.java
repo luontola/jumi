@@ -32,23 +32,28 @@
 package net.orfjackal.dimdwarf.serial;
 
 import javax.annotation.concurrent.Immutable;
+import java.util.*;
 
 /**
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 11.12.2008
  */
 @Immutable
-public abstract class SerializationAdapter implements SerializationListener {
+public class DeserializationResult {
 
-    public void beforeReplace(Object rootObject, Object obj, MetadataBuilder meta) {
+    private final Object deserializedObject;
+    private final Map<Class<?>, List<Object>> metadata;
+
+    public DeserializationResult(Object deserializedObject, Map<Class<?>, List<Object>> metadata) {
+        this.deserializedObject = deserializedObject;
+        this.metadata = Collections.unmodifiableMap(metadata);
     }
 
-    public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
+    public Object getDeserializedObject() {
+        return deserializedObject;
     }
 
-    public void afterDeserialize(Object obj, MetadataBuilder meta) {
-    }
-
-    public void afterResolve(Object obj, MetadataBuilder meta) {
+    public Map<Class<?>, List<Object>> getMetadata() {
+        return metadata;
     }
 }

@@ -37,7 +37,7 @@ import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.gc.MutatorListener;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigInteger;
@@ -80,7 +80,8 @@ public class GcAwareEntityRepository implements EntityRepository {
         }
         // TODO: combine the (de)serialization (which is done by default) and the counting of references - do not (de)serialize twise
         referencesOnRead.put(id, getReferences(bytes));
-        return serializer.deserialize(bytes);
+        DeserializationResult di = serializer.deserialize(bytes);
+        return di.getDeserializedObject();
     }
 
     private List<BigInteger> getReferences(Blob bytes) {
@@ -93,7 +94,8 @@ public class GcAwareEntityRepository implements EntityRepository {
 
     public void update(BigInteger id, Object entity) {
         // TODO: combine the (de)serialization (which is done by default) and the counting of references - do not (de)serialize twise
-        Blob newData = serializer.serialize(entity);
+        SerializationResult si = serializer.serialize(entity);
+        Blob newData = si.getSerializedBytes();
 
         List<BigInteger> oldReferences = referencesOnRead.remove(id);
         if (oldReferences == null) {

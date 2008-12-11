@@ -33,7 +33,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.*;
-import net.orfjackal.dimdwarf.serial.SerializationReplacer;
+import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -51,7 +51,7 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationRe
         this.factory = factory;
     }
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
+    public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
         if (obj != rootObject && Entities.isEntity(obj)) {
             return createTransparentReferenceForSerialization(obj);
         }
@@ -65,7 +65,7 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationRe
         return notSerializableProxy.writeReplace();
     }
 
-    public Object resolveDeserialized(Object obj) {
+    public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
         if (obj instanceof TransparentReferenceImpl) {
             return factory.newProxy((TransparentReferenceImpl) obj);
         }

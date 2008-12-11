@@ -39,7 +39,7 @@ import net.orfjackal.dimdwarf.db.Blob;
  */
 public interface ObjectSerializer {
 
-    Blob serialize(Object obj);
+    SerializationResult serialize(Object obj);
 
-    Object deserialize(Blob serialized);
+    DeserializationResult deserialize(Blob serialized);
 }

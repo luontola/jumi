@@ -31,24 +31,31 @@
 
 package net.orfjackal.dimdwarf.serial;
 
+import net.orfjackal.dimdwarf.db.Blob;
+
 import javax.annotation.concurrent.Immutable;
+import java.util.*;
 
 /**
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 11.12.2008
  */
 @Immutable
-public abstract class SerializationAdapter implements SerializationListener {
+public class SerializationResult {
 
-    public void beforeReplace(Object rootObject, Object obj, MetadataBuilder meta) {
+    private final Blob serializedBytes;
+    private final Map<Class<?>, List<Object>> metadata;
+
+    public SerializationResult(Blob serializedBytes, Map<Class<?>, List<Object>> metadata) {
+        this.serializedBytes = serializedBytes;
+        this.metadata = Collections.unmodifiableMap(metadata);
     }
 
-    public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
+    public Blob getSerializedBytes() {
+        return serializedBytes;
     }
 
-    public void afterDeserialize(Object obj, MetadataBuilder meta) {
-    }
-
-    public void afterResolve(Object obj, MetadataBuilder meta) {
+    public Map<Class<?>, List<Object>> getMetadata() {
+        return metadata;
     }
 }

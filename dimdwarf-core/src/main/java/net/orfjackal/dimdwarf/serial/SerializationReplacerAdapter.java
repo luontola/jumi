@@ -40,11 +40,11 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public abstract class SerializationReplacerAdapter implements SerializationReplacer {
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
+    public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
         return obj;
     }
 
-    public Object resolveDeserialized(Object obj) {
+    public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
         return obj;
     }
 }

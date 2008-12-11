@@ -49,7 +49,7 @@ public class EntityReferenceUtil {
 
     public Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
         EntityReferenceListener collectReferences = new EntityReferenceListener();
-        new ObjectSerializerImpl(
+        DeserializationResult di = new ObjectSerializerImpl(
                 new SerializationListener[]{collectReferences},
                 new SerializationReplacer[]{new TransparentReferenceDiscarder()}
         ).deserialize(entity);
@@ -60,7 +60,8 @@ public class EntityReferenceUtil {
 
         private final List<BigInteger> references = new ArrayList<BigInteger>();
 
-        public void afterDeserialize(Object obj) {
+        @Override
+        public void afterDeserialize(Object obj, MetadataBuilder meta) {
             if (obj instanceof EntityReference) {
                 EntityReference<?> ref = (EntityReference<?>) obj;
                 references.add(ref.getEntityId());
@@ -74,7 +75,8 @@ public class EntityReferenceUtil {
 
     private static class TransparentReferenceDiscarder extends SerializationReplacerAdapter {
 
-        public Object resolveDeserialized(Object obj) {
+        @Override
+        public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
             if (obj instanceof TransparentReferenceImpl) {
                 return null;
             }
