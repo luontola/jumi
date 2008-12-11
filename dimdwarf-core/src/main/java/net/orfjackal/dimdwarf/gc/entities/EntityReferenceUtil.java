@@ -45,7 +45,7 @@ import java.util.*;
  * @since 11.12.2008
  */
 public class EntityReferenceUtil {
-    // TODO: invent a better name
+    // TODO: invent a better name (or integrate this functionality to ObjectSerializer using listeners and better return values)
 
     public Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
         EntityReferenceListener collectReferences = new EntityReferenceListener();

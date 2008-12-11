@@ -31,8 +31,7 @@
 
 package net.orfjackal.dimdwarf.serial;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.DummyEntity;
@@ -47,89 +46,86 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class ObjectSerializerSpec extends Specification<Object> {
 
-    private DummyEntity obj;
-
-    public void create() throws Exception {
-        obj = new DummyEntity();
-        obj.other = "foo";
-    }
+    private DummyEntity obj = new DummyEntity("A");
 
 
     public class AnObjectSerializer {
-        private ObjectSerializerImpl serializer;
+        private Blob serialized;
+        private DummyEntity deserialized;
 
         public void create() {
-            serializer = new ObjectSerializerImpl();
+            ObjectSerializer os = new ObjectSerializerImpl();
+            serialized = os.serialize(obj);
+            deserialized = (DummyEntity) os.deserialize(serialized);
         }
 
-        public void serializesAndDeserializesObjects() {
-            Blob bytes = serializer.serialize(obj);
-            specify(bytes, should.not().equal(null));
-            specify(bytes, should.not().equal(Blob.EMPTY_BLOB));
+        public void serializesObjects() {
+            specify(serialized, should.not().equal(null));
+            specify(serialized, should.not().equal(Blob.EMPTY_BLOB));
+        }
 
-            DummyEntity deserialized = (DummyEntity) serializer.deserialize(bytes);
+        public void deserializesObjects() {
             specify(deserialized, should.not().equal(null));
-            specify(deserialized.other, should.equal("foo"));
+            specify(deserialized.other, should.equal("A"));
         }
     }
 
     public class SerializationListeners {
-        private Blob serializedBytes;
+        private ObjectSerializer os;
         private SerializationListener listener;
-        private ObjectSerializerImpl serializer;
+        private Blob serialized;
 
         public void create() {
-            serializedBytes = new ObjectSerializerImpl().serialize(obj);
+            serialized = new ObjectSerializerImpl().serialize(obj);
             listener = mock(SerializationListener.class);
-            serializer = new ObjectSerializerImpl(new SerializationListener[]{listener}, new SerializationReplacer[0]);
+            os = new ObjectSerializerImpl(new SerializationListener[]{listener}, new SerializationReplacer[0]);
         }
 
         public void areNotifiedOfAllSerializedObjects() {
             checking(new Expectations() {{
                 one(listener).beforeReplace(obj, obj);
-                one(listener).beforeReplace(obj, "foo");
+                one(listener).beforeReplace(obj, "A");
                 one(listener).beforeSerialize(obj, obj);
-                one(listener).beforeSerialize(obj, "foo");
+                one(listener).beforeSerialize(obj, "A");
             }});
-            serializer.serialize(obj);
+            os.serialize(obj);
         }
 
         public void areNotifiedOfAllDeserializedObjects() {
             checking(new Expectations() {{
                 one(listener).afterDeserialize(with(a(DummyEntity.class)));
-                one(listener).afterDeserialize("foo");
+                one(listener).afterDeserialize("A");
                 one(listener).afterResolve(with(a(DummyEntity.class)));
-                one(listener).afterResolve("foo");
+                one(listener).afterResolve("A");
             }});
-            serializer.deserialize(serializedBytes);
+            os.deserialize(serialized);
         }
     }
 
     public class SerializationReplacers {
-        private Blob serializedBytes;
-        private ObjectSerializerImpl serializer;
+        private ObjectSerializer os;
         private SerializationListener listener;
+        private Blob serialized;
 
         public void create() {
-            serializedBytes = new ObjectSerializerImpl().serialize(obj);
+            serialized = new ObjectSerializerImpl().serialize(obj);
             listener = mock(SerializationListener.class);
             SerializationReplacer replacer = new SerializationReplacer() {
-                
                 public Object replaceSerialized(Object rootObject, Object obj) {
-                    if (obj.equals("foo")) {
-                        return "bar";
+                    if (obj.equals("A")) {
+                        return "B";
                     }
                     return obj;
                 }
 
                 public Object resolveDeserialized(Object obj) {
-                    if (obj.equals("foo")) {
-                        return "gazonk";
+                    if (obj.equals("A")) {
+                        return "C";
                     }
                     return obj;
                 }
             };
-            serializer = new ObjectSerializerImpl(
+            os = new ObjectSerializerImpl(
                     new SerializationListener[]{listener},
                     new SerializationReplacer[]{replacer});
         }
@@ -137,26 +133,26 @@ public class ObjectSerializerSpec extends Specification<Object> {
         public void canReplaceObjectsOnSerialization() {
             checking(new Expectations() {{
                 one(listener).beforeReplace(obj, obj);
-                one(listener).beforeReplace(obj, "foo");
+                one(listener).beforeReplace(obj, "A");
                 one(listener).beforeSerialize(obj, obj);
-                one(listener).beforeSerialize(obj, "bar");
+                one(listener).beforeSerialize(obj, "B");
             }});
-            Blob bytes = serializer.serialize(obj);
+            Blob bytes = os.serialize(obj);
             DummyEntity serialized = (DummyEntity) new ObjectSerializerImpl().deserialize(bytes);
-            specify(obj.other, should.equal("foo"));
-            specify(serialized.other, should.equal("bar"));
+            specify(obj.other, should.equal("A"));
+            specify(serialized.other, should.equal("B"));
         }
 
         public void canResolveObjectsOnDeserialization() {
             checking(new Expectations() {{
                 one(listener).afterDeserialize(with(a(DummyEntity.class)));
-                one(listener).afterDeserialize("foo");
+                one(listener).afterDeserialize("A");
                 one(listener).afterResolve(with(a(DummyEntity.class)));
-                one(listener).afterResolve("gazonk");
+                one(listener).afterResolve("C");
             }});
-            DummyEntity deserialized = (DummyEntity) serializer.deserialize(serializedBytes);
-            specify(obj.other, should.equal("foo"));
-            specify(deserialized.other, should.equal("gazonk"));
+            DummyEntity deserialized = (DummyEntity) os.deserialize(serialized);
+            specify(obj.other, should.equal("A"));
+            specify(deserialized.other, should.equal("C"));
         }
     }
 }
