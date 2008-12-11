@@ -101,4 +101,6 @@ public class CmsCollectorManager implements GarbageCollectorManager {
             manager.signalCollectionFinished();
         }
     }
+
+    // TODO: unit test this class independencty of the GC implementation
 }
