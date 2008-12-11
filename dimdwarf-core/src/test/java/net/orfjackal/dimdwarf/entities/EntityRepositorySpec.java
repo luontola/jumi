@@ -36,12 +36,15 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
+import net.orfjackal.dimdwarf.gc.entities.*;
+import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
 import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.util.Collections;
 
 /**
  * @author Esko Luontola
@@ -55,7 +58,7 @@ public class EntityRepositorySpec extends Specification<Object> {
 
     private DatabaseTableWithMetadata<Blob, Blob> db;
     private ObjectSerializer serializer;
-    private EntityRepositoryImpl repository;
+    private GcAwareEntityRepository repository;
     private EntityObject entity;
     private Blob serialized;
 
@@ -63,13 +66,18 @@ public class EntityRepositorySpec extends Specification<Object> {
         db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         serializer = mock(ObjectSerializer.class);
         repository =
-                new EntityRepositoryImpl(
+                new GcAwareEntityRepository(
                         new EntityDao(
                                 db,
                                 new ConvertBigIntegerToBytes(),
                                 new NoConversion<Blob>()),
-                        new NoConversion<BigInteger>(),
-                        new ConvertEntityToBytes(serializer));
+                        new ConvertEntityToBytes(serializer),
+                        new FakeGarbageCollectionModule.NullMutatorListener(),
+                        new EntityReferenceUtil() {
+                            public Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
+                                return Collections.emptyList(); // TODO: messy test setup - it might be better to rewrite this spec
+                            }
+                        });
         entity = new DummyEntity();
         serialized = Blob.fromBytes(new byte[]{1, 2, 3});
     }
@@ -110,6 +118,7 @@ public class EntityRepositorySpec extends Specification<Object> {
 
         public void deletesEntitiesFromDatabase() {
             checking(new Expectations() {{
+                allowing(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
                 one(db).delete(asBytes(ENTITY_ID));
             }});
             repository.delete(ENTITY_ID);

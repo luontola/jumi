@@ -36,7 +36,7 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.*;
-import net.orfjackal.dimdwarf.gc.entities.GcAwareBindingRepository;
+import net.orfjackal.dimdwarf.gc.entities.*;
 import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 import net.orfjackal.dimdwarf.serial.*;
 
@@ -60,7 +60,7 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(MaxEntityId.class)
                 .toInstance(BigInteger.ZERO); // TODO: import from database
 
-        bind(EntityRepository.class).to(EntityRepositoryImpl.class);
+        bind(EntityRepository.class).to(GcAwareEntityRepository.class);
         bind(databaseTableConnectionWithMetadata())
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTableWithMetadata("entities"));

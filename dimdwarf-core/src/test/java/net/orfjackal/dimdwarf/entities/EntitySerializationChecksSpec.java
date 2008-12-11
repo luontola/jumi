@@ -35,6 +35,8 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
+import net.orfjackal.dimdwarf.gc.entities.*;
+import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
 import net.orfjackal.dimdwarf.serial.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
@@ -53,7 +55,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
 
     private DatabaseTableWithMetadata<Blob, Blob> db;
-    private EntityRepositoryImpl repository;
+    private GcAwareEntityRepository repository;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
@@ -67,13 +69,14 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
 
         repository =
-                new EntityRepositoryImpl(
+                new GcAwareEntityRepository(
                         new EntityDao(
                                 db,
                                 new ConvertBigIntegerToBytes(),
                                 new NoConversion<Blob>()),
-                        new NoConversion<BigInteger>(),
-                        new ConvertEntityToBytes(serializer));
+                        new ConvertEntityToBytes(serializer),
+                        new FakeGarbageCollectionModule.NullMutatorListener(),
+                        new EntityReferenceUtil());
         entity = new DummyEntity();
     }
 

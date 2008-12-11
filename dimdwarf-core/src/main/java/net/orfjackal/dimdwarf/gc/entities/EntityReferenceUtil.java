@@ -29,28 +29,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.gc.entities;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.entities.dao.EntityDao;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceImpl;
+import net.orfjackal.dimdwarf.serial.*;
+import net.orfjackal.dimdwarf.util.SerializableIterable;
 
-import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
+import java.util.*;
 
 /**
  * @author Esko Luontola
- * @since 1.9.2008
+ * @since 11.12.2008
  */
-@Immutable
-public class EntityRepositoryImpl
-        extends DatabaseTableAdapter<BigInteger, Object, BigInteger, Blob>
-        implements EntityRepository {
+public class EntityReferenceUtil {
+    // TODO: invent a better name
 
-    @Inject
-    public EntityRepositoryImpl(EntityDao entities,
-                                NoConversion<BigInteger> keys,
-                                ConvertEntityToBytes values) {
-        super(entities, keys, values);
+    public Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
+        EntityReferenceListener collectReferences = new EntityReferenceListener();
+        new ObjectSerializerImpl(
+                new SerializationListener[]{collectReferences},
+                new SerializationReplacer[]{new TransparentReferenceDiscarder()}
+        ).deserialize(entity);
+        return new SerializableIterable<BigInteger>(collectReferences.getReferences());
+    }
+
+    private static class EntityReferenceListener extends SerializationAdapter {
+
+        private final List<BigInteger> references = new ArrayList<BigInteger>();
+
+        public void afterDeserialize(Object obj) {
+            if (obj instanceof EntityReference) {
+                EntityReference<?> ref = (EntityReference<?>) obj;
+                references.add(ref.getEntityId());
+            }
+        }
+
+        public List<BigInteger> getReferences() {
+            return new ArrayList<BigInteger>(references);
+        }
+    }
+
+    private static class TransparentReferenceDiscarder extends SerializationReplacerAdapter {
+
+        public Object resolveDeserialized(Object obj) {
+            if (obj instanceof TransparentReferenceImpl) {
+                return null;
+            }
+            return obj;
+        }
     }
 }

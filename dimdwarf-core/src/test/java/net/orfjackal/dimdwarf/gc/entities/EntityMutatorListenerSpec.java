@@ -54,9 +54,9 @@ import java.util.*;
 public class EntityMutatorListenerSpec extends Specification<Object> {
 
     private Provider<BindingRepository> bindings;
+    private Provider<EntityRepository> entities;
     private Provider<EntityInfo> info;
     private TaskExecutor taskContext;
-
     private MutatorListenerSpy listener;
 
     public void create() throws Exception {
@@ -70,6 +70,7 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
                     }
                 });
         bindings = injector.getProvider(BindingRepository.class);
+        entities = injector.getProvider(EntityRepository.class);
         info = injector.getProvider(EntityInfo.class);
         taskContext = injector.getInstance(TaskExecutor.class);
     }
@@ -78,34 +79,30 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
 
         private static final String ROOT_BINDING = "root";
 
+        // graph: root -> node1 -> node2
         private BigInteger rootId;
         private BigInteger nodeId1;
         private BigInteger nodeId2;
+        private BigInteger garbageId;
 
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    DummyEntity root = new DummyEntity();
-                    DummyEntity node1 = new DummyEntity();
-                    DummyEntity node2 = new DummyEntity();
+                    DummyInterface root = new DummyEntity();
+                    DummyInterface node1 = new DummyEntity();
+                    DummyInterface node2 = new DummyEntity();
                     rootId = info.get().getEntityId(root);
                     nodeId1 = info.get().getEntityId(node1);
                     nodeId2 = info.get().getEntityId(node2);
                     bindings.get().update(ROOT_BINDING, root);
                     root.setOther(node1);
+                    node1.setOther(node2);
                 }
             });
         }
 
-        public void isNotifiedAboutNewReferences() {
-//            specify(listener.events, should.contain("+" + rootId + "->" + nodeId1));
-        }
-
         public void isNotifiedAboutNewBindings() {
             specify(listener.events, should.contain("+null->" + rootId));
-        }
-
-        public void isNotifiedAboutRemovedReferences() {
         }
 
         public void isNotifiedAboutRemovedBindings() {
@@ -116,9 +113,6 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
                 }
             });
             specify(listener.events, should.containInOrder("-null->" + rootId));
-        }
-
-        public void isNotifiedAboutChangedReferences() {
         }
 
         public void isNotifiedAboutChangedBindings() {
@@ -133,12 +127,53 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
             specify(listener.events, should.containInOrder("-null->" + rootId, "+null->" + nodeId1));
         }
 
-        public void isNotifiedAboutCreatedEntitiesWithoutAnyReferences() {
-//            specify(listener.events, should.containInPartialOrder("+null->" + nodeId2, "-null->" + nodeId2));
+        public void isNotifiedAboutNewReferences() {
+            specify(listener.events, should.contain("+" + rootId + "->" + nodeId1));
         }
 
-        public void isNotifiedAboutRemovedEntities() {
+        public void isNotifiedAboutRemovedReferences() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyInterface root = (DummyInterface) bindings.get().read(ROOT_BINDING);
+                    root.setOther(null);
+                }
+            });
+            specify(listener.events, should.containInOrder("-" + rootId + "->" + nodeId1));
+        }
 
+        public void isNotifiedAboutChangedReferences() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyInterface root = (DummyInterface) bindings.get().read(ROOT_BINDING);
+                    DummyInterface node1 = (DummyInterface) root.getOther();
+                    DummyInterface node2 = (DummyInterface) node1.getOther();
+                    root.setOther(node2);
+                }
+            });
+            specify(listener.events, should.containInOrder("-" + rootId + "->" + nodeId1, "+" + rootId + "->" + nodeId2));
+        }
+
+        public void isNotifiedAboutEntitiesWhichAreGarbageAlreadyWhenCreated() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity garbage = new DummyEntity();
+                    garbageId = info.get().getEntityId(garbage);
+                }
+            });
+            specify(listener.events, should.containInOrder("+" + garbageId + "->" + garbageId, "-" + garbageId + "->" + garbageId));
+        }
+
+        public void isNotifiedAboutEntitiesWhichAreRemovedByTheGarbageCollector() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    entities.get().delete(nodeId1);
+                }
+            });
+            specify(listener.events, should.containInOrder("-" + nodeId1 + "->" + nodeId2));
         }
     }
 

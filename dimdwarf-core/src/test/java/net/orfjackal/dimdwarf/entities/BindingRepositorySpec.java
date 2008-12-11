@@ -37,7 +37,7 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.EntityInfoImpl;
-import net.orfjackal.dimdwarf.gc.entities.GcAwareBindingRepository;
+import net.orfjackal.dimdwarf.gc.entities.*;
 import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.tx.*;
@@ -76,13 +76,15 @@ public class BindingRepositorySpec extends Specification<Object> {
         entityManager =
                 new EntityManagerImpl(
                         new EntityIdFactoryImpl(BigInteger.ZERO),
-                        new EntityRepositoryImpl(
+                        new GcAwareEntityRepository(
                                 new EntityDao(
                                         entitiesTable,
                                         new ConvertBigIntegerToBytes(),
                                         new NoConversion<Blob>()),
-                                new NoConversion<BigInteger>(),
-                                new ConvertEntityToBytes(new ObjectSerializerImpl())));
+                                new ConvertEntityToBytes(
+                                        new ObjectSerializerImpl()),
+                                new FakeGarbageCollectionModule.NullMutatorListener(),
+                                new EntityReferenceUtil()));
 
         repository =
                 new GcAwareBindingRepository(

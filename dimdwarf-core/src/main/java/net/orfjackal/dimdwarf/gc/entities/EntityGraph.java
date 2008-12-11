@@ -32,16 +32,13 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.gc.Graph;
-import net.orfjackal.dimdwarf.serial.*;
-import net.orfjackal.dimdwarf.util.SerializableIterable;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * @author Esko Luontola
@@ -51,11 +48,13 @@ public class EntityGraph implements Graph<BigInteger> {
 
     private final EntityDao entities;
     private final BindingDao bindings;
+    private final EntityReferenceUtil util;
 
     @Inject
-    public EntityGraph(EntityDao entities, BindingDao bindings) {
+    public EntityGraph(EntityDao entities, BindingDao bindings, EntityReferenceUtil util) {
         this.entities = entities;
         this.bindings = bindings;
+        this.util = util;
     }
 
     public Iterable<BigInteger> getAllNodes() {
@@ -75,16 +74,7 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {
-        return getReferencedEntityIds(entities.read(node));
-    }
-
-    private static Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
-        EntityReferenceListener listener = new EntityReferenceListener();
-        new ObjectSerializerImpl(
-                new SerializationListener[]{listener},
-                new SerializationReplacer[0]
-        ).deserialize(entity);
-        return new SerializableIterable<BigInteger>(listener.getReferences());
+        return util.getReferencedEntityIds(entities.read(node));
     }
 
     public void removeNode(BigInteger node) {
@@ -159,19 +149,4 @@ public class EntityGraph implements Graph<BigInteger> {
         }
     }
 
-    private static class EntityReferenceListener extends SerializationAdapter {
-
-        private final List<BigInteger> references = new ArrayList<BigInteger>();
-
-        public void afterDeserialize(Object obj) {
-            if (obj instanceof EntityReference) {
-                EntityReference<?> ref = (EntityReference<?>) obj;
-                references.add(ref.getEntityId());
-            }
-        }
-
-        public List<BigInteger> getReferences() {
-            return new ArrayList<BigInteger>(references);
-        }
-    }
 }
