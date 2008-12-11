@@ -74,7 +74,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
                                 db,
                                 new ConvertBigIntegerToBytes(),
                                 new NoConversion<Blob>()),
-                        new ConvertEntityToBytes(serializer),
+                        serializer,
                         new FakeGarbageCollectionModule.NullMutatorListener(),
                         new EntityReferenceUtil());
         entity = new DummyEntity();

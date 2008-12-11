@@ -177,6 +177,7 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
         }
     }
 
+
     private static class MutatorListenerSpy implements MutatorListener<BigInteger> {
 
         public final List<String> events = new ArrayList<String>();

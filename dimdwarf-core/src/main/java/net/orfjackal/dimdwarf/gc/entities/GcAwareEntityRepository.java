@@ -37,6 +37,7 @@ import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.gc.MutatorListener;
 import net.orfjackal.dimdwarf.scopes.TaskScoped;
+import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigInteger;
@@ -51,18 +52,19 @@ import java.util.*;
 public class GcAwareEntityRepository implements EntityRepository {
 
     private final EntityDao entities;
-    private final ConvertEntityToBytes entityToBytes;
+    private final ObjectSerializer serializer;
     private final MutatorListener<BigInteger> listener;
     private final EntityReferenceUtil util;
+
     private final Map<BigInteger, List<BigInteger>> referencesOnRead = new HashMap<BigInteger, List<BigInteger>>();
 
     @Inject
     public GcAwareEntityRepository(EntityDao entities,
-                                   ConvertEntityToBytes entityToBytes,
+                                   ObjectSerializer serializer,
                                    MutatorListener<BigInteger> listener,
                                    EntityReferenceUtil util) {
         this.entities = entities;
-        this.entityToBytes = entityToBytes;
+        this.serializer = serializer;
         this.listener = listener;
         this.util = util;
     }
@@ -76,13 +78,9 @@ public class GcAwareEntityRepository implements EntityRepository {
         if (bytes.equals(Blob.EMPTY_BLOB)) {
             throw new EntityNotFoundException("id = " + id);
         }
-        rememberReferencedEntities(id, bytes);
-        return entityToBytes.back(bytes);
-    }
-
-    private void rememberReferencedEntities(BigInteger id, Blob bytes) {
         // TODO: combine the (de)serialization (which is done by default) and the counting of references - do not (de)serialize twise
         referencesOnRead.put(id, getReferences(bytes));
+        return serializer.deserialize(bytes);
     }
 
     private List<BigInteger> getReferences(Blob bytes) {
@@ -94,7 +92,8 @@ public class GcAwareEntityRepository implements EntityRepository {
     }
 
     public void update(BigInteger id, Object entity) {
-        Blob newData = entityToBytes.forth(entity);
+        // TODO: combine the (de)serialization (which is done by default) and the counting of references - do not (de)serialize twise
+        Blob newData = serializer.serialize(entity);
 
         List<BigInteger> oldReferences = referencesOnRead.remove(id);
         if (oldReferences == null) {

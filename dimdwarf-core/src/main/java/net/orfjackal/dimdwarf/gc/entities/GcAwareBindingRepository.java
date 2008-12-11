@@ -48,15 +48,15 @@ import java.math.BigInteger;
 public class GcAwareBindingRepository implements BindingRepository {
 
     private final BindingDao bindings;
-    private final ConvertEntityToEntityId idConverter;
+    private final ConvertEntityToEntityId entityToId;
     private final MutatorListener<BigInteger> listener;
 
     @Inject
     public GcAwareBindingRepository(BindingDao bindings,
-                                    ConvertEntityToEntityId idConverter,
+                                    ConvertEntityToEntityId entityToId,
                                     MutatorListener<BigInteger> listener) {
         this.bindings = bindings;
-        this.idConverter = idConverter;
+        this.entityToId = entityToId;
         this.listener = listener;
     }
 
@@ -69,7 +69,7 @@ public class GcAwareBindingRepository implements BindingRepository {
     }
 
     private Object entityFromId(BigInteger id) {
-        return idConverter.back(id);
+        return entityToId.back(id);
     }
 
     public void update(String binding, Object entity) {
@@ -80,7 +80,7 @@ public class GcAwareBindingRepository implements BindingRepository {
     }
 
     private BigInteger idFromEntity(Object entity) {
-        return idConverter.forth(entity);
+        return entityToId.forth(entity);
     }
 
     public void delete(String binding) {
