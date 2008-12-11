@@ -100,6 +100,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
     public class WhenCollectorHasNotBeenRun {
 
         public void newNodesAreByDefaultWhite() {
+            // TODO: or should they be black?
             specify(collector.getColor("A"), should.equal(WHITE));
             specify(collector.getColor("B"), should.equal(WHITE));
             specify(collector.getColor("C"), should.equal(WHITE));
