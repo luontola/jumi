@@ -31,20 +31,12 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
-import net.orfjackal.dimdwarf.entities.dao.*;
-import net.orfjackal.dimdwarf.entities.tref.EntityInfoImpl;
-import net.orfjackal.dimdwarf.gc.entities.*;
-import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
-import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
-import net.orfjackal.dimdwarf.tx.*;
+import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -54,114 +46,104 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class BindingRepositorySpec extends Specification<Object> {
 
-    private BindingRepository repository;
-    private DatabaseManager dbms;
-    private TransactionCoordinator tx;
-    private EntityManagerImpl entityManager;
-    private Logger txLogger;
+    private TaskExecutor taskContext;
+    private Provider<BindingRepository> bindings;
 
     public void create() throws Exception {
-        dbms = new InMemoryDatabaseManager();
-        txLogger = mock(Logger.class);
-    }
-
-    private void beginTask() {
-        tx = new TransactionImpl(txLogger);
-        // TODO: use guice instead of manual setup
-
-        Database<Blob, Blob> db = dbms.openConnection(tx.getTransaction());
-        DatabaseTable<Blob, Blob> bindingsTable = db.openTable("bindings");
-        DatabaseTableWithMetadata<Blob, Blob> entitiesTable = new DatabaseTableWithMetadataImpl<Blob, Blob>(db, "entities");
-
-        entityManager =
-                new EntityManagerImpl(
-                        new EntityIdFactoryImpl(BigInteger.ZERO),
-                        new GcAwareEntityRepository(
-                                new EntityDao(
-                                        entitiesTable,
-                                        new ConvertBigIntegerToBytes(),
-                                        new NoConversion<Blob>()),
-                                new ConvertEntityToBytes(
-                                        new ObjectSerializerImpl()),
-                                new FakeGarbageCollectionModule.NullMutatorListener(),
-                                new EntityReferenceUtil()));
-
-        repository =
-                new GcAwareBindingRepository(
-                        new BindingDao(
-                                bindingsTable,
-                                new ConvertStringToBytes(),
-                                new ConvertBigIntegerToBytes()),
-                        new ConvertEntityToEntityId(
-                                entityManager,
-                                new EntityInfoImpl(entityManager)),
-                        new FakeGarbageCollectionModule.NullMutatorListener());
-    }
-
-    private void endTask() {
-        entityManager.flushAllEntitiesToDatabase();
-        tx.prepareAndCommit();
+        Injector injector = Guice.createInjector(
+                new TaskContextModule(),
+                new DatabaseModule(),
+                new EntityModule(),
+                new FakeGarbageCollectionModule()
+        );
+        taskContext = injector.getInstance(TaskExecutor.class);
+        bindings = injector.getProvider(BindingRepository.class);
     }
 
 
     public class BindingLifecycle {
 
-        public void create() {
-            beginTask();
-        }
-
         public void whenBindingHasNotBeenCreatedItDoesNotExist() {
-            specify(repository.read("foo"), should.equal(null));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(bindings.get().read("foo"), should.equal(null));
+                }
+            });
         }
 
         public void whenBindingIsCreatedItDoesExist() {
-            repository.update("foo", new DummyEntity());
-            specify(repository.read("foo"), should.not().equal(null));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    bindings.get().update("foo", new DummyEntity());
+                    specify(bindings.get().read("foo"), should.not().equal(null));
+                }
+            });
         }
 
         public void whenBindingIsUpdatedItIsChanged() {
-            DummyEntity d1 = new DummyEntity("1");
-            DummyEntity d2 = new DummyEntity("2");
-            repository.update("foo", d1);
-            repository.update("foo", d2);
-            specify(repository.read("foo"), should.equal(d2));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity d1 = new DummyEntity("1");
+                    DummyEntity d2 = new DummyEntity("2");
+                    bindings.get().update("foo", d1);
+                    bindings.get().update("foo", d2);
+                    specify(bindings.get().read("foo"), should.equal(d2));
+                }
+            });
         }
 
         public void whenBindingIsDeletedItDoesNotExist() {
-            repository.update("foo", new DummyEntity());
-            repository.delete("foo");
-            specify(repository.read("foo"), should.equal(null));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    bindings.get().update("foo", new DummyEntity());
+                    bindings.get().delete("foo");
+                    specify(bindings.get().read("foo"), should.equal(null));
+                }
+            });
         }
     }
 
     public class BrowsingBindings {
 
         public void create() {
-            beginTask();
-            DummyEntity foo = new DummyEntity();
-            foo.setOther("foo");
-            repository.update("foo", foo);
-            repository.update("foo.2", new DummyEntity());
-            repository.update("foo.1", new DummyEntity());
-            repository.update("bar.x", new DummyEntity());
-            repository.update("bar.y", new DummyEntity());
-            endTask();
-            beginTask();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity foo = new DummyEntity();
+                    foo.setOther("foo");
+                    bindings.get().update("foo", foo);
+                    bindings.get().update("foo.2", new DummyEntity());
+                    bindings.get().update("foo.1", new DummyEntity());
+                    bindings.get().update("bar.x", new DummyEntity());
+                    bindings.get().update("bar.y", new DummyEntity());
+                }
+            });
         }
 
         public void bindingsAreInAlphabeticalOrder() {
-            specify(repository.firstKey(), should.equal("bar.x"));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(bindings.get().firstKey(), should.equal("bar.x"));
+                }
+            });
         }
 
         public void whenBindingsHaveTheSamePrefixTheShortestBindingIsFirst() {
-            specify(repository.nextKeyAfter("foo"), should.equal("foo.1"));
-            specify(repository.nextKeyAfter("foo.1"), should.equal("foo.2"));
-            specify(repository.nextKeyAfter("foo.2"), should.equal(null));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(bindings.get().nextKeyAfter("foo"), should.equal("foo.1"));
+                    specify(bindings.get().nextKeyAfter("foo.1"), should.equal("foo.2"));
+                    specify(bindings.get().nextKeyAfter("foo.2"), should.equal(null));
+                }
+            });
         }
 
         public void entitiesCanBeAccessedByTheBindingName() {
-            DummyEntity entity = (DummyEntity) repository.read("foo");
-            specify(entity.getOther(), should.equal("foo"));
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyEntity entity = (DummyEntity) bindings.get().read("foo");
+                    specify(entity.getOther(), should.equal("foo"));
+                }
+            });
         }
     }
 }
