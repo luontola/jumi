@@ -60,6 +60,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private DelegatingSerializationReplacer replacer;
 
     public void create() throws Exception {
+        // TODO: would it be better for this class to use Guice, to make sure that the EntityModule has all listeners configured?
         db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         SerializationListener[] listeners = {
                 new CheckDirectlyReferredEntitySerialized(),

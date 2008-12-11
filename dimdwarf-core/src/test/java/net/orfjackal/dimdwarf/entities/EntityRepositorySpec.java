@@ -95,6 +95,10 @@ public class EntityRepositorySpec extends Specification<Object> {
         }
 
         public void updatesEntities() {
+            // This is not a realistic test case, because entities are always saved at the end of the task,
+            // and they are read using EntityManager. If an ID is already already owned by an entity, the only
+            // possible object to be passed to the update() method is the same object which was read earlier
+            // with the read() method. Would it be better to remove this test case?
             taskContext.execute(new Runnable() {
                 public void run() {
                     entities.get().update(ENTITY_ID, new DummyEntity("B"));

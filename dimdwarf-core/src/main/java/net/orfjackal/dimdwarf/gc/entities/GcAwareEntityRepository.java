@@ -71,18 +71,22 @@ public class GcAwareEntityRepository implements EntityRepository {
     }
 
     public Object read(BigInteger id) {
-        Blob bytes = readFromDatabase(id);
-        DeserializationResult result = serializer.deserialize(bytes);
-        referencesOnRead.put(id, getReferencedEntities(result));
-        return result.getDeserializedObject();
+        DeserializationResult oldData = readFromDatabase(id);
+        cacheReferencesOnRead(id, oldData);
+        return oldData.getDeserializedObject();
     }
 
-    private Blob readFromDatabase(BigInteger id) {
+    private DeserializationResult readFromDatabase(BigInteger id) {
         Blob bytes = entities.read(id);
         if (bytes.equals(Blob.EMPTY_BLOB)) {
-            throw new EntityNotFoundException("id = " + id);
+            throw new EntityNotFoundException("id=" + id);
         }
-        return bytes;
+        return serializer.deserialize(bytes);
+    }
+
+    private void cacheReferencesOnRead(BigInteger id, DeserializationResult oldData) {
+        Set<BigInteger> oldReferences = getReferencedEntities(oldData);
+        referencesOnRead.put(id, oldReferences);
     }
 
     private static Set<BigInteger> getReferencedEntities(ResultWithMetadata result) {
@@ -91,38 +95,53 @@ public class GcAwareEntityRepository implements EntityRepository {
     }
 
     public void update(BigInteger id, Object entity) {
-        SerializationResult result = serializer.serialize(entity);
-        Blob newData = result.getSerializedBytes();
+        SerializationResult newData = serializer.serialize(entity);
+        entities.update(id, newData.getSerializedBytes());
+        fireEntityUpdated(id, newData);
+    }
 
-        Set<BigInteger> newReferences = getReferencedEntities(result);
+    private void fireEntityUpdated(BigInteger id, SerializationResult newData) {
+        Set<BigInteger> newReferences = getReferencedEntities(newData);
         Set<BigInteger> oldReferences = referencesOnRead.remove(id);
         if (oldReferences == null) {
-            listener.onReferenceCreated(id, id);
-            listener.onReferenceRemoved(id, id);
             oldReferences = Collections.emptySet();
+            fireEntityCreated(id);
         }
+        fireReferencesRemoved(id, newReferences, oldReferences);
+        fireReferencesCreated(id, newReferences, oldReferences);
+    }
 
+    private void fireEntityCreated(BigInteger id) {
+        listener.onReferenceCreated(id, id);
+        listener.onReferenceRemoved(id, id);
+    }
+
+    private void fireReferencesRemoved(BigInteger id, Set<BigInteger> newReferences, Set<BigInteger> oldReferences) {
         for (BigInteger targetId : oldReferences) {
             if (!newReferences.contains(targetId)) {
                 listener.onReferenceRemoved(id, targetId);
             }
         }
+    }
+
+    private void fireReferencesCreated(BigInteger id, Set<BigInteger> newReferences, Set<BigInteger> oldReferences) {
         for (BigInteger targetId : newReferences) {
             if (!oldReferences.contains(targetId)) {
                 listener.onReferenceCreated(id, targetId);
             }
         }
-
-        entities.update(id, newData);
     }
 
     public void delete(BigInteger id) {
-        Blob data = entities.read(id);
-        DeserializationResult result = serializer.deserialize(data);
-        for (BigInteger targetId : getReferencedEntities(result)) {
-            listener.onReferenceRemoved(id, targetId);
-        }
+        DeserializationResult oldData = readFromDatabase(id);
         entities.delete(id);
+        fireEntityDeleted(id, oldData);
+    }
+
+    private void fireEntityDeleted(BigInteger id, DeserializationResult oldData) {
+        Set<BigInteger> newReferences = Collections.emptySet();
+        Set<BigInteger> oldReferences = getReferencedEntities(oldData);
+        fireReferencesRemoved(id, newReferences, oldReferences);
     }
 
     public BigInteger firstKey() {
