@@ -65,6 +65,9 @@ public class ConvertEntityToEntityId implements Converter<Object, BigInteger> {
         if (entity == null) {
             return null;
         }
+        // EntityInfo must be used instead of EntityManager, because the object
+        // could be a transparent reference proxy, and EntityManager does not
+        // know how to handle transparent references.
         return entityInfo.getEntityId(entity);
     }
 }
