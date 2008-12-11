@@ -73,6 +73,9 @@ public class GcAwareEntityRepository implements EntityRepository {
 
     public Object read(BigInteger id) {
         Blob bytes = entities.read(id);
+        if (bytes.equals(Blob.EMPTY_BLOB)) {
+            throw new EntityNotFoundException("id = " + id);
+        }
         rememberReferencedEntities(id, bytes);
         return entityToBytes.back(bytes);
     }

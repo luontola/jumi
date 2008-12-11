@@ -31,20 +31,14 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.entities.dao.EntityDao;
-import net.orfjackal.dimdwarf.gc.entities.*;
-import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
-import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
-import org.jmock.Expectations;
+import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
-import java.util.Collections;
 
 /**
  * @author Esko Luontola
@@ -55,73 +49,76 @@ import java.util.Collections;
 public class EntityRepositorySpec extends Specification<Object> {
 
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
+    private static final BigInteger INVALID_ENTITY_ID = BigInteger.valueOf(999);
 
-    private DatabaseTableWithMetadata<Blob, Blob> db;
-    private ObjectSerializer serializer;
-    private GcAwareEntityRepository repository;
-    private EntityObject entity;
-    private Blob serialized;
+    private TaskExecutor taskContext;
+    private Provider<EntityRepository> entities;
 
     public void create() throws Exception {
-        db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
-        serializer = mock(ObjectSerializer.class);
-        repository =
-                new GcAwareEntityRepository(
-                        new EntityDao(
-                                db,
-                                new ConvertBigIntegerToBytes(),
-                                new NoConversion<Blob>()),
-                        new ConvertEntityToBytes(serializer),
-                        new FakeGarbageCollectionModule.NullMutatorListener(),
-                        new EntityReferenceUtil() {
-                            public Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
-                                return Collections.emptyList(); // TODO: messy test setup - it might be better to rewrite this spec
-                            }
-                        });
-        entity = new DummyEntity();
-        serialized = Blob.fromBytes(new byte[]{1, 2, 3});
-    }
-
-    private static Blob asBytes(BigInteger id) {
-        return new ConvertBigIntegerToBytes().forth(id);
+        Injector injector = Guice.createInjector(
+                new TaskContextModule(),
+                new DatabaseModule(),
+                new EntityModule(),
+                new FakeGarbageCollectionModule()
+        );
+        taskContext = injector.getInstance(TaskExecutor.class);
+        entities = injector.getProvider(EntityRepository.class);
     }
 
 
     public class AnEntityRepository {
 
-        public void readsEntitiesFromDatabase() {
-            checking(new Expectations() {{
-                one(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
-                one(serializer).deserialize(serialized); will(returnValue(entity));
-            }});
-            specify(repository.read(ENTITY_ID), should.equal(entity));
-        }
-
-        public void canNotReadNonexistentEntities() {
-            checking(new Expectations() {{
-                one(db).read(asBytes(ENTITY_ID)); will(returnValue(Blob.EMPTY_BLOB));
-            }});
-            specify(new Block() {
-                public void run() throws Throwable {
-                    repository.read(ENTITY_ID);
+        public void create() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(entities.get().exists(ENTITY_ID), should.equal(false));
+                    entities.get().update(ENTITY_ID, new DummyEntity("A"));
+                    specify(entities.get().exists(ENTITY_ID), should.equal(true));
                 }
-            }, should.raise(EntityNotFoundException.class));
+            });
         }
 
-        public void writesEntitiesToDatabase() {
-            checking(new Expectations() {{
-                one(serializer).serialize(entity); will(returnValue(serialized));
-                one(db).update(asBytes(ENTITY_ID), serialized);
-            }});
-            repository.update(ENTITY_ID, entity);
+        public void readsEntitiesFromDatabase() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyInterface e = (DummyInterface) entities.get().read(ENTITY_ID);
+                    specify(e.getOther(), should.equal("A"));
+                }
+            });
+        }
+
+        public void updatesEntitiesInDatabase() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    entities.get().update(ENTITY_ID, new DummyEntity("B"));
+                    DummyInterface e = (DummyInterface) entities.get().read(ENTITY_ID);
+                    specify(e.getOther(), should.equal("B"));
+                }
+            });
         }
 
         public void deletesEntitiesFromDatabase() {
-            checking(new Expectations() {{
-                allowing(db).read(asBytes(ENTITY_ID)); will(returnValue(serialized));
-                one(db).delete(asBytes(ENTITY_ID));
-            }});
-            repository.delete(ENTITY_ID);
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(entities.get().exists(ENTITY_ID), should.equal(true));
+                    entities.get().delete(ENTITY_ID);
+                    specify(entities.get().exists(ENTITY_ID), should.equal(false));
+                }
+            });
+        }
+
+        public void canNotReadNonexistentEntities() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+
+                    specify(entities.get().exists(INVALID_ENTITY_ID), should.equal(false));
+                    specify(new Block() {
+                        public void run() throws Throwable {
+                            entities.get().read(INVALID_ENTITY_ID);
+                        }
+                    }, should.raise(EntityNotFoundException.class));
+                }
+            });
         }
     }
 
