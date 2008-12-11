@@ -41,21 +41,16 @@ import java.util.*;
  * @since 11.12.2008
  */
 @Immutable
-public class SerializationResult {
+public class SerializationResult extends ResultWithMetadata {
 
     private final Blob serializedBytes;
-    private final Map<Class<?>, List<Object>> metadata;
 
-    public SerializationResult(Blob serializedBytes, Map<Class<?>, List<Object>> metadata) {
+    public SerializationResult(Blob serializedBytes, Map<Class<?>, List<?>> metadata) {
+        super(metadata);
         this.serializedBytes = serializedBytes;
-        this.metadata = Collections.unmodifiableMap(metadata);
     }
 
     public Blob getSerializedBytes() {
         return serializedBytes;
-    }
-
-    public Map<Class<?>, List<Object>> getMetadata() {
-        return metadata;
     }
 }

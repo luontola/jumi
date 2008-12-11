@@ -198,23 +198,31 @@ public class ObjectSerializerSpec extends Specification<Object> {
         }
 
         public void isCollectedByTheListenersDuringSerialization() {
-            specify(ser.getMetadata().get(SerializationListener.class),
+            specify(ser.getMetadata(SerializationListener.class),
                     should.containInOrder("beforeReplace", "beforeSerialize"));
         }
 
         public void isCollectedByTheListenersDuringDeserialization() {
-            specify(deser.getMetadata().get(SerializationListener.class),
+            specify(deser.getMetadata(SerializationListener.class),
                     should.containInOrder("afterDeserialize", "afterResolve"));
         }
 
         public void isCollectedByTheReplacersDuringSerialization() {
-            specify(ser.getMetadata().get(SerializationReplacer.class),
+            specify(ser.getMetadata(SerializationReplacer.class),
                     should.containInOrder("replaceSerialized"));
         }
 
         public void isCollectedByTheReplacersDuringDeserialization() {
-            specify(deser.getMetadata().get(SerializationReplacer.class),
+            specify(deser.getMetadata(SerializationReplacer.class),
                     should.containInOrder("resolveDeserialized"));
+        }
+
+        public void byDefaultSerializationMetadataIsEmpty() {
+            specify(ser.getMetadata(Object.class), should.containInOrder());
+        }
+
+        public void byDefaultDeserializationMetadataIsEmpty() {
+            specify(deser.getMetadata(Object.class), should.containInOrder());
         }
     }
 }

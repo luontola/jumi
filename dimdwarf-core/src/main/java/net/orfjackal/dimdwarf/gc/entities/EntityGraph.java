@@ -35,10 +35,12 @@ import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.gc.Graph;
+import net.orfjackal.dimdwarf.serial.*;
+import net.orfjackal.dimdwarf.util.SerializableIterable;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -48,13 +50,13 @@ public class EntityGraph implements Graph<BigInteger> {
 
     private final EntityDao entities;
     private final BindingDao bindings;
-    private final EntityReferenceUtil util;
+    private final ObjectSerializer serializer;
 
     @Inject
-    public EntityGraph(EntityDao entities, BindingDao bindings, EntityReferenceUtil util) {
+    public EntityGraph(EntityDao entities, BindingDao bindings, ObjectSerializer serializer) {
         this.entities = entities;
         this.bindings = bindings;
-        this.util = util;
+        this.serializer = serializer;
     }
 
     public Iterable<BigInteger> getAllNodes() {
@@ -74,7 +76,14 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {
-        return util.getReferencedEntityIds(entities.read(node));
+        Blob entity = entities.read(node);
+        List<BigInteger> ids = getReferencedEntityIds(entity);
+        return new SerializableIterable<BigInteger>(ids);
+    }
+
+    private List<BigInteger> getReferencedEntityIds(Blob entity) {
+        DeserializationResult result = serializer.deserialize(entity);
+        return result.getMetadata(EntityReferenceListener.class);
     }
 
     public void removeNode(BigInteger node) {
@@ -148,5 +157,4 @@ public class EntityGraph implements Graph<BigInteger> {
             iterator.remove();
         }
     }
-
 }

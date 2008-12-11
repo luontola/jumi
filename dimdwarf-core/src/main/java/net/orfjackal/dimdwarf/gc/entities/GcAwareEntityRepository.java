@@ -54,19 +54,16 @@ public class GcAwareEntityRepository implements EntityRepository {
     private final EntityDao entities;
     private final ObjectSerializer serializer;
     private final MutatorListener<BigInteger> listener;
-    private final EntityReferenceUtil util;
 
     private final Map<BigInteger, List<BigInteger>> referencesOnRead = new HashMap<BigInteger, List<BigInteger>>();
 
     @Inject
     public GcAwareEntityRepository(EntityDao entities,
                                    ObjectSerializer serializer,
-                                   MutatorListener<BigInteger> listener,
-                                   EntityReferenceUtil util) {
+                                   MutatorListener<BigInteger> listener) {
         this.entities = entities;
         this.serializer = serializer;
         this.listener = listener;
-        this.util = util;
     }
 
     public boolean exists(BigInteger id) {
@@ -74,28 +71,28 @@ public class GcAwareEntityRepository implements EntityRepository {
     }
 
     public Object read(BigInteger id) {
+        Blob bytes = readFromDatabase(id);
+        DeserializationResult result = serializer.deserialize(bytes);
+        referencesOnRead.put(id, getReferencedEntities(result));
+        return result.getDeserializedObject();
+    }
+
+    private Blob readFromDatabase(BigInteger id) {
         Blob bytes = entities.read(id);
         if (bytes.equals(Blob.EMPTY_BLOB)) {
             throw new EntityNotFoundException("id = " + id);
         }
-        // TODO: combine the (de)serialization (which is done by default) and the counting of references - do not (de)serialize twise
-        referencesOnRead.put(id, getReferences(bytes));
-        DeserializationResult di = serializer.deserialize(bytes);
-        return di.getDeserializedObject();
+        return bytes;
     }
 
-    private List<BigInteger> getReferences(Blob bytes) {
-        List<BigInteger> references = new ArrayList<BigInteger>();
-        for (BigInteger ref : util.getReferencedEntityIds(bytes)) {
-            references.add(ref);
-        }
-        return references;
+    private static List<BigInteger> getReferencedEntities(ResultWithMetadata result) {
+        return result.getMetadata(EntityReferenceListener.class);
     }
 
     public void update(BigInteger id, Object entity) {
-        // TODO: combine the (de)serialization (which is done by default) and the counting of references - do not (de)serialize twise
-        SerializationResult si = serializer.serialize(entity);
-        Blob newData = si.getSerializedBytes();
+        SerializationResult result = serializer.serialize(entity);
+        Blob newData = result.getSerializedBytes();
+        List<BigInteger> newReferences = getReferencedEntities(result);
 
         List<BigInteger> oldReferences = referencesOnRead.remove(id);
         if (oldReferences == null) {
@@ -103,7 +100,6 @@ public class GcAwareEntityRepository implements EntityRepository {
             listener.onReferenceRemoved(id, id);
             oldReferences = Collections.emptyList();
         }
-        List<BigInteger> newReferences = getReferences(newData);
 
         // TODO: does not handle updating an entity twise during a task?
         // TODO: does not handle many outgoing references to the same entity correctly?
@@ -123,7 +119,8 @@ public class GcAwareEntityRepository implements EntityRepository {
 
     public void delete(BigInteger id) {
         Blob data = entities.read(id);
-        for (BigInteger targetId : getReferences(data)) {
+        DeserializationResult result = serializer.deserialize(data);
+        for (BigInteger targetId : getReferencedEntities(result)) {
             listener.onReferenceRemoved(id, targetId);
         }
         entities.delete(id);

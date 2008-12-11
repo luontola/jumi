@@ -35,7 +35,7 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
-import net.orfjackal.dimdwarf.gc.entities.*;
+import net.orfjackal.dimdwarf.gc.entities.GcAwareEntityRepository;
 import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
 import net.orfjackal.dimdwarf.serial.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
@@ -75,8 +75,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
                                 new ConvertBigIntegerToBytes(),
                                 new NoConversion<Blob>()),
                         serializer,
-                        new FakeGarbageCollectionModule.NullMutatorListener(),
-                        new EntityReferenceUtil());
+                        new FakeGarbageCollectionModule.NullMutatorListener());
         entity = new DummyEntity();
     }
 

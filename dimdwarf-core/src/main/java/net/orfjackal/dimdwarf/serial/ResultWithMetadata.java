@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.serial;
 
+import net.orfjackal.dimdwarf.util.Objects;
+
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
 
@@ -39,16 +41,19 @@ import java.util.*;
  * @since 11.12.2008
  */
 @Immutable
-public class DeserializationResult extends ResultWithMetadata {
+public abstract class ResultWithMetadata {
 
-    private final Object deserializedObject;
+    private final Map<Class<?>, List<?>> metadata;
 
-    public DeserializationResult(Object deserializedObject, Map<Class<?>, List<?>> metadata) {
-        super(metadata);
-        this.deserializedObject = deserializedObject;
+    public ResultWithMetadata(Map<Class<?>, List<?>> metadata) {
+        this.metadata = metadata;
     }
 
-    public Object getDeserializedObject() {
-        return deserializedObject;
+    public <T> List<T> getMetadata(Class<?> key) {
+        List<?> list = metadata.get(key);
+        if (list == null) {
+            list = Collections.emptyList();
+        }
+        return Objects.uncheckedCast(Collections.unmodifiableList(list));
     }
 }

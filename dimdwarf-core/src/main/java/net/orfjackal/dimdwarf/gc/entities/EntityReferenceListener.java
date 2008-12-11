@@ -32,55 +32,31 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.entities.tref.TransparentReferenceImpl;
 import net.orfjackal.dimdwarf.serial.*;
-import net.orfjackal.dimdwarf.util.SerializableIterable;
 
-import java.math.BigInteger;
-import java.util.*;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Esko Luontola
  * @since 11.12.2008
  */
-public class EntityReferenceUtil {
-    // TODO: invent a better name (or integrate this functionality to ObjectSerializer using listeners and better return values)
+@Immutable
+public class EntityReferenceListener extends SerializationAdapter {
 
-    public Iterable<BigInteger> getReferencedEntityIds(Blob entity) {
-        EntityReferenceListener collectReferences = new EntityReferenceListener();
-        DeserializationResult di = new ObjectSerializerImpl(
-                new SerializationListener[]{collectReferences},
-                new SerializationReplacer[]{new TransparentReferenceDiscarder()}
-        ).deserialize(entity);
-        return new SerializableIterable<BigInteger>(collectReferences.getReferences());
+    @Override
+    public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
+        appendIfReference(obj, meta);
     }
 
-    private static class EntityReferenceListener extends SerializationAdapter {
-
-        private final List<BigInteger> references = new ArrayList<BigInteger>();
-
-        @Override
-        public void afterDeserialize(Object obj, MetadataBuilder meta) {
-            if (obj instanceof EntityReference) {
-                EntityReference<?> ref = (EntityReference<?>) obj;
-                references.add(ref.getEntityId());
-            }
-        }
-
-        public List<BigInteger> getReferences() {
-            return new ArrayList<BigInteger>(references);
-        }
+    @Override
+    public void afterDeserialize(Object obj, MetadataBuilder meta) {
+        appendIfReference(obj, meta);
     }
 
-    private static class TransparentReferenceDiscarder extends SerializationReplacerAdapter {
-
-        @Override
-        public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
-            if (obj instanceof TransparentReferenceImpl) {
-                return null;
-            }
-            return obj;
+    private static void appendIfReference(Object obj, MetadataBuilder meta) {
+        if (obj instanceof EntityReference) {
+            EntityReference<?> ref = (EntityReference<?>) obj;
+            meta.append(EntityReferenceListener.class, ref.getEntityId());
         }
     }
 }

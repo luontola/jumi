@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.serial;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.Blob;
+import net.orfjackal.dimdwarf.util.Objects;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
@@ -155,8 +156,8 @@ public class ObjectSerializerImpl implements ObjectSerializer {
             list.add(value);
         }
 
-        public Map<Class<?>, List<Object>> getMetadata() {
-            return metadata;
+        public Map<Class<?>, List<?>> getMetadata() {
+            return Objects.uncheckedCast(metadata);
         }
     }
 }

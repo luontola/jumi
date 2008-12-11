@@ -60,12 +60,12 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(MaxEntityId.class)
                 .toInstance(BigInteger.ZERO); // TODO: import from database
 
-        bind(EntityRepository.class).to(GcAwareEntityRepository.class);
+        bind(EntityRepository.class).to(GcAwareEntityRepository.class); // TODO: move to GC module?
         bind(databaseTableConnectionWithMetadata())
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTableWithMetadata("entities"));
 
-        bind(BindingRepository.class).to(GcAwareBindingRepository.class);
+        bind(BindingRepository.class).to(GcAwareBindingRepository.class); // TODO: move to GC module?
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));
@@ -79,9 +79,10 @@ public class EntityModule extends AbstractModule {
         @Inject public CheckInnerClassSerialized listeneter1;
         @Inject public CheckDirectlyReferredEntitySerialized listeneter2;
         @Inject public InjectObjectsOnDeserialization listener3;
+        @Inject public EntityReferenceListener listener4;
 
         public SerializationListener[] get() {
-            return new SerializationListener[]{listeneter1, listeneter2, listener3};
+            return new SerializationListener[]{listeneter1, listeneter2, listener3, listener4};
         }
     }
 
