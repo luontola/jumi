@@ -61,49 +61,68 @@ public class BindingRepositorySpec extends Specification<Object> {
     }
 
 
-    public class BindingLifecycle {
+    public class ABindingRepository {
 
-        public void whenBindingHasNotBeenCreatedItDoesNotExist() {
+        private static final String BINDING = "binding";
+        private static final String INVALID_BINDING = "no-such-binding";
+
+        public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    specify(bindings.get().read("foo"), should.equal(null));
+                    DummyInterface e = new DummyEntity("A");
+                    bindings.get().update(BINDING, e);
                 }
             });
         }
 
-        public void whenBindingIsCreatedItDoesExist() {
+        public void createsBindings() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    bindings.get().update("foo", new DummyEntity());
-                    specify(bindings.get().read("foo"), should.not().equal(null));
+                    specify(bindings.get().exists(BINDING));
                 }
             });
         }
 
-        public void whenBindingIsUpdatedItIsChanged() {
+        public void readsBindings() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    DummyEntity d1 = new DummyEntity("1");
-                    DummyEntity d2 = new DummyEntity("2");
-                    bindings.get().update("foo", d1);
-                    bindings.get().update("foo", d2);
-                    specify(bindings.get().read("foo"), should.equal(d2));
+                    DummyInterface e = (DummyInterface) bindings.get().read(BINDING);
+                    specify(e.getOther(), should.equal("A"));
                 }
             });
         }
 
-        public void whenBindingIsDeletedItDoesNotExist() {
+        public void updatesBindings() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    bindings.get().update("foo", new DummyEntity());
-                    bindings.get().delete("foo");
-                    specify(bindings.get().read("foo"), should.equal(null));
+                    bindings.get().update(BINDING, new DummyEntity("B"));
+                    DummyInterface e = (DummyInterface) bindings.get().read(BINDING);
+                    specify(e.getOther(), should.equal("B"));
+                }
+            });
+        }
+
+        public void deletesBindings() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    bindings.get().delete(BINDING);
+                    specify(bindings.get().exists(BINDING), should.equal(false));
+                    specify(bindings.get().read(BINDING), should.equal(null));
+                }
+            });
+        }
+
+        public void canNotReadNonexistantBindings() {
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    specify(bindings.get().exists(INVALID_BINDING), should.equal(false));
+                    specify(bindings.get().read(INVALID_BINDING), should.equal(null));
                 }
             });
         }
     }
 
-    public class BrowsingBindings {
+    public class IterationOrderOfBindings {
 
         public void create() {
             taskContext.execute(new Runnable() {
@@ -133,15 +152,6 @@ public class BindingRepositorySpec extends Specification<Object> {
                     specify(bindings.get().nextKeyAfter("foo"), should.equal("foo.1"));
                     specify(bindings.get().nextKeyAfter("foo.1"), should.equal("foo.2"));
                     specify(bindings.get().nextKeyAfter("foo.2"), should.equal(null));
-                }
-            });
-        }
-
-        public void entitiesCanBeAccessedByTheBindingName() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    DummyEntity entity = (DummyEntity) bindings.get().read("foo");
-                    specify(entity.getOther(), should.equal("foo"));
                 }
             });
         }
