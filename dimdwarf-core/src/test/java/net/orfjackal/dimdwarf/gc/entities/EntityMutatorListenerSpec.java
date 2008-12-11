@@ -35,6 +35,7 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.gc.MutatorListener;
 import net.orfjackal.dimdwarf.modules.CommonModules;
@@ -75,7 +76,7 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
         taskContext = injector.getInstance(TaskExecutor.class);
     }
 
-    public class AMutatorListener {
+    public class TheMutatorListener {
 
         private static final String ROOT_BINDING = "root";
 
@@ -83,6 +84,7 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
         private BigInteger rootId;
         private BigInteger nodeId1;
         private BigInteger nodeId2;
+        private BigInteger otherNodeId;
         private BigInteger garbageId;
 
         public void create() {
@@ -175,6 +177,54 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
             });
             specify(listener.events, should.containInOrder("-" + nodeId1 + "->" + nodeId2));
         }
+
+        public void atMostOneReferenceIsCountedBetweenTwoEntities() {
+            rootRefersOtherNodeTwise();
+            specify(listener.events, listener.numberOfEvents("+" + rootId + "->" + otherNodeId) == 1);
+
+            rootRefersOtherNodeOnce();
+            specify(listener.events, should.containInOrder());
+
+            rootDoesNotReferOtherNode();
+            specify(listener.events, should.containInOrder("-" + rootId + "->" + otherNodeId));
+        }
+
+        private void rootRefersOtherNodeTwise() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyInterface root = (DummyInterface) bindings.get().read(ROOT_BINDING);
+                    DummyEntity other = new DummyEntity();
+                    otherNodeId = info.get().getEntityId(other);
+                    root.setOther(new EntityReference<?>[]{
+                            new EntityReferenceImpl<DummyEntity>(otherNodeId, other),
+                            new EntityReferenceImpl<DummyEntity>(otherNodeId, other),
+                    });
+                }
+            });
+        }
+
+        private void rootRefersOtherNodeOnce() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyInterface root = (DummyInterface) bindings.get().read(ROOT_BINDING);
+                    EntityReference<?>[] twoRefs = (EntityReference<?>[]) root.getOther();
+                    twoRefs[1] = null;
+                }
+            });
+        }
+
+        private void rootDoesNotReferOtherNode() {
+            listener.events.clear();
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    DummyInterface root = (DummyInterface) bindings.get().read(ROOT_BINDING);
+                    EntityReference<?>[] oneRef = (EntityReference<?>[]) root.getOther();
+                    oneRef[0] = null;
+                }
+            });
+        }
     }
 
 
@@ -188,6 +238,16 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
 
         public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
             events.add("-" + source + "->" + target);
+        }
+
+        private int numberOfEvents(String event) {
+            int count = 0;
+            for (String s : events) {
+                if (s.equals(event)) {
+                    count++;
+                }
+            }
+            return count;
         }
     }
 }

@@ -55,7 +55,7 @@ public class GcAwareEntityRepository implements EntityRepository {
     private final ObjectSerializer serializer;
     private final MutatorListener<BigInteger> listener;
 
-    private final Map<BigInteger, List<BigInteger>> referencesOnRead = new HashMap<BigInteger, List<BigInteger>>();
+    private final Map<BigInteger, Set<BigInteger>> referencesOnRead = new HashMap<BigInteger, Set<BigInteger>>();
 
     @Inject
     public GcAwareEntityRepository(EntityDao entities,
@@ -85,24 +85,23 @@ public class GcAwareEntityRepository implements EntityRepository {
         return bytes;
     }
 
-    private static List<BigInteger> getReferencedEntities(ResultWithMetadata result) {
-        return result.getMetadata(EntityReferenceListener.class);
+    private static Set<BigInteger> getReferencedEntities(ResultWithMetadata result) {
+        List<BigInteger> possibleDuplicates = result.getMetadata(EntityReferenceListener.class);
+        return new HashSet<BigInteger>(possibleDuplicates);
     }
 
     public void update(BigInteger id, Object entity) {
         SerializationResult result = serializer.serialize(entity);
         Blob newData = result.getSerializedBytes();
-        List<BigInteger> newReferences = getReferencedEntities(result);
 
-        List<BigInteger> oldReferences = referencesOnRead.remove(id);
+        Set<BigInteger> newReferences = getReferencedEntities(result);
+        Set<BigInteger> oldReferences = referencesOnRead.remove(id);
         if (oldReferences == null) {
             listener.onReferenceCreated(id, id);
             listener.onReferenceRemoved(id, id);
-            oldReferences = Collections.emptyList();
+            oldReferences = Collections.emptySet();
         }
 
-        // TODO: does not handle updating an entity twise during a task?
-        // TODO: does not handle many outgoing references to the same entity correctly?
         for (BigInteger targetId : oldReferences) {
             if (!newReferences.contains(targetId)) {
                 listener.onReferenceRemoved(id, targetId);
