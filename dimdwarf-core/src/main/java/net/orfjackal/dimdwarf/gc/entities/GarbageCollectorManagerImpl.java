@@ -58,8 +58,8 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
 
     @Inject
     public GarbageCollectorManagerImpl(Provider<GarbageCollector<BigInteger>> collector,
-                               Provider<TaskScheduler> scheduler,
-                               TaskExecutor taskContext) {
+                                       Provider<TaskScheduler> scheduler,
+                                       TaskExecutor taskContext) {
         this.collector = collector;
         this.scheduler = scheduler;
         this.taskContext = taskContext;
