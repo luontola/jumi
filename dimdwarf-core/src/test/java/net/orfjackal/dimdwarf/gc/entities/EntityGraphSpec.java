@@ -65,7 +65,8 @@ public class EntityGraphSpec extends Specification<Object> {
         Injector injector = Guice.createInjector(
                 new EntityModule(),
                 new DatabaseModule(),
-                new TaskContextModule()
+                new TaskContextModule(),
+                new FakeGarbageCollectionModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         info = injector.getProvider(EntityInfo.class);

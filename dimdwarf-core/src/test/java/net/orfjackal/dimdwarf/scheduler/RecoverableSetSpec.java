@@ -63,7 +63,8 @@ public class RecoverableSetSpec extends Specification<Object> {
         Injector injector = Guice.createInjector(
                 new EntityModule(),
                 new DatabaseModule(),
-                new TaskContextModule()
+                new TaskContextModule(),
+                new FakeGarbageCollectionModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         bindings = injector.getProvider(BindingRepository.class);

@@ -37,6 +37,8 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.EntityInfoImpl;
+import net.orfjackal.dimdwarf.gc.entities.GcAwareBindingRepository;
+import net.orfjackal.dimdwarf.modules.FakeGarbageCollectionModule;
 import net.orfjackal.dimdwarf.serial.ObjectSerializerImpl;
 import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
@@ -65,6 +67,7 @@ public class BindingRepositorySpec extends Specification<Object> {
 
     private void beginTask() {
         tx = new TransactionImpl(txLogger);
+        // TODO: use guice instead of manual setup
 
         Database<Blob, Blob> db = dbms.openConnection(tx.getTransaction());
         DatabaseTable<Blob, Blob> bindingsTable = db.openTable("bindings");
@@ -82,15 +85,15 @@ public class BindingRepositorySpec extends Specification<Object> {
                                 new ConvertEntityToBytes(new ObjectSerializerImpl())));
 
         repository =
-                new BindingRepositoryImpl(
+                new GcAwareBindingRepository(
                         new BindingDao(
                                 bindingsTable,
                                 new ConvertStringToBytes(),
                                 new ConvertBigIntegerToBytes()),
-                        new NoConversion<String>(),
                         new ConvertEntityToEntityId(
                                 entityManager,
-                                new EntityInfoImpl(entityManager)));
+                                new EntityInfoImpl(entityManager)),
+                        new FakeGarbageCollectionModule.NullMutatorListener());
     }
 
     private void endTask() {

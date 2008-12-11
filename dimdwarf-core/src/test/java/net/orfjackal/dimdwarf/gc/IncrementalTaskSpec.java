@@ -35,7 +35,7 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
-import net.orfjackal.dimdwarf.modules.CommonModules;
+import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -58,7 +58,7 @@ public class IncrementalTaskSpec extends Specification<Object> {
     private TestSpy spy;
 
     public void create() throws Exception {
-        server = new TestServer(new CommonModules());
+        server = new TestServer(new CommonModules(), new FakeGarbageCollectionModule());
         server.hideStartupShutdownLogs();
         server.start();
 

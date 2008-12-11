@@ -29,28 +29,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.entities.dao.BindingDao;
+import com.google.inject.*;
+import net.orfjackal.dimdwarf.gc.MutatorListener;
 
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 12.9.2008
+ * @since 11.12.2008
  */
-@Immutable
-public class BindingRepositoryImpl
-        extends DatabaseTableAdapter<String, Object, String, BigInteger>
-        implements BindingRepository {
+public class FakeGarbageCollectionModule extends AbstractModule {
 
-    @Inject
-    public BindingRepositoryImpl(BindingDao bindings,
-                                 NoConversion<String> keys,
-                                 ConvertEntityToEntityId values) {
-        super(bindings, keys, values);
+    protected void configure() {
+        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new NullMutatorListener());
+    }
+
+    public static class NullMutatorListener implements MutatorListener<BigInteger> {
+
+        public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
+        }
+
+        public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
+        }
     }
 }

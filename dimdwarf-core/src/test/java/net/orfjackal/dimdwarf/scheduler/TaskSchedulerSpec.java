@@ -72,6 +72,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 new EntityModule(),
                 new DatabaseModule(),
                 new TaskContextModule(),
+                new FakeGarbageCollectionModule(),
                 new AbstractModule() {
                     protected void configure() {
                         bind(Clock.class).toInstance(clock);

@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.*;
+import net.orfjackal.dimdwarf.gc.entities.GcAwareBindingRepository;
 import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 import net.orfjackal.dimdwarf.serial.*;
 
@@ -64,7 +65,7 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTableWithMetadata("entities"));
 
-        bind(BindingRepository.class).to(BindingRepositoryImpl.class);
+        bind(BindingRepository.class).to(GcAwareBindingRepository.class);
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));

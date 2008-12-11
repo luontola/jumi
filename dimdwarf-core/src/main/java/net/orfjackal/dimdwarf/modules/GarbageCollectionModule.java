@@ -36,6 +36,7 @@ import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
 import net.orfjackal.dimdwarf.gc.entities.*;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
@@ -45,9 +46,16 @@ import java.math.BigInteger;
 public class GarbageCollectionModule extends AbstractModule {
 
     protected void configure() {
-        bind(new Key<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
-        bind(new Key<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
+        bind(new TypeLiteral<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
+        bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
+        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new MutatorListener<BigInteger>() {
+            // TODO: use a real listener
+            public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
+            }
 
+            public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
+            }
+        });
         bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);
     }
 
