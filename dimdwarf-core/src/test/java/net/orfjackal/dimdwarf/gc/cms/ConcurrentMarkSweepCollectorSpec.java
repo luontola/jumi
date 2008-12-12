@@ -47,6 +47,8 @@ import java.util.*;
 @Group({"fast"})
 public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
+    private static final int MAX_NODES_PER_TASK = 1;
+
     private static final int STAGE_1_STEPS = 2;
     private static final int STAGE_2_STEPS = 5;
     private static final int STAGE_3_STEPS = 5;
@@ -69,7 +71,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         graph.createDirectedEdge("B", "A");
         graph.createDirectedEdge("B", "C");
 
-        collector = new ConcurrentMarkSweepCollector<String>(graph);
+        collector = new ConcurrentMarkSweepCollector<String>(graph, MAX_NODES_PER_TASK);
         graph.addMutatorListener(collector.getMutatorListener());
 
         Iterator<? extends IncrementalTask> stages = collector.getCollectorStagesToExecute().iterator();
@@ -100,7 +102,6 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
     public class WhenCollectorHasNotBeenRun {
 
         public void newNodesAreByDefaultWhite() {
-            // TODO: or should they be black?
             specify(collector.getColor("A"), should.equal(WHITE));
             specify(collector.getColor("B"), should.equal(WHITE));
             specify(collector.getColor("C"), should.equal(WHITE));
@@ -124,20 +125,27 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         public void thenTheStageEnds() {
             specify(stage1, should.containExactly());
         }
+
+        public void ifMutatorsCreateNewRootsTheyAreMarkedGray() {
+            graph.createDirectedEdge(null, "C");
+            specify(collector.getColor("C"), should.equal(GRAY));
+        }
     }
 
     public class InTheSecondStage {
+        private int remainingSteps;
 
         public void create() {
             stage1 = executeManySteps(stage1, STAGE_1_STEPS);
             stage2 = executeOneStep(stage2);
+            remainingSteps = STAGE_2_STEPS - MAX_NODES_PER_TASK;
         }
 
-        public void grayNodesAreMarkedBlack() {
+        public void grayNodesAreScannedBlack() {
             specify(collector.getColor("A"), should.equal(BLACK));
         }
 
-        public void nodesReachableFromBlackNodesAreMarkedGray() {
+        public void nodesReachableFromScannedBlackNodesAreMarkedGray() {
             specify(collector.getColor("B"), should.equal(GRAY));
         }
 
@@ -146,7 +154,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
             specify(collector.getColor("D"), should.equal(WHITE));
         }
 
-        public void theAlgorithmProceedsRecursivelyToNotYetReachedNodes() {
+        public void theAlgorithmProceedsRecursivelyToNotYetScannedNodes() {
             stage2 = executeOneStep(stage2);
             specify(collector.getColor("A"), should.equal(BLACK));
             specify(collector.getColor("B"), should.equal(BLACK));
@@ -155,7 +163,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         }
 
         public void finallyAllReachableNodesAreBlackAndUnreachableNodesAreWhite() {
-            stage2 = executeManySteps(stage2, STAGE_2_STEPS - 1);
+            stage2 = executeManySteps(stage2, remainingSteps);
             specify(collector.getColor("A"), should.equal(BLACK));
             specify(collector.getColor("B"), should.equal(BLACK));
             specify(collector.getColor("C"), should.equal(BLACK));
@@ -163,8 +171,33 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         }
 
         public void thenTheStageEnds() {
-            stage2 = executeManySteps(stage2, STAGE_2_STEPS - 1);
+            stage2 = executeManySteps(stage2, remainingSteps);
             specify(stage2, should.containExactly());
+        }
+
+        public void ifMutatorsCreateNewNodesTheyAreMarkedGrayAndLaterScannedBlack() {
+            graph.createNode("X");
+            graph.createDirectedEdge("A", "X");
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("X"), should.equal(GRAY));
+
+            stage2 = executeManySteps(stage2, remainingSteps);
+            specify(collector.getColor("A"), should.equal(BLACK));
+//            specify(collector.getColor("X"), should.equal(BLACK)); // TODO
+        }
+
+        public void ifMutatorsRedirectEdgesTheTargetNodesAreMarkedGrayAndLaterScannedBlack() {
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("C"), should.equal(WHITE));
+
+            graph.createDirectedEdge("A", "C");
+            graph.removeDirectedEdge("B", "C");
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("C"), should.equal(GRAY));
+
+            stage2 = executeManySteps(stage2, remainingSteps);
+            specify(collector.getColor("A"), should.equal(BLACK));
+//            specify(collector.getColor("C"), should.equal(BLACK)); // TODO
         }
     }
 
@@ -173,14 +206,29 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         public void create() {
             stage1 = executeManySteps(stage1, STAGE_1_STEPS);
             stage2 = executeManySteps(stage2, STAGE_2_STEPS);
+            mutatorCreatesANewNode();
             stage3 = executeManySteps(stage3, STAGE_3_STEPS);
         }
 
-        public void allWhiteNodesAreRemoved() {
-            specify(graph.getAllNodes(), should.containExactly("A", "B", "C"));
+        private void mutatorCreatesANewNode() {
+            graph.createNode("X");
+            graph.createDirectedEdge("A", "X");
+            stage3 = executeOneStep(stage3);
         }
 
-        public void theRemainingNodesAreMarkedWhite() {
+        public void blackNodesAreKept() {
+            specify(graph.getAllNodes(), should.containAll("A", "B", "C"));
+        }
+
+        public void whiteNodesAreRemoved() {
+            specify(graph.getAllNodes(), should.not().contain("D"));
+        }
+
+        public void ifMutatorsCreateNewNodesTheyAreKept() {
+            specify(graph.getAllNodes(), should.contain("X"));
+        }
+
+        public void theRemainingNodesAreClearedWhite() {
             specify(collector.getColor("A"), should.equal(WHITE));
             specify(collector.getColor("B"), should.equal(WHITE));
             specify(collector.getColor("C"), should.equal(WHITE));

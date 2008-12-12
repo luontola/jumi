@@ -49,23 +49,29 @@ import java.util.*;
 public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final int MAX_NODES_TO_REMOVE_PER_TASK = 100;
+    private static final int DEFAULT_MAX_NODES_PER_TASK = 10;
     private static final String COLOR_KEY = "cms-color";
 
     private final Graph<T> graph;
+    private final int maxNodesPerTask;
 
     @Inject
     public ConcurrentMarkSweepCollector(Graph<T> graph) {
+        this(graph, DEFAULT_MAX_NODES_PER_TASK);
+    }
+
+    public ConcurrentMarkSweepCollector(Graph<T> graph, int maxNodesPerTask) {
         this.graph = graph;
+        this.maxNodesPerTask = maxNodesPerTask;
     }
 
     public List<? extends IncrementalTask> getCollectorStagesToExecute() {
         return Arrays.asList(
-                new MarkAllRootNodesGray(graph.getRootNodes().iterator()),
-                new MarkReachableNodesBlack(graph.getRootNodes().iterator()),
+                new MarkRootNodesGray(graph.getRootNodes().iterator()),
+                new ScanReachableNodesBlack(graph.getRootNodes().iterator()),
                 new MultiStepIncrementalTask(
-                        new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(graph.getAllNodes().iterator()),
-                        MAX_NODES_TO_REMOVE_PER_TASK));
+                        new RemoveUnreachableWhiteNodesAndClearOtherNodesWhite(graph.getAllNodes().iterator()),
+                        maxNodesPerTask));
     }
 
     public MutatorListener<T> getMutatorListener() {
@@ -98,12 +104,12 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     }
 
 
-    private class MarkAllRootNodesGray implements IncrementalTask, Serializable {
+    private class MarkRootNodesGray implements IncrementalTask, Serializable {
         private static final long serialVersionUID = 1L;
 
         private final Iterator<T> rootNodes;
 
-        public MarkAllRootNodesGray(Iterator<T> rootNodes) {
+        public MarkRootNodesGray(Iterator<T> rootNodes) {
             this.rootNodes = rootNodes;
         }
 
@@ -114,17 +120,17 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
             T current = rootNodes.next();
             setColor(current, Color.GRAY);
             return Arrays.asList(
-                    new MarkAllRootNodesGray(rootNodes)
+                    new MarkRootNodesGray(rootNodes)
             );
         }
     }
 
-    private class MarkReachableNodesBlack implements IncrementalTask, Serializable {
+    private class ScanReachableNodesBlack implements IncrementalTask, Serializable {
         private static final long serialVersionUID = 1L;
 
         private final Iterator<T> nodes;
 
-        public MarkReachableNodesBlack(Iterator<T> nodes) {
+        public ScanReachableNodesBlack(Iterator<T> nodes) {
             this.nodes = nodes;
         }
 
@@ -134,24 +140,24 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
             }
             T current = nodes.next();
             if (getColor(current).equals(Color.BLACK)) {
-                return alreadyReachedAndMarkedBlack();
+                return alreadyScanned();
             } else {
-                return markReachedNodeBlack(current);
+                return scanNodeBlack(current);
             }
         }
 
-        private Collection<? extends IncrementalTask> alreadyReachedAndMarkedBlack() {
+        private Collection<? extends IncrementalTask> alreadyScanned() {
             return Arrays.asList(
-                    new MarkReachableNodesBlack(nodes)
+                    new ScanReachableNodesBlack(nodes)
             );
         }
 
-        private Collection<? extends IncrementalTask> markReachedNodeBlack(T current) {
+        private Collection<? extends IncrementalTask> scanNodeBlack(T current) {
             setColor(current, Color.BLACK);
             markUnseenConnectedNodesGray(current);
             return Arrays.asList(
-                    new MarkReachableNodesBlack(nodes),
-                    new MarkReachableNodesBlack(graph.getConnectedNodesOf(current).iterator())
+                    new ScanReachableNodesBlack(nodes),
+                    new ScanReachableNodesBlack(graph.getConnectedNodesOf(current).iterator())
             );
         }
 
@@ -164,12 +170,12 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
         }
     }
 
-    private class RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite implements IncrementalTask, Serializable {
+    private class RemoveUnreachableWhiteNodesAndClearOtherNodesWhite implements IncrementalTask, Serializable {
         private static final long serialVersionUID = 1L;
 
         private final Iterator<T> nodes;
 
-        public RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(Iterator<T> nodes) {
+        public RemoveUnreachableWhiteNodesAndClearOtherNodesWhite(Iterator<T> nodes) {
             this.nodes = nodes;
         }
 
@@ -181,10 +187,10 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
             if (isUnreachableGarbageNode(current)) {
                 graph.removeNode(current);
             } else {
-                resetColorToWhite(current);
+                clearColorToWhite(current);
             }
             return Arrays.asList(
-                    new RemoveUnreachableWhiteNodesAndMarkBlackNodesWhite(nodes)
+                    new RemoveUnreachableWhiteNodesAndClearOtherNodesWhite(nodes)
             );
         }
 
@@ -192,7 +198,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
             return getColor(current).equals(Color.WHITE);
         }
 
-        private void resetColorToWhite(T current) {
+        private void clearColorToWhite(T current) {
             setColor(current, Color.WHITE);
         }
     }
