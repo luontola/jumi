@@ -37,6 +37,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.BindingRepository;
 import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import static net.orfjackal.dimdwarf.scheduler.TaskSchedulerSpec.takeNextTaskFrom;
 import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.tx.*;
@@ -69,7 +70,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
                 new EntityModule(),
                 new DatabaseModule(),
                 new TaskContextModule(),
-                new FakeGarbageCollectionModule(),
+                new NullGarbageCollectionOption(),
                 new AbstractModule() {
                     protected void configure() {
                         bind(Clock.class).toInstance(clock);

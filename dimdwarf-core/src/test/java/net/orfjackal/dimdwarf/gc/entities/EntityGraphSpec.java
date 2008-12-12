@@ -37,6 +37,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.util.Objects;
 import org.junit.runner.RunWith;
@@ -53,20 +54,19 @@ import java.util.concurrent.atomic.*;
 @Group({"fast"})
 public class EntityGraphSpec extends Specification<Object> {
 
-    private Provider<EntityGraph> graph;
-
     private TaskExecutor taskContext;
     private Provider<EntityInfo> info;
     private Provider<BindingRepository> bindings;
+    private Provider<EntityGraph> graph;
 
     private BigInteger entityId;
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
-                new EntityModule(),
-                new DatabaseModule(),
                 new TaskContextModule(),
-                new FakeGarbageCollectionModule()
+                new DatabaseModule(),
+                new EntityModule(),
+                new NullGarbageCollectionOption()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         info = injector.getProvider(EntityInfo.class);

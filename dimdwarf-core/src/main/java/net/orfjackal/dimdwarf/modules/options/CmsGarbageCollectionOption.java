@@ -29,30 +29,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
+package net.orfjackal.dimdwarf.modules.options;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.gc.MutatorListener;
+import net.orfjackal.dimdwarf.gc.*;
+import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
+import net.orfjackal.dimdwarf.gc.entities.*;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 11.12.2008
+ * @since 10.12.2008
  */
-public class FakeGarbageCollectionModule extends AbstractModule {
+public class CmsGarbageCollectionOption extends AbstractModule {
 
     protected void configure() {
-        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new NullMutatorListener());
+        bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
+        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new MutatorListener<BigInteger>() {
+            // TODO: use a real listener
+            public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
+            }
+
+            public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
+            }
+        });
+        bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);
     }
 
-    public static class NullMutatorListener implements MutatorListener<BigInteger> {
+    private static class GarbageCollectorProvider implements Provider<GarbageCollector<BigInteger>> {
+        @Inject public Graph<BigInteger> graph;
 
-        public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
-        }
-
-        public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
+        public GarbageCollector<BigInteger> get() {
+            return new ConcurrentMarkSweepCollector<BigInteger>(graph);
         }
     }
+
+    // TODO: reference counting collector
+    // TODO: run the CMS collector periodically
 }

@@ -38,6 +38,7 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
@@ -64,7 +65,7 @@ public class RecoverableSetSpec extends Specification<Object> {
                 new EntityModule(),
                 new DatabaseModule(),
                 new TaskContextModule(),
-                new FakeGarbageCollectionModule()
+                new NullGarbageCollectionOption()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         bindings = injector.getProvider(BindingRepository.class);

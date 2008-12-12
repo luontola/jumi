@@ -37,7 +37,8 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.gc.entities.GarbageCollectorManager;
-import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.modules.CommonModules;
+import net.orfjackal.dimdwarf.modules.options.CmsGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -69,7 +70,10 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
     private BigInteger garbageCycleId2;
 
     public void create() throws Exception {
-        server = new TestServer(new CommonModules(), new GarbageCollectionModule());
+        server = new TestServer(
+                new CommonModules(),
+                new CmsGarbageCollectionOption()
+        );
         server.hideStartupShutdownLogs();
         server.start();
 

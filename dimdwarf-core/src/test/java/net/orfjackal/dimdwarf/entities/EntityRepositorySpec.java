@@ -35,6 +35,7 @@ import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
@@ -59,7 +60,7 @@ public class EntityRepositorySpec extends Specification<Object> {
                 new TaskContextModule(),
                 new DatabaseModule(),
                 new EntityModule(),
-                new FakeGarbageCollectionModule()
+                new NullGarbageCollectionOption()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         entities = injector.getProvider(EntityRepository.class);

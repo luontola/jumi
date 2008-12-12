@@ -29,32 +29,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules;
+package net.orfjackal.dimdwarf.modules.options;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.entities.dao.EntityDao;
-import net.orfjackal.dimdwarf.gc.*;
-import net.orfjackal.dimdwarf.gc.entities.*;
-import net.orfjackal.dimdwarf.util.Objects;
+import net.orfjackal.dimdwarf.gc.MutatorListener;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
- * @since 10.12.2008
+ * @since 11.12.2008
  */
-public class GarbageCollectionModule extends AbstractModule {
+public class NullGarbageCollectionOption extends AbstractModule {
 
     protected void configure() {
-        bind(new TypeLiteral<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
-        bind(NodeSetFactory.class).to(EntityNodeSetFactory.class);
+        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new NullMutatorListener());
     }
 
-    public static class EntityNodeSetFactory implements NodeSetFactory {
-        @Inject public EntityDao entities;
+    public static class NullMutatorListener implements MutatorListener<BigInteger> {
 
-        public <T> NodeSet<T> create(String name) {
-            return Objects.uncheckedCast(new EntityNodeSet(name, entities));
+        public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
+        }
+
+        public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
         }
     }
 }
