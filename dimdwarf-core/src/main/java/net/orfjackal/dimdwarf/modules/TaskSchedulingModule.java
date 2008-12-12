@@ -46,7 +46,6 @@ import java.util.concurrent.*;
 public class TaskSchedulingModule extends AbstractModule {
 
     protected void configure() {
-
         bind(TaskScheduler.class).to(TaskSchedulerImpl.class);
         bind(TaskProducer.class).to(TaskSchedulerImpl.class);
 

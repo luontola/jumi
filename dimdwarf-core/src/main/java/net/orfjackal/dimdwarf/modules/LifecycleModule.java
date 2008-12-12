@@ -42,7 +42,6 @@ import net.orfjackal.dimdwarf.scheduler.TaskSchedulingLifecycleManager;
 public class LifecycleModule extends AbstractModule {
 
     protected void configure() {
-
         bind(SystemLifecycleListener[].class).toProvider(SystemLifecycleListenerProvider.class);
     }
 

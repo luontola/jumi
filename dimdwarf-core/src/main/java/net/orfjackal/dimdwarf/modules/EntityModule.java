@@ -49,7 +49,6 @@ import java.math.BigInteger;
 public class EntityModule extends AbstractModule {
 
     protected void configure() {
-
         bind(EntityManager.class).to(EntityManagerImpl.class);
         bind(ReferenceFactory.class).to(ReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(EntityInfoImpl.class);
@@ -60,12 +59,12 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(MaxEntityId.class)
                 .toInstance(BigInteger.ZERO); // TODO: import from database
 
-        bind(EntityRepository.class).to(GcAwareEntityRepository.class); // TODO: move to GC module?
+        bind(EntityRepository.class).to(GcAwareEntityRepository.class);
         bind(databaseTableConnectionWithMetadata())
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTableWithMetadata("entities"));
 
-        bind(BindingRepository.class).to(GcAwareBindingRepository.class); // TODO: move to GC module?
+        bind(BindingRepository.class).to(GcAwareBindingRepository.class);
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));

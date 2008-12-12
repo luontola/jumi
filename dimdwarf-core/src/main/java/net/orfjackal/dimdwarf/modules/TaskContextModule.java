@@ -45,7 +45,6 @@ import net.orfjackal.dimdwarf.tx.*;
 public class TaskContextModule extends AbstractModule {
 
     protected void configure() {
-
         bindScope(TaskScoped.class, new TaskScope());
         bind(Context.class).to(TaskScopedContext.class);
 

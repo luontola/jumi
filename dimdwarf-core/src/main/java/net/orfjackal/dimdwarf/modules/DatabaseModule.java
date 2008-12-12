@@ -43,12 +43,8 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 public class DatabaseModule extends AbstractModule {
 
     protected void configure() {
-
-        bind(DatabaseManager.class)
-                .to(InMemoryDatabaseManager.class);
-
-        bind(new TypeLiteral<Database<Blob, Blob>>() {})
-                .toProvider(DatabaseConnectionProvider.class);
+        bind(DatabaseManager.class).to(InMemoryDatabaseManager.class);
+        bind(new TypeLiteral<Database<Blob, Blob>>() {}).toProvider(DatabaseConnectionProvider.class);
     }
 
     private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
