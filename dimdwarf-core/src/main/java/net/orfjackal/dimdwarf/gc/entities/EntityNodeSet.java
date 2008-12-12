@@ -29,45 +29,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc;
+package net.orfjackal.dimdwarf.gc.entities;
 
-import jdave.*;
-import jdave.junit4.JDaveRunner;
-import org.junit.runner.RunWith;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.entities.dao.EntityDao;
+import net.orfjackal.dimdwarf.gc.NodeSet;
 
-import java.util.*;
+import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 12.12.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class MockNodeSetSpec extends Specification<Object> {
+public class EntityNodeSet implements NodeSet<BigInteger> {
 
-    private MockNodeSet set = new MockNodeSet();
+    private static final Blob PLACEHOLDER = Blob.fromBytes(new byte[]{1});
 
+    private final String name;
+    private final EntityDao entities;
 
-    public class WhenNodeSetIsEmpty {
-
-        public void itContainsNoNodes() {
-            specify(set.pollFirst(), should.equal(null));
-        }
+    @Inject
+    public EntityNodeSet(String name, EntityDao entities) {
+        this.name = name;
+        this.entities = entities;
     }
 
-    public class WhenNodesHaveBeenAddedToNodeSet {
+    private DatabaseTable<BigInteger, Blob> getTable() {
+        return entities.getMetaTable(name);
+    }
 
-        public void create() {
-            set.add("A");
-            set.add("B");
-        }
+    public void add(BigInteger node) {
+        getTable().update(node, PLACEHOLDER);
+    }
 
-        public void thoseNodesCanBeTakenFromIt() {
-            List<String> taken = new ArrayList<String>();
-            taken.add(set.pollFirst());
-            taken.add(set.pollFirst());
-            specify(taken, should.containExactly("A", "B"));
-            specify(set.pollFirst(), should.equal(null));
+    public BigInteger pollFirst() {
+        DatabaseTable<BigInteger, Blob> t = getTable();
+        BigInteger first = t.firstKey();
+        if (first != null) {
+            t.delete(first);
         }
+        return first;
     }
 }
