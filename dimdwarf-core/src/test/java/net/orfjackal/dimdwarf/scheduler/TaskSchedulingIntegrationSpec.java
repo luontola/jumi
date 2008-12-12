@@ -189,11 +189,6 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
         public void run() {
             myExecutionCount++;
             spy.logExecution(getDummyId(), myExecutionCount);
-//            System.err.println("*** TaskSchedulingIntegrationSpec$ExecutionLoggingTask.run");
-//            System.err.println("*** getDummyId() = " + getDummyId());
-//            System.err.println("*** myExecutionCount = " + myExecutionCount);
         }
     }
-
-    // TODO: repeated tasks should not create more entities. otherwise the garbage collector would produce more garbage than it collects.
 }

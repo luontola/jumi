@@ -60,6 +60,9 @@ public class IncrementalTaskRunner implements Runnable, Serializable {
         } else {
             tasks.addAll(task.step());
             scheduler.submit(this);
+            // TODO: Run incremental tasks without scheduling new tasks and as such creating new entities.
+            // Submitting a new task will create a new entity, which is problematic because
+            // that causes more work for the garbage collector while the collector is running.
         }
     }
 }
