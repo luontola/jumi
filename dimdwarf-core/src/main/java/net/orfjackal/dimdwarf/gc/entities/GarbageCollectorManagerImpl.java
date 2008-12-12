@@ -66,6 +66,7 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
     }
 
     public void runGarbageCollector() throws InterruptedException {
+        // TODO: create RetryingTaskExecutor (with injectable retry strategy) and do not use TaskScheduler here, to avoid creating entities through running GC
         lock.lock();
         try {
             taskContext.execute(new Runnable() {

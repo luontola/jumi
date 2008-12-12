@@ -94,6 +94,8 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     public Color getColor(T node) {
         byte[] value = graph.getMetadata(node, COLOR_KEY);
         if (value.length == 0) {
+            // TODO: Revert the default back to white, when running GC does not anymore produce garbage.
+            // Alternatively add a onNodeCreated method to MutatorListener and scan new nodes.
             return Color.BLACK;
         }
         return Color.parseIndex(value[0]);
