@@ -54,6 +54,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
     private static final int STAGE_3_STEPS = 5;
 
     private MockGraph graph;
+    private MockNodeSetFactory factory;
     private ConcurrentMarkSweepCollector<String> collector;
 
     private Collection<? extends IncrementalTask> stage1;
@@ -62,6 +63,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
     public void create() throws Exception {
         graph = new MockGraph();
+        factory = new MockNodeSetFactory();
         graph.createNode("A");
         graph.createNode("B");
         graph.createNode("C");
@@ -71,7 +73,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         graph.createDirectedEdge("B", "A");
         graph.createDirectedEdge("B", "C");
 
-        collector = new ConcurrentMarkSweepCollector<String>(graph, MAX_NODES_PER_TASK);
+        collector = new ConcurrentMarkSweepCollector<String>(graph, factory, MAX_NODES_PER_TASK);
         graph.addMutatorListener(collector.getMutatorListener());
 
         Iterator<? extends IncrementalTask> stages = collector.getCollectorStagesToExecute().iterator();
@@ -183,7 +185,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
             stage2 = executeManySteps(stage2, remainingSteps);
             specify(collector.getColor("A"), should.equal(BLACK));
-//            specify(collector.getColor("X"), should.equal(BLACK)); // TODO
+            specify(collector.getColor("X"), should.equal(BLACK));
         }
 
         public void ifMutatorsRedirectEdgesTheTargetNodesAreMarkedGrayAndLaterScannedBlack() {
@@ -197,7 +199,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
             stage2 = executeManySteps(stage2, remainingSteps);
             specify(collector.getColor("A"), should.equal(BLACK));
-//            specify(collector.getColor("C"), should.equal(BLACK)); // TODO
+            specify(collector.getColor("C"), should.equal(BLACK));
         }
     }
 

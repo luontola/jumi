@@ -36,18 +36,20 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.gc.NodeSet;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 12.12.2008
  */
-public class EntityNodeSet implements NodeSet<BigInteger> {
+public class EntityNodeSet implements NodeSet<BigInteger>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Blob PLACEHOLDER = Blob.fromBytes(new byte[]{1});
 
     private final String name;
-    private final EntityDao entities;
+    @Inject public transient final EntityDao entities;
 
     @Inject
     public EntityNodeSet(String name, EntityDao entities) {

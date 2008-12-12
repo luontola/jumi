@@ -29,44 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.modules.options;
+package net.orfjackal.dimdwarf.gc;
 
-import com.google.inject.*;
-import net.orfjackal.dimdwarf.gc.*;
-import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
-import net.orfjackal.dimdwarf.gc.entities.*;
-
-import javax.annotation.Nullable;
-import java.math.BigInteger;
+import net.orfjackal.dimdwarf.util.Objects;
 
 /**
  * @author Esko Luontola
- * @since 10.12.2008
+ * @since 12.12.2008
  */
-public class CmsGarbageCollectionOption extends AbstractModule {
+public class MockNodeSetFactory implements NodeSetFactory {
 
-    protected void configure() {
-        bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
-        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new MutatorListener<BigInteger>() {
-            // TODO: use a real listener
-            public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
-            }
-
-            public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
-            }
-        });
-        bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);
+    public <T> NodeSet<T> create(String name) {
+        return Objects.uncheckedCast(new MockNodeSet());
     }
-
-    private static class GarbageCollectorProvider implements Provider<GarbageCollector<BigInteger>> {
-        @Inject public Graph<BigInteger> graph;
-        @Inject public NodeSetFactory factory;
-
-        public GarbageCollector<BigInteger> get() {
-            return new ConcurrentMarkSweepCollector<BigInteger>(graph, factory);
-        }
-    }
-
-    // TODO: reference counting collector
-    // TODO: run the CMS collector periodically
 }
