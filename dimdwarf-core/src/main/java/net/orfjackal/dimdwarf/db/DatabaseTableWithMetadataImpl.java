@@ -51,7 +51,7 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
         this.dataTable = db.openTable(tableName);
     }
 
-    private DatabaseTable<K, V> getMetaTable(String metaKey) {
+    public DatabaseTable<K, V> getMetaTable(String metaKey) {
         return db.openTable(tableName + META_SEPARATOR + metaKey);
     }
 

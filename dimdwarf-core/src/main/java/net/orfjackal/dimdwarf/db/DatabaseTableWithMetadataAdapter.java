@@ -52,6 +52,10 @@ public class DatabaseTableWithMetadataAdapter<K1, V1, K2, V2>
         this.values = values;
     }
 
+    public DatabaseTable<K1, V1> getMetaTable(String metaKey) {
+        return new DatabaseTableAdapter<K1, V1, K2, V2>(parent.getMetaTable(metaKey), keys, values);
+    }
+
     public V1 readMetadata(K1 key, String metaKey) {
         return values.back(parent.readMetadata(keys.forth(key), metaKey));
     }

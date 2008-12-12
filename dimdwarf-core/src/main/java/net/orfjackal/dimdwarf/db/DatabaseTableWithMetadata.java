@@ -39,6 +39,13 @@ public interface DatabaseTableWithMetadata<K, V> extends DatabaseTable<K, V> {
 
     String META_SEPARATOR = "$";
 
+    /**
+     * Gives direct low-level access to the underlying metadata table.
+     * The user is responsible for not writing keys which do not exist
+     * in the parent table.
+     */
+    DatabaseTable<K, V> getMetaTable(String metaKey);
+
     V readMetadata(K key, String metaKey);
 
     void updateMetadata(K key, String metaKey, V metaValue);
