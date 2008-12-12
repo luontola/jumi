@@ -36,7 +36,7 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.util.Objects;
@@ -63,9 +63,7 @@ public class EntityGraphSpec extends Specification<Object> {
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
-                new TaskContextModule(),
-                new DatabaseModule(),
-                new EntityModule(),
+                new CommonModules(),
                 new NullGarbageCollectionOption()
         );
         taskContext = injector.getInstance(TaskExecutor.class);

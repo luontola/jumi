@@ -48,6 +48,8 @@ public class GarbageCollectionModule extends AbstractModule {
     protected void configure() {
         bind(new TypeLiteral<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
         bind(NodeSetFactory.class).to(EntityNodeSetFactory.class);
+
+        bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);
     }
 
     public static class EntityNodeSetFactory implements NodeSetFactory {

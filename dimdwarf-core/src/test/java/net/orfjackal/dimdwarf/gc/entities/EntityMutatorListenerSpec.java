@@ -37,8 +37,9 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.gc.MutatorListener;
+import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.modules.CommonModules;
+import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
@@ -66,8 +67,8 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
                 new CommonModules(),
                 new AbstractModule() {
                     protected void configure() {
-                        bind(new TypeLiteral<MutatorListener<BigInteger>>() {
-                        }).toInstance(listener);
+                        bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toInstance(new NullGarbageCollectionOption.NullGarbageCollector());
+                        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(listener);
                     }
                 });
         bindings = injector.getProvider(BindingRepository.class);

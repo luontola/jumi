@@ -34,9 +34,7 @@ package net.orfjackal.dimdwarf.modules.options;
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
-import net.orfjackal.dimdwarf.gc.entities.*;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
@@ -47,15 +45,7 @@ public class CmsGarbageCollectionOption extends AbstractModule {
 
     protected void configure() {
         bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
-        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new MutatorListener<BigInteger>() {
-            // TODO: use a real listener
-            public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
-            }
-
-            public void onReferenceRemoved(@Nullable BigInteger source, BigInteger target) {
-            }
-        });
-        bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);
+        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toProvider(MutatorListenerProvider.class);
     }
 
     private static class GarbageCollectorProvider implements Provider<GarbageCollector<BigInteger>> {
@@ -64,6 +54,14 @@ public class CmsGarbageCollectionOption extends AbstractModule {
 
         public GarbageCollector<BigInteger> get() {
             return new ConcurrentMarkSweepCollector<BigInteger>(graph, factory);
+        }
+    }
+
+    private static class MutatorListenerProvider implements Provider<MutatorListener<BigInteger>> {
+        @Inject public GarbageCollector<BigInteger> collector;
+
+        public MutatorListener<BigInteger> get() {
+            return collector.getMutatorListener();
         }
     }
 

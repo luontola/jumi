@@ -32,10 +32,11 @@
 package net.orfjackal.dimdwarf.modules.options;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.gc.MutatorListener;
+import net.orfjackal.dimdwarf.gc.*;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -44,7 +45,23 @@ import java.math.BigInteger;
 public class NullGarbageCollectionOption extends AbstractModule {
 
     protected void configure() {
+        bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toInstance(new NullGarbageCollector());
         bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toInstance(new NullMutatorListener());
+    }
+
+    public static class NullGarbageCollector implements GarbageCollector<BigInteger> {
+
+        public List<? extends IncrementalTask> getCollectorStagesToExecute() {
+            return Collections.emptyList();
+        }
+
+        public MutatorListener<BigInteger> getMutatorListener() {
+            return new NullMutatorListener();
+        }
+
+        public Enum<?> getColor(BigInteger node) {
+            return null;
+        }
     }
 
     public static class NullMutatorListener implements MutatorListener<BigInteger> {
