@@ -101,5 +101,5 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
         }
     }
 
-    // TODO: unit test this class independencty of the GC implementation
+    // TODO: unit test this class independently of the GC implementation
 }
