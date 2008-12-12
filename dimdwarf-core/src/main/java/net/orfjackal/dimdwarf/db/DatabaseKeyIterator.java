@@ -31,9 +31,10 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -44,26 +45,30 @@ public class DatabaseKeyIterator<K> implements Iterator<K>, Serializable {
     private static final long serialVersionUID = 1L;
 
     private transient DatabaseTable<K, ?> table;
-    private K next;
-
-    public DatabaseKeyIterator(K firstKey) {
-        this.next = firstKey;
-    }
+    private K previous = null;
 
     public void setTable(DatabaseTable<K, ?> table) {
         this.table = table;
     }
 
     public boolean hasNext() {
-        return next != null;
+        return nextOrNull() != null;
     }
 
     public K next() {
-        try {
-            return next;
-        } finally {
-            next = table.nextKeyAfter(next);
+        K next = nextOrNull();
+        if (next == null) {
+            throw new NoSuchElementException(previous + " was the last one");
         }
+        previous = next;
+        return next;
+    }
+
+    @CheckForNull
+    private K nextOrNull() {
+        return previous == null
+                ? table.firstKey()
+                : table.nextKeyAfter(previous);
     }
 
     public void remove() {
