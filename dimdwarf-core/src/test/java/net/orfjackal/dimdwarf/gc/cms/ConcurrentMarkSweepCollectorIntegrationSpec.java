@@ -41,9 +41,11 @@ import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.modules.options.CmsGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.util.Objects;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -86,6 +88,7 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
         gc = injector.getInstance(GarbageCollectorManager.class);
 
         initGraphNoGarbage();
+        gc.runGarbageCollector(); // reset the node colors to white
         createGarbage();
     }
 
@@ -102,7 +105,9 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
 
                 DummyEntity liveRef = new DummyEntity();
                 liveRefId = info.get().getEntityId(liveRef);
-                liveRoot.setOther(liveRef);
+                List<DummyInterface> list = new ArrayList<DummyInterface>();
+                list.add(liveRef);
+                liveRoot.setOther(list);
 
                 DummyEntity garbageRoot = new DummyEntity();
                 garbageRootId = info.get().getEntityId(garbageRoot);
@@ -167,5 +172,44 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
         }
     }
 
-    // TODO: MutatorListener
+    public class WhenThereAreMutationsDuringGarbageCollection {
+
+        private List<BigInteger> liveNodesCreated = new ArrayList<BigInteger>();
+
+        public void create() throws InterruptedException {
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        gc.runGarbageCollector();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            t.start();
+            for (int i = 0; i < 10; i++) {
+                taskContext.execute(new Runnable() {
+                    public void run() {
+                        BigInteger id = createALiveNode();
+                        liveNodesCreated.add(id);
+                    }
+                });
+            }
+            t.join();
+        }
+
+        private BigInteger createALiveNode() {
+            DummyInterface liveRoot = (DummyInterface) entities.get().read(liveRootId);
+            List<DummyInterface> childrenOfRoot = Objects.uncheckedCast(liveRoot.getOther());
+            DummyEntity liveNode = new DummyEntity();
+            childrenOfRoot.add(liveNode);
+            return info.get().getEntityId(liveNode);
+        }
+
+        public void theMutatorListenerMakesSureThatNoLiveNodesAreCollected() {
+            for (BigInteger node : liveNodesCreated) {
+                specify(node + " of " + liveNodesCreated, entityExists(node));
+            }
+        }
+    }
 }

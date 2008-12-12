@@ -54,7 +54,6 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
     private static final int STAGE_3_STEPS = 5;
 
     private MockGraph graph;
-    private MockNodeSetFactory factory;
     private ConcurrentMarkSweepCollector<String> collector;
 
     private Collection<? extends IncrementalTask> stage1;
@@ -63,7 +62,9 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
     public void create() throws Exception {
         graph = new MockGraph();
-        factory = new MockNodeSetFactory();
+        collector = new ConcurrentMarkSweepCollector<String>(graph, new MockNodeSetFactory(), MAX_NODES_PER_TASK);
+        graph.addMutatorListener(collector.getMutatorListener());
+
         graph.createNode("A");
         graph.createNode("B");
         graph.createNode("C");
@@ -73,14 +74,24 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
         graph.createDirectedEdge("B", "A");
         graph.createDirectedEdge("B", "C");
 
-        collector = new ConcurrentMarkSweepCollector<String>(graph, factory, MAX_NODES_PER_TASK);
-        graph.addMutatorListener(collector.getMutatorListener());
+        // reset the node colors to white
+        executeSequenceFully(collector.getCollectorStagesToExecute());
+        specify(graph.getAllNodes(), should.containExactly("A", "B", "C", "D"));
 
         Iterator<? extends IncrementalTask> stages = collector.getCollectorStagesToExecute().iterator();
         stage1 = Arrays.asList(stages.next());
         stage2 = Arrays.asList(stages.next());
         stage3 = Arrays.asList(stages.next());
         specify(stages.hasNext(), should.equal(false));
+    }
+
+    private void executeSequenceFully(List<? extends IncrementalTask> stages) {
+        for (IncrementalTask stage : stages) {
+            Collection<IncrementalTask> tmp = Arrays.asList(stage);
+            while (!tmp.isEmpty()) {
+                tmp = executeOneStep(tmp);
+            }
+        }
     }
 
     private static Collection<IncrementalTask> executeManySteps(Collection<? extends IncrementalTask> tasks, int count) {
@@ -101,13 +112,18 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
     }
 
 
-    public class WhenCollectorHasNotBeenRun {
+    public class BeforeANewCollectionIsStarted {
 
-        public void newNodesAreByDefaultWhite() {
+        public void nodesWhichSurvivedTheLastCollectionAreWhite() {
             specify(collector.getColor("A"), should.equal(WHITE));
             specify(collector.getColor("B"), should.equal(WHITE));
             specify(collector.getColor("C"), should.equal(WHITE));
             specify(collector.getColor("D"), should.equal(WHITE));
+        }
+
+        public void nodesWhichWereCreatedAfterTheLastCollectionAreBlack() {
+            graph.createNode("X");
+            specify(collector.getColor("X"), should.equal(BLACK));
         }
     }
 
@@ -177,17 +193,6 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
             specify(stage2, should.containExactly());
         }
 
-        public void ifMutatorsCreateNewNodesTheyAreMarkedGrayAndLaterScannedBlack() {
-            graph.createNode("X");
-            graph.createDirectedEdge("A", "X");
-            specify(collector.getColor("A"), should.equal(BLACK));
-            specify(collector.getColor("X"), should.equal(GRAY));
-
-            stage2 = executeManySteps(stage2, remainingSteps);
-            specify(collector.getColor("A"), should.equal(BLACK));
-            specify(collector.getColor("X"), should.equal(BLACK));
-        }
-
         public void ifMutatorsRedirectEdgesTheTargetNodesAreMarkedGrayAndLaterScannedBlack() {
             specify(collector.getColor("A"), should.equal(BLACK));
             specify(collector.getColor("C"), should.equal(WHITE));
@@ -200,6 +205,13 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
             stage2 = executeManySteps(stage2, remainingSteps);
             specify(collector.getColor("A"), should.equal(BLACK));
             specify(collector.getColor("C"), should.equal(BLACK));
+        }
+
+        public void ifMutatorsCreateNewNodesTheyAreScannedBlack() {
+            graph.createNode("X");
+            graph.createDirectedEdge("A", "X");
+            specify(collector.getColor("A"), should.equal(BLACK));
+            specify(collector.getColor("X"), should.equal(BLACK));
         }
     }
 

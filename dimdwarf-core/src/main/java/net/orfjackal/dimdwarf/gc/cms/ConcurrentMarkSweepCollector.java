@@ -94,7 +94,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     public Color getColor(T node) {
         byte[] value = graph.getMetadata(node, COLOR_KEY);
         if (value.length == 0) {
-            return Color.WHITE;
+            return Color.BLACK;
         }
         return Color.parseIndex(value[0]);
     }

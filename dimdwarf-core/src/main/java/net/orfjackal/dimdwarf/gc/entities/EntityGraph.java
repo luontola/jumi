@@ -91,21 +91,20 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public byte[] getMetadata(BigInteger node, String metaKey) {
-        return entities.readMetadata(node, metaKey).getByteArray();
+        return entities.getMetaTable(metaKey).read(node).getByteArray();
     }
 
     public void setMetadata(BigInteger node, String metaKey, byte[] metaValue) {
-        entities.updateMetadata(node, metaKey, Blob.fromBytes(metaValue));
+        entities.getMetaTable(metaKey).update(node, Blob.fromBytes(metaValue));
     }
 
 
     private static class AllNodesIterator implements Iterator<BigInteger>, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final DatabaseKeyIterator<BigInteger> iterator;
+        private final DatabaseKeyIterator<BigInteger> iterator = new DatabaseKeyIterator<BigInteger>();
 
         public AllNodesIterator(EntityDao entities) {
-            iterator = new DatabaseKeyIterator<BigInteger>(entities.firstKey());
             setEntityDao(entities);
         }
 
@@ -130,11 +129,10 @@ public class EntityGraph implements Graph<BigInteger> {
     private static class RootNodesIterator implements Iterator<BigInteger>, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final DatabaseKeyIterator<String> iterator;
+        private final DatabaseKeyIterator<String> iterator = new DatabaseKeyIterator<String>();
         private transient BindingDao bindings;
 
         public RootNodesIterator(BindingDao bindings) {
-            iterator = new DatabaseKeyIterator<String>(bindings.firstKey());
             setBindingDao(bindings);
         }
 
