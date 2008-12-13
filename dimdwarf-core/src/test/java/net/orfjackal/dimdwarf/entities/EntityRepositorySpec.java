@@ -40,6 +40,7 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
@@ -52,7 +53,7 @@ public class EntityRepositorySpec extends Specification<Object> {
     private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
     private static final BigInteger INVALID_ENTITY_ID = BigInteger.valueOf(999);
 
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<EntityRepository> entities;
 
     public void create() throws Exception {

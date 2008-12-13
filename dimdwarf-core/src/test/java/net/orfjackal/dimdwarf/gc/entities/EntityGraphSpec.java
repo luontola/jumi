@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.*;
 
 /**
@@ -54,7 +55,7 @@ import java.util.concurrent.atomic.*;
 @Group({"fast"})
 public class EntityGraphSpec extends Specification<Object> {
 
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<EntityInfo> info;
     private Provider<BindingRepository> bindings;
     private Provider<EntityGraph> graph;

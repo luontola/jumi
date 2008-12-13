@@ -45,7 +45,7 @@ import net.orfjackal.dimdwarf.util.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.*;
 
 /**
@@ -58,7 +58,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
 
     private TaskSchedulerImpl scheduler;
     private Provider<Transaction> tx;
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private DummyClock clock;
     private Logger hideTransactionFailedLogs;
 

@@ -46,6 +46,7 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -59,7 +60,7 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
     private Provider<EntityInfo> info;
     private Provider<EntityRepository> entities;
     private Provider<BindingRepository> bindings;
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private TestServer server;
 
     private GarbageCollectorManager gc;

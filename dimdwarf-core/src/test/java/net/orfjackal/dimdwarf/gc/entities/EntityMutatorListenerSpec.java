@@ -46,6 +46,7 @@ import org.junit.runner.RunWith;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
@@ -58,7 +59,7 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
     private Provider<BindingRepository> bindings;
     private Provider<EntityRepository> entities;
     private Provider<EntityInfo> info;
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private MutatorListenerSpy listener;
 
     public void create() throws Exception {

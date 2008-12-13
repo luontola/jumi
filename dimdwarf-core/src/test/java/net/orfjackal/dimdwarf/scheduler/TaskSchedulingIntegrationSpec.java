@@ -55,7 +55,7 @@ import java.util.concurrent.*;
 public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
     private Injector injector;
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<TaskScheduler> scheduler;
     private TestSpy spy;
     private TestServer server;

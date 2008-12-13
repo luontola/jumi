@@ -39,6 +39,7 @@ import net.orfjackal.dimdwarf.tx.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.Executor;
 import java.util.logging.*;
 
 /**
@@ -50,7 +51,7 @@ import java.util.logging.*;
 public class ExecutingTransactionalTasksSpec extends Specification<Object> {
 
     private Injector injector;
-    private TaskExecutor taskExecutor;
+    private Executor taskExecutor;
     private Logger hideTransactionFailedLogs;
 
     public void create() throws Exception {

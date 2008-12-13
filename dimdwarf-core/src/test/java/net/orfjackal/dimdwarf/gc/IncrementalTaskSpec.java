@@ -53,7 +53,7 @@ import java.util.concurrent.*;
 @Group({"fast"})
 public class IncrementalTaskSpec extends Specification<Object> {
 
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<TaskScheduler> scheduler;
     private TestServer server;
     private TestSpy spy;

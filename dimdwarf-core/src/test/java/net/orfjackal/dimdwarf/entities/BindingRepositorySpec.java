@@ -39,6 +39,8 @@ import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.Executor;
+
 /**
  * @author Esko Luontola
  * @since 12.9.2008
@@ -50,7 +52,7 @@ public class BindingRepositorySpec extends Specification<Object> {
     private static final String BINDING = "binding";
     private static final String INVALID_BINDING = "no-such-binding";
 
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<BindingRepository> bindings;
 
     public void create() throws Exception {

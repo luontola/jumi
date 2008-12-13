@@ -60,7 +60,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private Provider<BindingRepository> bindings;
     private Provider<EntityInfo> info;
     private Provider<Transaction> tx;
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private RecoverableSetFactory rsf;
     private DummyClock clock;
 

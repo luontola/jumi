@@ -42,6 +42,7 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -53,7 +54,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class EntityIntegrationSpec extends Specification<Object> {
 
     private Injector injector;
-    private TaskExecutor taskExecutor;
+    private Executor taskExecutor;
     private Provider<BindingRepository> bindings;
 
     public void create() throws Exception {

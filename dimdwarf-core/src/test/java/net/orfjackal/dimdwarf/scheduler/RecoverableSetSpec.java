@@ -43,6 +43,7 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
+import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
@@ -54,7 +55,7 @@ public class RecoverableSetSpec extends Specification<Object> {
 
     private static final String PREFIX = "prefix";
 
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<BindingRepository> bindings;
     private Provider<EntityInfo> info;
 

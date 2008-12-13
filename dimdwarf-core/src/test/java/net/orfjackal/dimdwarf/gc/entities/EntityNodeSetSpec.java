@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
@@ -56,7 +57,7 @@ public class EntityNodeSetSpec extends Specification<Object> {
     private static final String SET_NAME = "set-name";
     private static final String OTHER_SET_NAME = "other-set-name";
 
-    private TaskExecutor taskContext;
+    private Executor taskContext;
     private Provider<EntityInfo> info;
     private Provider<NodeSetFactory> factory;
 

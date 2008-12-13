@@ -58,7 +58,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
     public void create() throws Exception {
         taskContext = mock(Context.class);
-        TaskExecutor executor = new TaskExecutor(
+        Executor executor = new TaskExecutor(
                 new StubProvider<Context>(taskContext),
                 new Provider<FilterChain>() {
                     public FilterChain get() {
