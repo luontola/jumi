@@ -40,14 +40,15 @@ import net.orfjackal.dimdwarf.gc.entities.GarbageCollectorManager;
 import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.modules.options.CmsGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
-import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.util.Objects;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
+import java.util.logging.Level;
 
 /**
  * @author Esko Luontola
@@ -150,7 +151,7 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
 
     public class WhenGarbageCollectorIsRun {
 
-        public void create() throws InterruptedException {
+        public void create() {
             gc.runGarbageCollector();
         }
 
@@ -177,17 +178,22 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
 
         private List<BigInteger> liveNodesCreated = new ArrayList<BigInteger>();
 
-        public void create() throws InterruptedException {
-            Thread t = new Thread(new Runnable() {
+        public void create() throws Throwable {
+            server.changeLoggingLevel(TransactionFilter.class, Level.WARNING);
+            server.changeLoggingLevel(RetryingTaskExecutor.class, Level.WARNING);
+
+            final AtomicReference<Throwable> failureInGcThread = new AtomicReference<Throwable>();
+            Thread gcThread = new Thread(new Runnable() {
                 public void run() {
                     try {
                         gc.runGarbageCollector();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (Throwable t) {
+                        failureInGcThread.set(t);
                     }
                 }
             });
-            t.start();
+
+            gcThread.start();
             for (int i = 0; i < 10; i++) {
                 taskContext.execute(new Runnable() {
                     public void run() {
@@ -195,8 +201,14 @@ public class ConcurrentMarkSweepCollectorIntegrationSpec extends Specification<O
                         liveNodesCreated.add(id);
                     }
                 });
+                Thread.yield();
             }
-            t.join();
+            gcThread.join();
+
+            Throwable t = failureInGcThread.get();
+            if (t != null) {
+                throw t;
+            }
         }
 
         private BigInteger createALiveNode() {

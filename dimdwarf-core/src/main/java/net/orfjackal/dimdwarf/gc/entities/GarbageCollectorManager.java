@@ -37,5 +37,5 @@ package net.orfjackal.dimdwarf.gc.entities;
  */
 public interface GarbageCollectorManager {
 
-    void runGarbageCollector() throws InterruptedException;
+    void runGarbageCollector();
 }

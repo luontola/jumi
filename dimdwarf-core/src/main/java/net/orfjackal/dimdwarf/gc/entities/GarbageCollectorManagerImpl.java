@@ -32,15 +32,18 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.api.TaskScheduler;
+import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.entities.BindingRepository;
 import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.tasks.RetryingTaskContext;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Esko Luontola
@@ -50,56 +53,68 @@ import java.util.concurrent.locks.*;
 @ThreadSafe
 public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
 
-    private final Provider<GarbageCollector<BigInteger>> collector;
-    private final Provider<TaskScheduler> scheduler;
-    private final Executor taskContext;
+    private static final String WORKER_BINDING = GarbageCollectorManagerImpl.class.getName() + ".worker";
 
-    private final Lock lock = new ReentrantLock(true);
-    private final Condition collectionFinished = lock.newCondition();
+    private final Provider<GarbageCollector<BigInteger>> collector;
+    private final Provider<BindingRepository> bindings;
+    private final Executor taskContext;
 
     @Inject
     public GarbageCollectorManagerImpl(Provider<GarbageCollector<BigInteger>> collector,
-                                       Provider<TaskScheduler> scheduler,
+                                       Provider<BindingRepository> bindings,
                                        @RetryingTaskContext Executor taskContext) {
         this.collector = collector;
-        this.scheduler = scheduler;
+        this.bindings = bindings;
         this.taskContext = taskContext;
     }
 
-    public void runGarbageCollector() throws InterruptedException {
-        // TODO: create RetryingTaskExecutor (with injectable retry strategy) and do not use TaskScheduler here, to avoid creating entities through running GC
-        lock.lock();
-        try {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    scheduler.get().submit(
-                            new IncrementalTaskRunner(
-                                    new IncrementalTaskSequence(collector.get().getCollectorStagesToExecute()),
-                                    new OnCollectionFinished()));
-                }
-            });
-            collectionFinished.await();
-        } finally {
-            lock.unlock();
-        }
+    public void runGarbageCollector() {
+        initGcWorker();
+        boolean done;
+        do {
+            done = stepGcWorker();
+        } while (!done);
     }
 
-    private void signalCollectionFinished() {
-        lock.lock();
-        try {
-            collectionFinished.signal();
-        } finally {
-            lock.unlock();
-        }
+    private void initGcWorker() {
+        taskContext.execute(new Runnable() {
+            public void run() {
+                IncrementalTask gc = new IncrementalTaskSequence(collector.get().getCollectorStagesToExecute());
+                GcWorker w = new GcWorker(gc);
+                bindings.get().update(WORKER_BINDING, w);
+            }
+        });
     }
 
-    private static class OnCollectionFinished implements Runnable, Serializable {
-        private static final long serialVersionUID = 1L;
+    private boolean stepGcWorker() {
+        final AtomicBoolean done = new AtomicBoolean(false);
+        taskContext.execute(new Runnable() {
+            public void run() {
+                GcWorker w = (GcWorker) bindings.get().read(WORKER_BINDING);
+                w.step();
+                done.set(w.isDone());
+            }
+        });
+        return done.get();
+    }
 
-        @Inject public transient GarbageCollectorManagerImpl manager;
 
-        public void run() {
-            manager.signalCollectionFinished();
+    @Entity
+    private static class GcWorker implements EntityObject, Serializable {
+
+        private final Queue<IncrementalTask> workQueue = new LinkedList<IncrementalTask>();
+
+        public GcWorker(IncrementalTask gc) {
+            workQueue.add(gc);
+        }
+
+        public void step() {
+            IncrementalTask task = workQueue.poll();
+            workQueue.addAll(task.step());
+        }
+
+        public boolean isDone() {
+            return workQueue.isEmpty();
         }
     }
 
