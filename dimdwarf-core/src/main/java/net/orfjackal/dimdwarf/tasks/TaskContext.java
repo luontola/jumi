@@ -31,16 +31,16 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
+import com.google.inject.BindingAnnotation;
+
+import java.lang.annotation.*;
+
 /**
  * @author Esko Luontola
  * @since 13.12.2008
  */
-public class DoNotRetry implements RetryPolicy {
-
-    public void taskHasFailed(Throwable t) {
-    }
-
-    public boolean shouldRetry() {
-        return false;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@BindingAnnotation
+public @interface TaskContext {
 }

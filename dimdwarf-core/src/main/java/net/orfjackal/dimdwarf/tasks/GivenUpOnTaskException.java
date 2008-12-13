@@ -35,20 +35,20 @@ package net.orfjackal.dimdwarf.tasks;
  * @author Esko Luontola
  * @since 13.12.2008
  */
-public class RetryANumberOfTimes implements RetryPolicy {
+public class GivenUpOnTaskException extends RuntimeException {
 
-    private final int maxRetries;
-    private int failures = 0;
-
-    public RetryANumberOfTimes(int maxRetries) {
-        this.maxRetries = maxRetries;
+    public GivenUpOnTaskException() {
     }
 
-    public void taskHasFailed(Throwable t) {
-        failures++;
+    public GivenUpOnTaskException(String message) {
+        super(message);
     }
 
-    public boolean shouldRetry() {
-        return failures <= maxRetries;
+    public GivenUpOnTaskException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public GivenUpOnTaskException(Throwable cause) {
+        super(cause);
     }
 }
