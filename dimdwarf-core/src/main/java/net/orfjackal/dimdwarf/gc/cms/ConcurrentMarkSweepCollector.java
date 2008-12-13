@@ -49,44 +49,42 @@ import java.util.*;
 public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final int DEFAULT_MAX_NODES_PER_TASK = 10;
     private static final String COLOR_KEY = "cms-color";
     private static final String GRAY_NODES_KEY = "cms-gray-nodes";
 
     private final Graph<T> graph;
     private final NodeSet<T> grayNodes;
-    private final int maxNodesPerTask;
 
     @Inject
     public ConcurrentMarkSweepCollector(Graph<T> graph, NodeSetFactory factory) {
-        this(graph, factory, DEFAULT_MAX_NODES_PER_TASK);
-    }
-
-    public ConcurrentMarkSweepCollector(Graph<T> graph, NodeSetFactory factory, int maxNodesPerTask) {
         this.graph = graph;
         this.grayNodes = factory.create(GRAY_NODES_KEY);
-        this.maxNodesPerTask = maxNodesPerTask;
     }
 
     public List<? extends IncrementalTask> getCollectorStagesToExecute() {
         return Arrays.asList(
                 new MarkRootNodes(graph.getRootNodes().iterator()),
                 new ScanMarkedNodes(),
-                new MultiStepIncrementalTask(
-                        new RemoveGarbageNodesAndDoCleanup(graph.getAllNodes().iterator()),
-                        maxNodesPerTask));
+                new RemoveGarbageNodesAndDoCleanup(graph.getAllNodes().iterator()));
     }
 
     public MutatorListener<T> getMutatorListener() {
         return new MutatorListener<T>() {
 
+            public void onNodeCreated(T node) {
+//                System.out.println("onNodeCreated " + node);
+                // TODO: scan black?
+            }
+
             public void onReferenceCreated(@Nullable T source, T target) {
+//                System.out.println("onReferenceCreated " + source + " -> " + target);
                 if (getColor(target).equals(Color.WHITE)) {
                     setColor(target, Color.GRAY);
                 }
             }
 
             public void onReferenceRemoved(@Nullable T source, T target) {
+//                System.out.println("onReferenceRemoved " + source + " -> " + target);
             }
         };
     }
@@ -94,8 +92,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     public Color getColor(T node) {
         byte[] value = graph.getMetadata(node, COLOR_KEY);
         if (value.length == 0) {
-            // TODO: Revert the default back to white, when running GC does not anymore produce garbage.
-            // Alternatively add a onNodeCreated method to MutatorListener and scan new nodes.
+            // TODO: Revert the default back to white? Maybe also scan new nodes black in MutatorListener.onNodeCreated.
             return Color.BLACK;
         }
         return Color.parseIndex(value[0]);

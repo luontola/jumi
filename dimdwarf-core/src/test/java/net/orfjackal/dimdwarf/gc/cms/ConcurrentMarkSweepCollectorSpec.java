@@ -62,7 +62,7 @@ public class ConcurrentMarkSweepCollectorSpec extends Specification<Object> {
 
     public void create() throws Exception {
         graph = new MockGraph();
-        collector = new ConcurrentMarkSweepCollector<String>(graph, new MockNodeSetFactory(), MAX_NODES_PER_TASK);
+        collector = new ConcurrentMarkSweepCollector<String>(graph, new MockNodeSetFactory());
         graph.addMutatorListener(collector.getMutatorListener());
 
         graph.createNode("A");

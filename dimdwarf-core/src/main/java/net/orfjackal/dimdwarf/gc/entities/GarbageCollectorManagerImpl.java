@@ -102,7 +102,7 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
     @Entity
     private static class GcWorker implements EntityObject, Serializable {
 
-        private final Queue<IncrementalTask> workQueue = new LinkedList<IncrementalTask>();
+        private final Queue<IncrementalTask> workQueue = new ArrayDeque<IncrementalTask>();
 
         public GcWorker(IncrementalTask gc) {
             workQueue.add(gc);
