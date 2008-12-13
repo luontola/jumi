@@ -35,8 +35,9 @@ import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.BindingRepository;
-import net.orfjackal.dimdwarf.gc.*;
+import net.orfjackal.dimdwarf.gc.GarbageCollector;
 import net.orfjackal.dimdwarf.tasks.RetryingTaskContext;
+import net.orfjackal.dimdwarf.tasks.util.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;

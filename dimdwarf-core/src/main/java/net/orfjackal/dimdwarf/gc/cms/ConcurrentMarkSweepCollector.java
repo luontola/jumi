@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.gc.cms;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.gc.*;
+import net.orfjackal.dimdwarf.tasks.util.IncrementalTask;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;

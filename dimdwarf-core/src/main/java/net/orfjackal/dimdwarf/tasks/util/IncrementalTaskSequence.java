@@ -29,10 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc;
-
-import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.TaskScheduler;
+package net.orfjackal.dimdwarf.tasks.util;
 
 import java.io.Serializable;
 import java.util.*;
@@ -41,28 +38,25 @@ import java.util.*;
  * @author Esko Luontola
  * @since 10.12.2008
  */
-public class IncrementalTaskRunner implements Runnable, Serializable {
+public class IncrementalTaskSequence implements IncrementalTask, Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Inject public transient TaskScheduler scheduler;
-    private final Queue<IncrementalTask> tasks = new LinkedList<IncrementalTask>();
-    private final Runnable onFinished;
+    private final Queue<IncrementalTask> currentStage = new LinkedList<IncrementalTask>();
+    private final Queue<IncrementalTask> nextStages = new LinkedList<IncrementalTask>();
 
-    public IncrementalTaskRunner(IncrementalTask task, Runnable onFinished) {
-        this.tasks.add(task);
-        this.onFinished = onFinished;
+    public IncrementalTaskSequence(Collection<? extends IncrementalTask> stages) {
+        this.nextStages.addAll(stages);
     }
 
-    public void run() {
-        IncrementalTask task = tasks.poll();
+    public Collection<? extends IncrementalTask> step() {
+        IncrementalTask task = currentStage.poll();
         if (task == null) {
-            onFinished.run();
-        } else {
-            tasks.addAll(task.step());
-            scheduler.submit(this);
-            // TODO: Run incremental tasks without scheduling new tasks and as such creating new entities.
-            // Submitting a new task will create a new entity, which is problematic because
-            // that causes more work for the garbage collector while the collector is running.
+            task = nextStages.poll();
         }
+        if (task == null) {
+            return Collections.emptyList();
+        }
+        currentStage.addAll(task.step());
+        return Arrays.asList(this);
     }
 }

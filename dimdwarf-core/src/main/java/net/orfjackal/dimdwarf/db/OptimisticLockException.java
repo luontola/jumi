@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import net.orfjackal.dimdwarf.tasks.Retryable;
+import net.orfjackal.dimdwarf.tx.Retryable;
 
 /**
  * Thrown when an optimistic locking conflict occurs.

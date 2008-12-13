@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.gc;
 
+import net.orfjackal.dimdwarf.tasks.util.IncrementalTask;
+
 import java.util.List;
 
 /**

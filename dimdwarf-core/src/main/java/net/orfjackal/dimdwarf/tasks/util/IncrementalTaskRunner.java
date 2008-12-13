@@ -29,13 +29,40 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tasks;
+package net.orfjackal.dimdwarf.tasks.util;
+
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.TaskScheduler;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * @author Esko Luontola
- * @since 13.12.2008
+ * @since 10.12.2008
  */
-public interface Retryable {
+public class IncrementalTaskRunner implements Runnable, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    boolean mayBeRetried();
+    @Inject public transient TaskScheduler scheduler;
+    private final Queue<IncrementalTask> tasks = new LinkedList<IncrementalTask>();
+    private final Runnable onFinished;
+
+    public IncrementalTaskRunner(IncrementalTask task, Runnable onFinished) {
+        this.tasks.add(task);
+        this.onFinished = onFinished;
+    }
+
+    public void run() {
+        IncrementalTask task = tasks.poll();
+        if (task == null) {
+            onFinished.run();
+        } else {
+            tasks.addAll(task.step());
+            scheduler.submit(this);
+            // TODO: Run incremental tasks without scheduling new tasks and as such creating new entities.
+            // Submitting a new task will create a new entity, which is problematic because
+            // that causes more work for the garbage collector while the collector is running.
+        }
+    }
 }

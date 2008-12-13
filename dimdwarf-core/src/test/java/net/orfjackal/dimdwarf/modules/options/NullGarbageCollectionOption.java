@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.modules.options;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.gc.*;
+import net.orfjackal.dimdwarf.tasks.util.IncrementalTask;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;

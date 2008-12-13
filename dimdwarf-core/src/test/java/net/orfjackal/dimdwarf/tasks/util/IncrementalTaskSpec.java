@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc;
+package net.orfjackal.dimdwarf.tasks.util;
 
 import com.google.inject.*;
 import jdave.*;

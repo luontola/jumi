@@ -29,34 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc;
+package net.orfjackal.dimdwarf.tasks.util;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
 
 /**
  * @author Esko Luontola
- * @since 10.12.2008
+ * @since 29.11.2008
  */
-public class IncrementalTaskSequence implements IncrementalTask, Serializable {
-    private static final long serialVersionUID = 1L;
+public interface IncrementalTask {
 
-    private final Queue<IncrementalTask> currentStage = new LinkedList<IncrementalTask>();
-    private final Queue<IncrementalTask> nextStages = new LinkedList<IncrementalTask>();
-
-    public IncrementalTaskSequence(Collection<? extends IncrementalTask> stages) {
-        this.nextStages.addAll(stages);
-    }
-
-    public Collection<? extends IncrementalTask> step() {
-        IncrementalTask task = currentStage.poll();
-        if (task == null) {
-            task = nextStages.poll();
-        }
-        if (task == null) {
-            return Collections.emptyList();
-        }
-        currentStage.addAll(task.step());
-        return Arrays.asList(this);
-    }
+    Collection<? extends IncrementalTask> step();
 }

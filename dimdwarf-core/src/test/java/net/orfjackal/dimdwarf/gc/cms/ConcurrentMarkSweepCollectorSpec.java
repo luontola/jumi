@@ -35,6 +35,7 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.gc.*;
 import static net.orfjackal.dimdwarf.gc.cms.Color.*;
+import net.orfjackal.dimdwarf.tasks.util.IncrementalTask;
 import org.junit.runner.RunWith;
 
 import java.util.*;

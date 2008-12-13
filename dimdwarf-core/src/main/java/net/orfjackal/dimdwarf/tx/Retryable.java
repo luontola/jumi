@@ -29,34 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.gc;
-
-import java.io.Serializable;
-import java.util.*;
+package net.orfjackal.dimdwarf.tx;
 
 /**
  * @author Esko Luontola
- * @since 10.12.2008
+ * @since 13.12.2008
  */
-public class MultiStepIncrementalTask implements IncrementalTask, Serializable {
-    private static final long serialVersionUID = 1L;
+public interface Retryable {
 
-    private final Queue<IncrementalTask> tasks = new LinkedList<IncrementalTask>();
-    private final int stepsPerTask;
-
-    public MultiStepIncrementalTask(IncrementalTask task, int stepsPerTask) {
-        this.tasks.add(task);
-        this.stepsPerTask = stepsPerTask;
-    }
-
-    public Collection<? extends IncrementalTask> step() {
-        for (int i = 0; i < stepsPerTask && !tasks.isEmpty(); i++) {
-            IncrementalTask task = tasks.poll();
-            tasks.addAll(task.step());
-        }
-        if (tasks.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList(this);
-    }
+    boolean mayBeRetried();
 }

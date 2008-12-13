@@ -34,6 +34,7 @@ package net.orfjackal.dimdwarf.tasks;
 import com.google.inject.Provider;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.tx.Retryable;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

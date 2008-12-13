@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
+import net.orfjackal.dimdwarf.tx.Retryable;
+
 /**
  * @author Esko Luontola
  * @since 13.12.2008
