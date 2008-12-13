@@ -31,63 +31,64 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import net.orfjackal.dimdwarf.db.OptimisticLockException;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 /**
  * @author Esko Luontola
  * @since 19.11.2008
  */
 @ThreadSafe
-public class GroupLock<T> {
+public class GroupLock<T extends Comparable<T>> {
 
-    private final Set<T> lockedKeys = new HashSet<T>();
-    private final ReentrantLock lock = new ReentrantLock();
+    private final SortedSet<T> lockedKeys = new TreeSet<T>();
+
+    private final ReentrantLock myLock = new ReentrantLock();
+    private final Condition someKeyWasUnlocked = myLock.newCondition();
 
     @CheckReturnValue
-    public LockHandle tryLock(T... keys) throws OptimisticLockException {
-        return tryLock(Arrays.asList(keys));
+    public LockHandle lockAll(T... keys) {
+        return lockAll(Arrays.asList(keys));
     }
 
     @CheckReturnValue
-    public LockHandle tryLock(Collection<T> keys) throws OptimisticLockException {
-        lock.lock();
+    public LockHandle lockAll(Collection<T> keys) {
+        myLock.lock();
         try {
-            checkNoneIsLocked(keys);
-            lockedKeys.addAll(keys);
-            return new MyLockHandle(keys);
+            SortedSet<T> sortedKeys = new TreeSet<T>(keys);
+            for (T key : sortedKeys) {
+                awaitAndLock(key);
+            }
+            return new MyLockHandle(sortedKeys);
         } finally {
-            lock.unlock();
+            myLock.unlock();
         }
     }
 
-    private void checkNoneIsLocked(Collection<T> keys) throws OptimisticLockException {
-        for (T key : keys) {
-            if (isLocked(key)) {
-                throw new OptimisticLockException("Key is already locked: " + key);
-            }
+    private void awaitAndLock(T key) {
+        while (isLocked(key)) {
+            someKeyWasUnlocked.awaitUninterruptibly();
         }
+        lockedKeys.add(key);
     }
 
     public boolean isLocked(T key) {
-        lock.lock();
+        myLock.lock();
         try {
             return lockedKeys.contains(key);
         } finally {
-            lock.unlock();
+            myLock.unlock();
         }
     }
 
     public int getLockCount() {
-        lock.lock();
+        myLock.lock();
         try {
             return lockedKeys.size();
         } finally {
-            lock.unlock();
+            myLock.unlock();
         }
     }
 
@@ -98,19 +99,20 @@ public class GroupLock<T> {
         private Collection<T> keys;
 
         public MyLockHandle(Collection<T> keys) {
-            this.keys = Collections.unmodifiableCollection(new ArrayList<T>(keys));
+            this.keys = keys;
         }
 
         public void unlock() {
-            lock.lock();
+            myLock.lock();
             try {
                 if (keys == null) {
                     throw new IllegalStateException("Keys have already been unlocked: " + keys);
                 }
                 lockedKeys.removeAll(keys);
                 keys = null;
+                someKeyWasUnlocked.signalAll();
             } finally {
-                lock.unlock();
+                myLock.unlock();
             }
         }
     }

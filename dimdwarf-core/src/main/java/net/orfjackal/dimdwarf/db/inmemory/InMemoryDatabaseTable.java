@@ -88,7 +88,7 @@ public class InMemoryDatabaseTable implements PersistedDatabaseTable<RevisionHan
         }
 
         private LockHandle prepare() {
-            LockHandle lock = keysLockedForCommit.tryLock(updates.keySet());
+            LockHandle lock = keysLockedForCommit.lockAll(updates.keySet());
             try {
                 checkForConflicts();
             } catch (OptimisticLockException e) {

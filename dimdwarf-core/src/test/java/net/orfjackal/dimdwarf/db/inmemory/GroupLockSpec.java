@@ -33,10 +33,9 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.db.OptimisticLockException;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Esko Luontola
@@ -52,6 +51,17 @@ public class GroupLockSpec extends Specification<Object> {
         lock = new GroupLock<String>();
     }
 
+    private static void unlockInNewThread(final LockHandle handle, final AtomicBoolean wasUnlockedFirst) {
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                wasUnlockedFirst.set(true);
+                handle.unlock();
+            }
+        });
+        t.setPriority(Thread.MIN_PRIORITY);
+        t.start();
+    }
+
 
     public class WhenNothingIsLocked {
 
@@ -62,9 +72,10 @@ public class GroupLockSpec extends Specification<Object> {
     }
 
     public class WhenOneKeyIsLocked {
+        private LockHandle handle;
 
         public void create() {
-            lock.tryLock("A");
+            handle = lock.lockAll("A");
         }
 
         public void oneKeyIsLocked() {
@@ -72,30 +83,29 @@ public class GroupLockSpec extends Specification<Object> {
             specify(lock.getLockCount(), should.equal(1));
         }
 
+        public void theLockedKeyCanNotBeRelockedUntilItIsFirstUnlocked() {
+            AtomicBoolean wasUnlocked = new AtomicBoolean(false);
+            unlockInNewThread(handle, wasUnlocked);
+            lock.lockAll("A");
+            specify(wasUnlocked.get());
+        }
+
         public void otherKeysAreNotLocked() {
             specify(lock.isLocked("B"), should.equal(false));
         }
 
-        public void theSameKeyCanNotBeLockedTwise() {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    lock.tryLock("A");
-                }
-            }, should.raise(OptimisticLockException.class));
-            specify(lock.getLockCount(), should.equal(1));
-        }
-
         public void otherKeysMayBeLocked() {
-            lock.tryLock("B");
+            lock.lockAll("B");
             specify(lock.isLocked("B"));
             specify(lock.getLockCount(), should.equal(2));
         }
     }
 
     public class WhenManyKeysAreLocked {
+        private LockHandle handle;
 
         public void create() {
-            lock.tryLock(Arrays.asList("A", "B"));
+            handle = lock.lockAll("A", "B");
         }
 
         public void thoseKeysAreLocked() {
@@ -104,17 +114,16 @@ public class GroupLockSpec extends Specification<Object> {
             specify(lock.getLockCount(), should.equal(2));
         }
 
-        public void anOverlappingSetOfKeysCanNotBeLocked() {
-            specify(new Block() {
-                public void run() throws Throwable {
-                    lock.tryLock(Arrays.asList("B", "C"));
-                }
-            }, should.raise(OptimisticLockException.class));
+        public void anOverlappingSetOfKeysCanNotBeRelockedUntilTheyAreFirstUnlocked() {
+            AtomicBoolean wasUnlocked = new AtomicBoolean(false);
+            unlockInNewThread(handle, wasUnlocked);
+            lock.lockAll("B", "C");
+            specify(wasUnlocked.get());
             specify(lock.getLockCount(), should.equal(2));
         }
 
         public void aDistinctSetOfKeysMayBeLocked() {
-            lock.tryLock(Arrays.asList("C", "D"));
+            lock.lockAll("C", "D");
             specify(lock.getLockCount(), should.equal(4));
         }
     }
@@ -123,8 +132,8 @@ public class GroupLockSpec extends Specification<Object> {
         private LockHandle handleA;
 
         public void create() {
-            handleA = lock.tryLock("A");
-            lock.tryLock("B");
+            handleA = lock.lockAll("A");
+            lock.lockAll("B");
             handleA.unlock();
         }
 
@@ -149,7 +158,7 @@ public class GroupLockSpec extends Specification<Object> {
         public void aUsedHandleCanNotUnlockAKeyWhichIsRelocked() {
             specify(lock.getLockCount(), should.equal(1));
             final LockHandle oldHandleA = handleA;
-            final LockHandle newHandleA = lock.tryLock("A");
+            final LockHandle newHandleA = lock.lockAll("A");
             specify(lock.getLockCount(), should.equal(2));
             specify(new Block() {
                 public void run() throws Throwable {

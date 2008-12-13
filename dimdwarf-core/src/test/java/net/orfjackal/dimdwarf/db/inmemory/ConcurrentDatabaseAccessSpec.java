@@ -36,8 +36,11 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.*;
+import net.orfjackal.dimdwarf.util.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
+
+import java.util.concurrent.CyclicBarrier;
 
 /**
  * @author Esko Luontola
@@ -84,15 +87,28 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
         tx.prepareAndCommit();
     }
 
-    private void tx1PreparesBeforeTx2() {
-        tx1.prepare();
+    private void tx1PreparesBeforeTx2() throws Exception {
+        final CyclicBarrier sync = new CyclicBarrier(2);
+
+        Thread t1 = new Thread(new ThrowingRunnable() {
+            public void doRun() throws Throwable {
+                tx1.prepare();
+                sync.await();
+                Thread.sleep(1);
+                tx1.commit();
+            }
+        });
+        t1.start();
+
+        sync.await();
         specify(new Block() {
             public void run() throws Throwable {
                 tx2.prepare();
             }
         }, should.raise(TransactionException.class));
-        tx1.commit();
         tx2.rollback();
+
+        t1.join();
     }
 
     private void tx1PreparesAndCommitsBeforeTx2() {
@@ -230,7 +246,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             table2.update(key, value2);
         }
 
-        public void onlyTheFirstToPrepareWillSucceed() {
+        public void onlyTheFirstToPrepareWillSucceed() throws Exception {
             tx1PreparesBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
         }
@@ -251,7 +267,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             table2.update(key, value2);
         }
 
-        public void onlyTheFirstToPrepareWillSucceed() {
+        public void onlyTheFirstToPrepareWillSucceed() throws Exception {
             tx1PreparesBeforeTx2();
             specify(readInNewTransaction(key), should.equal(value1));
         }
@@ -279,7 +295,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
             table2.delete(key);
         }
 
-        public void onlyTheFirstToPrepareWillSucceed() {
+        public void onlyTheFirstToPrepareWillSucceed() throws Exception {
             tx1PreparesBeforeTx2();
             specify(readInNewTransaction(key), should.equal(Blob.EMPTY_BLOB));
         }
