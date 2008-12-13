@@ -34,11 +34,12 @@ package net.orfjackal.dimdwarf.gc.entities;
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.gc.*;
-import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.tasks.RetryingTaskContext;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.concurrent.Executor;
 import java.util.concurrent.locks.*;
 
 /**
@@ -51,7 +52,7 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
 
     private final Provider<GarbageCollector<BigInteger>> collector;
     private final Provider<TaskScheduler> scheduler;
-    private final TaskExecutor taskContext;
+    private final Executor taskContext;
 
     private final Lock lock = new ReentrantLock(true);
     private final Condition collectionFinished = lock.newCondition();
@@ -59,7 +60,7 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
     @Inject
     public GarbageCollectorManagerImpl(Provider<GarbageCollector<BigInteger>> collector,
                                        Provider<TaskScheduler> scheduler,
-                                       TaskExecutor taskContext) {
+                                       @RetryingTaskContext Executor taskContext) {
         this.collector = collector;
         this.scheduler = scheduler;
         this.taskContext = taskContext;

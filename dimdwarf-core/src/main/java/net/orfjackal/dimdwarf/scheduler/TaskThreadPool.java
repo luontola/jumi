@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.tasks.TaskExecutor;
+import net.orfjackal.dimdwarf.tasks.TaskContext;
 import org.jetbrains.annotations.TestOnly;
 import org.slf4j.*;
 
@@ -51,7 +51,7 @@ public class TaskThreadPool {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TaskThreadPool.class);
     private final Logger logger;
 
-    private final TaskExecutor taskContext;
+    private final Executor taskContext;
     private final TaskProducer producer;
     private final Thread consumer;
     private final ExecutorService workers;
@@ -59,12 +59,14 @@ public class TaskThreadPool {
     private final AtomicInteger waitingForCurrentTasksToFinish = new AtomicInteger(0);
     private volatile boolean shutdown = false;
 
+    // TODO: use @RetryingTaskContext and remove retry code from this class and the task scheduler
+
     @Inject
-    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool) {
+    public TaskThreadPool(@TaskContext Executor taskContext, TaskProducer producer, ExecutorService threadPool) {
         this(taskContext, producer, threadPool, DEFAULT_LOGGER);
     }
 
-    public TaskThreadPool(TaskExecutor taskContext, TaskProducer producer, ExecutorService threadPool, Logger logger) {
+    public TaskThreadPool(Executor taskContext, TaskProducer producer, ExecutorService threadPool, Logger logger) {
         this.taskContext = taskContext;
         this.producer = producer;
         this.consumer = new Thread(new TaskConsumer(), "Consume Scheduled Tasks");

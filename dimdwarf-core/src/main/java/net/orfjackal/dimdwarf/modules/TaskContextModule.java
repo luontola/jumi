@@ -38,11 +38,15 @@ import net.orfjackal.dimdwarf.scopes.*;
 import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.tx.*;
 
+import java.util.concurrent.Executor;
+
 /**
  * @author Esko Luontola
  * @since 13.9.2008
  */
 public class TaskContextModule extends AbstractModule {
+
+    private static final int MAX_RETRIES = 40;
 
     protected void configure() {
         bindScope(TaskScoped.class, new TaskScope());
@@ -53,6 +57,16 @@ public class TaskContextModule extends AbstractModule {
                 .in(TaskScoped.class);
         bind(Transaction.class).toProvider(TransactionProvider.class);
         bind(Filter[].class).toProvider(FilterListProvider.class);
+
+        bind(Executor.class)
+                .annotatedWith(TaskContext.class)
+                .to(TaskExecutor.class);
+
+        bind(RetryPolicy.class).toInstance(new RetryOnRetryableExceptionsANumberOfTimes(MAX_RETRIES));
+        bind(Executor.class)
+                .annotatedWith(RetryingTaskContext.class)
+                .to(RetryingTaskExecutor.class);
+
     }
 
     private static class TransactionProvider implements Provider<Transaction> {
