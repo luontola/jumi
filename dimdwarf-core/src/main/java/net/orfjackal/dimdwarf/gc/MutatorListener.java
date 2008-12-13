@@ -40,6 +40,8 @@ import java.util.EventListener;
  */
 public interface MutatorListener<T> extends EventListener {
 
+    void onNodeCreated(T node);
+
     void onReferenceCreated(@Nullable T source, T target);
 
     void onReferenceRemoved(@Nullable T source, T target);

@@ -159,15 +159,15 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
             specify(listener.events, should.containInOrder("-" + rootId + "->" + nodeId1, "+" + rootId + "->" + nodeId2));
         }
 
-        public void isNotifiedAboutEntitiesWhichAreGarbageAlreadyWhenCreated() {
+        public void isNotifiedAboutCreatedEntitiesEvenIfThereAreNoReferencesToThem() {
             listener.events.clear();
             taskContext.execute(new Runnable() {
                 public void run() {
-                    DummyEntity garbage = new DummyEntity();
-                    garbageId = info.get().getEntityId(garbage);
+                    DummyEntity garbageOnCreation = new DummyEntity();
+                    garbageId = info.get().getEntityId(garbageOnCreation);
                 }
             });
-            specify(listener.events, should.containInOrder("+" + garbageId + "->" + garbageId, "-" + garbageId + "->" + garbageId));
+            specify(listener.events, should.containInOrder("*" + garbageId));
         }
 
         public void isNotifiedAboutEntitiesWhichAreRemovedByTheGarbageCollector() {
@@ -233,6 +233,10 @@ public class EntityMutatorListenerSpec extends Specification<Object> {
     private static class MutatorListenerSpy implements MutatorListener<BigInteger> {
 
         public final List<String> events = new ArrayList<String>();
+
+        public void onNodeCreated(BigInteger node) {
+            events.add("*" + node);
+        }
 
         public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
             events.add("+" + source + "->" + target);

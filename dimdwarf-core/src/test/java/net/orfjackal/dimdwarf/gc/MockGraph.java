@@ -64,22 +64,40 @@ public class MockGraph implements Graph<String> {
 
     public void createNode(String node) {
         nodes.put(node, new MockNode());
+        fireNodeCreated(node);
     }
 
     public void removeNode(String node) {
+        for (String target : getConnectedNodesOf(node)) {
+            fireReferenceRemoved(node, target);
+        }
         nodes.remove(node);
         root.edges.remove(node);
     }
 
     public void createDirectedEdge(@Nullable String source, String target) {
         getNode(source).edges.add(target);
+        fireReferenceCreated(source, target);
+    }
+
+    public void removeDirectedEdge(@Nullable String source, String target) {
+        getNode(source).edges.remove(target);
+        fireReferenceRemoved(source, target);
+    }
+
+    private void fireNodeCreated(String node) {
+        for (MutatorListener<String> listener : getMutatorListeners()) {
+            listener.onNodeCreated(node);
+        }
+    }
+
+    private void fireReferenceCreated(String source, String target) {
         for (MutatorListener<String> listener : getMutatorListeners()) {
             listener.onReferenceCreated(source, target);
         }
     }
 
-    public void removeDirectedEdge(@Nullable String source, String target) {
-        getNode(source).edges.remove(target);
+    private void fireReferenceRemoved(String source, String target) {
         for (MutatorListener<String> listener : getMutatorListeners()) {
             listener.onReferenceRemoved(source, target);
         }
@@ -116,6 +134,7 @@ public class MockGraph implements Graph<String> {
     private MutatorListener<String>[] getMutatorListeners() {
         return Objects.uncheckedCast(listeners.getListeners(MutatorListener.class));
     }
+
 
     private static class MockNode {
         public final Map<String, byte[]> metadata = new ConcurrentHashMap<String, byte[]>();

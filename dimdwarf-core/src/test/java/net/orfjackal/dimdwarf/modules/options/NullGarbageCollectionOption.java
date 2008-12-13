@@ -66,6 +66,9 @@ public class NullGarbageCollectionOption extends AbstractModule {
 
     public static class NullMutatorListener implements MutatorListener<BigInteger> {
 
+        public void onNodeCreated(BigInteger node) {
+        }
+
         public void onReferenceCreated(@Nullable BigInteger source, BigInteger target) {
         }
 

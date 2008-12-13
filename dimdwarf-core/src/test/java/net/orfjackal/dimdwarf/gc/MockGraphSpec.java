@@ -69,6 +69,9 @@ public class MockGraphSpec extends Specification<Object> {
     public class WhenANodeIsCreated {
 
         public void create() {
+            checking(new Expectations() {{
+                one(listener).onNodeCreated("A");
+            }});
             graph.createNode("A");
         }
 
@@ -91,6 +94,7 @@ public class MockGraphSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
+                one(listener).onNodeCreated("A");
                 one(listener).onReferenceCreated(null, "A");
             }});
             graph.createNode("A");
@@ -116,6 +120,8 @@ public class MockGraphSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
+                one(listener).onNodeCreated("A");
+                one(listener).onNodeCreated("B");
                 one(listener).onReferenceCreated("A", "B");
             }});
             graph.createNode("A");
@@ -132,6 +138,9 @@ public class MockGraphSpec extends Specification<Object> {
         }
 
         public void afterNodeRemovalTheEdgeDoesNotExist() {
+            checking(new Expectations() {{
+                one(listener).onReferenceRemoved("A", "B");
+            }});
             graph.removeNode("A");
             specify(graph.getConnectedNodesOf("A"), should.containExactly());
         }
@@ -149,11 +158,15 @@ public class MockGraphSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
+                one(listener).onNodeCreated("A");
+                one(listener).onNodeCreated("B");
+                one(listener).onNodeCreated("C");
                 one(listener).onReferenceCreated("A", "B");
                 one(listener).onReferenceCreated("A", "C");
             }});
             graph.createNode("A");
             graph.createNode("B");
+            graph.createNode("C");
             graph.createDirectedEdge("A", "B");
             graph.createDirectedEdge("A", "C");
         }
@@ -175,6 +188,8 @@ public class MockGraphSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
+                one(listener).onNodeCreated("A");
+                one(listener).onNodeCreated("B");
                 exactly(2).of(listener).onReferenceCreated("A", "B");
             }});
             graph.createNode("A");
@@ -201,6 +216,10 @@ public class MockGraphSpec extends Specification<Object> {
         private byte[] nullValue = {};
 
         public void create() {
+            checking(new Expectations() {{
+                one(listener).onNodeCreated("A");
+                one(listener).onNodeCreated("B");
+            }});
             graph.createNode("A");
             graph.createNode("B");
             graph.setMetadata("A", "status", value);

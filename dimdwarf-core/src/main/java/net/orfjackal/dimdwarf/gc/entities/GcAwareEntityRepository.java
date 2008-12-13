@@ -112,8 +112,7 @@ public class GcAwareEntityRepository implements EntityRepository {
     }
 
     private void fireEntityCreated(BigInteger id) {
-        listener.onReferenceCreated(id, id);
-        listener.onReferenceRemoved(id, id);
+        listener.onNodeCreated(id);
     }
 
     private void fireReferencesRemoved(BigInteger id, Set<BigInteger> newReferences, Set<BigInteger> oldReferences) {
