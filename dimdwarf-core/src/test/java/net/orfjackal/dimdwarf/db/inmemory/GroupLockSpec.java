@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.db.inmemory;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.db.OptimisticLockException;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
@@ -80,7 +81,7 @@ public class GroupLockSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     lock.tryLock("A");
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(OptimisticLockException.class));
             specify(lock.getLockCount(), should.equal(1));
         }
 
@@ -108,7 +109,7 @@ public class GroupLockSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     lock.tryLock(Arrays.asList("B", "C"));
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(OptimisticLockException.class));
             specify(lock.getLockCount(), should.equal(2));
         }
 

@@ -31,6 +31,8 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import net.orfjackal.dimdwarf.db.OptimisticLockException;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
@@ -47,12 +49,12 @@ public class GroupLock<T> {
     private final ReentrantLock lock = new ReentrantLock();
 
     @CheckReturnValue
-    public LockHandle tryLock(T... keys) throws IllegalStateException {
+    public LockHandle tryLock(T... keys) throws OptimisticLockException {
         return tryLock(Arrays.asList(keys));
     }
 
     @CheckReturnValue
-    public LockHandle tryLock(Collection<T> keys) throws IllegalStateException {
+    public LockHandle tryLock(Collection<T> keys) throws OptimisticLockException {
         lock.lock();
         try {
             checkNoneIsLocked(keys);
@@ -63,10 +65,10 @@ public class GroupLock<T> {
         }
     }
 
-    private void checkNoneIsLocked(Collection<T> keys) {
+    private void checkNoneIsLocked(Collection<T> keys) throws OptimisticLockException {
         for (T key : keys) {
             if (isLocked(key)) {
-                throw new IllegalStateException("Key is already locked: " + key);
+                throw new OptimisticLockException("Key is already locked: " + key);
             }
         }
     }

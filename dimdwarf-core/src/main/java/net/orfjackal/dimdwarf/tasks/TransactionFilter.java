@@ -57,7 +57,7 @@ public class TransactionFilter implements Filter {
             nextInChain.run();
             tx.prepareAndCommit();
         } catch (Throwable t) {
-            logger.warn("Task failed, rolling back its transaction", t);
+            logger.info("Task failed, rolling back its transaction", t);
             tx.rollback();
             throw throwAsUnchecked(t);
         }

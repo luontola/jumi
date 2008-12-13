@@ -31,11 +31,13 @@
 
 package net.orfjackal.dimdwarf.tx;
 
+import net.orfjackal.dimdwarf.tasks.Retryable;
+
 /**
  * @author Esko Luontola
  * @since 17.8.2008
  */
-public class TransactionException extends RuntimeException {
+public class TransactionException extends RuntimeException implements Retryable {
     private static final long serialVersionUID = 1L;
 
     public TransactionException() {
@@ -51,5 +53,11 @@ public class TransactionException extends RuntimeException {
 
     public TransactionException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public boolean mayBeRetried() {
+        Throwable cause = getCause();
+        return cause instanceof Retryable
+                && ((Retryable) cause).mayBeRetried();
     }
 }

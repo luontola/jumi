@@ -69,7 +69,7 @@ public class RetryingTaskExecutor implements Executor {
                     logger.info("Retrying a failed task");
                     continue;
                 }
-                throw new GivenUpOnTaskException("Retry limit reached, not retrying the failed task", t);
+                throw new GivenUpOnTaskException("Not retrying the failed task", t);
             }
         }
     }

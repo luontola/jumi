@@ -31,13 +31,15 @@
 
 package net.orfjackal.dimdwarf.db;
 
+import net.orfjackal.dimdwarf.tasks.Retryable;
+
 /**
  * Thrown when an optimistic locking conflict occurs.
  *
  * @author Esko Luontola
  * @since 19.8.2008
  */
-public class OptimisticLockException extends PersistenceException {
+public class OptimisticLockException extends PersistenceException implements Retryable {
     private static final long serialVersionUID = 1L;
 
     public OptimisticLockException() {
@@ -53,5 +55,9 @@ public class OptimisticLockException extends PersistenceException {
 
     public OptimisticLockException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public boolean mayBeRetried() {
+        return true;
     }
 }
