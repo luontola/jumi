@@ -91,11 +91,15 @@ public class EntityGraph implements Graph<BigInteger> {
     }
 
     public byte[] getMetadata(BigInteger node, String metaKey) {
-        return entities.getMetaTable(metaKey).read(node).getByteArray();
+        if (entities.exists(node)) {
+            return entities.readMetadata(node, metaKey).getByteArray();
+        } else {
+            return new byte[0];
+        }
     }
 
     public void setMetadata(BigInteger node, String metaKey, byte[] metaValue) {
-        entities.getMetaTable(metaKey).update(node, Blob.fromBytes(metaValue));
+        entities.updateMetadata(node, metaKey, Blob.fromBytes(metaValue));
     }
 
 

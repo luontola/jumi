@@ -97,11 +97,15 @@ public class EntityNodeSetSpec extends Specification<Object> {
         public void create() {
             taskContext.execute(new Runnable() {
                 public void run() {
-                    NodeSet<BigInteger> set = getNodeSet(SET_NAME);
                     DummyEntity e1 = new DummyEntity("A");
                     DummyEntity e2 = new DummyEntity("A");
                     entityId1 = info.get().getEntityId(e1);
                     entityId2 = info.get().getEntityId(e2);
+                }
+            });
+            taskContext.execute(new Runnable() {
+                public void run() {
+                    NodeSet<BigInteger> set = getNodeSet(SET_NAME);
                     set.add(entityId1);
                     set.add(entityId2);
                 }

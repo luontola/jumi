@@ -51,11 +51,11 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
         this.dataTable = db.openTable(tableName);
     }
 
-    public DatabaseTable<K, V> getMetaTable(String metaKey) {
+    private DatabaseTable<K, V> metaTable(String metaKey) {
         return db.openTable(tableName + META_SEPARATOR + metaKey);
     }
 
-    private List<DatabaseTable<K, V>> getAllMetaTables() {
+    private List<DatabaseTable<K, V>> allMetaTables() {
         List<DatabaseTable<K, V>> metaTables = new ArrayList<DatabaseTable<K, V>>();
         for (String s : db.getTableNames()) {
             if (s.startsWith(tableName + META_SEPARATOR)) {
@@ -67,17 +67,21 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
 
     public V readMetadata(K key, String metaKey) {
         checkEntryExists(key);
-        return getMetaTable(metaKey).read(key);
+        return metaTable(metaKey).read(key);
     }
 
     public void updateMetadata(K key, String metaKey, V metaValue) {
         checkEntryExists(key);
-        getMetaTable(metaKey).update(key, metaValue);
+        metaTable(metaKey).update(key, metaValue);
     }
 
     public void deleteMetadata(K key, String metaKey) {
         checkEntryExists(key);
-        getMetaTable(metaKey).delete(key);
+        metaTable(metaKey).delete(key);
+    }
+
+    public K firstEntryWithMetadata(String metaKey) {
+        return metaTable(metaKey).firstKey();
     }
 
     private void checkEntryExists(K key) {
@@ -99,7 +103,7 @@ public class DatabaseTableWithMetadataImpl<K, V> implements DatabaseTableWithMet
     }
 
     public void delete(K key) {
-        for (DatabaseTable<K, V> metaTable : getAllMetaTables()) {
+        for (DatabaseTable<K, V> metaTable : allMetaTables()) {
             metaTable.delete(key);
         }
         dataTable.delete(key);

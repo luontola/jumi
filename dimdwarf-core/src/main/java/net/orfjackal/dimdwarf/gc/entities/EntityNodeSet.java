@@ -32,7 +32,7 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.db.*;
+import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.gc.NodeSet;
 
@@ -48,28 +48,23 @@ public class EntityNodeSet implements NodeSet<BigInteger>, Serializable {
 
     private static final Blob PLACEHOLDER = Blob.fromBytes(new byte[]{1});
 
-    private final String name;
+    private final String metaKey;
     @Inject public transient final EntityDao entities;
 
     @Inject
-    public EntityNodeSet(String name, EntityDao entities) {
-        this.name = name;
+    public EntityNodeSet(String metaKey, EntityDao entities) {
+        this.metaKey = metaKey;
         this.entities = entities;
     }
 
-    private DatabaseTable<BigInteger, Blob> getTable() {
-        return entities.getMetaTable(name);
-    }
-
     public void add(BigInteger node) {
-        getTable().update(node, PLACEHOLDER);
+        entities.updateMetadata(node, metaKey, PLACEHOLDER);
     }
 
     public BigInteger pollFirst() {
-        DatabaseTable<BigInteger, Blob> t = getTable();
-        BigInteger first = t.firstKey();
+        BigInteger first = entities.firstEntryWithMetadata(metaKey);
         if (first != null) {
-            t.delete(first);
+            entities.deleteMetadata(first, metaKey);
         }
         return first;
     }
