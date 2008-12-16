@@ -68,6 +68,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
     private DummyTask task2;
 
     public void create() {
+        // TODO: mock dependencies, test without Guice
         clock = new DummyClock();
         Injector injector = Guice.createInjector(
                 new EntityModule(),

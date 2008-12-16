@@ -75,6 +75,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     }
 
     private void recoverTasksFromDatabase() {
+        // TODO: move recovery of scheduled tasks to a new class
         taskContext.execute(new Runnable() {
             public void run() {
                 for (ScheduledTask st : persistedTasks.getAll()) {
