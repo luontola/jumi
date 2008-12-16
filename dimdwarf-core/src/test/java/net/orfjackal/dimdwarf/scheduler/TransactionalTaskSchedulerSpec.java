@@ -221,7 +221,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         }
     }
 
-    // TODO: retry limits for repatedly failing tasks
+    // TODO: integrate RetryingTaskExecutor: retry limits for repatedly failing tasks
+    // TODO: integrate RetryingTaskExecutor: do not retry when the exception is not because of transaction conflict
     // TODO: retry executing tasks in exclusive (single-threaded) mode (ReentrantReadWriteLock?)
-    // TODO: do not retry when the exception is not because of transaction conflict
 }
