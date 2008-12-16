@@ -49,7 +49,7 @@ public class TaskScope implements Scope {
             public T get() {
                 Context context = ThreadContext.getCurrentContext();
                 if (!(context instanceof TaskScopedContext)) {
-                    throw new IllegalStateException("Not inside task scope");
+                    throw new IllegalStateException("Not inside task scope (context was " + context + ")");
                 }
                 return ((TaskScopedContext) context).scopedGet(key, unscoped);
             }
