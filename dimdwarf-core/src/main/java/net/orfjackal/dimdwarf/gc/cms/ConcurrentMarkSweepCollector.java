@@ -74,7 +74,7 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
 
             public void onNodeCreated(T node) {
 //                System.out.println("onNodeCreated " + node);
-                // TODO: scan black?
+//                setColor(node, Color.BLACK);
             }
 
             public void onReferenceCreated(@Nullable T source, T target) {
@@ -93,8 +93,11 @@ public class ConcurrentMarkSweepCollector<T> implements GarbageCollector<T>, Ser
     public Color getColor(T node) {
         byte[] value = graph.getMetadata(node, COLOR_KEY);
         if (value.length == 0) {
-            // TODO: Revert the default back to white? Maybe also scan new nodes black in MutatorListener.onNodeCreated.
+            // TODO: Revert the default back to white and scan new nodes black in MutatorListener.onNodeCreated(),
+            // but there is a problem that bindings to an entity may be created before the entity is persisted,
+            // which results in not being able to modify its metadata.
             return Color.BLACK;
+//            return Color.WHITE;
         }
         return Color.parseIndex(value[0]);
     }
