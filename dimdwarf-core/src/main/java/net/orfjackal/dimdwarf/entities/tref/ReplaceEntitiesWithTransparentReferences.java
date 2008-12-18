@@ -58,8 +58,8 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationRe
         return obj;
     }
 
-    private Object createTransparentReferenceForSerialization(Object obj) {
-        TransparentReference notSerializableProxy = factory.createTransparentReference((EntityObject) obj);
+    private Object createTransparentReferenceForSerialization(Object entity) {
+        TransparentReference notSerializableProxy = factory.createTransparentReference(entity);
         // The call to writeReplace() is needed because ObjectOutputStream#replaceObject does not check
         // whether the returned objects have a writeReplace() method.
         return notSerializableProxy.writeReplace();

@@ -45,7 +45,7 @@ public interface TransparentReferenceFactory {
      * external interface as the proxied entity, but the proxy itself does not need
      * to be wrapped into an {@link EntityReference}.
      */
-    TransparentReference createTransparentReference(EntityObject object);
+    TransparentReference createTransparentReference(Object entity);
 
     /**
      * Creates a proxy from a {@link TransparentReferenceImpl} which is not yet proxied.

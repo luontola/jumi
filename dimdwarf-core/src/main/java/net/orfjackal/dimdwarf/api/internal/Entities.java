@@ -47,4 +47,8 @@ public class Entities {
     public static boolean isTransparentReference(Object obj) {
         return obj instanceof TransparentReference;
     }
+
+    public static Class<?> getEntityClass() {
+        return EntityObject.class;
+    }
 }

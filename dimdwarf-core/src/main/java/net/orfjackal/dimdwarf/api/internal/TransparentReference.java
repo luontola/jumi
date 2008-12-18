@@ -37,7 +37,7 @@ package net.orfjackal.dimdwarf.api.internal;
  */
 public interface TransparentReference {
 
-    EntityObject getEntity();
+    Object getEntity();
 
     EntityReference<?> getEntityReference();
 

@@ -58,9 +58,9 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         this.referenceFactory = referenceFactory;
     }
 
-    public TransparentReference createTransparentReference(EntityObject object) {
-        Class<?> type = object.getClass();
-        EntityReference<?> ref = referenceFactory.get().createReference(object);
+    public TransparentReference createTransparentReference(Object entity) {
+        Class<?> type = entity.getClass();
+        EntityReference<?> ref = referenceFactory.get().createReference(entity);
         return newProxy(new TransparentReferenceImpl(type, ref));
     }
 
@@ -99,7 +99,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
             for (Class<?> c = aClass; c != null; c = c.getSuperclass()) {
                 for (Class<?> anInterface : c.getInterfaces()) {
                     assert !TransparentReference.class.equals(anInterface);
-                    if (!EntityObject.class.isAssignableFrom(anInterface)) {
+                    if (!Entities.getEntityClass().isAssignableFrom(anInterface)) {
                         results.add(anInterface);
                     }
                 }
