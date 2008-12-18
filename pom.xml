@@ -56,6 +56,7 @@
 
     <modules>
         <module>dimdwarf-api</module>
+        <module>dimdwarf-api-internal</module>
         <module>dimdwarf-aop-agent</module>
         <module>dimdwarf-core</module>
         <module>dimdwarf-dist</module>
@@ -102,6 +103,11 @@
             <dependency>
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-api</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.orfjackal.dimdwarf</groupId>
+                <artifactId>dimdwarf-api-internal</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>

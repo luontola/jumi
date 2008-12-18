@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>net.orfjackal.dimdwarf</groupId>
+            <artifactId>dimdwarf-api-internal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-aop-agent</artifactId>
         </dependency>
 
