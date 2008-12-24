@@ -31,7 +31,7 @@
 
 package net.orfjackal.dimdwarf.agent;
 
-import net.orfjackal.dimdwarf.aop.conf.DimdwarfTransformationChain;
+import net.orfjackal.dimdwarf.aop.conf.*;
 
 import java.lang.instrument.Instrumentation;
 
@@ -48,11 +48,11 @@ public class AopAgent {
         installTransformations(inst);
     }
 
-    public static void agentmain(String agentArgs, Instrumentation inst) {
-        installTransformations(inst);
-    }
+//    public static void agentmain(String agentArgs, Instrumentation inst) {
+//        installTransformations(inst);
+//    }
 
     private static void installTransformations(Instrumentation inst) {
-        inst.addTransformer(new DimdwarfTransformationChain());
+        inst.addTransformer(new AopTransformationChain(new DimdwarfAopApi()));
     }
 }

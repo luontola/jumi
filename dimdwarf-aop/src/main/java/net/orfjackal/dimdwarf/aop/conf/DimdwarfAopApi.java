@@ -29,15 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop;
+package net.orfjackal.dimdwarf.aop.conf;
+
+import net.orfjackal.dimdwarf.aop.AopApi;
 
 /**
  * @author Esko Luontola
  * @since 9.9.2008
  */
-public class DimdwarfApi {
+public class DimdwarfAopApi implements AopApi {
 
-    public static final String ENTITY_ANNOTATION = "net/orfjackal/dimdwarf/api/Entity";
-    public static final String ENTITY_INTERFACE = "net/orfjackal/dimdwarf/api/internal/EntityObject";
-    public static final String ENTITY_HELPER_CLASS = "net/orfjackal/dimdwarf/entities/tref/EntityHelper";
+    public String getEntityAnnotation() {
+        return "net/orfjackal/dimdwarf/api/Entity";
+    }
+
+    public String getEntityInterface() {
+        return "net/orfjackal/dimdwarf/api/internal/EntityObject";
+    }
+
+    public String getEntityHelperClass() {
+        return "net/orfjackal/dimdwarf/entities/tref/EntityHelper";
+    }
 }

@@ -29,65 +29,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.aop;
 
-import jdave.*;
-import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.aop.*;
-import net.orfjackal.dimdwarf.aop.conf.*;
-import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.Entities;
-import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.tree.*;
+
+import java.util.*;
 
 /**
  * @author Esko Luontola
  * @since 9.9.2008
  */
-@RunWith(JDaveRunner.class)
-@Group({"fast"})
-public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object> {
+@SuppressWarnings({"unchecked"})
+public class AddMarkerInterfaceForEntities extends ClassNode {
 
-    private Object target;
+    private final String annotationToFind;
+    private final String interfaceToAdd;
+    private final ClassVisitor cv;
 
-    private static Object newInstrumentedInstance(Class<?> cls) throws Exception {
-        ClassLoader loader = new TransformationTestClassLoader(cls.getName(), new AbstractTransformationChain() {
-            protected ClassVisitor getAdapters(ClassVisitor cv) {
-                cv = new CheckClassAdapter(cv);
-                cv = new AddMarkerInterfaceForEntities(new DimdwarfAopApi(), cv);
-                return cv;
+    public AddMarkerInterfaceForEntities(AopApi api, ClassVisitor cv) {
+        this.annotationToFind = "L" + api.getEntityAnnotation() + ";";
+        this.interfaceToAdd = api.getEntityInterface();
+        this.cv = cv;
+    }
+
+    public void visitEnd() {
+        if (hasEntityAnnotation()) {
+            interfaces.add(interfaceToAdd);
+        }
+        accept(cv);
+    }
+
+    private boolean hasEntityAnnotation() {
+        for (AnnotationNode an : visibleAnnotations()) {
+            if (an.desc.equals(annotationToFind)) {
+                return true;
             }
-        });
-        return loader.loadClass(cls.getName()).newInstance();
+        }
+        return false;
     }
 
-
-    public class AClassWithNoAnnotations {
-
-        public void create() throws Exception {
-            target = newInstrumentedInstance(DummyObject.class);
-        }
-
-        public void isNotTransformed() {
-            specify(Entities.isEntity(target), should.equal(false));
-        }
-    }
-
-    public class AClassWithTheEntityAnnotation {
-
-        public void create() throws Exception {
-            target = newInstrumentedInstance(AnnotatedEntity.class);
-        }
-
-        public void isTransformedToAnEntity() {
-            specify(Entities.isEntity(target));
-        }
-    }
-
-
-    @Entity
-    public static class AnnotatedEntity {
-
+    private List<AnnotationNode> visibleAnnotations() {
+        return visibleAnnotations != null ? visibleAnnotations : Collections.emptyList();
     }
 }

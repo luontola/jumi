@@ -29,45 +29,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop;
+package net.orfjackal.dimdwarf.aop.conf;
 
+import net.orfjackal.dimdwarf.aop.*;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.tree.*;
-
-import java.util.*;
 
 /**
  * @author Esko Luontola
  * @since 9.9.2008
  */
-@SuppressWarnings({"unchecked"})
-public class MarkAsEntitiesAllClassesAnnotatedWith extends ClassNode {
+public class AopTransformationChain extends AbstractTransformationChain {
 
-    private final String entityAnnotationDesc;
-    private final ClassVisitor cv;
+    private final AopApi api;
 
-    public MarkAsEntitiesAllClassesAnnotatedWith(String entityAnnotationDesc, ClassVisitor cv) {
-        this.entityAnnotationDesc = "L" + entityAnnotationDesc + ";";
-        this.cv = cv;
+    public AopTransformationChain(AopApi api) {
+        this.api = api;
     }
 
-    public void visitEnd() {
-        if (hasEntityAnnotation()) {
-            interfaces.add(DimdwarfApi.ENTITY_INTERFACE);
-        }
-        accept(cv);
-    }
-
-    private boolean hasEntityAnnotation() {
-        for (AnnotationNode an : visibleAnnotations()) {
-            if (an.desc.equals(entityAnnotationDesc)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private List<AnnotationNode> visibleAnnotations() {
-        return visibleAnnotations != null ? visibleAnnotations : Collections.emptyList();
+    protected ClassVisitor getAdapters(ClassVisitor cv) {
+        // the adapter declared last is processed first
+        cv = new AddEqualsAndHashCodeMethodsForEntities(api, cv);
+        cv = new AddMarkerInterfaceForEntities(api, cv);
+        return cv;
     }
 }

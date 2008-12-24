@@ -29,21 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop.conf;
-
-import net.orfjackal.dimdwarf.aop.*;
-import org.objectweb.asm.ClassVisitor;
+package net.orfjackal.dimdwarf.aop;
 
 /**
  * @author Esko Luontola
- * @since 9.9.2008
+ * @since 24.12.2008
  */
-public class DimdwarfTransformationChain extends AbstractTransformationChain {
+public interface AopApi {
 
-    protected ClassVisitor getAdapters(ClassVisitor cv) {
-        // the adapter declared last is processed first
-        cv = new AddEqualsAndHashCodeMethodsForEntities(cv);
-        cv = new MarkAsEntitiesAllClassesAnnotatedWith(DimdwarfApi.ENTITY_ANNOTATION, cv);
-        return cv;
-    }
+    String getEntityAnnotation();
+
+    String getEntityInterface();
+
+    String getEntityHelperClass();
 }

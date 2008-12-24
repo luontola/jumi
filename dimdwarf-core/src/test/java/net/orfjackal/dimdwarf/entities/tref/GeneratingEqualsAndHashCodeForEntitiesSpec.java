@@ -34,7 +34,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.aop.*;
-import net.orfjackal.dimdwarf.aop.conf.AbstractTransformationChain;
+import net.orfjackal.dimdwarf.aop.conf.*;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.entities.*;
@@ -73,7 +73,7 @@ public class GeneratingEqualsAndHashCodeForEntitiesSpec extends Specification<Ob
         ClassLoader loader = new TransformationTestClassLoader(cls.getName(), new AbstractTransformationChain() {
             protected ClassVisitor getAdapters(ClassVisitor cv) {
                 cv = new CheckClassAdapter(cv);
-                cv = new AddEqualsAndHashCodeMethodsForEntities(cv);
+                cv = new AddEqualsAndHashCodeMethodsForEntities(new DimdwarfAopApi(), cv);
                 return cv;
             }
         });
