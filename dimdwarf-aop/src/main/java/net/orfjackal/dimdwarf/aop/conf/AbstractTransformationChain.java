@@ -29,47 +29,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop;
+package net.orfjackal.dimdwarf.aop.conf;
 
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.*;
 
-import java.util.Collections;
-import java.util.List;
+import java.lang.instrument.*;
+import java.security.ProtectionDomain;
 
 /**
  * @author Esko Luontola
  * @since 9.9.2008
  */
-@SuppressWarnings({"unchecked"})
-public class MarkAsEntitiesAllClassesAnnotatedWith extends ClassNode {
+public abstract class AbstractTransformationChain implements ClassFileTransformer {
 
-    private final String entityAnnotationDesc;
-    private final ClassVisitor cv;
-
-    public MarkAsEntitiesAllClassesAnnotatedWith(String entityAnnotationDesc, ClassVisitor cv) {
-        this.entityAnnotationDesc = "L" + entityAnnotationDesc + ";";
-        this.cv = cv;
-    }
-
-    public void visitEnd() {
-        if (hasEntityAnnotation()) {
-            interfaces.add(DimdwarfApi.ENTITY_INTERFACE);
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+        // TODO: at least the ClassLoader could be passed to the adapters, so they could examine super classes, package annotations etc. 
+        ClassReader cr = new ClassReader(classfileBuffer);
+        ClassWriter cw;
+        if (enableAdditiveTransformationOptimization()) {
+            cw = new ClassWriter(cr, 0);
+        } else {
+            cw = new ClassWriter(0);
         }
-        accept(cv);
+        ClassVisitor cv = getAdapters(cw);
+        cr.accept(cv, 0);
+        return cw.toByteArray();
     }
 
-    private boolean hasEntityAnnotation() {
-        for (AnnotationNode an : visibleAnnotations()) {
-            if (an.desc.equals(entityAnnotationDesc)) {
-                return true;
-            }
-        }
-        return false;
+    /**
+     * See "Optimization" in section 2.2.4 of
+     * <a href="http://download.forge.objectweb.org/asm/asm-guide.pdf">ASM 3.0 User Guide</a>
+     */
+    protected boolean enableAdditiveTransformationOptimization() {
+        return true;
     }
 
-    private List<AnnotationNode> visibleAnnotations() {
-        return visibleAnnotations != null ? visibleAnnotations : Collections.emptyList();
-    }
+    protected abstract ClassVisitor getAdapters(ClassVisitor cv);
 }

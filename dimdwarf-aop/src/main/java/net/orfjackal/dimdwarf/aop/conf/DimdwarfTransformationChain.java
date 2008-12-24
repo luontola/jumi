@@ -29,11 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop.agent;
+package net.orfjackal.dimdwarf.aop.conf;
 
-import net.orfjackal.dimdwarf.aop.AddEqualsAndHashCodeMethodsForEntities;
-import net.orfjackal.dimdwarf.aop.DimdwarfApi;
-import net.orfjackal.dimdwarf.aop.MarkAsEntitiesAllClassesAnnotatedWith;
+import net.orfjackal.dimdwarf.aop.*;
 import org.objectweb.asm.ClassVisitor;
 
 /**

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -8,20 +9,16 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dimdwarf-aop-agent</artifactId>
+    <artifactId>dimdwarf-agent</artifactId>
     <packaging>jar</packaging>
 
-    <name>dimdwarf-aop-agent</name>
+    <name>dimdwarf-agent</name>
 
     <dependencies>
 
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-tree</artifactId>
+            <groupId>net.orfjackal.dimdwarf</groupId>
+            <artifactId>dimdwarf-aop</artifactId>
         </dependency>
 
     </dependencies>
@@ -37,8 +34,8 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>net.orfjackal.dimdwarf.aop.agent.AopAgent</Premain-Class>
-                            <Agent-Class>net.orfjackal.dimdwarf.aop.agent.AopAgent</Agent-Class>
+                            <Premain-Class>net.orfjackal.dimdwarf.agent.AopAgent</Premain-Class>
+                            <Agent-Class>net.orfjackal.dimdwarf.agent.AopAgent</Agent-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>

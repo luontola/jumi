@@ -346,7 +346,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/dimdwarf.iml" filepath="$PROJECT_DIR$/dimdwarf.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-aop-agent/dimdwarf-aop-agent.iml" filepath="$PROJECT_DIR$/dimdwarf-aop-agent/dimdwarf-aop-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dimdwarf-agent/dimdwarf-agent.iml" filepath="$PROJECT_DIR$/dimdwarf-agent/dimdwarf-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dimdwarf-aop/dimdwarf-aop.iml" filepath="$PROJECT_DIR$/dimdwarf-aop/dimdwarf-aop.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api/dimdwarf-api.iml" filepath="$PROJECT_DIR$/dimdwarf-api/dimdwarf-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" filepath="$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" filepath="$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" />

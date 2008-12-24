@@ -31,13 +31,10 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.aop.DimdwarfApi;
-import net.orfjackal.dimdwarf.aop.MarkAsEntitiesAllClassesAnnotatedWith;
-import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
-import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
+import net.orfjackal.dimdwarf.aop.*;
+import net.orfjackal.dimdwarf.aop.conf.AbstractTransformationChain;
 import net.orfjackal.dimdwarf.api.Entity;
 import net.orfjackal.dimdwarf.api.internal.Entities;
 import org.junit.runner.RunWith;

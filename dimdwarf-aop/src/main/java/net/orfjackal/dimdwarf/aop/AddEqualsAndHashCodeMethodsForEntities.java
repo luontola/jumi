@@ -31,9 +31,7 @@
 
 package net.orfjackal.dimdwarf.aop;
 
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 import static org.objectweb.asm.Opcodes.*;
 
 /**

@@ -31,20 +31,13 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.aop.AddEqualsAndHashCodeMethodsForEntities;
-import net.orfjackal.dimdwarf.aop.TransformationTestClassLoader;
-import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
-import net.orfjackal.dimdwarf.context.FakeContext;
-import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.entities.DummyEntity;
-import net.orfjackal.dimdwarf.entities.DummyObject;
-import net.orfjackal.dimdwarf.entities.EntityReferenceImpl;
-import net.orfjackal.dimdwarf.entities.ReferenceFactory;
+import net.orfjackal.dimdwarf.aop.*;
+import net.orfjackal.dimdwarf.aop.conf.AbstractTransformationChain;
+import net.orfjackal.dimdwarf.api.internal.*;
+import net.orfjackal.dimdwarf.context.*;
+import net.orfjackal.dimdwarf.entities.*;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;

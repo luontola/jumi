@@ -29,41 +29,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop.agent;
+package net.orfjackal.dimdwarf.agent;
 
-import org.objectweb.asm.*;
+import net.orfjackal.dimdwarf.aop.conf.DimdwarfTransformationChain;
 
-import java.lang.instrument.*;
-import java.security.ProtectionDomain;
+import java.lang.instrument.Instrumentation;
 
 /**
+ * See http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html
+ * for details on using agents.
+ *
  * @author Esko Luontola
  * @since 9.9.2008
  */
-public abstract class AbstractTransformationChain implements ClassFileTransformer {
+public class AopAgent {
 
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        // TODO: at least the ClassLoader could be passed to the adapters, so they could examine super classes, package annotations etc. 
-        ClassReader cr = new ClassReader(classfileBuffer);
-        ClassWriter cw;
-        if (enableAdditiveTransformationOptimization()) {
-            cw = new ClassWriter(cr, 0);
-        } else {
-            cw = new ClassWriter(0);
-        }
-        ClassVisitor cv = getAdapters(cw);
-        cr.accept(cv, 0);
-        return cw.toByteArray();
+    public static void premain(String agentArgs, Instrumentation inst) {
+        installTransformations(inst);
     }
 
-    /**
-     * See "Optimization" in section 2.2.4 of
-     * <a href="http://download.forge.objectweb.org/asm/asm-guide.pdf">ASM 3.0 User Guide</a>
-     */
-    protected boolean enableAdditiveTransformationOptimization() {
-        return true;
+    public static void agentmain(String agentArgs, Instrumentation inst) {
+        installTransformations(inst);
     }
 
-    protected abstract ClassVisitor getAdapters(ClassVisitor cv);
+    private static void installTransformations(Instrumentation inst) {
+        inst.addTransformer(new DimdwarfTransformationChain());
+    }
 }

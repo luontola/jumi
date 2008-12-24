@@ -29,28 +29,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.aop.agent;
+package net.orfjackal.dimdwarf.aop;
 
-import java.lang.instrument.Instrumentation;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.tree.*;
+
+import java.util.*;
 
 /**
- * See http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html
- * for details on using agents.
- *
  * @author Esko Luontola
  * @since 9.9.2008
  */
-public class AopAgent {
+@SuppressWarnings({"unchecked"})
+public class MarkAsEntitiesAllClassesAnnotatedWith extends ClassNode {
 
-    public static void premain(String agentArgs, Instrumentation inst) {
-        installTransformations(inst);
+    private final String entityAnnotationDesc;
+    private final ClassVisitor cv;
+
+    public MarkAsEntitiesAllClassesAnnotatedWith(String entityAnnotationDesc, ClassVisitor cv) {
+        this.entityAnnotationDesc = "L" + entityAnnotationDesc + ";";
+        this.cv = cv;
     }
 
-    public static void agentmain(String agentArgs, Instrumentation inst) {
-        installTransformations(inst);
+    public void visitEnd() {
+        if (hasEntityAnnotation()) {
+            interfaces.add(DimdwarfApi.ENTITY_INTERFACE);
+        }
+        accept(cv);
     }
 
-    private static void installTransformations(Instrumentation inst) {
-        inst.addTransformer(new DimdwarfTransformationChain());
+    private boolean hasEntityAnnotation() {
+        for (AnnotationNode an : visibleAnnotations()) {
+            if (an.desc.equals(entityAnnotationDesc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<AnnotationNode> visibleAnnotations() {
+        return visibleAnnotations != null ? visibleAnnotations : Collections.emptyList();
     }
 }

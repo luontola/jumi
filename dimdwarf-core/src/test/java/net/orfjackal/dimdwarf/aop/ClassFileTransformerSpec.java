@@ -31,15 +31,11 @@
 
 package net.orfjackal.dimdwarf.aop;
 
-import jdave.Group;
-import jdave.Specification;
+import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.aop.agent.AbstractTransformationChain;
+import net.orfjackal.dimdwarf.aop.conf.AbstractTransformationChain;
 import org.junit.runner.RunWith;
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 /**
  * @author Esko Luontola

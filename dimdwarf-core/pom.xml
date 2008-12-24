@@ -26,7 +26,8 @@
         </dependency>
         <dependency>
             <groupId>net.orfjackal.dimdwarf</groupId>
-            <artifactId>dimdwarf-aop-agent</artifactId>
+            <artifactId>dimdwarf-aop</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Dependency injection -->
