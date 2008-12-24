@@ -27,7 +27,7 @@
         <dependency>
             <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-aop</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
 
         <!-- Dependency injection -->
