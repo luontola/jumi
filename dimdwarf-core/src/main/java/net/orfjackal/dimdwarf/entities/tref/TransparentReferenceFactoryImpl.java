@@ -37,6 +37,7 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.ReferenceFactory;
 import net.orfjackal.dimdwarf.util.SingletonCache;
 import net.sf.cglib.proxy.*;
+import org.objenesis.*;
 
 import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Method;
@@ -75,18 +76,20 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
 
     private static class CglibProxyFactoryCache extends SingletonCache<Class<?>, Factory> {
 
+        private final Objenesis objenesis = new ObjenesisStd();
+
         protected Factory newInstance(Class<?> type) {
             Enhancer e = new Enhancer();
             if (useConcreteSuperclass(type)) {
                 e.setSuperclass(type);
             }
             e.setInterfaces(proxiedInterfaces(type));
-            e.setCallbacks(new Callback[]{
-                    new EntityCallback(null),
-                    new TransparentReferenceCallback(null)
+            e.setCallbackTypes(new Class[]{
+                    EntityCallback.class,
+                    TransparentReferenceCallback.class
             });
             e.setCallbackFilter(new TransparentReferenceCallbackFilter());
-            return (Factory) e.create();
+            return new ConstructorIgnoringCglibProxyFactory(e.createClass(), objenesis);
         }
 
         private static boolean useConcreteSuperclass(Class<?> type) {

@@ -29,25 +29,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api;
+package net.orfjackal.dimdwarf.entities.tref;
+
+import net.sf.cglib.proxy.Callback;
+import org.objenesis.Objenesis;
+import org.objenesis.instantiator.ObjectInstantiator;
+
+import java.lang.reflect.Method;
 
 /**
- * The kind of proxy to generate for given a target class.
- *
  * @author Esko Luontola
- * @since 9.9.2008
+ * @since 27.12.2008
  */
-public enum ProxyType {
+public class ConstructorIgnoringCglibProxyFactory extends NullCglibProxyFactory {
 
-    /**
-     * The proxy will extend {@link Object} and implement the same interfaces as the target class.
-     */
-    INTERFACE,
+    private final ObjectInstantiator instantiator;
+    private final Method setThreadCallbacks;
+    private final Method bindCallbacks;
 
-    /**
-     * The proxy will extend the target class. The target class should not have any publicly accessible fields,
-     * because the proxy can not intercept field access. The constructor of the target class will not be called
-     * when the proxy is created.
-     */
-    CLASS
+    public ConstructorIgnoringCglibProxyFactory(Class<?> proxyClass, Objenesis objenesis) {
+        instantiator = objenesis.getInstantiatorOf(proxyClass);
+        try {
+            setThreadCallbacks = proxyClass.getDeclaredMethod("CGLIB$SET_THREAD_CALLBACKS", Callback[].class);
+            bindCallbacks = proxyClass.getDeclaredMethod("CGLIB$BIND_CALLBACKS", Object.class);
+            bindCallbacks.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Unable to create factory for " + proxyClass, e);
+        }
+    }
+
+    public Object newInstance(Callback[] callbacks) {
+        try {
+            return newProxyWithoutCallingConstructor(callbacks);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object newProxyWithoutCallingConstructor(Callback[] callbacks) throws Exception {
+        // TODO: generate bytecode for calling these methods, or is reflection fast enough?
+        setThreadCallbacks.invoke(null, (Object) callbacks);
+        Object obj = instantiator.newInstance();
+        bindCallbacks.invoke(null, obj);
+        setThreadCallbacks.invoke(null, (Object) null);
+        return obj;
+    }
 }

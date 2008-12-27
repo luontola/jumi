@@ -29,25 +29,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.api;
+package net.orfjackal.dimdwarf.entities.tref;
+
+import net.sf.cglib.proxy.*;
 
 /**
- * The kind of proxy to generate for given a target class.
- *
  * @author Esko Luontola
- * @since 9.9.2008
+ * @since 27.12.2008
  */
-public enum ProxyType {
+public abstract class NullCglibProxyFactory implements Factory {
 
-    /**
-     * The proxy will extend {@link Object} and implement the same interfaces as the target class.
-     */
-    INTERFACE,
+    public Object newInstance(Callback callback) {
+        throw new UnsupportedOperationException();
+    }
 
-    /**
-     * The proxy will extend the target class. The target class should not have any publicly accessible fields,
-     * because the proxy can not intercept field access. The constructor of the target class will not be called
-     * when the proxy is created.
-     */
-    CLASS
+    public Object newInstance(Callback[] callbacks) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Object newInstance(Class[] types, Object[] args, Callback[] callbacks) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Callback getCallback(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setCallback(int index, Callback callback) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setCallbacks(Callback[] callbacks) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Callback[] getCallbacks() {
+        throw new UnsupportedOperationException();
+    }
 }

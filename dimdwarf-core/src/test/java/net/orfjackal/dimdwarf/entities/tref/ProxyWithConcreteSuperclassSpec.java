@@ -53,20 +53,19 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
     private ReferenceFactory referenceFactory;
     private TransparentReferenceFactory proxyFactory;
-    private MyEntity entity;
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
         proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
-        entity = new MyEntity();
     }
 
 
     public class AProxyWithConcreteSuperclass {
-
+        private MyEntity entity;
         private Object proxy;
 
         public void create() {
+            entity = new MyEntity(42);
             checking(new Expectations() {{
                 one(referenceFactory).createReference(entity);
                 will(returnValue(new EntityReferenceImpl<EntityObject>(BigInteger.ONE, entity)));
@@ -87,7 +86,6 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
         }
 
         public void delegatesItsMethodsToTheEntity() {
-            entity.value = 42;
             MyEntity proxy = (MyEntity) this.proxy;
             specify(proxy.getValue(), should.equal(42));
             specify(proxy.value, should.equal(0));
@@ -105,6 +103,14 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
                 }
             }, should.raise(IllegalArgumentException.class));
         }
+
+        public void doesNotRequireTheEntityToHaveAnAccessibleDefaultConstructor() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    entity.getClass().getConstructor();
+                }
+            }, should.raise(NoSuchMethodException.class));
+        }
     }
 
 
@@ -112,11 +118,11 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
     public static class MyEntity implements EntityObject, Serializable {
         private static final long serialVersionUID = 1L;
 
-        public int value = 0;
+        public final int value;
 
-        // TODO: modify CGLIB so that the proxied classes don't need an accessible default constructor - https://sourceforge.net/tracker2/?func=detail&aid=2070600&group_id=56933&atid=482371
-//        private MyEntity() {
-//        }
+        public MyEntity(int value) {
+            this.value = value;
+        }
 
         public int getValue() {
             return value;
