@@ -137,7 +137,4 @@ public class RetryableExceptionsSpec extends Specification<Object> {
             specify(runCount.get(), should.equal(3));
         }
     }
-
-    // TODO: optimistic locking exceptions should be retryable
-    // TODO: transaction failed exception is retryable when the wrapped exception is
 }
