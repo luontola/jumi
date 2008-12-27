@@ -33,10 +33,8 @@ package net.orfjackal.dimdwarf.aop;
 
 import net.orfjackal.dimdwarf.util.ByteUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
+import java.io.*;
+import java.lang.instrument.*;
 import java.security.ProtectionDomain;
 
 /**
@@ -45,23 +43,22 @@ import java.security.ProtectionDomain;
  */
 public class TransformationTestClassLoader extends ClassLoader {
 
-    private final String classToInstrument;
+    private final ClassNameMatcher classesToInstrument;
     private final ClassFileTransformer transformer;
 
-    // TODO: allow matching classes with (multiple) wildcards, maybe Ant style: http://ant.apache.org/manual/dirtasks.html
-    public TransformationTestClassLoader(String classToInstrument, ClassFileTransformer transformer) {
+    public TransformationTestClassLoader(String classesToInstrumentPattern, ClassFileTransformer transformer) {
         super(TransformationTestClassLoader.class.getClassLoader());
         if (transformer == null) {
             transformer = new NullClassFileTransformer();
         }
-        this.classToInstrument = classToInstrument;
+        this.classesToInstrument = new ClassNameMatcher(classesToInstrumentPattern);
         this.transformer = transformer;
     }
 
     public synchronized Class<?> loadClass(String name) throws ClassNotFoundException {
         Class<?> c = findLoadedClass(name);
         if (c == null) {
-            c = name.equals(classToInstrument) ? findClass(name) : super.loadClass(name);
+            c = classesToInstrument.matches(name) ? findClass(name) : super.loadClass(name);
         }
         return c;
     }
