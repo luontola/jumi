@@ -40,30 +40,33 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
 
-    private final AopApi api;
+    private final String entityAnnotationDesc;
+    private final String entityHelperClass;
+
+    private boolean isInterface = false;
     private boolean isEntity = false;
     private boolean hasEqualsMethod = false;
     private boolean hasHashCodeMethod = false;
 
     public AddEqualsAndHashCodeMethodsForEntities(AopApi api, ClassVisitor cv) {
         super(cv);
-        this.api = api;
+        entityAnnotationDesc = "L" + api.getEntityAnnotation() + ";";
+        entityHelperClass = api.getEntityHelperClass();
     }
 
-    // TODO: would it be best to transform annotated classes only, to avoid the following inheritance issues?
-
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        for (String s : interfaces) {
-            // TODO: will this work for inherited interfaces?
-            if (s.equals(api.getEntityInterface())) {
-                isEntity = true;
-            }
-        }
+        isInterface = (access & ACC_INTERFACE) != 0;
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        if (desc.equals(entityAnnotationDesc) && !isInterface) {
+            isEntity = true;
+        }
+        return super.visitAnnotation(desc, visible);
+    }
+
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        // TODO: if equals was defined in "Foo implementes Entity", will "Bar extends Foo" keep the equals from Foo?
         if (name.equals("equals") && desc.equals("(Ljava/lang/Object;)Z")) {
             hasEqualsMethod = true;
         }
@@ -90,7 +93,7 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
         mv.visitCode();
         mv.visitVarInsn(ALOAD, 0);
         mv.visitVarInsn(ALOAD, 1);
-        mv.visitMethodInsn(INVOKESTATIC, api.getEntityHelperClass(), "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z");
+        mv.visitMethodInsn(INVOKESTATIC, entityHelperClass, "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z");
         mv.visitInsn(IRETURN);
         mv.visitMaxs(2, 2);
         mv.visitEnd();
@@ -100,7 +103,7 @@ public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
         MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, "hashCode", "()I", null, null);
         mv.visitCode();
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKESTATIC, api.getEntityHelperClass(), "hashCode", "(Ljava/lang/Object;)I");
+        mv.visitMethodInsn(INVOKESTATIC, entityHelperClass, "hashCode", "(Ljava/lang/Object;)I");
         mv.visitInsn(IRETURN);
         mv.visitMaxs(1, 1);
         mv.visitEnd();

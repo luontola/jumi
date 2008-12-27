@@ -54,7 +54,7 @@ public class AddMarkerInterfaceForEntities extends ClassNode {
     }
 
     public void visitEnd() {
-        if (hasEntityAnnotation()) {
+        if (hasEntityAnnotation() && !interfaces.contains(interfaceToAdd)) {
             interfaces.add(interfaceToAdd);
         }
         accept(cv);

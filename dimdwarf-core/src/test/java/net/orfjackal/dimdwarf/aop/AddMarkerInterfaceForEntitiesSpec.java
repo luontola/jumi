@@ -29,14 +29,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.entities;
+package net.orfjackal.dimdwarf.aop;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.aop.*;
 import net.orfjackal.dimdwarf.aop.conf.*;
 import net.orfjackal.dimdwarf.api.Entity;
-import net.orfjackal.dimdwarf.api.internal.Entities;
+import net.orfjackal.dimdwarf.api.internal.*;
+import net.orfjackal.dimdwarf.entities.DummyObject;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
@@ -47,7 +47,7 @@ import org.objectweb.asm.util.CheckClassAdapter;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object> {
+public class AddMarkerInterfaceForEntitiesSpec extends Specification<Object> {
 
     private Object target;
 
@@ -85,9 +85,20 @@ public class SpecifyingEntitiesWithAnAnnotationSpec extends Specification<Object
         }
     }
 
+    public class AClassWithTheEntityAnnotationAndMarkerInterface {
+
+        public void doesNotHaveTheSameInterfaceAddedTwise() throws Exception {
+            // The class loader will throw ClassFormatError if the same interface is declared twise.
+            newInstrumentedInstance(AnnotatedEntityWithMarkerInterface.class);
+        }
+    }
+
 
     @Entity
     public static class AnnotatedEntity {
+    }
 
+    @Entity
+    public static class AnnotatedEntityWithMarkerInterface implements EntityObject {
     }
 }
