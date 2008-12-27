@@ -662,39 +662,6 @@
         <root url="jar://$M2_REPO$/asm/asm-all/3.1/asm-all-3.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.slf4j:slf4j-jdk14:1.5.5">
-      <CLASSES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.5/slf4j-jdk14-1.5.5.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.5/slf4j-jdk14-1.5.5-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.5/slf4j-jdk14-1.5.5-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.slf4j:slf4j-api:1.5.5">
-      <CLASSES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.5/slf4j-api-1.5.5.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.5/slf4j-api-1.5.5-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.5/slf4j-api-1.5.5-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.slf4j:slf4j-simple:1.5.5">
-      <CLASSES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.5/slf4j-simple-1.5.5.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.5/slf4j-simple-1.5.5-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.5/slf4j-simple-1.5.5-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.objenesis:objenesis:1.1">
       <CLASSES>
         <root url="jar://$M2_REPO$/org/objenesis/objenesis/1.1/objenesis-1.1.jar!/" />
@@ -759,6 +726,39 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.slf4j:slf4j-jdk14:1.5.6">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.slf4j:slf4j-api:1.5.6">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.slf4j:slf4j-simple:1.5.6">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.6/slf4j-simple-1.5.6.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.6/slf4j-simple-1.5.6-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/slf4j/slf4j-simple/1.5.6/slf4j-simple-1.5.6-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
