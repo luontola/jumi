@@ -203,5 +203,8 @@ public class AddEqualsAndHashCodeMethodsForEntitiesSpec extends Specification<Ob
     }
 }
 
-// TODO: when calling the equals/hashCode method of a transparent reference proxy whose target class has
-// custom equals/hashCode methods, the method call should be delegated to the actual entity and not the proxy
+// TODO: When calling the equals/hashCode method of a transparent reference proxy whose target class has
+// custom equals/hashCode methods, the method call should be delegated to the actual entity and not the proxy.
+// Maybe it would be wise to annotate the generated methods with javax.annotation.Generated, so that
+// net.orfjackal.dimdwarf.entities.tref.TransparentReferenceFactoryImpl.TransparentReferenceCallbackFilter
+// can check whether it should delegate those methods.
