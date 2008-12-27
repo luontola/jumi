@@ -96,8 +96,16 @@ public class GcAwareEntityRepository implements EntityRepository {
 
     public void update(BigInteger id, Object entity) {
         SerializationResult newData = serializer.serialize(entity);
-        entities.update(id, newData.getSerializedBytes());
-        fireEntityUpdated(id, newData);
+        if (hasBeenModified(id, newData)) {
+            entities.update(id, newData.getSerializedBytes());
+            fireEntityUpdated(id, newData);
+        }
+    }
+
+    private boolean hasBeenModified(BigInteger id, SerializationResult newData) {
+        Blob oldBytes = entities.read(id);
+        Blob newBytes = newData.getSerializedBytes();
+        return !oldBytes.equals(newBytes);
     }
 
     private void fireEntityUpdated(BigInteger id, SerializationResult newData) {

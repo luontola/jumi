@@ -40,7 +40,7 @@ import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
@@ -55,6 +55,7 @@ public class EntityRepositorySpec extends Specification<Object> {
 
     private Executor taskContext;
     private Provider<EntityRepository> entities;
+    private Provider<EntityManager> entityManager;
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
@@ -65,18 +66,31 @@ public class EntityRepositorySpec extends Specification<Object> {
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         entities = injector.getProvider(EntityRepository.class);
+        entityManager = injector.getProvider(EntityManager.class);
+    }
+
+    private void createDummyEntity(final BigInteger entityId, final Object other) {
+        taskContext.execute(new Runnable() {
+            public void run() {
+                specify(entities.get().exists(entityId), should.equal(false));
+                entities.get().update(entityId, new DummyEntity(other));
+            }
+        });
+    }
+
+    private static void await(CountDownLatch latch) {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     public class AnEntityRepository {
 
         public void create() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    specify(entities.get().exists(ENTITY_ID), should.equal(false));
-                    entities.get().update(ENTITY_ID, new DummyEntity("A"));
-                }
-            });
+            createDummyEntity(ENTITY_ID, "A");
         }
 
         public void createsEntities() {
@@ -138,5 +152,40 @@ public class EntityRepositorySpec extends Specification<Object> {
         }
     }
 
+    public class WhenAnEntityIsOnlyReadAndNotModified {
+        private CountDownLatch bothTasksAreRunning = new CountDownLatch(2);
+        private CountDownLatch firstTaskHasFinished = new CountDownLatch(1);
+
+        public void create() {
+            createDummyEntity(ENTITY_ID, "A");
+        }
+
+        public void theEntityIsNotUpdatedAndThusCanBeReadConcurrentlyInManyTasks() {
+            final Runnable task1 = new Runnable() {
+                public void run() {
+                    bothTasksAreRunning.countDown();
+                    await(bothTasksAreRunning);
+                    entityManager.get().getEntityById(ENTITY_ID);
+                }
+            };
+            Runnable task2 = new Runnable() {
+                public void run() {
+                    bothTasksAreRunning.countDown();
+                    await(bothTasksAreRunning);
+                    entityManager.get().getEntityById(ENTITY_ID);
+                    await(firstTaskHasFinished);
+                }
+            };
+            new Thread(new Runnable() {
+                public void run() {
+                    taskContext.execute(task1);
+                    firstTaskHasFinished.countDown();
+                }
+            }).start();
+            // If the entity was updated by the other task, this would throw OptimisticLockException,
+            // but we expect that it should not have been updated.
+            taskContext.execute(task2);
+        }
+    }
     // TODO: do not update database if the entity has not changed
 }

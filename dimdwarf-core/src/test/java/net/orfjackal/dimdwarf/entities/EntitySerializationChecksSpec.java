@@ -80,6 +80,13 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         entity = new DummyEntity();
     }
 
+    private Expectations entityIsUpdated(final BigInteger entityId) {
+        return new Expectations() {{
+            one(db).update(with(equal(asBytes(entityId))), with(aNonNull(Blob.class)));
+            allowing(db).read(asBytes(entityId)); will(returnValue(Blob.EMPTY_BLOB));
+        }};
+    }
+
     private static Blob asBytes(BigInteger id) {
         return new ConvertBigIntegerToBytes().forth(id);
     }
@@ -97,9 +104,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         }
 
         public void referringAnEntityThroughAnEntityReferenceIsAllowed() {
-            checking(new Expectations() {{
-                one(db).update(with(equal(asBytes(ENTITY_ID))), with(aNonNull(Blob.class)));
-            }});
+            checking(entityIsUpdated(ENTITY_ID));
             entity.other = new EntityReferenceImpl<DummyEntity>(BigInteger.valueOf(123), new DummyEntity());
             repository.update(ENTITY_ID, entity);
         }
@@ -149,9 +154,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         }
 
         public void serializingStaticMemberClassesIsAllowed() {
-            checking(new Expectations() {{
-                one(db).update(with(equal(asBytes(ENTITY_ID))), with(aNonNull(Blob.class)));
-            }});
+            checking(entityIsUpdated(ENTITY_ID));
             entity.other = new StaticMemberClass();
             repository.update(ENTITY_ID, entity);
         }
