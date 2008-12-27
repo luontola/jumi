@@ -41,6 +41,8 @@ import java.util.*;
 public class MultiStepIncrementalTask implements IncrementalTask, Serializable {
     private static final long serialVersionUID = 1L;
 
+    // TODO: this class is not used in production code
+
     private final Queue<IncrementalTask> tasks = new LinkedList<IncrementalTask>();
     private final int stepsPerTask;
 
