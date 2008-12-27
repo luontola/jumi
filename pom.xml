@@ -31,9 +31,8 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/trunk</connection>
-        <developerConnection>scm:svn:https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/trunk</developerConnection>
-        <url>http://dimdwarf.svn.sourceforge.net/viewvc/dimdwarf/trunk</url>
+        <connection>scm:git:git://github.com/orfjackal/dimdwarf.git</connection>
+        <url>http://github.com/orfjackal/dimdwarf/tree</url>
     </scm>
 
     <distributionManagement>
