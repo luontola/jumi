@@ -187,5 +187,4 @@ public class EntityRepositorySpec extends Specification<Object> {
             taskContext.execute(task2);
         }
     }
-    // TODO: do not update database if the entity has not changed
 }
