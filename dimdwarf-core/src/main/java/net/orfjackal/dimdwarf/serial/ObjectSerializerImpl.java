@@ -33,11 +33,9 @@ package net.orfjackal.dimdwarf.serial;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.Blob;
-import net.orfjackal.dimdwarf.util.Objects;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
-import java.util.*;
 
 /**
  * @author Esko Luontola
@@ -61,13 +59,13 @@ public class ObjectSerializerImpl implements ObjectSerializer {
 
     public SerializationResult serialize(Object obj) {
         ByteArrayOutputStream serialized = new ByteArrayOutputStream();
-        MyMetadataBuilder meta = new MyMetadataBuilder();
+        MetadataBuilderImpl meta = new MetadataBuilderImpl();
         serializeToStream(serialized, obj, meta);
         return new SerializationResult(Blob.fromBytes(serialized.toByteArray()), meta.getMetadata());
     }
 
     public DeserializationResult deserialize(Blob serialized) {
-        MyMetadataBuilder meta = new MyMetadataBuilder();
+        MetadataBuilderImpl meta = new MetadataBuilderImpl();
         Object deserialized = deserializeFromStream(serialized.getInputStream(), meta);
         return new DeserializationResult(deserialized, meta.getMetadata());
     }
@@ -141,23 +139,6 @@ public class ObjectSerializerImpl implements ObjectSerializer {
                 listener.afterResolve(obj, meta);
             }
             return obj;
-        }
-    }
-
-    private static class MyMetadataBuilder implements MetadataBuilder {
-        private final HashMap<Class<?>, List<Object>> metadata = new HashMap<Class<?>, List<Object>>();
-
-        public void append(Class<?> key, Object value) {
-            List<Object> list = metadata.get(key);
-            if (list == null) {
-                list = new ArrayList<Object>();
-                metadata.put(key, list);
-            }
-            list.add(value);
-        }
-
-        public Map<Class<?>, List<?>> getMetadata() {
-            return Objects.uncheckedCast(metadata);
         }
     }
 }
