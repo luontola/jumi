@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.jdave</groupId>
             <artifactId>jdave-junit4</artifactId>
-            <version>1.1-rc3</version>
+            <version>1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
