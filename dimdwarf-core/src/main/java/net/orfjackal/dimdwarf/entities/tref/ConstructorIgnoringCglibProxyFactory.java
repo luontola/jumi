@@ -50,6 +50,7 @@ public class ConstructorIgnoringCglibProxyFactory extends NullCglibProxyFactory 
     public ConstructorIgnoringCglibProxyFactory(Class<?> proxyClass, Objenesis objenesis) {
         instantiator = objenesis.getInstantiatorOf(proxyClass);
         try {
+            // XXX: It would be best to integrate the behaviour of bypassing constructors to CGLIB, instead of invoking CGLIB's internals here.
             setThreadCallbacks = proxyClass.getDeclaredMethod("CGLIB$SET_THREAD_CALLBACKS", Callback[].class);
             bindCallbacks = proxyClass.getDeclaredMethod("CGLIB$BIND_CALLBACKS", Object.class);
             bindCallbacks.setAccessible(true);
