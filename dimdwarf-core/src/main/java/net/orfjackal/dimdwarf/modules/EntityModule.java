@@ -75,13 +75,13 @@ public class EntityModule extends AbstractModule {
     }
 
     private static class SerializationListenerListProvider implements Provider<SerializationListener[]> {
-        @Inject public CheckInnerClassSerialized listeneter1;
-        @Inject public CheckDirectlyReferredEntitySerialized listeneter2;
+        @Inject public CheckInnerClassSerialized listener1;
+        @Inject public CheckDirectlyReferredEntitySerialized listener2;
         @Inject public InjectObjectsOnDeserialization listener3;
         @Inject public EntityReferenceListener listener4;
 
         public SerializationListener[] get() {
-            return new SerializationListener[]{listeneter1, listeneter2, listener3, listener4};
+            return new SerializationListener[]{listener1, listener2, listener3, listener4};
         }
     }
 
