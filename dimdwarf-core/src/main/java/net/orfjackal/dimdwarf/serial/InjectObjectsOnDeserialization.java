@@ -51,6 +51,7 @@ public class InjectObjectsOnDeserialization extends SerializationAdapter {
 
     @Override
     public void afterResolve(Object obj, MetadataBuilder meta) {
+        // TODO: Would afterDeserialize be better? May this accidentally inject transparent reference proxies?
         injector.injectMembers(obj);
     }
 }
