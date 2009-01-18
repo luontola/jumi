@@ -34,12 +34,14 @@ package net.orfjackal.dimdwarf.tasks;
 import com.google.inject.*;
 import org.slf4j.*;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.concurrent.Executor;
 
 /**
  * @author Esko Luontola
  * @since 13.12.2008
  */
+@Immutable
 public class RetryingTaskExecutor implements Executor {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(RetryingTaskExecutor.class);
     private final Logger logger;
@@ -48,7 +50,7 @@ public class RetryingTaskExecutor implements Executor {
     private final Provider<RetryPolicy> retryPolicy;
 
     @Inject
-    public RetryingTaskExecutor(@TaskContext Executor taskContext, Provider<RetryPolicy> retryPolicy) {
+    public RetryingTaskExecutor(@PlainTaskContext Executor taskContext, Provider<RetryPolicy> retryPolicy) {
         this(taskContext, retryPolicy, DEFAULT_LOGGER);
     }
 

@@ -33,6 +33,7 @@ package net.orfjackal.dimdwarf.tasks;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
+import net.orfjackal.dimdwarf.util.Exceptions;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -59,17 +60,7 @@ public class TransactionFilter implements Filter {
         } catch (Throwable t) {
             logger.info("Task failed, rolling back its transaction", t);
             tx.rollback();
-            throw throwAsUnchecked(t);
+            throw Exceptions.throwAsUnchecked(t);
         }
-    }
-
-    private static RuntimeException throwAsUnchecked(Throwable t) {
-        if (t instanceof RuntimeException) {
-            throw (RuntimeException) t;
-        }
-        if (t instanceof Error) {
-            throw (Error) t;
-        }
-        throw new RuntimeException(t);
     }
 }

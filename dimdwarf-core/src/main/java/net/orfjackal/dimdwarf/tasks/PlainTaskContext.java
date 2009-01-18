@@ -31,32 +31,16 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import net.orfjackal.dimdwarf.tx.Retryable;
+import com.google.inject.BindingAnnotation;
 
-import javax.annotation.concurrent.NotThreadSafe;
+import java.lang.annotation.*;
 
 /**
  * @author Esko Luontola
- * @since 13.12.2008
+ * @since 18.1.2009
  */
-@NotThreadSafe
-public class RetryOnRetryableExceptionsANumberOfTimes implements RetryPolicy {
-
-    private final int maxRetries;
-    private boolean retryable = true;
-    private int failures = 0;
-
-    public RetryOnRetryableExceptionsANumberOfTimes(int maxRetries) {
-        this.maxRetries = maxRetries;
-    }
-
-    public void taskHasFailed(Throwable t) {
-        retryable = (t instanceof Retryable)
-                && ((Retryable) t).mayBeRetried();
-        failures++;
-    }
-
-    public boolean shouldRetry() {
-        return retryable && failures <= maxRetries;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@BindingAnnotation
+public @interface PlainTaskContext {
 }

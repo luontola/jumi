@@ -46,7 +46,7 @@ import java.util.concurrent.Executor;
  */
 public class TaskContextModule extends AbstractModule {
 
-    private static final int MAX_RETRIES = 40;
+    private static final int MAX_RETRIES = 5;
 
     protected void configure() {
         bindScope(TaskScoped.class, new TaskScope());
@@ -58,15 +58,12 @@ public class TaskContextModule extends AbstractModule {
         bind(Transaction.class).toProvider(TransactionProvider.class);
         bind(Filter[].class).toProvider(FilterListProvider.class);
 
-        bind(Executor.class)
-                .annotatedWith(TaskContext.class)
-                .to(TaskExecutor.class);
-
         bind(RetryPolicy.class).toInstance(new RetryOnRetryableExceptionsANumberOfTimes(MAX_RETRIES));
-        bind(Executor.class)
-                .annotatedWith(RetryingTaskContext.class)
-                .to(RetryingTaskExecutor.class);
 
+        bind(Executor.class).annotatedWith(PlainTaskContext.class).to(TaskExecutor.class);
+        bind(Executor.class).annotatedWith(RetryingTaskContext.class).to(RetryingTaskExecutor.class);
+        bind(Executor.class).annotatedWith(SingleThreadFallbackTaskContext.class).to(SingleThreadFallbackTaskExecutor.class);
+        bind(Executor.class).annotatedWith(TaskContext.class).to(Key.get(Executor.class, SingleThreadFallbackTaskContext.class));
     }
 
     private static class TransactionProvider implements Provider<Transaction> {

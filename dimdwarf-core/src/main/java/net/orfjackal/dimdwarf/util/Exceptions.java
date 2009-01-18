@@ -29,34 +29,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.dimdwarf.tasks;
-
-import net.orfjackal.dimdwarf.tx.Retryable;
-
-import javax.annotation.concurrent.NotThreadSafe;
+package net.orfjackal.dimdwarf.util;
 
 /**
  * @author Esko Luontola
- * @since 13.12.2008
+ * @since 18.1.2009
  */
-@NotThreadSafe
-public class RetryOnRetryableExceptionsANumberOfTimes implements RetryPolicy {
+public class Exceptions {
 
-    private final int maxRetries;
-    private boolean retryable = true;
-    private int failures = 0;
-
-    public RetryOnRetryableExceptionsANumberOfTimes(int maxRetries) {
-        this.maxRetries = maxRetries;
+    private Exceptions() {
     }
 
-    public void taskHasFailed(Throwable t) {
-        retryable = (t instanceof Retryable)
-                && ((Retryable) t).mayBeRetried();
-        failures++;
-    }
-
-    public boolean shouldRetry() {
-        return retryable && failures <= maxRetries;
+    public static RuntimeException throwAsUnchecked(Throwable t) {
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
+        }
+        if (t instanceof Error) {
+            throw (Error) t;
+        }
+        throw new RuntimeException(t);
     }
 }
