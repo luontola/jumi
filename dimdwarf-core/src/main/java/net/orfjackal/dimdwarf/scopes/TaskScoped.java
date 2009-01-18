@@ -1,7 +1,7 @@
 /*
  * This file is part of Dimdwarf Application Server <http://dimdwarf.sourceforge.net/>
  *
- * Copyright (c) 2008, Esko Luontola. All Rights Reserved.
+ * Copyright (c) 2008-2009, Esko Luontola. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -12,10 +12,6 @@
  *     * Redistributions in binary form must reproduce the above copyright notice,
  *       this list of conditions and the following disclaimer in the documentation
  *       and/or other materials provided with the distribution.
- *
- *     * Neither the name of the copyright holder nor the names of its contributors
- *       may be used to endorse or promote products derived from this software
- *       without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -33,10 +29,7 @@ package net.orfjackal.dimdwarf.scopes;
 
 import com.google.inject.ScopeAnnotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Indicates that an object needs to be task scoped. Each task will run in a transaction
