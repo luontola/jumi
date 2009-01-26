@@ -279,7 +279,7 @@ public class TaskThreadPoolSpec extends Specification<Object> {
 
         public Expectations theExceptionIsLogged() {
             return new Expectations() {{
-                one(logger).warn("Task threw an exception", exception);
+                one(logger).error("Task threw an exception", exception);
             }};
         }
 

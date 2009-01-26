@@ -159,7 +159,7 @@ public class TaskThreadPool {
                 runningTasks.add(taskHasFinished);
                 taskContext.execute(task);
             } catch (Throwable t) {
-                logger.warn("Task threw an exception", t);
+                logger.error("Task threw an exception", t);
             } finally {
                 runningTasks.remove(taskHasFinished);
                 taskHasFinished.countDown();
