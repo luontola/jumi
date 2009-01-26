@@ -55,8 +55,6 @@ public class TaskThreadPool {
     private final AtomicInteger waitingForCurrentTasksToFinish = new AtomicInteger(0);
     private volatile boolean shutdown = false;
 
-    // TODO: use @RetryingTaskContext and remove retry code from this class and the task scheduler
-
     @Inject
     public TaskThreadPool(@TaskContext Executor taskContext, TaskProducer producer, ExecutorService threadPool) {
         this(taskContext, producer, threadPool, DEFAULT_LOGGER);

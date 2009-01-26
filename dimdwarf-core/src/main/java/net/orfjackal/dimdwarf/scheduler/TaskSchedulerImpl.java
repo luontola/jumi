@@ -162,6 +162,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     }
 
     private void cancelTakeOnRollback(final ScheduledTaskHolder holder) {
+        // TODO: remove the retry code from this class, because SingleThreadFallbackTaskExecutor and RetryingTaskExecutor will take care of retrying
         // FIXME: If the task fails and the retry limit is reached, the task should be removed from the database
         // or cancelled, so that it will not be rescheduled when the system is restarted. 
         tx.get().join(new TransactionParticipant() {
