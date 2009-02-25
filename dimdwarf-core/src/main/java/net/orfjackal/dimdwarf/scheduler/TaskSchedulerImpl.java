@@ -48,6 +48,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
+    // TODO: Extract 'scheduledTasks' into its own class, for example NonPersistedScheduledTasksQueue
     private final BlockingQueue<ScheduledTaskHolder> scheduledTasks = new DelayQueue<ScheduledTaskHolder>();
     private final RecoverableSet<ScheduledTask> persistedTasks;
 
@@ -90,7 +91,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
         delay = unit.toMillis(delay);
         ScheduledTask st = new ScheduledTaskImpl(task, ScheduledOneTimeRun.create(delay, clock));
-        addToExecutionQueue(st);
+        enqueueDurableTask(st);
         return new SchedulingFuture(st);
     }
 
@@ -98,7 +99,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         initialDelay = unit.toMillis(initialDelay);
         period = unit.toMillis(period);
         ScheduledTask st = new ScheduledTaskImpl(task, ScheduledAtFixedRate.create(initialDelay, period, clock));
-        addToExecutionQueue(st);
+        enqueueDurableTask(st);
         return new SchedulingFuture(st);
     }
 
@@ -106,11 +107,11 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         initialDelay = unit.toMillis(initialDelay);
         delay = unit.toMillis(delay);
         ScheduledTask st = new ScheduledTaskImpl(task, ScheduledWithFixedDelay.create(initialDelay, delay, clock));
-        addToExecutionQueue(st);
+        enqueueDurableTask(st);
         return new SchedulingFuture(st);
     }
 
-    private void addToExecutionQueue(ScheduledTask st) {
+    private void enqueueDurableTask(ScheduledTask st) {
         ScheduledTaskHolder h = saveToDatabase(st);
         enqueueOnCommit(h);
     }
@@ -152,7 +153,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
         }
         Runnable run = task.startScheduledRun();
         if (!task.isDone()) {
-            addToExecutionQueue(task);
+            enqueueDurableTask(task);
         }
         return run;
     }

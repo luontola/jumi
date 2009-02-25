@@ -42,6 +42,10 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledTaskImpl implements EntityObject, Serializable, ScheduledTask {
     private static final long serialVersionUID = 1L;
 
+    // TODO: For all references to this class, do not rely on transparent references, but use entity references directly.
+    // Otherwise relying on transparent references may complicate Dimdwarf's internals too much, maybe even create
+    // non-explicit cyclic dependencies (code expects tref support from the container), which may complicate testing.
+
     private final Runnable task;
     @Nullable private SchedulingStrategy nextRun;
     private boolean cancelled = false;

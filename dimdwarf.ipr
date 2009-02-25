@@ -424,7 +424,7 @@
         <option name="otherClassesToStartFrom" value="" />
         <option name="profileNewRunnables" value="true" />
         <option name="filteringMode" value="EXCLUDE" />
-        <option name="filterIncludeClasses" value="" />
+        <option name="filterIncludeClasses" value="net.orfjackal.*" />
         <option name="filterExcludeClasses" value="java.*, javax.*,&#10;sun.*, sunw.*, com.sun.*" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Profile Memory">
@@ -434,6 +434,7 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Profile CPU" />
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />

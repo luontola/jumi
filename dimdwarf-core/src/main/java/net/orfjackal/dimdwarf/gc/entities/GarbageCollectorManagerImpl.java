@@ -115,5 +115,6 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
         }
     }
 
+    // TODO: make garbage collection non-persisted
     // TODO: unit test this class independently of the GC implementation
 }
