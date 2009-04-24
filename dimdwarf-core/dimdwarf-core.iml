@@ -23,6 +23,7 @@
     <orderEntry type="library" name="Maven: org.jdave:jdave-core:1.1" level="project" />
     <orderEntry type="library" name="Maven: junit:junit-dep:4.4" level="project" />
     <orderEntry type="library" name="Maven: org.easymock:easymock:2.4" level="project" />
+    <orderEntry type="library" name="Maven: org.mockito:mockito-all:1.7" level="project" />
     <orderEntry type="module" module-name="dimdwarf-api" exported="" />
     <orderEntry type="module" module-name="dimdwarf-api-internal" exported="" />
     <orderEntry type="module" module-name="dimdwarf-aop" />

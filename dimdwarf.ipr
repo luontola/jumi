@@ -151,7 +151,7 @@
     <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="DEPRECATION" value="true" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-target 1.6" />
     <option name="MAXIMUM_HEAP_SIZE" value="128" />
   </component>
   <component name="JavadocGenerationManager">
@@ -775,6 +775,18 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$M2_REPO$/org/jdave/jdave-core/1.1/jdave-core-1.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.mockito:mockito-all:1.7">
+      <CLASSES>
+        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-sources.jar!/" />
+        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7.jar!/" />
       </SOURCES>
     </library>
   </component>
