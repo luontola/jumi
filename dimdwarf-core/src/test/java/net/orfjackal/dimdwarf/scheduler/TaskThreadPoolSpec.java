@@ -28,13 +28,14 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.Provider;
-import jdave.*;
+import jdave.Group;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.tasks.*;
-import net.orfjackal.dimdwarf.util.StubProvider;
-import org.jmock.Expectations;
+import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
+import org.mockito.*;
+import static org.mockito.Mockito.verify;
 import org.slf4j.Logger;
 
 import java.util.concurrent.*;
@@ -45,15 +46,16 @@ import java.util.concurrent.*;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class TaskThreadPoolSpec extends Specification<Object> {
+public class TaskThreadPoolSpec extends Specification2 {
 
-    private Context taskContext;
-    private BlockingQueue<TaskBootstrap> taskQueue;
-    private Logger logger;
     private TaskThreadPool pool;
+    private BlockingQueue<TaskBootstrap> taskQueue;
+    @Mock Context taskContext;
+    @Mock Logger logger;
 
     public void create() throws Exception {
-        taskContext = mock(Context.class);
+        MockitoAnnotations.initMocks(this);
+
         Executor executor = new TaskExecutor(
                 new StubProvider<Context>(taskContext),
                 new Provider<FilterChain>() {
@@ -73,18 +75,12 @@ public class TaskThreadPoolSpec extends Specification<Object> {
                 return taskQueue.poll();
             }
         };
-        logger = mock(Logger.class);
 
         pool = new TaskThreadPool(executor, producer, Executors.newCachedThreadPool(), logger);
         pool.start();
     }
 
-    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void destroy() throws Exception {
-        checking(new Expectations() {{
-            allowing(logger).info(with(any(String.class)), with(any(Object.class)));
-            allowing(logger).info(with(any(String.class)), with(any(Throwable.class)));
-        }});
         pool.shutdown();
     }
 
@@ -265,7 +261,6 @@ public class TaskThreadPoolSpec extends Specification<Object> {
         private RuntimeException exception = new RuntimeException("Dummy exception");
 
         public void create() throws InterruptedException {
-            checking(theExceptionIsLogged());
             Runnable task = new Runnable() {
                 public void run() {
                     end.countDown();
@@ -277,21 +272,18 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             pool.awaitForCurrentTasksToFinish();
         }
 
-        public Expectations theExceptionIsLogged() {
-            return new Expectations() {{
-                one(logger).error("Task threw an exception", exception);
-            }};
-        }
-
         public void theNumberOfRunningTasksIsDecrementedCorrectly() {
             specify(pool.getRunningTasks(), should.equal(0));
+        }
+
+        public void theExceptionIsLogged() {
+            verify(logger).error("Task threw an exception", exception);
         }
     }
 
     public class WhenThePoolIsShutDown {
 
         public void create() {
-            checking(theShutdownIsLogged());
             pool.shutdown();
             taskQueue.add(new SimpleTaskBootstrap(new Runnable() {
                 public void run() {
@@ -300,18 +292,14 @@ public class TaskThreadPoolSpec extends Specification<Object> {
             }));
         }
 
-        @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-        private Expectations theShutdownIsLogged() {
-            return new Expectations() {{
-                one(logger).info("Shutting down {}...", "TaskThreadPool");
-                allowing(logger).info(with(equal("Task consumer was interrupted")), with(aNonNull(InterruptedException.class)));
-                one(logger).info("{} has been shut down", "TaskThreadPool");
-            }};
-        }
-
         public void noMoreTasksAreTakenFromTheQueue() throws InterruptedException {
             Thread.sleep(10);
             specify(taskQueue.size(), should.equal(1));
+        }
+
+        public void theShutdownIsLogged() {
+            verify(logger).info("Shutting down {}...", "TaskThreadPool");
+            verify(logger).info("{} has been shut down", "TaskThreadPool");
         }
     }
 
