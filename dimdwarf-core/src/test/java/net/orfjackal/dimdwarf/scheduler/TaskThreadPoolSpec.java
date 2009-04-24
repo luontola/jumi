@@ -34,7 +34,7 @@ import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import org.slf4j.Logger;
 
@@ -54,8 +54,6 @@ public class TaskThreadPoolSpec extends Specification2 {
     @Mock Logger logger;
 
     public void create() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         Executor executor = new TaskExecutor(
                 new StubProvider<Context>(taskContext),
                 new Provider<FilterChain>() {

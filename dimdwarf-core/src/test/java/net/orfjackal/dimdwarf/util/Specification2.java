@@ -27,7 +27,7 @@
 
 package net.orfjackal.dimdwarf.util;
 
-import jdave.Specification;
+import jdave.*;
 import org.mockito.*;
 
 /**
@@ -36,7 +36,17 @@ import org.mockito.*;
  */
 public abstract class Specification2 extends Specification<Object> {
 
-    private static final String MOCK_METHOD_DISABLED = "Use the mockito() or jmock() methods instead";
+    private static final String MOCK_METHOD_DISABLED =
+            "Use the mockito() or jmock() methods or the @Mock annotation instead";
+
+    protected Specification2() {
+        MockitoAnnotations.initMocks(this);
+        addListener(new DefaultLifecycleListener() {
+            public void afterContextInstantiation(Object contextInstance) {
+                MockitoAnnotations.initMocks(contextInstance);
+            }
+        });
+    }
 
     /**
      * @see org.mockito.Mockito#mock(java.lang.Class<T>)
