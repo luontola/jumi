@@ -35,6 +35,8 @@ import java.util.concurrent.*;
  */
 public interface TaskScheduler {
 
+    // TODO: replace Future and ScheduledFuture with a custom interface, which does not have unnecessary operations (e.g. get)
+
     /**
      * @see ExecutorService#submit(Runnable)
      */
@@ -44,6 +46,8 @@ public interface TaskScheduler {
      * @see ScheduledExecutorService#schedule(Runnable, long, TimeUnit)
      */
     ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit);
+
+    // TODO: are scheduleAtFixedRate and scheduleWithFixedDelay needed? should gather more use cases and simplify the API
 
     /**
      * @see ScheduledExecutorService#scheduleAtFixedRate
