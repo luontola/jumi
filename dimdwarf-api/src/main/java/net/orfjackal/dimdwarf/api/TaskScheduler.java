@@ -36,6 +36,7 @@ import java.util.concurrent.*;
 public interface TaskScheduler {
 
     // TODO: replace Future and ScheduledFuture with a custom interface, which does not have unnecessary operations (e.g. get)
+    // Or is it even necessary to return anything? Why not make the task itself responsible for deciding whether it should run?
 
     /**
      * @see ExecutorService#submit(Runnable)
