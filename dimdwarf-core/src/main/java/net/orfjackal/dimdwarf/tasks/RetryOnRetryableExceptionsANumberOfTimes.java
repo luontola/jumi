@@ -52,6 +52,7 @@ public class RetryOnRetryableExceptionsANumberOfTimes implements RetryPolicy {
         failures++;
     }
 
+    // TODO: make this class stateless? - change method to shouldRetry(Throwable t, int previousRetries, long startTime)
     public boolean shouldRetry() {
         return retryable && failures <= maxRetries;
     }
