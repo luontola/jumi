@@ -52,6 +52,12 @@
             <url>http://www.laughingpanda.org/maven2/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>codehaus</id>
+            <url>http://repository.codehaus.org/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <modules>
         <module>dimdwarf-agent</module>
