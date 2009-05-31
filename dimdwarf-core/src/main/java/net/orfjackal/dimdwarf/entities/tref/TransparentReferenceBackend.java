@@ -15,13 +15,13 @@ import java.io.Serializable;
  * @since 31.1.2008
  */
 @Immutable
-public class TransparentReferenceImpl implements TransparentReference, Serializable {
+public class TransparentReferenceBackend implements TransparentReference, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final EntityReference<?> reference;
     private final Class<?> type;
 
-    public TransparentReferenceImpl(Class<?> type, EntityReference<?> reference) {
+    public TransparentReferenceBackend(Class<?> type, EntityReference<?> reference) {
         this.type = type;
         this.reference = reference;
     }

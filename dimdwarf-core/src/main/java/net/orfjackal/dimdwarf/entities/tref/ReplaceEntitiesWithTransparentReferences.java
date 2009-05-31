@@ -39,8 +39,8 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationRe
     }
 
     public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
-        if (obj instanceof TransparentReferenceImpl) {
-            return factory.newProxy((TransparentReferenceImpl) obj);
+        if (obj instanceof TransparentReferenceBackend) {
+            return factory.newProxy((TransparentReferenceBackend) obj);
         }
         return obj;
     }

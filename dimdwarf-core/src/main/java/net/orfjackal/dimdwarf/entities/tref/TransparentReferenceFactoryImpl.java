@@ -35,10 +35,10 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
     public TransparentReference createTransparentReference(Object entity) {
         Class<?> type = entity.getClass();
         EntityReference<?> ref = referenceFactory.get().createReference(entity);
-        return newProxy(new TransparentReferenceImpl(type, ref));
+        return newProxy(new TransparentReferenceBackend(type, ref));
     }
 
-    public TransparentReference newProxy(TransparentReferenceImpl tref) {
+    public TransparentReference newProxy(TransparentReferenceBackend tref) {
         Factory factory = proxyFactories.get(tref.getType$TREF());
         return (TransparentReference) factory.newInstance(new Callback[]{
                 new EntityCallback(tref),
@@ -107,6 +107,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         }
     }
 
+    // TODO: add one more callback that uses 'ManagedReference.getForUpdate' or 'markForUpdate' when target method has a special annotation  
     private static class EntityCallback implements LazyLoader {
 
         private final TransparentReference tref;

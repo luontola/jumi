@@ -21,8 +21,8 @@ public interface TransparentReferenceFactory {
     TransparentReference createTransparentReference(Object entity);
 
     /**
-     * Creates a proxy from a {@link TransparentReferenceImpl} which is not yet proxied.
+     * Creates a proxy from a {@link TransparentReferenceBackend} which is not yet proxied.
      * This is needed only during deserialization and should not be called elsewhere.
      */
-    TransparentReference newProxy(TransparentReferenceImpl reference);
+    TransparentReference newProxy(TransparentReferenceBackend tref);
 }
