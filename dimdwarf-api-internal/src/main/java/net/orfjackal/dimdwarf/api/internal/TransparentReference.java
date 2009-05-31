@@ -10,11 +10,11 @@ package net.orfjackal.dimdwarf.api.internal;
  */
 public interface TransparentReference {
 
-    Object getEntity();
+    Object getEntity$TREF();
 
-    EntityReference<?> getEntityReference();
+    EntityReference<?> getEntityReference$TREF();
 
-    Class<?> getType();
+    Class<?> getType$TREF();
 
     /**
      * Returns {@code true} when (1) the other object is a transparent reference to the same entity

@@ -26,15 +26,15 @@ public class TransparentReferenceImpl implements TransparentReference, Serializa
         this.reference = reference;
     }
 
-    public Object getEntity() {
+    public Object getEntity$TREF() {
         return reference.get();
     }
 
-    public EntityReference<?> getEntityReference() {
+    public EntityReference<?> getEntityReference$TREF() {
         return reference;
     }
 
-    public Class<?> getType() {
+    public Class<?> getType$TREF() {
         return type;
     }
 

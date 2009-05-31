@@ -42,6 +42,6 @@ public class EntityInfoImpl implements EntityInfo {
 
     private BigInteger getIdFromProxy(Object proxy) {
         TransparentReference tref = (TransparentReference) proxy;
-        return tref.getEntityReference().getEntityId();
+        return tref.getEntityReference$TREF().getEntityId();
     }
 }

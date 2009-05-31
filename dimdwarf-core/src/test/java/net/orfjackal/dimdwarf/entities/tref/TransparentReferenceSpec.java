@@ -133,15 +133,15 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void theEntityCanBeRetrievedFromTheProxy() {
-            specify(((TransparentReference) proxy).getEntity(), should.equal(entity));
+            specify(((TransparentReference) proxy).getEntity$TREF(), should.equal(entity));
         }
 
         public void theTypeOfTheEntityCanBeRetrievedFromTheProxy() {
-            specify(((TransparentReference) proxy).getType(), should.equal(DummyEntity.class));
+            specify(((TransparentReference) proxy).getType$TREF(), should.equal(DummyEntity.class));
         }
 
         public void theEntityReferenceCanBeRetrievedFromTheProxy() {
-            specify(((TransparentReference) proxy).getEntityReference().get(), should.equal(entity));
+            specify(((TransparentReference) proxy).getEntityReference$TREF().get(), should.equal(entity));
         }
     }
 

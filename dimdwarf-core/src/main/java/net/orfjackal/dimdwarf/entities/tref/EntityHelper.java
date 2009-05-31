@@ -45,7 +45,7 @@ public class EntityHelper {
     @Nullable
     private static EntityReference<?> getReference(@Nullable Object obj) {
         if (Entities.isTransparentReference(obj)) {
-            return ((TransparentReference) obj).getEntityReference();
+            return ((TransparentReference) obj).getEntityReference$TREF();
         } else if (Entities.isEntity(obj)) {
             return ThreadContext.get(ReferenceFactory.class).createReference(obj);
         } else {

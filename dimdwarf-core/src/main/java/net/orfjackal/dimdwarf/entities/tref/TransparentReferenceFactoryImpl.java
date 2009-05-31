@@ -39,7 +39,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
     }
 
     public TransparentReference newProxy(TransparentReferenceImpl tref) {
-        Factory factory = proxyFactories.get(tref.getType());
+        Factory factory = proxyFactories.get(tref.getType$TREF());
         return (TransparentReference) factory.newInstance(new Callback[]{
                 new EntityCallback(tref),
                 new TransparentReferenceCallback(tref)
@@ -115,7 +115,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         }
 
         public Object loadObject() throws Exception {
-            return tref.getEntity();
+            return tref.getEntity$TREF();
         }
     }
 
