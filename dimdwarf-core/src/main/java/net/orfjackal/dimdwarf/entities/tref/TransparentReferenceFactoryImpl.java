@@ -71,18 +71,19 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         }
 
         private static Class<?>[] proxiedInterfaces(Class<?> aClass) {
-            List<Class<?>> results = new ArrayList<Class<?>>();
+            List<Class<?>> interfaces = interfacesOf(aClass);
+            assert !interfaces.contains(TransparentReference.class)
+                    : aClass + " should not implement " + TransparentReference.class;
+            interfaces.add(TransparentReference.class);
+            return interfaces.toArray(new Class<?>[interfaces.size()]);
+        }
+
+        private static List<Class<?>> interfacesOf(Class<?> aClass) {
+            List<Class<?>> interfaces = new ArrayList<Class<?>>();
             for (Class<?> c = aClass; c != null; c = c.getSuperclass()) {
-                for (Class<?> anInterface : c.getInterfaces()) {
-                    assert !TransparentReference.class.equals(anInterface);
-                    // TODO: this condition is legacy and should not anymore be needed, as concrete-baseclass-proxies will anyways implement EntityObject
-                    if (!Entities.getEntityClass().isAssignableFrom(anInterface)) {
-                        results.add(anInterface);
-                    }
-                }
+                interfaces.addAll(Arrays.asList(c.getInterfaces()));
             }
-            results.add(TransparentReference.class);
-            return results.toArray(new Class<?>[results.size()]);
+            return interfaces;
         }
     }
 
