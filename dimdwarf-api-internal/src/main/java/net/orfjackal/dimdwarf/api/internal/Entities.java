@@ -10,6 +10,8 @@ package net.orfjackal.dimdwarf.api.internal;
  */
 public class Entities {
 
+    // TODO: refactor static methods away, introduce EntityApi interface
+
     private Entities() {
     }
 
