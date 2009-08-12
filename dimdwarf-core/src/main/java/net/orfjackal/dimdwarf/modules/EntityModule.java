@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.*;
@@ -22,6 +23,8 @@ import java.math.BigInteger;
 public class EntityModule extends AbstractModule {
 
     protected void configure() {
+        bind(EntityApi.class).to(DimdwarfEntityApi.class);
+
         bind(EntityManager.class).to(EntityManagerImpl.class);
         bind(ReferenceFactory.class).to(ReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(EntityInfoImpl.class);

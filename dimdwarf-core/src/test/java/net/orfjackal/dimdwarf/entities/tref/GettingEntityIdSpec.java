@@ -7,7 +7,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 import com.google.inject.Provider;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.EntityObject;
+import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
@@ -32,7 +32,7 @@ public class GettingEntityIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         entityManager = mock(EntityManager.class);
-        entityInfo = new EntityInfoImpl(entityManager);
+        entityInfo = new EntityInfoImpl(entityManager, new DimdwarfEntityApi());
 
         entity = new DummyEntity();
         checking(new Expectations() {{

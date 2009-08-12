@@ -26,6 +26,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
     private ReferenceFactory referenceFactory;
     private TransparentReferenceFactory proxyFactory;
+    private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
@@ -47,11 +48,11 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
         }
 
         public void isATransparentReference() {
-            specify(Entities.isTransparentReference(proxy));
+            specify(entityApi.isTransparentReference(proxy));
         }
 
         public void isNotAnEntity() {
-            specify(Entities.isEntity(proxy), should.equal(false));
+            specify(entityApi.isEntity(proxy), should.equal(false));
         }
 
         public void isAnInstanceOfTheSameClassAsTheEntity() {
@@ -69,7 +70,8 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
                     new ReferenceFactoryImpl(
                             new EntityManagerImpl(
                                     mock(EntityIdFactory.class),
-                                    mock(EntityRepository.class)));
+                                    mock(EntityRepository.class),
+                                    entityApi));
             specify(new Block() {
                 public void run() throws Throwable {
                     factory.createReference(proxy);

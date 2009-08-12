@@ -23,6 +23,7 @@ import org.objectweb.asm.util.CheckClassAdapter;
 public class AddMarkerInterfaceForEntitiesSpec extends Specification<Object> {
 
     private Object target;
+    private EntityApi entityApi = new DimdwarfEntityApi();
 
     private static Object newInstrumentedInstance(Class<?> cls) throws Exception {
         ClassLoader loader = new TransformationTestClassLoader(cls.getName(), new AbstractTransformationChain() {
@@ -43,7 +44,7 @@ public class AddMarkerInterfaceForEntitiesSpec extends Specification<Object> {
         }
 
         public void isNotTransformed() {
-            specify(Entities.isEntity(target), should.equal(false));
+            specify(entityApi.isEntity(target), should.equal(false));
         }
     }
 
@@ -54,7 +55,7 @@ public class AddMarkerInterfaceForEntitiesSpec extends Specification<Object> {
         }
 
         public void isTransformedToAnEntity() {
-            specify(Entities.isEntity(target));
+            specify(entityApi.isEntity(target));
         }
     }
 

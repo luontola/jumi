@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.internal.DimdwarfEntityApi;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -29,7 +30,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
     public void create() throws Exception {
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), repository);
+        manager = new EntityManagerImpl(new EntityIdFactoryImpl(BigInteger.ZERO), repository, new DimdwarfEntityApi());
         refFactory = new ReferenceFactoryImpl(manager);
 
         entity = new DummyEntity();

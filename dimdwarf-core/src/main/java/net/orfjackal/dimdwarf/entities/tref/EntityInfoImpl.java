@@ -20,17 +20,19 @@ import java.math.BigInteger;
 public class EntityInfoImpl implements EntityInfo {
 
     private final EntityManager entityManager;
+    private final EntityApi entityApi;
 
     @Inject
-    public EntityInfoImpl(EntityManager entityManager) {
+    public EntityInfoImpl(EntityManager entityManager, EntityApi entityApi) {
         this.entityManager = entityManager;
+        this.entityApi = entityApi;
     }
 
     public BigInteger getEntityId(Object entity) {
-        if (Entities.isEntity(entity)) {
+        if (entityApi.isEntity(entity)) {
             return getIdFromEntity(entity);
         }
-        if (Entities.isTransparentReference(entity)) {
+        if (entityApi.isTransparentReference(entity)) {
             return getIdFromProxy(entity);
         }
         throw new IllegalArgumentException("Not an entity: " + entity);

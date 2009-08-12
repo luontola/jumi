@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.internal.DimdwarfEntityApi;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.gc.entities.GcAwareEntityRepository;
@@ -36,7 +37,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         // TODO: would it be better for this class to use Guice, to make sure that the EntityModule has all listeners configured?
         db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
         SerializationListener[] listeners = {
-                new CheckDirectlyReferredEntitySerialized(),
+                new CheckDirectlyReferredEntitySerialized(new DimdwarfEntityApi()),
                 new CheckInnerClassSerialized()
         };
         replacer = new DelegatingSerializationReplacer();

@@ -18,14 +18,16 @@ import javax.annotation.concurrent.Immutable;
 public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
 
     private final TransparentReferenceFactory factory;
+    private final EntityApi entityApi;
 
     @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory) {
+    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory, EntityApi entityApi) {
         this.factory = factory;
+        this.entityApi = entityApi;
     }
 
     public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
-        if (obj != rootObject && Entities.isEntity(obj)) {
+        if (obj != rootObject && entityApi.isEntity(obj)) {
             return createTransparentReferenceForSerialization(obj);
         }
         return obj;

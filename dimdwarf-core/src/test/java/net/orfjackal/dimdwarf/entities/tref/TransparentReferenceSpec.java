@@ -29,6 +29,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
     private ReferenceFactory referenceFactory;
     private TransparentReferenceFactory proxyFactory;
     private DummyEntity entity;
+    private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
         referenceFactory = mock(ReferenceFactory.class);
@@ -61,11 +62,11 @@ public class TransparentReferenceSpec extends Specification<Object> {
         }
 
         public void itIsATransparentReference() {
-            specify(Entities.isTransparentReference(proxy));
+            specify(entityApi.isTransparentReference(proxy));
         }
 
         public void itIsNotAnEntity() {
-            specify(Entities.isEntity(proxy), should.equal(false));
+            specify(entityApi.isEntity(proxy), should.equal(false));
         }
 
         public void itImplementsTheSameInterfacesAsTheEntity() {
@@ -91,7 +92,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
                     enableReplaceObject(true);
                 }
 
-                protected Object replaceObject(Object obj) throws IOException {
+                protected Object replaceObject(Object obj) {
                     serializedObjects.add(obj);
                     return obj;
                 }
@@ -101,7 +102,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
             boolean containsEntityReference = false;
             for (Object obj : serializedObjects) {
-                specify(Entities.isEntity(obj), should.equal(false));
+                specify(entityApi.isEntity(obj), should.equal(false));
                 if (obj instanceof EntityReference) {
                     containsEntityReference = true;
                 }
@@ -151,7 +152,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public void create() {
             ObjectSerializerImpl serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{
-                    new ReplaceEntitiesWithTransparentReferences(proxyFactory)
+                    new ReplaceEntitiesWithTransparentReferences(proxyFactory, entityApi)
             });
             checking(referenceIsCreatedFor(entity, BigInteger.ONE));
             Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject())).getSerializedBytes();
@@ -160,21 +161,21 @@ public class TransparentReferenceSpec extends Specification<Object> {
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {
             specify(deserialized.entity instanceof DummyInterface);
-            specify(Entities.isTransparentReference(deserialized.entity));
-            specify(Entities.isEntity(deserialized.entity), should.equal(false));
+            specify(entityApi.isTransparentReference(deserialized.entity));
+            specify(entityApi.isEntity(deserialized.entity), should.equal(false));
         }
 
         public void theRootEntityIsNotReplaced() {
             specify(deserialized.getClass(), should.equal(SerializationTestEntity.class));
-            specify(Entities.isTransparentReference(deserialized), should.equal(false));
-            specify(Entities.isEntity(deserialized));
+            specify(entityApi.isTransparentReference(deserialized), should.equal(false));
+            specify(entityApi.isEntity(deserialized));
         }
 
         public void nonEntityObjectsAreNotReplaced() {
             specify(deserialized.normalObject instanceof DummyInterface);
             specify(deserialized.normalObject.getClass(), should.equal(DummyObject.class));
-            specify(Entities.isTransparentReference(deserialized.normalObject), should.equal(false));
-            specify(Entities.isEntity(deserialized.normalObject), should.equal(false));
+            specify(entityApi.isTransparentReference(deserialized.normalObject), should.equal(false));
+            specify(entityApi.isEntity(deserialized.normalObject), should.equal(false));
         }
     }
 

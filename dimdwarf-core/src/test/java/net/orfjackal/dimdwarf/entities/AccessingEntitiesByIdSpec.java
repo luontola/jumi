@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.internal.DimdwarfEntityApi;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -28,7 +29,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(mock(EntityIdFactory.class), repository);
+        manager = new EntityManagerImpl(mock(EntityIdFactory.class), repository, new DimdwarfEntityApi());
     }
 
     private Expectations loadsFromRepository(final BigInteger id, final DummyEntity entity) {

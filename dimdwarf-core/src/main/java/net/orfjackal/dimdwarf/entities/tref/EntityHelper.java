@@ -28,6 +28,8 @@ import javax.annotation.Nullable;
  */
 public class EntityHelper {
 
+    private static final EntityApi entityApi = new DimdwarfEntityApi();
+
     private EntityHelper() {
     }
 
@@ -44,9 +46,9 @@ public class EntityHelper {
 
     @Nullable
     private static EntityReference<?> getReference(@Nullable Object obj) {
-        if (Entities.isTransparentReference(obj)) {
+        if (entityApi.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference$TREF();
-        } else if (Entities.isEntity(obj)) {
+        } else if (entityApi.isEntity(obj)) {
             return ThreadContext.get(ReferenceFactory.class).createReference(obj);
         } else {
             return null;

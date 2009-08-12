@@ -6,7 +6,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
+import net.orfjackal.dimdwarf.api.internal.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import net.orfjackal.dimdwarf.util.TestUtil;
 import org.jmock.Expectations;
@@ -34,7 +34,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(idFactory, repository);
+        manager = new EntityManagerImpl(idFactory, repository, new DimdwarfEntityApi());
         refFactory = new ReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }

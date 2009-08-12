@@ -29,6 +29,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
     private Injector injector;
     private Executor taskExecutor;
     private Provider<BindingRepository> bindings;
+    private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
         injector = Guice.createInjector(
@@ -106,8 +107,8 @@ public class EntityIntegrationSpec extends Specification<Object> {
                     DummyEntity entity = (DummyEntity) bindings.get().read("foo");
                     DummyInterface other = (DummyInterface) entity.getOther();
                     specify(other.getOther(), should.equal("other"));
-                    specify(Entities.isEntity(entity));
-                    specify(Entities.isTransparentReference(other));
+                    specify(entityApi.isEntity(entity));
+                    specify(entityApi.isTransparentReference(other));
                 }
             });
         }
@@ -143,7 +144,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
                 public void run() {
                     DummyEntity root = (DummyEntity) bindings.get().read("root");
                     DummyInterface tref = (DummyInterface) root.getOther();
-                    specify(Entities.isTransparentReference(tref));
+                    specify(entityApi.isTransparentReference(tref));
                     bindings.get().update("tref", tref);
                 }
             });

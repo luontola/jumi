@@ -24,6 +24,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private final EntityIdFactory idFactory;
     private final EntityRepository repository;
+    private final EntityApi entityApi;
 
     private final Map<EntityObject, BigInteger> entities = new IdentityHashMap<EntityObject, BigInteger>();
     private final Map<BigInteger, EntityObject> entitiesById = new HashMap<BigInteger, EntityObject>();
@@ -31,9 +32,10 @@ public class EntityManagerImpl implements EntityManager {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManagerImpl(EntityIdFactory idFactory, EntityRepository repository) {
+    public EntityManagerImpl(EntityIdFactory idFactory, EntityRepository repository, EntityApi entityApi) {
         this.idFactory = idFactory;
         this.repository = repository;
+        this.entityApi = entityApi;
     }
 
     @TestOnly
@@ -51,8 +53,8 @@ public class EntityManagerImpl implements EntityManager {
         return id;
     }
 
-    private static void checkIsEntity(EntityObject entity) {
-        if (!Entities.isEntity(entity)) {
+    private void checkIsEntity(EntityObject entity) {
+        if (!entityApi.isEntity(entity)) {
             throw new IllegalArgumentException("Not an entity: " + entity);
         }
     }

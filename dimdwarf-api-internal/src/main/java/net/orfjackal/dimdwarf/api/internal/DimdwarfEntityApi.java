@@ -8,22 +8,13 @@ package net.orfjackal.dimdwarf.api.internal;
  * @author Esko Luontola
  * @since 10.9.2008
  */
-public class Entities {
+public class DimdwarfEntityApi implements EntityApi {
 
-    // TODO: refactor static methods away, introduce EntityApi interface
-
-    private Entities() {
-    }
-
-    public static boolean isEntity(Object obj) {
+    public boolean isEntity(Object obj) {
         return obj instanceof EntityObject && !isTransparentReference(obj);
     }
 
-    public static boolean isTransparentReference(Object obj) {
+    public boolean isTransparentReference(Object obj) {
         return obj instanceof TransparentReference;
-    }
-
-    public static Class<?> getEntityClass() {
-        return EntityObject.class;
     }
 }

@@ -29,7 +29,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(idFactory, repository);
+        manager = new EntityManagerImpl(idFactory, repository, new DimdwarfEntityApi());
         refFactory = new ReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }
