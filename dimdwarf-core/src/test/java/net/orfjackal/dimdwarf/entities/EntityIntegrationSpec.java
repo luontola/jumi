@@ -47,7 +47,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
             final AtomicReference<BigInteger> id = new AtomicReference<BigInteger>();
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
+                    EntityReferenceFactory factory = injector.getInstance(EntityReferenceFactory.class);
                     EntityReference<DummyEntity> ref = factory.createReference(new DummyEntity("foo"));
                     id.set(ref.getEntityId());
                 }
@@ -116,7 +116,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
         public void referenceFactoryAndEntityLoaderAreInSync() {
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    ReferenceFactory factory = injector.getInstance(ReferenceFactory.class);
+                    EntityReferenceFactory factory = injector.getInstance(EntityReferenceFactory.class);
                     EntityManager manager = injector.getInstance(EntityManager.class);
 
                     DummyEntity entity = new DummyEntity();

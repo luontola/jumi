@@ -15,12 +15,12 @@ import java.math.BigInteger;
  * @since 3.11.2008
  */
 @Immutable
-public class ReferenceFactoryImpl implements ReferenceFactory {
+public class EntityReferenceFactoryImpl implements EntityReferenceFactory {
 
     private final EntityManager entityManager;
 
     @Inject
-    public ReferenceFactoryImpl(EntityManager entityManager) {
+    public EntityReferenceFactoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

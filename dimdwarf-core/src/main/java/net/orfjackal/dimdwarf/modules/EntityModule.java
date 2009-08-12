@@ -26,7 +26,7 @@ public class EntityModule extends AbstractModule {
         bind(EntityApi.class).to(DimdwarfEntityApi.class);
 
         bind(EntityManager.class).to(EntityManagerImpl.class);
-        bind(ReferenceFactory.class).to(ReferenceFactoryImpl.class);
+        bind(EntityReferenceFactory.class).to(EntityReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(EntityInfoImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
 

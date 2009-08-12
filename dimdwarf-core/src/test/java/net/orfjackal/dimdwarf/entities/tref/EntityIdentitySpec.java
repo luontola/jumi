@@ -23,7 +23,7 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class EntityIdentitySpec extends Specification<Object> {
 
-    private ReferenceFactory referenceFactory;
+    private EntityReferenceFactory referenceFactory;
     protected TransparentReferenceFactory proxyFactory;
     private EntityObject ent1;
     private EntityObject ent2;
@@ -33,7 +33,7 @@ public class EntityIdentitySpec extends Specification<Object> {
     private Object obj;
 
     public void create() throws Exception {
-        referenceFactory = mock(ReferenceFactory.class);
+        referenceFactory = mock(EntityReferenceFactory.class);
         proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
@@ -43,7 +43,7 @@ public class EntityIdentitySpec extends Specification<Object> {
         tref1b = proxyFactory.createTransparentReference(ent1);
         tref2 = proxyFactory.createTransparentReference(ent2);
         obj = new Object();
-        ThreadContext.setUp(new FakeContext().with(ReferenceFactory.class, referenceFactory));
+        ThreadContext.setUp(new FakeContext().with(EntityReferenceFactory.class, referenceFactory));
     }
 
     public void destroy() throws Exception {

@@ -24,12 +24,12 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
 
-    private ReferenceFactory referenceFactory;
+    private EntityReferenceFactory referenceFactory;
     private TransparentReferenceFactory proxyFactory;
     private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
-        referenceFactory = mock(ReferenceFactory.class);
+        referenceFactory = mock(EntityReferenceFactory.class);
         proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
     }
 
@@ -66,8 +66,8 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
         }
 
         public void entityReferencesCanNotBeCreatedForTheProxy() {
-            final ReferenceFactory factory =
-                    new ReferenceFactoryImpl(
+            final EntityReferenceFactory factory =
+                    new EntityReferenceFactoryImpl(
                             new EntityManagerImpl(
                                     mock(EntityIdFactory.class),
                                     mock(EntityRepository.class),

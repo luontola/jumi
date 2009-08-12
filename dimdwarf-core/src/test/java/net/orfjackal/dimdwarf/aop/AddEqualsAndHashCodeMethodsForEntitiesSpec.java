@@ -30,14 +30,14 @@ public class AddEqualsAndHashCodeMethodsForEntitiesSpec extends Specification<Ob
     private Object target;
 
     public void create() throws Exception {
-        // the EntityHelper class will call ReferenceFactory on every equals() and hashCode() operation
-        ReferenceFactory factory = new ReferenceFactory() {
+        // the EntityHelper class will call EntityReferenceFactory on every equals() and hashCode() operation
+        EntityReferenceFactory factory = new EntityReferenceFactory() {
             public <T> EntityReference<T> createReference(T entity) {
                 entityHelperCalled++;
                 return new EntityReferenceImpl<T>(BigInteger.ONE, entity);
             }
         };
-        ThreadContext.setUp(new FakeContext().with(ReferenceFactory.class, factory));
+        ThreadContext.setUp(new FakeContext().with(EntityReferenceFactory.class, factory));
     }
 
     public void destroy() throws Exception {

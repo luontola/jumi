@@ -23,14 +23,14 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
     private EntityIdFactory idFactory;
     private EntityRepository repository;
     private EntityManagerImpl manager;
-    private ReferenceFactory refFactory;
+    private EntityReferenceFactory refFactory;
     private EntityObject entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         repository = mock(EntityRepository.class);
         manager = new EntityManagerImpl(idFactory, repository, new DimdwarfEntityApi());
-        refFactory = new ReferenceFactoryImpl(manager);
+        refFactory = new EntityReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }
 

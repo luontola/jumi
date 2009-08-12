@@ -7,7 +7,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.api.internal.*;
-import net.orfjackal.dimdwarf.entities.ReferenceFactory;
+import net.orfjackal.dimdwarf.entities.EntityReferenceFactory;
 import net.orfjackal.dimdwarf.util.SingletonCache;
 import net.sf.cglib.proxy.*;
 import org.objenesis.*;
@@ -25,10 +25,10 @@ import java.util.*;
 public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
 
     private final CglibProxyFactoryCache proxyFactories = new CglibProxyFactoryCache();
-    private final Provider<ReferenceFactory> referenceFactory;
+    private final Provider<EntityReferenceFactory> referenceFactory;
 
     @Inject
-    public TransparentReferenceFactoryImpl(Provider<ReferenceFactory> referenceFactory) {
+    public TransparentReferenceFactoryImpl(Provider<EntityReferenceFactory> referenceFactory) {
         this.referenceFactory = referenceFactory;
     }
 

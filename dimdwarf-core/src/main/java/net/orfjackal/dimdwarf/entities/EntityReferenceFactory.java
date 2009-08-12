@@ -10,7 +10,7 @@ import net.orfjackal.dimdwarf.api.internal.EntityReference;
  * @author Esko Luontola
  * @since 5.9.2008
  */
-public interface ReferenceFactory {
+public interface EntityReferenceFactory {
 
     <T> EntityReference<T> createReference(T entity);
 }

@@ -26,13 +26,13 @@ import java.util.*;
 @Group({"fast"})
 public class TransparentReferenceSpec extends Specification<Object> {
 
-    private ReferenceFactory referenceFactory;
+    private EntityReferenceFactory referenceFactory;
     private TransparentReferenceFactory proxyFactory;
     private DummyEntity entity;
     private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
-        referenceFactory = mock(ReferenceFactory.class);
+        referenceFactory = mock(EntityReferenceFactory.class);
         proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
         entity = new DummyEntity();
     }

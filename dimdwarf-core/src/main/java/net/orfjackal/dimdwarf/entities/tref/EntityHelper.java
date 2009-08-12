@@ -6,7 +6,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.context.ThreadContext;
-import net.orfjackal.dimdwarf.entities.ReferenceFactory;
+import net.orfjackal.dimdwarf.entities.EntityReferenceFactory;
 import net.orfjackal.dimdwarf.util.Objects;
 
 import javax.annotation.Nullable;
@@ -49,7 +49,7 @@ public class EntityHelper {
         if (entityApi.isTransparentReference(obj)) {
             return ((TransparentReference) obj).getEntityReference$TREF();
         } else if (entityApi.isEntity(obj)) {
-            return ThreadContext.get(ReferenceFactory.class).createReference(obj);
+            return ThreadContext.get(EntityReferenceFactory.class).createReference(obj);
         } else {
             return null;
         }
