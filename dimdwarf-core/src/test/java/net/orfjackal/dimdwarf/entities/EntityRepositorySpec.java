@@ -10,7 +10,6 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import net.orfjackal.dimdwarf.modules.*;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
@@ -35,8 +34,7 @@ public class EntityRepositorySpec extends Specification<Object> {
         Injector injector = Guice.createInjector(
                 new TaskContextModule(),
                 new DatabaseModule(),
-                new EntityModule(),
-                new NullGarbageCollectionOption()
+                new EntityModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         entities = injector.getProvider(EntityRepository.class);

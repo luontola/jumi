@@ -12,7 +12,6 @@ import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.modules.CommonModules;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
 import org.junit.runner.RunWith;
 
@@ -36,8 +35,7 @@ public class RetryableExceptionsSpec extends Specification<Object> {
 
     public void create() throws Exception {
         server = new TestServer(
-                new CommonModules(),
-                new NullGarbageCollectionOption()
+                new CommonModules()
         );
         server.changeLoggingLevel(TransactionFilter.class, Level.WARNING);
         server.changeLoggingLevel(RetryingTaskExecutor.class, Level.WARNING);

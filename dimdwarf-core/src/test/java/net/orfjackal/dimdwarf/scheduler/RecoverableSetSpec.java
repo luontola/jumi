@@ -11,7 +11,6 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
@@ -38,8 +37,7 @@ public class RecoverableSetSpec extends Specification<Object> {
         Injector injector = Guice.createInjector(
                 new EntityModule(),
                 new DatabaseModule(),
-                new TaskContextModule(),
-                new NullGarbageCollectionOption()
+                new TaskContextModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         bindings = injector.getProvider(BindingRepository.class);

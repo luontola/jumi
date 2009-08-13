@@ -2,10 +2,9 @@
 // This software is released under the MIT License.
 // The license may be viewed at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.gc.entities;
+package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.EntityId;
-import net.orfjackal.dimdwarf.api.internal.EntityReference;
 import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -15,25 +14,22 @@ import javax.annotation.concurrent.Immutable;
  * @since 11.12.2008
  */
 @Immutable
-public class EntityReferenceListener extends SerializationAdapter {
-
-    // TODO: listen for EntityId instead of EntityReference
+public class EntityIdSerializationListener extends SerializationAdapter {
 
     @Override
     public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
-        appendIfReference(obj, meta);
+        appendIfEntityId(obj, meta);
     }
 
     @Override
     public void afterDeserialize(Object obj, MetadataBuilder meta) {
-        appendIfReference(obj, meta);
+        appendIfEntityId(obj, meta);
     }
 
-    private static void appendIfReference(Object obj, MetadataBuilder meta) {
-        if (obj instanceof EntityReference) {
-            EntityReference<?> ref = (EntityReference<?>) obj;
-            EntityId id = ref.getEntityId();
-            meta.append(EntityReferenceListener.class, id);
+    private static void appendIfEntityId(Object obj, MetadataBuilder meta) {
+        if (obj instanceof EntityId) {
+            EntityId id = (EntityId) obj;
+            meta.append(EntityIdSerializationListener.class, id);
         }
     }
 }

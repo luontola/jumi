@@ -11,7 +11,6 @@ import net.orfjackal.dimdwarf.api.EntityInfo;
 import net.orfjackal.dimdwarf.context.ThreadContext;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.modules.*;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.*;
@@ -47,7 +46,6 @@ public class TaskSchedulerSpec extends Specification<Object> {
                 new EntityModule(),
                 new DatabaseModule(),
                 new TaskContextModule(),
-                new NullGarbageCollectionOption(),
                 new AbstractModule() {
                     protected void configure() {
                         bind(Clock.class).toInstance(clock);

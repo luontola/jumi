@@ -9,7 +9,6 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.modules.CommonModules;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -33,8 +32,7 @@ public class IncrementalTaskSpec extends Specification<Object> {
 
     public void create() throws Exception {
         server = new TestServer(
-                new CommonModules(),
-                new NullGarbageCollectionOption()
+                new CommonModules()
         );
         server.hideStartupShutdownLogs();
         server.start();

@@ -8,7 +8,7 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
-import net.orfjackal.dimdwarf.entities.ConvertEntityIdToBytes;
+import net.orfjackal.dimdwarf.entities.dao.ConvertEntityIdToBytes;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;

@@ -9,9 +9,8 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.entities.dao.EntityDao;
-import net.orfjackal.dimdwarf.gc.entities.GcAwareEntityRepository;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
+import net.orfjackal.dimdwarf.entities.dao.*;
+import net.orfjackal.dimdwarf.entities.EntityRepositoryImpl;
 import net.orfjackal.dimdwarf.serial.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
@@ -28,7 +27,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
     private DatabaseTableWithMetadata<Blob, Blob> db;
-    private GcAwareEntityRepository repository;
+    private EntityRepositoryImpl repository;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
@@ -43,13 +42,12 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
 
         repository =
-                new GcAwareEntityRepository(
+                new EntityRepositoryImpl(
                         new EntityDao(
                                 db,
                                 new ConvertEntityIdToBytes(),
                                 new NoConversion<Blob>()),
-                        serializer,
-                        new NullGarbageCollectionOption.NullMutatorListener());
+                        serializer);
         entity = new DummyEntity();
     }
 

@@ -11,7 +11,6 @@ import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
 import net.orfjackal.dimdwarf.modules.CommonModules;
-import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
@@ -35,8 +34,7 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
     public void create() throws Exception {
         startupTheServer(
-                new CommonModules(),
-                new NullGarbageCollectionOption()
+                new CommonModules()
         );
     }
 
@@ -65,7 +63,6 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
         final EntityIdFactoryImpl idFactoryBackup = injector.getInstance(EntityIdFactoryImpl.class);
         startupTheServer(
                 new CommonModules(),
-                new NullGarbageCollectionOption(),
                 new AbstractModule() {
                     protected void configure() {
                         bind(InMemoryDatabaseManager.class).toInstance(dbBackup);

@@ -10,7 +10,6 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.*;
-import net.orfjackal.dimdwarf.gc.entities.*;
 import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 import net.orfjackal.dimdwarf.serial.*;
 
@@ -33,12 +32,12 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(MaxEntityId.class)
                 .toInstance(0L); // TODO: import from database
 
-        bind(EntityRepository.class).to(GcAwareEntityRepository.class);
+        bind(EntityRepository.class).to(EntityRepositoryImpl.class);
         bind(databaseTableConnectionWithMetadata())
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTableWithMetadata("entities"));
 
-        bind(BindingRepository.class).to(GcAwareBindingRepository.class);
+        bind(BindingRepository.class).to(BindingRepositoryImpl.class);
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));
@@ -52,7 +51,7 @@ public class EntityModule extends AbstractModule {
         @Inject public CheckInnerClassSerialized listener1;
         @Inject public CheckDirectlyReferredEntitySerialized listener2;
         @Inject public InjectObjectsOnDeserialization listener3;
-        @Inject public EntityReferenceListener listener4;
+        @Inject public EntityIdSerializationListener listener4;
 
         public SerializationListener[] get() {
             return new SerializationListener[]{listener1, listener2, listener3, listener4};
