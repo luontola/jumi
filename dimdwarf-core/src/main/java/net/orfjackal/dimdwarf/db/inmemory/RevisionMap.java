@@ -4,6 +4,8 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
+import net.orfjackal.dimdwarf.db.common.SortedMapUtil;
+
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;

@@ -2,7 +2,7 @@
 // This software is released under the MIT License.
 // The license may be viewed at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.db.inmemory;
+package net.orfjackal.dimdwarf.db.common;
 
 import javax.annotation.Nullable;
 import java.util.*;

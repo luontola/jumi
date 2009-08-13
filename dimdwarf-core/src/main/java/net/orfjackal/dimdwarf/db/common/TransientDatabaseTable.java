@@ -5,7 +5,6 @@
 package net.orfjackal.dimdwarf.db.common;
 
 import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.db.inmemory.SortedMapUtil;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
 import javax.annotation.*;
