@@ -10,7 +10,6 @@ import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
-import net.orfjackal.dimdwarf.entities.EntityRepositoryImpl;
 import net.orfjackal.dimdwarf.serial.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
@@ -26,14 +25,14 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
     private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
-    private DatabaseTableWithMetadata<Blob, Blob> db;
+    private DatabaseTable<Blob, Blob> db;
     private EntityRepositoryImpl repository;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
     public void create() throws Exception {
         // TODO: would it be better for this class to use Guice, to make sure that the EntityModule has all listeners configured?
-        db = uncheckedCast(mock(DatabaseTableWithMetadata.class));
+        db = uncheckedCast(mock(DatabaseTable.class));
         SerializationListener[] listeners = {
                 new CheckDirectlyReferredEntitySerialized(new DimdwarfEntityApi()),
                 new CheckInnerClassSerialized()

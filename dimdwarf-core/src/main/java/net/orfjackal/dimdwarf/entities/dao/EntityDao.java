@@ -13,11 +13,11 @@ import net.orfjackal.dimdwarf.db.*;
  * @since 2.12.2008
  */
 public class EntityDao
-        extends DatabaseTableWithMetadataAdapter<EntityId, Blob, Blob, Blob>
-        implements DatabaseTableWithMetadata<EntityId, Blob> {
+        extends DatabaseTableAdapter<EntityId, Blob, Blob, Blob>
+        implements DatabaseTable<EntityId, Blob> {
 
     @Inject
-    public EntityDao(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
+    public EntityDao(@EntitiesTable DatabaseTable<Blob, Blob> parent,
                      ConvertEntityIdToBytes keys,
                      NoConversion<Blob> values) {
         super(parent, keys, values);

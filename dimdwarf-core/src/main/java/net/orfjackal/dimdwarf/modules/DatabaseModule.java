@@ -34,27 +34,11 @@ public class DatabaseModule extends AbstractModule {
     }
 
     public static Provider<DatabaseTable<Blob, Blob>> databaseTable(final String name) {
-        assert !name.contains(DatabaseTableWithMetadata.META_SEPARATOR);
         return new Provider<DatabaseTable<Blob, Blob>>() {
             @Inject public Provider<Database<Blob, Blob>> db;
 
             public DatabaseTable<Blob, Blob> get() {
                 return db.get().openTable(name);
-            }
-        };
-    }
-
-    public static TypeLiteral<DatabaseTableWithMetadata<Blob, Blob>> databaseTableConnectionWithMetadata() {
-        return new TypeLiteral<DatabaseTableWithMetadata<Blob, Blob>>() {};
-    }
-
-    public static Provider<DatabaseTableWithMetadata<Blob, Blob>> databaseTableWithMetadata(final String name) {
-        assert !name.contains(DatabaseTableWithMetadata.META_SEPARATOR);
-        return new Provider<DatabaseTableWithMetadata<Blob, Blob>>() {
-            @Inject public Provider<Database<Blob, Blob>> db;
-
-            public DatabaseTableWithMetadata<Blob, Blob> get() {
-                return new DatabaseTableWithMetadataImpl<Blob, Blob>(db.get(), name);
             }
         };
     }

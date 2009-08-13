@@ -33,9 +33,9 @@ public class EntityModule extends AbstractModule {
                 .toInstance(0L); // TODO: import from database
 
         bind(EntityRepository.class).to(EntityRepositoryImpl.class);
-        bind(databaseTableConnectionWithMetadata())
+        bind(databaseTableConnection())
                 .annotatedWith(EntitiesTable.class)
-                .toProvider(databaseTableWithMetadata("entities"));
+                .toProvider(databaseTable("entities"));
 
         bind(BindingRepository.class).to(BindingRepositoryImpl.class);
         bind(databaseTableConnection())
