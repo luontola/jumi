@@ -799,8 +799,8 @@
         <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-sources.jar!/" />
         <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7.jar!/" />
+        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
