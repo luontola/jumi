@@ -20,6 +20,8 @@ import java.util.*;
 @ThreadSafe
 public class RecoverableSetImpl<T> implements RecoverableSet<T> {
 
+    // FIXME: RecoverableSetImpl will be removed/refactored in new architecture
+
     private final String prefix;
     private final Provider<BindingRepository> bindings;
     private final Provider<EntityInfo> info;

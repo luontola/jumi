@@ -27,6 +27,8 @@ import java.util.logging.Level;
 @Group({"fast"})
 public class RetryableExceptionsSpec extends Specification<Object> {
 
+    // FIXME: retryable exceptions will be removed/refactored in new architecture
+
     private static final EntityId ID1 = new EntityObjectId(1);
 
     private TestServer server;

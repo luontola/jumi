@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Group({"fast"})
 public class SingleThreadFallbackTaskExecutorSpec extends Specification<Object> {
 
+    // FIXME: SingleThreadFallbackTaskExecutor will be removed/refactored in new architecture
+
     private SingleThreadFallbackTaskExecutor executor;
     private Executor backingExecutor;
     private Logger logger;

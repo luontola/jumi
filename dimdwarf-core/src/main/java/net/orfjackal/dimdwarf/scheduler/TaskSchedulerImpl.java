@@ -23,6 +23,8 @@ import java.util.concurrent.*;
 @ThreadSafe
 public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
 
+    // FIXME: TaskSchedulerImpl will be removed/refactored in new architecture
+
     private static final String TASKS_PREFIX = TaskSchedulerImpl.class.getName() + ".tasks";
 
     // TODO: Extract 'scheduledTasks' into its own class, for example NonPersistedScheduledTasksQueue

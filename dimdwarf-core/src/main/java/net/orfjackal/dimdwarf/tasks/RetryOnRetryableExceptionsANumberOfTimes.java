@@ -15,6 +15,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public class RetryOnRetryableExceptionsANumberOfTimes implements RetryPolicy {
 
+    // FIXME: RetryOnRetryableExceptionsANumberOfTimes will be removed/refactored in new architecture
+
     private final int maxRetries;
     private boolean retryable = true;
     private int failures = 0;

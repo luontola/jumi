@@ -22,6 +22,8 @@ import java.util.concurrent.Executor;
 @Group({"fast"})
 public class RetryingTaskExecutorSpec extends Specification<Object> {
 
+    // FIXME: RetryingTaskExecutor will be removed/refactored in new architecture
+
     private Logger logger;
     private Executor taskContext;
     private RetryingTaskExecutor executor;

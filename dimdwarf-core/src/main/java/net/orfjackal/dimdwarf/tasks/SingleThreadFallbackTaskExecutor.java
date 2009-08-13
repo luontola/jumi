@@ -20,6 +20,9 @@ import java.util.concurrent.locks.*;
 @Singleton
 @ThreadSafe
 public class SingleThreadFallbackTaskExecutor implements Executor {
+
+    // FIXME: SingleThreadFallbackTaskExecutor will be removed/refactored in new architecture
+
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(SingleThreadFallbackTaskExecutor.class);
     private final Logger logger;
 

@@ -21,6 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Singleton
 @ThreadSafe
 public class TaskThreadPool {
+
+    // FIXME: TaskThreadPool will be removed/refactored in new architecture
+
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TaskThreadPool.class);
     private final Logger logger;
 

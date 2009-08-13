@@ -16,6 +16,9 @@ import java.util.concurrent.Executor;
  */
 @Immutable
 public class RetryingTaskExecutor implements Executor {
+
+    // FIXME: RetryingTaskExecutor will be removed/refactored in new architecture
+
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(RetryingTaskExecutor.class);
     private final Logger logger;
 
