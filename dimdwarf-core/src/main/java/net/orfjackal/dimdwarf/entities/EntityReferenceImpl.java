@@ -5,44 +5,30 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.*;
-import java.math.BigInteger;
+import java.io.Serializable;
 
 /**
  * @author Esko Luontola
  * @since 25.8.2008
  */
 @NotThreadSafe
-public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizable {
+public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private BigInteger id;
+    private final EntityId id;
     @Nullable private transient T entity;
     @Nullable private transient EntityManager entityManager;
 
-    public EntityReferenceImpl(BigInteger id, T entity) {
+    public EntityReferenceImpl(EntityId id, T entity) {
         assert id != null;
         assert entity != null;
         this.id = id;
         this.entity = entity;
-    }
-
-    public EntityReferenceImpl() {
-        // default constructor is required by Externalizable
-    }
-
-    public void writeExternal(ObjectOutput out) throws IOException {
-        byte[] bytes = id.toByteArray();
-        out.writeObject(bytes);
-    }
-
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        byte[] bytes = (byte[]) in.readObject();
-        id = new BigInteger(bytes);
     }
 
     /**
@@ -61,7 +47,7 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Externalizabl
         return entity;
     }
 
-    public BigInteger getEntityId() {
+    public EntityId getEntityId() {
         return id;
     }
 

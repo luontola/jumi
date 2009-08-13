@@ -10,8 +10,6 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.math.BigInteger;
-
 /**
  * @author Esko Luontola
  * @since 25.8.2008
@@ -48,7 +46,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
-                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(42)));
+                one(idFactory).newId(); will(returnValue(new EntityObjectId(42)));
             }});
             ref = refFactory.createReference(entity);
         }
@@ -62,7 +60,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theEntityGetsAnId() {
-            specify(ref.getEntityId(), should.equal(BigInteger.valueOf(42)));
+            specify(ref.getEntityId(), should.equal(new EntityObjectId(42)));
         }
 
         public void onMultipleCallsAllReferencesToTheSameObjectAreEqual() {
@@ -84,8 +82,8 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
         public void create() {
             checking(new Expectations() {{
-                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(1)));
-                one(idFactory).newId(); will(returnValue(BigInteger.valueOf(2)));
+                one(idFactory).newId(); will(returnValue(new EntityObjectId(1)));
+                one(idFactory).newId(); will(returnValue(new EntityObjectId(2)));
             }});
             ref1 = refFactory.createReference(entity);
             ref2 = refFactory.createReference(new DummyEntity());
@@ -100,8 +98,8 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void eachEntityGetsItsOwnId() {
-            specify(ref1.getEntityId(), should.equal(BigInteger.valueOf(1)));
-            specify(ref2.getEntityId(), should.equal(BigInteger.valueOf(2)));
+            specify(ref1.getEntityId(), should.equal(new EntityObjectId(1)));
+            specify(ref2.getEntityId(), should.equal(new EntityObjectId(2)));
         }
     }
 }

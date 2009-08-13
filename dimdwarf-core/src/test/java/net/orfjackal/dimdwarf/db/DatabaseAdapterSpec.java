@@ -6,12 +6,14 @@ package net.orfjackal.dimdwarf.db;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityId;
+import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
+import net.orfjackal.dimdwarf.entities.ConvertEntityIdToBytes;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -24,21 +26,21 @@ public class DatabaseAdapterSpec extends Specification<Object> {
 
     private Database<Blob, Blob> db;
     private DatabaseTable<Blob, Blob> table;
-    private Database<String, BigInteger> dbAdapter;
-    private DatabaseTable<String, BigInteger> tableAdapter;
+    private Database<String, EntityId> dbAdapter;
+    private DatabaseTable<String, EntityId> tableAdapter;
 
     private String key = "key";
-    private BigInteger value = BigInteger.TEN;
+    private EntityId value = new EntityObjectId(42);
     private Blob keyBytes;
     private Blob valueBytes;
 
     public void create() throws Exception {
         db = uncheckedCast(mock(Database.class));
         table = uncheckedCast(mock(DatabaseTable.class));
-        dbAdapter = new DatabaseAdapter<String, BigInteger, Blob, Blob>(db, new ConvertStringToBytes(), new ConvertBigIntegerToBytes());
+        dbAdapter = new DatabaseAdapter<String, EntityId, Blob, Blob>(db, new ConvertStringToBytes(), new ConvertEntityIdToBytes());
 
         keyBytes = Blob.fromBytes(key.getBytes("UTF-8"));
-        valueBytes = new ConvertBigIntegerToBytes().forth(value);
+        valueBytes = new ConvertEntityIdToBytes().forth(value);
     }
 
     public class ADatabaseAdapter {

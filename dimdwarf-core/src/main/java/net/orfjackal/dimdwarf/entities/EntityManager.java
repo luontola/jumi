@@ -4,18 +4,17 @@
 
 package net.orfjackal.dimdwarf.entities;
 
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.db.IterableKeys;
-
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 31.8.2008
  */
-public interface EntityManager extends IterableKeys<BigInteger> {
+public interface EntityManager extends IterableKeys<EntityId> {
 
-    BigInteger getEntityId(EntityObject entity);
+    EntityId getEntityId(EntityObject entity);
 
-    EntityObject getEntityById(BigInteger id);
+    EntityObject getEntityById(EntityId id);
 }

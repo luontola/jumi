@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import java.math.BigInteger;
+import net.orfjackal.dimdwarf.api.EntityId;
 
 /**
  * @author Esko Luontola
@@ -12,5 +12,5 @@ import java.math.BigInteger;
  */
 public interface EntityIdFactory {
 
-    BigInteger newId();
+    EntityId newId();
 }

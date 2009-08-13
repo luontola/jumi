@@ -5,10 +5,9 @@
 package net.orfjackal.dimdwarf.modules.options;
 
 import com.google.inject.*;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.gc.cms.ConcurrentMarkSweepCollector;
-
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -17,23 +16,23 @@ import java.math.BigInteger;
 public class CmsGarbageCollectionOption extends AbstractModule {
 
     protected void configure() {
-        bind(new TypeLiteral<GarbageCollector<BigInteger>>() {}).toProvider(GarbageCollectorProvider.class);
-        bind(new TypeLiteral<MutatorListener<BigInteger>>() {}).toProvider(MutatorListenerProvider.class);
+        bind(new TypeLiteral<GarbageCollector<EntityId>>() {}).toProvider(GarbageCollectorProvider.class);
+        bind(new TypeLiteral<MutatorListener<EntityId>>() {}).toProvider(MutatorListenerProvider.class);
     }
 
-    private static class GarbageCollectorProvider implements Provider<GarbageCollector<BigInteger>> {
-        @Inject public Graph<BigInteger> graph;
+    private static class GarbageCollectorProvider implements Provider<GarbageCollector<EntityId>> {
+        @Inject public Graph<EntityId> graph;
         @Inject public NodeSetFactory factory;
 
-        public GarbageCollector<BigInteger> get() {
-            return new ConcurrentMarkSweepCollector<BigInteger>(graph, factory);
+        public GarbageCollector<EntityId> get() {
+            return new ConcurrentMarkSweepCollector<EntityId>(graph, factory);
         }
     }
 
-    private static class MutatorListenerProvider implements Provider<MutatorListener<BigInteger>> {
-        @Inject public GarbageCollector<BigInteger> collector;
+    private static class MutatorListenerProvider implements Provider<MutatorListener<EntityId>> {
+        @Inject public GarbageCollector<EntityId> collector;
 
-        public MutatorListener<BigInteger> get() {
+        public MutatorListener<EntityId> get() {
             return collector.getMutatorListener();
         }
     }

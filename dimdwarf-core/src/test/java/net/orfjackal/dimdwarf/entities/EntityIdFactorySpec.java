@@ -6,9 +6,9 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityId;
+import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import org.junit.runner.RunWith;
-
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -18,7 +18,7 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class EntityIdFactorySpec extends Specification<Object> {
 
-    private static final BigInteger LARGEST_USED_ID = BigInteger.valueOf(42);
+    private static final long LARGEST_USED_ID = 42;
 
     private EntityIdFactoryImpl factory;
 
@@ -30,14 +30,15 @@ public class EntityIdFactorySpec extends Specification<Object> {
     public class AnEntityIdFactory {
 
         public void startsFromTheNextUnusedId() {
-            BigInteger nextUnused = LARGEST_USED_ID.add(BigInteger.ONE);
-            specify(factory.newId(), should.equal(nextUnused));
+            EntityId nextUnused = new EntityObjectId(LARGEST_USED_ID + 1);
+            EntityId id1 = factory.newId();
+            specify(id1, should.equal(nextUnused));
         }
 
         public void incrementsTheIdOnEveryCall() {
-            BigInteger id1 = factory.newId();
-            BigInteger id2 = factory.newId();
-            specify(id2, should.equal(id1.add(BigInteger.ONE)));
+            EntityId id1 = factory.newId();
+            EntityId id2 = factory.newId();
+            specify(id2, should.not().equal(id1));
         }
     }
 }

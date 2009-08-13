@@ -5,7 +5,7 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.api.Entity;
+import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
 import net.orfjackal.dimdwarf.entities.BindingRepository;
 import net.orfjackal.dimdwarf.gc.GarbageCollector;
@@ -14,7 +14,6 @@ import net.orfjackal.dimdwarf.tasks.util.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,12 +28,12 @@ public class GarbageCollectorManagerImpl implements GarbageCollectorManager {
 
     private static final String WORKER_BINDING = GarbageCollectorManagerImpl.class.getName() + ".worker";
 
-    private final Provider<GarbageCollector<BigInteger>> collector;
+    private final Provider<GarbageCollector<EntityId>> collector;
     private final Provider<BindingRepository> bindings;
     private final Executor taskContext;
 
     @Inject
-    public GarbageCollectorManagerImpl(Provider<GarbageCollector<BigInteger>> collector,
+    public GarbageCollectorManagerImpl(Provider<GarbageCollector<EntityId>> collector,
                                        Provider<BindingRepository> bindings,
                                        @RetryingTaskContext Executor taskContext) {
         this.collector = collector;

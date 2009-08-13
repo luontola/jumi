@@ -5,10 +5,10 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 
 import javax.annotation.concurrent.Immutable;
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -25,7 +25,7 @@ public class EntityReferenceFactoryImpl implements EntityReferenceFactory {
     }
 
     public <T> EntityReference<T> createReference(T entity) {
-        BigInteger id = entityManager.getEntityId((EntityObject) entity);
+        EntityId id = entityManager.getEntityId((EntityObject) entity);
         return new EntityReferenceImpl<T>(id, entity);
     }
 }

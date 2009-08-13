@@ -5,6 +5,7 @@
 package net.orfjackal.dimdwarf.gc.entities;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.gc.Graph;
@@ -12,14 +13,13 @@ import net.orfjackal.dimdwarf.serial.*;
 import net.orfjackal.dimdwarf.util.SerializableIterable;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.*;
 
 /**
  * @author Esko Luontola
  * @since 30.11.2008
  */
-public class EntityGraph implements Graph<BigInteger> {
+public class EntityGraph implements Graph<EntityId> {
 
     private final EntityDao entities;
     private final BindingDao bindings;
@@ -32,38 +32,38 @@ public class EntityGraph implements Graph<BigInteger> {
         this.serializer = serializer;
     }
 
-    public Iterable<BigInteger> getAllNodes() {
-        return new Iterable<BigInteger>() {
-            public Iterator<BigInteger> iterator() {
+    public Iterable<EntityId> getAllNodes() {
+        return new Iterable<EntityId>() {
+            public Iterator<EntityId> iterator() {
                 return new AllNodesIterator(entities);
             }
         };
     }
 
-    public Iterable<BigInteger> getRootNodes() {
-        return new Iterable<BigInteger>() {
-            public Iterator<BigInteger> iterator() {
+    public Iterable<EntityId> getRootNodes() {
+        return new Iterable<EntityId>() {
+            public Iterator<EntityId> iterator() {
                 return new RootNodesIterator(bindings);
             }
         };
     }
 
-    public Iterable<BigInteger> getConnectedNodesOf(BigInteger node) {
+    public Iterable<EntityId> getConnectedNodesOf(EntityId node) {
         Blob entity = entities.read(node);
-        List<BigInteger> ids = getReferencedEntityIds(entity);
-        return new SerializableIterable<BigInteger>(ids);
+        List<EntityId> ids = getReferencedEntityIds(entity);
+        return new SerializableIterable<EntityId>(ids);
     }
 
-    private List<BigInteger> getReferencedEntityIds(Blob entity) {
+    private List<EntityId> getReferencedEntityIds(Blob entity) {
         DeserializationResult result = serializer.deserialize(entity);
         return result.getMetadata(EntityReferenceListener.class);
     }
 
-    public void removeNode(BigInteger node) {
+    public void removeNode(EntityId node) {
         entities.delete(node);
     }
 
-    public byte[] getMetadata(BigInteger node, String metaKey) {
+    public byte[] getMetadata(EntityId node, String metaKey) {
         if (entities.exists(node)) {
             return entities.readMetadata(node, metaKey).getByteArray();
         } else {
@@ -71,15 +71,15 @@ public class EntityGraph implements Graph<BigInteger> {
         }
     }
 
-    public void setMetadata(BigInteger node, String metaKey, byte[] metaValue) {
+    public void setMetadata(EntityId node, String metaKey, byte[] metaValue) {
         entities.updateMetadata(node, metaKey, Blob.fromBytes(metaValue));
     }
 
 
-    private static class AllNodesIterator implements Iterator<BigInteger>, Serializable {
+    private static class AllNodesIterator implements Iterator<EntityId>, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final DatabaseKeyIterator<BigInteger> iterator = new DatabaseKeyIterator<BigInteger>();
+        private final DatabaseKeyIterator<EntityId> iterator = new DatabaseKeyIterator<EntityId>();
 
         public AllNodesIterator(EntityDao entities) {
             setEntityDao(entities);
@@ -94,7 +94,7 @@ public class EntityGraph implements Graph<BigInteger> {
             return iterator.hasNext();
         }
 
-        public BigInteger next() {
+        public EntityId next() {
             return iterator.next();
         }
 
@@ -103,7 +103,7 @@ public class EntityGraph implements Graph<BigInteger> {
         }
     }
 
-    private static class RootNodesIterator implements Iterator<BigInteger>, Serializable {
+    private static class RootNodesIterator implements Iterator<EntityId>, Serializable {
         private static final long serialVersionUID = 1L;
 
         private final DatabaseKeyIterator<String> iterator = new DatabaseKeyIterator<String>();
@@ -123,7 +123,7 @@ public class EntityGraph implements Graph<BigInteger> {
             return iterator.hasNext();
         }
 
-        public BigInteger next() {
+        public EntityId next() {
             String binding = iterator.next();
             return bindings.read(binding);
         }

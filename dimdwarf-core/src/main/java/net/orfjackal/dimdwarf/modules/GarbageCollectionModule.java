@@ -5,12 +5,11 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.gc.*;
 import net.orfjackal.dimdwarf.gc.entities.*;
 import net.orfjackal.dimdwarf.util.Objects;
-
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -19,7 +18,7 @@ import java.math.BigInteger;
 public class GarbageCollectionModule extends AbstractModule {
 
     protected void configure() {
-        bind(new TypeLiteral<Graph<BigInteger>>() {}).to(EntityGraphWrapper.class);
+        bind(new TypeLiteral<Graph<EntityId>>() {}).to(EntityGraphWrapper.class);
         bind(NodeSetFactory.class).to(EntityNodeSetFactory.class);
 
         bind(GarbageCollectorManager.class).to(GarbageCollectorManagerImpl.class);

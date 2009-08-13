@@ -10,23 +10,32 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
+ * Unique ID for an entity of type {@link EntityObject}. Later on there might be added
+ * more entities, of which some are stored in the database in a different format than
+ * the entity objects of application code. Examples of such are: sessions, channels, tasks.
+ * These will probably be stored in their own database, separate from application entities.
+ * <p/>
+ * TODO: When that happens, there will be need to be more careful where EntityId and where EntityObjectId is used.
+ * It will be necessary to make a distinction between different types of EntityIds in the
+ * implementation level, but to the application programmer the IDs should not be visible.
+ *
  * @author Esko Luontola
  * @since 13.8.2009
  */
-public class ObjectId implements EntityId, Serializable {
+public class EntityObjectId implements EntityId, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final long id;
 
-    public ObjectId(long id) {
+    public EntityObjectId(long id) {
         this.id = id;
     }
 
     public boolean equals(Object obj) {
-        if (!(obj instanceof ObjectId)) {
+        if (!(obj instanceof EntityObjectId)) {
             return false;
         }
-        ObjectId that = (ObjectId) obj;
+        EntityObjectId that = (EntityObjectId) obj;
         return this.id == that.id;
     }
 

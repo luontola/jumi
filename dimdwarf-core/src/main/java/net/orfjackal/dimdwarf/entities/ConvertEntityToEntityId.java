@@ -5,18 +5,17 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.api.EntityInfo;
+import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.db.Converter;
 
 import javax.annotation.concurrent.Immutable;
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
  * @since 12.9.2008
  */
 @Immutable
-public class ConvertEntityToEntityId implements Converter<Object, BigInteger> {
+public class ConvertEntityToEntityId implements Converter<Object, EntityId> {
 
     private final EntityManager entityManager;
     private final EntityInfo entityInfo;
@@ -27,14 +26,14 @@ public class ConvertEntityToEntityId implements Converter<Object, BigInteger> {
         this.entityInfo = entityInfo;
     }
 
-    public Object back(BigInteger id) {
+    public Object back(EntityId id) {
         if (id == null) {
             return null;
         }
         return entityManager.getEntityById(id);
     }
 
-    public BigInteger forth(Object entity) {
+    public EntityId forth(Object entity) {
         if (entity == null) {
             return null;
         }

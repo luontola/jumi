@@ -14,8 +14,6 @@ import net.orfjackal.dimdwarf.gc.entities.*;
 import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 import net.orfjackal.dimdwarf.serial.*;
 
-import java.math.BigInteger;
-
 /**
  * @author Esko Luontola
  * @since 13.9.2008
@@ -31,9 +29,9 @@ public class EntityModule extends AbstractModule {
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
 
         bind(EntityIdFactory.class).to(EntityIdFactoryImpl.class);
-        bind(BigInteger.class)
+        bind(Long.class)
                 .annotatedWith(MaxEntityId.class)
-                .toInstance(BigInteger.ZERO); // TODO: import from database
+                .toInstance(0L); // TODO: import from database
 
         bind(EntityRepository.class).to(GcAwareEntityRepository.class);
         bind(databaseTableConnectionWithMetadata())

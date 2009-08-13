@@ -7,6 +7,8 @@ package net.orfjackal.dimdwarf.tasks;
 import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityId;
+import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
 import net.orfjackal.dimdwarf.modules.CommonModules;
@@ -14,7 +16,6 @@ import net.orfjackal.dimdwarf.modules.options.NullGarbageCollectionOption;
 import net.orfjackal.dimdwarf.server.TestServer;
 import org.junit.runner.RunWith;
 
-import java.math.BigInteger;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -26,6 +27,8 @@ import java.util.logging.Level;
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class RetryableExceptionsSpec extends Specification<Object> {
+
+    private static final EntityId ID1 = new EntityObjectId(1);
 
     private TestServer server;
     private Executor taskContext;
@@ -85,14 +88,14 @@ public class RetryableExceptionsSpec extends Specification<Object> {
                 public void run() {
                     runCount.incrementAndGet();
                     countDownAndAwait(bothTasksRunning);
-                    entities.get().update(BigInteger.ONE, value1);
+                    entities.get().update(ID1, value1);
                 }
             };
             Runnable task2 = new Runnable() {
                 public void run() {
                     runCount.incrementAndGet();
                     countDownAndAwait(bothTasksRunning);
-                    entities.get().update(BigInteger.ONE, value2);
+                    entities.get().update(ID1, value2);
                 }
             };
 

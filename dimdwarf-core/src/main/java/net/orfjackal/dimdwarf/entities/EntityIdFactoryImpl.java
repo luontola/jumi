@@ -5,9 +5,11 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.*;
+import net.orfjackal.dimdwarf.api.EntityId;
+import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Esko Luontola
@@ -17,18 +19,15 @@ import java.math.BigInteger;
 @ThreadSafe
 public class EntityIdFactoryImpl implements EntityIdFactory {
 
-    // using java.util.concurrent.atomic.AtomicLong would also be an option
-
-    private BigInteger nextId;
+    private final AtomicLong counter = new AtomicLong();
 
     @Inject
-    public EntityIdFactoryImpl(@MaxEntityId BigInteger largestUsedId) {
-        nextId = largestUsedId.add(BigInteger.ONE);
+    public EntityIdFactoryImpl(@MaxEntityId long largestUsedId) {
+        counter.set(largestUsedId);
     }
 
-    public synchronized BigInteger newId() {
-        BigInteger currentId = nextId;
-        nextId = nextId.add(BigInteger.ONE);
-        return currentId;
+    public EntityId newId() {
+        long nextId = counter.incrementAndGet();
+        return new EntityObjectId(nextId);
     }
 }

@@ -5,21 +5,21 @@
 package net.orfjackal.dimdwarf.entities.dao;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.db.*;
-
-import java.math.BigInteger;
+import net.orfjackal.dimdwarf.entities.ConvertEntityIdToBytes;
 
 /**
  * @author Esko Luontola
  * @since 2.12.2008
  */
 public class EntityDao
-        extends DatabaseTableWithMetadataAdapter<BigInteger, Blob, Blob, Blob>
-        implements DatabaseTableWithMetadata<BigInteger, Blob> {
+        extends DatabaseTableWithMetadataAdapter<EntityId, Blob, Blob, Blob>
+        implements DatabaseTableWithMetadata<EntityId, Blob> {
 
     @Inject
     public EntityDao(@EntitiesTable DatabaseTableWithMetadata<Blob, Blob> parent,
-                     ConvertBigIntegerToBytes keys,
+                     ConvertEntityIdToBytes keys,
                      NoConversion<Blob> values) {
         super(parent, keys, values);
     }

@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import net.orfjackal.dimdwarf.util.TestUtil;
@@ -13,7 +14,6 @@ import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -23,7 +23,7 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class ReadingEntityReferencesSpec extends Specification<Object> {
 
-    private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
+    private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
     private EntityIdFactory idFactory;
     private EntityRepository repository;
@@ -39,7 +39,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         entity = new DummyEntity();
     }
 
-    private Expectations loadsFromRepository(final BigInteger id, final DummyEntity entity) {
+    private Expectations loadsFromRepository(final EntityId id, final DummyEntity entity) {
         return new Expectations() {{
             one(repository).read(id); will(returnValue(entity));
         }};

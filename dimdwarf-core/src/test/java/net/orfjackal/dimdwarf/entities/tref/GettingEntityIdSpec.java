@@ -7,13 +7,12 @@ package net.orfjackal.dimdwarf.entities.tref;
 import com.google.inject.Provider;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
-
-import java.math.BigInteger;
 
 /**
  * @author Esko Luontola
@@ -23,7 +22,7 @@ import java.math.BigInteger;
 @Group({"fast"})
 public class GettingEntityIdSpec extends Specification<Object> {
 
-    private static final BigInteger ENTITY_ID = BigInteger.valueOf(42);
+    private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
     private EntityInfoImpl entityInfo;
     private EntityManager entityManager;

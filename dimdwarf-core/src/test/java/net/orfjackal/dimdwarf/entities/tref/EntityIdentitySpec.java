@@ -13,8 +13,6 @@ import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-import java.math.BigInteger;
-
 /**
  * @author Esko Luontola
  * @since 5.9.2008
@@ -37,8 +35,8 @@ public class EntityIdentitySpec extends Specification<Object> {
         proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
-        checking(referencesMayBeCreatedFor(ent1, BigInteger.valueOf(1)));
-        checking(referencesMayBeCreatedFor(ent2, BigInteger.valueOf(2)));
+        checking(referencesMayBeCreatedFor(ent1, new EntityObjectId(1)));
+        checking(referencesMayBeCreatedFor(ent2, new EntityObjectId(2)));
         tref1 = proxyFactory.createTransparentReference(ent1);
         tref1b = proxyFactory.createTransparentReference(ent1);
         tref2 = proxyFactory.createTransparentReference(ent2);
@@ -50,7 +48,7 @@ public class EntityIdentitySpec extends Specification<Object> {
         ThreadContext.tearDown();
     }
 
-    private Expectations referencesMayBeCreatedFor(final EntityObject entity, final BigInteger id) {
+    private Expectations referencesMayBeCreatedFor(final EntityObject entity, final EntityObjectId id) {
         return new Expectations() {{
             allowing(referenceFactory).createReference(entity); will(returnValue(new EntityReferenceImpl<EntityObject>(id, entity)));
         }};
@@ -124,14 +122,14 @@ public class EntityIdentitySpec extends Specification<Object> {
 
         public void equalsMethodOnProxyWillNotDelegateToEntity() {
             final EntityObject entity = mock(EntityObject.class);
-            checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
+            checking(referencesMayBeCreatedFor(entity, new EntityObjectId(3)));
             TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.equals(entity);
         }
 
         public void hashCodeMethodOnProxyWillNotDelegateToEntity() {
             final EntityObject entity = mock(EntityObject.class);
-            checking(referencesMayBeCreatedFor(entity, BigInteger.valueOf(3)));
+            checking(referencesMayBeCreatedFor(entity, new EntityObjectId(3)));
             TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.hashCode();
         }
