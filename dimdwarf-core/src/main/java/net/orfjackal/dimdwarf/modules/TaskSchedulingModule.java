@@ -24,7 +24,11 @@ public class TaskSchedulingModule extends AbstractModule {
 
         bind(RecoverableSetFactory.class).to(RecoverableSetFactoryImpl.class);
         bind(Clock.class).to(SystemClock.class);
-        bind(ExecutorService.class).toProvider(ExecutorServiceProvider.class);
+    }
+
+    @Provides
+    ExecutorService executorService() {
+        return Executors.newCachedThreadPool();
     }
 
     private static class RecoverableSetFactoryImpl implements RecoverableSetFactory {
@@ -33,12 +37,6 @@ public class TaskSchedulingModule extends AbstractModule {
 
         public <T> RecoverableSet<T> create(String prefix) {
             return new RecoverableSetImpl<T>(prefix, bindings, info);
-        }
-    }
-
-    private static class ExecutorServiceProvider implements Provider<ExecutorService> {
-        public ExecutorService get() {
-            return Executors.newCachedThreadPool();
         }
     }
 }

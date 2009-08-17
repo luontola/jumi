@@ -43,26 +43,18 @@ public class EntityModule extends AbstractModule {
                 .toProvider(databaseTable("bindings"));
 
         bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
-        bind(SerializationListener[].class).toProvider(SerializationListenerListProvider.class);
-        bind(SerializationReplacer[].class).toProvider(SerializationReplacerListProvider.class);
     }
 
-    private static class SerializationListenerListProvider implements Provider<SerializationListener[]> {
-        @Inject public CheckInnerClassSerialized listener1;
-        @Inject public CheckDirectlyReferredEntitySerialized listener2;
-        @Inject public InjectObjectsOnDeserialization listener3;
-        @Inject public EntityIdSerializationListener listener4;
-
-        public SerializationListener[] get() {
-            return new SerializationListener[]{listener1, listener2, listener3, listener4};
-        }
+    @Provides
+    SerializationListener[] serializationListeners(CheckInnerClassSerialized listener1,
+                                                   CheckDirectlyReferredEntitySerialized listener2,
+                                                   InjectObjectsOnDeserialization listener3,
+                                                   EntityIdSerializationListener listener4) {
+        return new SerializationListener[]{listener1, listener2, listener3, listener4};
     }
 
-    private static class SerializationReplacerListProvider implements Provider<SerializationReplacer[]> {
-        @Inject public ReplaceEntitiesWithTransparentReferences replacer1;
-
-        public SerializationReplacer[] get() {
-            return new SerializationReplacer[]{replacer1};
-        }
+    @Provides
+    SerializationReplacer[] serializationReplacers(ReplaceEntitiesWithTransparentReferences replacer1) {
+        return new SerializationReplacer[]{replacer1};
     }
 }

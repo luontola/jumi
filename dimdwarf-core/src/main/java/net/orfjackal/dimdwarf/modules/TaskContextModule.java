@@ -28,8 +28,6 @@ public class TaskContextModule extends AbstractModule {
         bind(TransactionCoordinator.class)
                 .to(TransactionImpl.class)
                 .in(TaskScoped.class);
-        bind(Transaction.class).toProvider(TransactionProvider.class);
-        bind(Filter[].class).toProvider(FilterListProvider.class);
 
         bind(RetryPolicy.class).toInstance(new RetryOnRetryableExceptionsANumberOfTimes(MAX_RETRIES));
 
@@ -39,20 +37,13 @@ public class TaskContextModule extends AbstractModule {
         bind(Executor.class).annotatedWith(TaskContext.class).to(Key.get(Executor.class, SingleThreadFallbackTaskContext.class));
     }
 
-    private static class TransactionProvider implements Provider<Transaction> {
-        @Inject public TransactionCoordinator coordinator;
-
-        public Transaction get() {
-            return coordinator.getTransaction();
-        }
+    @Provides
+    Transaction transaction(TransactionCoordinator coordinator) {
+        return coordinator.getTransaction();
     }
 
-    private static class FilterListProvider implements Provider<Filter[]> {
-        @Inject public TransactionFilter filter1;
-        @Inject public EntityFlushingFilter filter2;
-
-        public Filter[] get() {
-            return new Filter[]{filter1, filter2};
-        }
+    @Provides
+    Filter[] filters(TransactionFilter filter1, EntityFlushingFilter filter2) {
+        return new Filter[]{filter1, filter2};
     }
 }

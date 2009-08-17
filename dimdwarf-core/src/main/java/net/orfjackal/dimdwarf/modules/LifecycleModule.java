@@ -15,14 +15,10 @@ import net.orfjackal.dimdwarf.scheduler.TaskSchedulingLifecycleManager;
 public class LifecycleModule extends AbstractModule {
 
     protected void configure() {
-        bind(SystemLifecycleListener[].class).toProvider(SystemLifecycleListenerProvider.class);
     }
 
-    private static class SystemLifecycleListenerProvider implements Provider<SystemLifecycleListener[]> {
-        @Inject public TaskSchedulingLifecycleManager listener1;
-
-        public SystemLifecycleListener[] get() {
-            return new SystemLifecycleListener[]{listener1};
-        }
+    @Provides
+    SystemLifecycleListener[] lifecycleListeners(TaskSchedulingLifecycleManager listener1) {
+        return new SystemLifecycleListener[]{listener1};
     }
 }

@@ -17,16 +17,11 @@ public class DatabaseModule extends AbstractModule {
 
     protected void configure() {
         bind(DatabaseManager.class).to(InMemoryDatabaseManager.class);
-        bind(new TypeLiteral<Database<Blob, Blob>>() {}).toProvider(DatabaseConnectionProvider.class);
     }
 
-    private static class DatabaseConnectionProvider implements Provider<Database<Blob, Blob>> {
-        @Inject public DatabaseManager dbms;
-        @Inject public Transaction tx;
-
-        public Database<Blob, Blob> get() {
-            return dbms.openConnection(tx);
-        }
+    @Provides
+    Database<Blob, Blob> database(DatabaseManager dbms, Transaction tx) {
+        return dbms.openConnection(tx);
     }
 
     public static TypeLiteral<DatabaseTable<Blob, Blob>> databaseTableConnection() {
