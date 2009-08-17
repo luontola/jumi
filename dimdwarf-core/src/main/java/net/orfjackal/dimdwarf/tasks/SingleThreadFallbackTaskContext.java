@@ -13,7 +13,6 @@ import java.lang.annotation.*;
  * @since 18.1.2009
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
 @BindingAnnotation
 public @interface SingleThreadFallbackTaskContext {
 }

@@ -13,7 +13,6 @@ import java.lang.annotation.*;
  * @since 13.9.2008
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
 @BindingAnnotation
 public @interface EntitiesTable {
 }

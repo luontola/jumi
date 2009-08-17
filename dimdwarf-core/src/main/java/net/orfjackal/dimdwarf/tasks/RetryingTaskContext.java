@@ -13,7 +13,6 @@ import java.lang.annotation.*;
  * @since 13.12.2008
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
 @BindingAnnotation
 public @interface RetryingTaskContext {
 }
