@@ -17,6 +17,8 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class TaskScope implements Scope {
 
+    // TODO: when CoordinatorScope is created, extract AbstractThreadScope from this class
+
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         return new Provider<T>() {
             public T get() {

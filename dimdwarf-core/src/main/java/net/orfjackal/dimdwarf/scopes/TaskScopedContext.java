@@ -21,6 +21,8 @@ import java.util.*;
 @NotThreadSafe
 public class TaskScopedContext implements Context {
 
+    // TODO: when CoordinatorScope is created, extract AbstractThreadContext from this class
+
     private final Map<Key<?>, Object> cache = new HashMap<Key<?>, Object>();
     private final Injector injector;
 

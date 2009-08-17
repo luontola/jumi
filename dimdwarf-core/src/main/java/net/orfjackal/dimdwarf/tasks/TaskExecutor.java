@@ -18,6 +18,10 @@ import java.util.concurrent.Executor;
 @Immutable
 public class TaskExecutor implements Executor {
 
+    // TODO: when CoordinatorScope is created, convert this class to ThreadContextExecutor
+    // We will probably need to annotate the context in new architecture, as CoordinatorContext/Scope will be implemented.
+    // It might be possible to generalize TaskExecutor into ThreadContextExecutor and use custom providers for Task and Coordinator scopes.
+
     private final Provider<Context> contextProvider;
     private final Provider<FilterChain> filterProvider;
 
