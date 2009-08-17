@@ -8,8 +8,8 @@ import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
-import net.orfjackal.dimdwarf.scopes.TaskScoped;
 import net.orfjackal.dimdwarf.serial.*;
+import net.orfjackal.dimdwarf.tasks.TaskScoped;
 
 import javax.annotation.concurrent.NotThreadSafe;
 

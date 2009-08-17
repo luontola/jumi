@@ -6,7 +6,7 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
-import net.orfjackal.dimdwarf.tasks.TaskContext;
+import net.orfjackal.dimdwarf.tasks.Task;
 import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.Clock;
 import org.jetbrains.annotations.TestOnly;
@@ -38,7 +38,7 @@ public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {
     @Inject
     public TaskSchedulerImpl(Provider<Transaction> tx,
                              Clock clock,
-                             @TaskContext Executor taskContext,
+                             @Task Executor taskContext,
                              RecoverableSetFactory rsf) {
         this.tx = tx;
         this.clock = clock;

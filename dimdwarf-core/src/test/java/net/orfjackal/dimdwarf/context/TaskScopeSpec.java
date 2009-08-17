@@ -2,13 +2,13 @@
 // This software is released under the MIT License.
 // The license may be viewed at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.scopes;
+package net.orfjackal.dimdwarf.context;
 
 import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.tasks.*;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
@@ -22,8 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
 @Group({"fast"})
 public class TaskScopeSpec extends Specification<Object> {
 
+    // XXX: we are not actually testing TaskScope, but ThreadScope - refactor this class to reflect it, maybe split it
+
     private Injector injector;
-    private Provider<Context> contextProvider;
+    private Provider<TaskContext> contextProvider;
 
     public void create() throws Exception {
         injector = Guice.createInjector(
@@ -31,7 +33,7 @@ public class TaskScopeSpec extends Specification<Object> {
                 new TaskContextModule(),
                 new FakeEntityModule(this)
         );
-        contextProvider = injector.getProvider(Context.class);
+        contextProvider = injector.getProvider(TaskContext.class);
     }
 
     public void destroy() throws Exception {

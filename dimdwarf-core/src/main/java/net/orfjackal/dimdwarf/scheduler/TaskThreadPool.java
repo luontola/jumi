@@ -5,7 +5,7 @@
 package net.orfjackal.dimdwarf.scheduler;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.tasks.TaskContext;
+import net.orfjackal.dimdwarf.tasks.Task;
 import org.jetbrains.annotations.TestOnly;
 import org.slf4j.*;
 
@@ -36,7 +36,7 @@ public class TaskThreadPool {
     private volatile boolean shutdown = false;
 
     @Inject
-    public TaskThreadPool(@TaskContext Executor taskContext, TaskProducer producer, ExecutorService threadPool) {
+    public TaskThreadPool(@Task Executor taskContext, TaskProducer producer, ExecutorService threadPool) {
         this(taskContext, producer, threadPool, DEFAULT_LOGGER);
     }
 

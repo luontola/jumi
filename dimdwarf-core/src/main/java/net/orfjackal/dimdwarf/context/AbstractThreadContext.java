@@ -2,32 +2,22 @@
 // This software is released under the MIT License.
 // The license may be viewed at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.scopes;
+package net.orfjackal.dimdwarf.context;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.context.Context;
-import net.orfjackal.dimdwarf.context.*;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
 /**
- * When {@code TaskScopedContext} is installed as the current {@link ThreadContext},
- * then that thread is in a task scope identified by the {@code TaskScopedContext} instance.
- *
  * @author Esko Luontola
- * @since 13.9.2008
+ * @since 17.8.2009
  */
-@NotThreadSafe
-public class TaskScopedContext implements Context {
-
-    // TODO: when CoordinatorScope is created, extract AbstractThreadContext from this class
+public abstract class AbstractThreadContext implements Context {
 
     private final Map<Key<?>, Object> cache = new HashMap<Key<?>, Object>();
     private final Injector injector;
 
-    @Inject
-    public TaskScopedContext(Injector injector) {
+    protected AbstractThreadContext(Injector injector) {
         this.injector = injector;
     }
 

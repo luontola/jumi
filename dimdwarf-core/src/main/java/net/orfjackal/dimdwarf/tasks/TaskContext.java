@@ -4,16 +4,20 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.BindingAnnotation;
+import com.google.inject.*;
+import net.orfjackal.dimdwarf.context.AbstractThreadContext;
 
-import java.lang.annotation.*;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * @author Esko Luontola
- * @since 13.12.2008
+ * @since 13.9.2008
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
-@BindingAnnotation
-public @interface TaskContext {
+@NotThreadSafe
+public class TaskContext extends AbstractThreadContext {
+
+    @Inject
+    public TaskContext(Injector injector) {
+        super(injector);
+    }
 }

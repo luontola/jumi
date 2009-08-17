@@ -5,9 +5,8 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.context.Context;
+import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.entities.EntityFlushingFilter;
-import net.orfjackal.dimdwarf.scopes.*;
 import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.tx.*;
 
@@ -22,8 +21,8 @@ public class TaskContextModule extends AbstractModule {
     private static final int MAX_RETRIES = 5;
 
     protected void configure() {
-        bindScope(TaskScoped.class, new TaskScope());
-        bind(Context.class).to(TaskScopedContext.class);
+        bindScope(TaskScoped.class, new ThreadScope(TaskContext.class));
+        bind(Context.class).annotatedWith(Task.class).to(TaskContext.class);
 
         bind(TransactionCoordinator.class)
                 .to(TransactionImpl.class)
@@ -34,7 +33,7 @@ public class TaskContextModule extends AbstractModule {
         bind(Executor.class).annotatedWith(PlainTaskContext.class).to(TaskExecutor.class);
         bind(Executor.class).annotatedWith(RetryingTaskContext.class).to(RetryingTaskExecutor.class);
         bind(Executor.class).annotatedWith(SingleThreadFallbackTaskContext.class).to(SingleThreadFallbackTaskExecutor.class);
-        bind(Executor.class).annotatedWith(TaskContext.class).to(Key.get(Executor.class, SingleThreadFallbackTaskContext.class));
+        bind(Executor.class).annotatedWith(Task.class).to(Key.get(Executor.class, SingleThreadFallbackTaskContext.class));
     }
 
     @Provides
@@ -43,7 +42,10 @@ public class TaskContextModule extends AbstractModule {
     }
 
     @Provides
-    Filter[] filters(TransactionFilter filter1, EntityFlushingFilter filter2) {
-        return new Filter[]{filter1, filter2};
+    @Task
+    FilterChain filters(TransactionFilter filter1, EntityFlushingFilter filter2) {
+        return new FilterChain(new Filter[]{
+                filter1, filter2
+        });
     }
 }
