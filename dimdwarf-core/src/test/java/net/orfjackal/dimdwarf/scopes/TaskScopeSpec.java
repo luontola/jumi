@@ -7,7 +7,6 @@ package net.orfjackal.dimdwarf.scopes;
 import com.google.inject.*;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.modules.*;
 import org.junit.runner.RunWith;
@@ -58,7 +57,7 @@ public class TaskScopeSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     injector.getInstance(MyService.class);
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(ProvisionException.class));
         }
 
         public void taskScopedBindingsCanNotBeAccessedInOtherThreadContexts() {
@@ -67,7 +66,7 @@ public class TaskScopeSpec extends Specification<Object> {
                 public void run() throws Throwable {
                     injector.getInstance(MyService.class);
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(ProvisionException.class));
         }
     }
 
