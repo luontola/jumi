@@ -10,9 +10,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-jdk14:1.5.6" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.5.6" level="project" />
-    <orderEntry type="library" name="Maven: junit:junit:4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-jdk14:1.5.8" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.5.8" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:4.7" level="project" />
     <orderEntry type="library" name="Maven: org.jdave:jdave-junit4:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.jmock:jmock:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
@@ -22,10 +22,10 @@
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
     <orderEntry type="library" name="Maven: org.jdave:jdave-core:1.1" level="project" />
     <orderEntry type="library" name="Maven: junit:junit-dep:4.4" level="project" />
-    <orderEntry type="library" name="Maven: org.easymock:easymock:2.4" level="project" />
-    <orderEntry type="library" name="Maven: org.mockito:mockito-all:1.7" level="project" />
-    <orderEntry type="library" exported="" name="Maven: asm:asm:3.1" level="project" />
-    <orderEntry type="library" exported="" name="Maven: asm:asm-tree:3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.easymock:easymock:2.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.mockito:mockito-all:1.8.0" level="project" />
+    <orderEntry type="library" exported="" name="Maven: asm:asm:3.2" level="project" />
+    <orderEntry type="library" exported="" name="Maven: asm:asm-tree:3.2" level="project" />
   </component>
 </module>
 
