@@ -196,6 +196,14 @@
                 <version>2.0.0-M6</version>
             </dependency>
 
+            <!-- Caching -->
+
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
             <!-- Logging -->
 
             <!-- TODO: evaluate SLF4J + Logback -->
