@@ -6,13 +6,13 @@ package net.orfjackal.dimdwarf.context;
 
 import com.google.inject.*;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Esko Luontola
  * @since 13.9.2008
  */
-@ThreadSafe
+@Immutable
 public class ThreadScope implements Scope {
 
     private final Class<? extends AbstractThreadContext> contextType;
@@ -26,7 +26,7 @@ public class ThreadScope implements Scope {
             public T get() {
                 Context context = ThreadContext.getCurrentContext();
                 checkInsideScope(context);
-                return ((AbstractThreadContext) context).scopedGet(key, unscoped);
+                return contextType.cast(context).scopedGet(key, unscoped);
             }
         };
     }
