@@ -55,6 +55,7 @@ public class EntityRepositoryImpl implements EntityRepository {
     }
 
     private boolean hasBeenModified(EntityId id, SerializationResult newData) {
+        // TODO: Compare with bytes from reserializing the original bytes, and not with the original bytes. See http://www.projectdarkstar.com/forum/?topic=1328.msg9107#msg9107
         Blob oldBytes = entities.read(id);
         Blob newBytes = newData.getSerializedBytes();
         return !oldBytes.equals(newBytes);
