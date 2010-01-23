@@ -79,7 +79,6 @@
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
-    <option name="DEPLOY_AFTER_MAKE" value="0" />
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
@@ -120,11 +119,8 @@
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
-    <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="true" />
     <option name="DEPRECATION" value="false" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
   </component>
   <component name="EclipseEmbeddedCompilerSettings">
     <option name="DEBUGGING_INFO" value="true" />
@@ -150,12 +146,96 @@
     <option name="OUTPUT_DIRECTORY" />
   </component>
   <component name="IdProvider" IDEtalkID="5402466EBEFF36CFEDA746B784547311" />
+  <component name="InspectionProjectProfileManager">
+    <profiles>
+      <profile version="1.0" is_locked="false">
+        <option name="myName" value="Project Default" />
+        <option name="myLocal" value="false" />
+        <inspection_tool class="CollectionContainsUrl" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="CollectionsFieldAccessReplaceableByMethodCall" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="EnumerationCanBeIteration" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="EqualsHashCodeCalledOnUrl" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="IndexOfReplaceableByContains" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="JavaDoc" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="TOP_LEVEL_CLASS_OPTIONS">
+            <value>
+              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+              <option name="REQUIRED_TAGS" value="" />
+            </value>
+          </option>
+          <option name="INNER_CLASS_OPTIONS">
+            <value>
+              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+              <option name="REQUIRED_TAGS" value="" />
+            </value>
+          </option>
+          <option name="METHOD_OPTIONS">
+            <value>
+              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+              <option name="REQUIRED_TAGS" value="" />
+            </value>
+          </option>
+          <option name="FIELD_OPTIONS">
+            <value>
+              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+              <option name="REQUIRED_TAGS" value="" />
+            </value>
+          </option>
+          <option name="IGNORE_DEPRECATED" value="false" />
+          <option name="IGNORE_JAVADOC_PERIOD" value="true" />
+          <option name="IGNORE_DUPLICATED_THROWS" value="false" />
+          <option name="myAdditionalJavadocTags" value="" />
+        </inspection_tool>
+        <inspection_tool class="ListIndexOfReplaceableByContains" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MethodMayBeSynchronized" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="NonSerializableWithSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="PointlessArithmeticExpression" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="m_ignoreExpressionsContainingConstants" value="true" />
+        </inspection_tool>
+        <inspection_tool class="RawUseOfParameterizedType" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreObjectConstruction" value="true" />
+          <option name="ignoreTypeCasts" value="false" />
+        </inspection_tool>
+        <inspection_tool class="RedundantSuppression" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="RedundantThrowsDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="SerialPersistentFieldsWithWrongSignature" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="SerialVersionUIDNotStaticFinal" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="SerializableWithUnconstructableAncestor" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="SuspiciousIndentAfterControlStatement" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="SynchronizedOnLiteralObject" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="TestOnlyProblems" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="TransientFieldInNonSerializableClass" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="TransientFieldNotInitialized" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="UnnecessaryBoxing" enabled="true" level="INFO" enabled_by_default="true" />
+        <inspection_tool class="UnnecessaryUnboxing" enabled="true" level="INFO" enabled_by_default="true" />
+        <inspection_tool class="UnpredictableBigDecimalConstructorCall" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreReferences" value="true" />
+          <option name="ignoreComplexLiterals" value="false" />
+        </inspection_tool>
+        <inspection_tool class="UnusedDeclaration" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="ADD_MAINS_TO_ENTRIES" value="true" />
+          <option name="ADD_APPLET_TO_ENTRIES" value="true" />
+          <option name="ADD_SERVLET_TO_ENTRIES" value="true" />
+          <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
+          <option name="ADDITIONAL_ANNOTATIONS">
+            <value>
+              <list size="1">
+                <item index="0" class="java.lang.String" itemvalue="javax.ws.rs.*" />
+              </list>
+            </value>
+          </option>
+          <option name="ADD_EJB_TO_ENTRIES" value="true" />
+          <option name="ADD_TESTNG_TO_ENTRIES" value="true" />
+          <option name="ADD_JUNIT_TO_ENTRIES" value="true" />
+        </inspection_tool>
+      </profile>
+    </profiles>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
+  </component>
   <component name="JavacSettings">
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="false" />
-    <option name="DEPRECATION" value="true" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="-target 1.6" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
   </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
@@ -173,14 +253,6 @@
     <option name="HEAP_SIZE" />
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
-  </component>
-  <component name="JikesSettings">
-    <option name="JIKES_PATH" value="" />
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="DEPRECATION" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="false" />
-    <option name="IS_EMACS_ERRORS_MODE" value="true" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
   <component name="MavenBuildProjectComponent">
     <option name="mavenExecutable" value="" />
@@ -368,7 +440,7 @@
   </component>
   <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="Startup" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" />
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <extension name="snapshooter" />
       <option name="MAIN_CLASS_NAME" value="net.orfjackal.dimdwarf.server.Startup" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -396,9 +468,7 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
-      <method>
-        <option name="Make" enabled="true" />
-      </method>
+      <method />
     </configuration>
     <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
@@ -441,9 +511,7 @@
       <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Profile CPU" />
       <ConfigurationWrapper RunnerId="Run" />
-      <method>
-        <option name="Make" enabled="true" />
-      </method>
+      <method />
     </configuration>
     <configuration default="false" name="All tests with coverage" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="true" merge="false" per_test_coverage_enabled="false" track_test_folders="true" runner="idea">
@@ -490,9 +558,7 @@
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
-      <method>
-        <option name="Make" enabled="true" />
-      </method>
+      <method />
     </configuration>
   </component>
   <component name="ResourceManagerContainer">
@@ -502,19 +568,11 @@
       </value>
     </option>
   </component>
-  <component name="RmicSettings">
-    <option name="IS_EANABLED" value="false" />
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="false" />
-    <option name="GENERATE_IIOP_STUBS" value="false" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-  </component>
   <component name="ScopeChooserConfigurable.UI">
     <option name="proportions">
       <SplitterProportionsDataImpl />
     </option>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" Folders="0" Dictionaries="0" />
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
@@ -556,134 +614,134 @@
   <component name="libraryTable">
     <library name="Maven: org.jmock:jmock:2.4.0">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/jmock/jmock/2.4.0/jmock-2.4.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jmock/jmock/2.4.0/jmock-2.4.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/jmock/jmock/2.4.0/jmock-2.4.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jmock/jmock/2.4.0/jmock-2.4.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/jmock/jmock/2.4.0/jmock-2.4.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jmock/jmock/2.4.0/jmock-2.4.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.hamcrest:hamcrest-core:1.1">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.hamcrest:hamcrest-library:1.1">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/hamcrest/hamcrest-library/1.1/hamcrest-library-1.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.1/hamcrest-library-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/hamcrest/hamcrest-library/1.1/hamcrest-library-1.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.1/hamcrest-library-1.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/hamcrest/hamcrest-library/1.1/hamcrest-library-1.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.1/hamcrest-library-1.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.jmock:jmock-legacy:2.4.0">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/jmock/jmock-legacy/2.4.0/jmock-legacy-2.4.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jmock/jmock-legacy/2.4.0/jmock-legacy-2.4.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/jmock/jmock-legacy/2.4.0/jmock-legacy-2.4.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jmock/jmock-legacy/2.4.0/jmock-legacy-2.4.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/jmock/jmock-legacy/2.4.0/jmock-legacy-2.4.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jmock/jmock-legacy/2.4.0/jmock-legacy-2.4.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: cglib:cglib-nodep:2.1_3">
       <CLASSES>
-        <root url="jar://$M2_REPO$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: junit:junit-dep:4.4">
       <CLASSES>
-        <root url="jar://$M2_REPO$/junit/junit-dep/4.4/junit-dep-4.4.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit-dep/4.4/junit-dep-4.4.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/junit/junit-dep/4.4/junit-dep-4.4-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit-dep/4.4/junit-dep-4.4-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/junit/junit-dep/4.4/junit-dep-4.4-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit-dep/4.4/junit-dep-4.4-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.intellij:annotations:7.0.3">
       <CLASSES>
-        <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/intellij/annotations/7.0.3/annotations-7.0.3.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/intellij/annotations/7.0.3/annotations-7.0.3-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/com/intellij/annotations/7.0.3/annotations-7.0.3-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/intellij/annotations/7.0.3/annotations-7.0.3-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.objenesis:objenesis:1.1">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/objenesis/objenesis/1.1/objenesis-1.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/objenesis/objenesis/1.1/objenesis-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/objenesis/objenesis/1.1/objenesis-1.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/objenesis/objenesis/1.1/objenesis-1.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/objenesis/objenesis/1.1/objenesis-1.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/objenesis/objenesis/1.1/objenesis-1.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: cglib:cglib:2.2">
       <CLASSES>
-        <root url="jar://$M2_REPO$/cglib/cglib/2.2/cglib-2.2.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib/2.2/cglib-2.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/cglib/cglib/2.2/cglib-2.2-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib/2.2/cglib-2.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/cglib/cglib/2.2/cglib-2.2-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib/2.2/cglib-2.2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: net.orfjackal.ext.javax.annotations:jsr305:20080825">
       <CLASSES>
-        <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/net/orfjackal/ext/javax/annotations/jsr305/20080825/jsr305-20080825-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.jdave:jdave-junit4:1.1">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-junit4/1.1/jdave-junit4-1.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.jdave:jdave-core:1.1">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/jdave/jdave-core/1.1/jdave-core-1.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-core/1.1/jdave-core-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/jdave/jdave-core/1.1/jdave-core-1.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-core/1.1/jdave-core-1.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/jdave/jdave-core/1.1/jdave-core-1.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-core/1.1/jdave-core-1.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.mockito:mockito-all:1.7">
@@ -700,112 +758,112 @@
     </library>
     <library name="Maven: junit:junit:4.7">
       <CLASSES>
-        <root url="jar://$M2_REPO$/junit/junit/4.7/junit-4.7.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.7/junit-4.7.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/junit/junit/4.7/junit-4.7-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.7/junit-4.7-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/junit/junit/4.7/junit-4.7-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.mockito:mockito-all:1.8.0">
-      <CLASSES>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.8.0/mockito-all-1.8.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.8.0/mockito-all-1.8.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.8.0/mockito-all-1.8.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.easymock:easymock:2.5.1">
-      <CLASSES>
-        <root url="jar://$M2_REPO$/org/easymock/easymock/2.5.1/easymock-2.5.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$M2_REPO$/org/easymock/easymock/2.5.1/easymock-2.5.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$M2_REPO$/org/easymock/easymock/2.5.1/easymock-2.5.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.7/junit-4.7-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: asm:asm:3.2">
       <CLASSES>
-        <root url="jar://$M2_REPO$/asm/asm/3.2/asm-3.2.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.2/asm-3.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/asm/asm/3.2/asm-3.2-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.2/asm-3.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/asm/asm/3.2/asm-3.2-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm/3.2/asm-3.2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: asm:asm-tree:3.2">
       <CLASSES>
-        <root url="jar://$M2_REPO$/asm/asm-tree/3.2/asm-tree-3.2.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm-tree/3.2/asm-tree-3.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/asm/asm-tree/3.2/asm-tree-3.2-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm-tree/3.2/asm-tree-3.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/asm/asm-tree/3.2/asm-tree-3.2-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm-tree/3.2/asm-tree-3.2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: asm:asm-all:3.2">
       <CLASSES>
-        <root url="jar://$M2_REPO$/asm/asm-all/3.2/asm-all-3.2.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm-all/3.2/asm-all-3.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/asm/asm-all/3.2/asm-all-3.2-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm-all/3.2/asm-all-3.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/asm/asm-all/3.2/asm-all-3.2-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/asm/asm-all/3.2/asm-all-3.2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.slf4j:slf4j-jdk14:1.5.8">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.8/slf4j-jdk14-1.5.8.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-jdk14/1.5.8/slf4j-jdk14-1.5.8.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.8/slf4j-jdk14-1.5.8-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-jdk14/1.5.8/slf4j-jdk14-1.5.8-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-jdk14/1.5.8/slf4j-jdk14-1.5.8-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-jdk14/1.5.8/slf4j-jdk14-1.5.8-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.slf4j:slf4j-api:1.5.8">
       <CLASSES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.google.inject:guice:2.0">
       <CLASSES>
-        <root url="jar://$M2_REPO$/com/google/inject/guice/2.0/guice-2.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/inject/guice/2.0/guice-2.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/com/google/inject/guice/2.0/guice-2.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/inject/guice/2.0/guice-2.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/com/google/inject/guice/2.0/guice-2.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/inject/guice/2.0/guice-2.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: aopalliance:aopalliance:1.0">
       <CLASSES>
-        <root url="jar://$M2_REPO$/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$M2_REPO$/aopalliance/aopalliance/1.0/aopalliance-1.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$M2_REPO$/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.mockito:mockito-all:1.8.2">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.easymock:easymock:2.5.2">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/easymock/easymock/2.5.2/easymock-2.5.2.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/easymock/easymock/2.5.2/easymock-2.5.2-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/easymock/easymock/2.5.2/easymock-2.5.2-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
