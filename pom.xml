@@ -142,16 +142,13 @@
                 <version>${version}</version>
             </dependency>
 
-            <!-- Project Darkstar -->
-
-            <dependency>
-                <groupId>net.orfjackal.darkstar-exp</groupId>
-                <artifactId>darkstar-shared</artifactId>
-                <version>0.9.6_2</version>
-            </dependency>
-
             <!-- Dependency injection -->
 
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
