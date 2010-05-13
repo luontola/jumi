@@ -19,7 +19,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @TaskScoped
 @NotThreadSafe
-public class EntityRepositoryImpl implements EntityRepository {
+public class EntityRepositoryImpl implements EntitiesPersistedInDatabase {
 
     private final EntityDao entities;
     private final ObjectSerializer serializer;

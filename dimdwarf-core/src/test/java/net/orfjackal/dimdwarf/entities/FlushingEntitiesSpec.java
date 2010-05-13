@@ -24,15 +24,15 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     private static final EntityId ID1 = new EntityObjectId(1);
     private static final EntityObjectId ID2 = new EntityObjectId(2);
 
-    private EntityRepository repository;
+    private EntitiesPersistedInDatabase database;
     private EntityManager manager;
     private EntityReferenceFactory refFactory;
     private DummyEntity entity;
     private DummyEntity newEntity;
 
     public void create() throws Exception {
-        repository = mock(EntityRepository.class);
-        manager = new EntityManager(new EntityIdFactoryImpl(0), repository, new DimdwarfEntityApi());
+        database = mock(EntitiesPersistedInDatabase.class);
+        manager = new EntityManager(new EntityIdFactoryImpl(0), database, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
 
         entity = new DummyEntity();
@@ -44,14 +44,14 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
-                one(repository).update(ID1, entity);
+                one(database).update(ID1, entity);
             }});
             manager.flushToDatabase();
         }
 
         public void flushingTwiseIsNotAllowed() {
             checking(new Expectations() {{
-                one(repository).update(ID1, entity);
+                one(database).update(ID1, entity);
             }});
             manager.flushToDatabase();
             specify(new Block() {
@@ -63,7 +63,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theEntityManagerCanNotBeUsedAfterFlushHasEnded() {
             checking(new Expectations() {{
-                one(repository).update(ID1, entity);
+                one(database).update(ID1, entity);
             }});
             manager.flushToDatabase();
 
@@ -100,8 +100,8 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theyAreStoredInDatabase() {
             checking(new Expectations() {{
-                one(repository).update(ID1, entity); will(new RegisterEntity(newEntity));
-                one(repository).update(ID2, newEntity);
+                one(database).update(ID1, entity); will(registerEntity(newEntity));
+                one(database).update(ID2, newEntity);
             }});
             manager.flushToDatabase();
         }
@@ -111,12 +111,16 @@ public class FlushingEntitiesSpec extends Specification<Object> {
 
         public void theyAreStoredInDatabaseOnlyOnce() {
             checking(new Expectations() {{
-                one(repository).update(ID1, entity); will(new RegisterEntity(entity));
+                one(database).update(ID1, entity); will(registerEntity(entity));
             }});
             manager.flushToDatabase();
         }
     }
 
+
+    private RegisterEntity registerEntity(DummyEntity entity) {
+        return new RegisterEntity(entity);
+    }
 
     private class RegisterEntity extends CustomAction {
         private final DummyEntity entity;

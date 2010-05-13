@@ -27,22 +27,22 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
     private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
     private EntityIdFactory idFactory;
-    private EntityRepository repository;
+    private EntitiesPersistedInDatabase database;
     private EntityManager manager;
     private EntityReferenceFactory refFactory;
     private DummyEntity entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
-        repository = mock(EntityRepository.class);
-        manager = new EntityManager(idFactory, repository, new DimdwarfEntityApi());
+        database = mock(EntitiesPersistedInDatabase.class);
+        manager = new EntityManager(idFactory, database, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }
 
-    private Expectations loadsFromRepository(final EntityId id, final DummyEntity entity) {
+    private Expectations loadsFromDatabase(final EntityId id, final DummyEntity entity) {
         return new Expectations() {{
-            one(repository).read(id); will(returnValue(entity));
+            one(database).read(id); will(returnValue(entity));
         }};
     }
 
@@ -82,13 +82,13 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theEntityIsLazyLoadedFromDatabase() {
-            checking(loadsFromRepository(ENTITY_ID, entity));
+            checking(loadsFromDatabase(ENTITY_ID, entity));
             specify(ref.get(), should.equal(entity));
         }
 
         public void theEntityIsRegisteredOnLoad() {
             specify(manager.getRegisteredEntities(), should.equal(0));
-            checking(loadsFromRepository(ENTITY_ID, entity));
+            checking(loadsFromDatabase(ENTITY_ID, entity));
             ref.get();
             specify(manager.getRegisteredEntities(), should.equal(1));
         }
@@ -108,7 +108,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theEntityIsLoadedFromDatabaseOnlyOnce() {
-            checking(loadsFromRepository(ENTITY_ID, entity));
+            checking(loadsFromDatabase(ENTITY_ID, entity));
             specify(ref1.get(), should.equal(entity));
             specify(ref2.get(), should.equal(entity));
         }

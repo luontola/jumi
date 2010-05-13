@@ -71,7 +71,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
                     new EntityReferenceFactoryImpl(
                             new EntityManager(
                                     mock(EntityIdFactory.class),
-                                    mock(EntityRepository.class),
+                                    mock(EntitiesPersistedInDatabase.class),
                                     entityApi));
             specify(new Block() {
                 public void run() throws Throwable {

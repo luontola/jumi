@@ -18,16 +18,16 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class CreatingEntityReferencesSpec extends Specification<Object> {
 
+    private static final EntitiesPersistedInDatabase UNUSED_DATABASE = null;
+
     private EntityIdFactory idFactory;
-    private EntityRepository repository;
     private EntityManager manager;
     private EntityReferenceFactory refFactory;
     private EntityObject entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
-        repository = mock(EntityRepository.class);
-        manager = new EntityManager(idFactory, repository, new DimdwarfEntityApi());
+        manager = new EntityManager(idFactory, UNUSED_DATABASE, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }

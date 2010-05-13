@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  * @author Esko Luontola
  * @since 31.8.2008
  */
-public interface EntityRepository extends DatabaseTable<EntityId, Object> {
+public interface EntitiesPersistedInDatabase extends DatabaseTable<EntityId, Object> {
 
     @Nonnull
     Object read(EntityId id) throws EntityNotFoundException;

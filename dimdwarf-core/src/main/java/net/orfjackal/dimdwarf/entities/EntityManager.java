@@ -1,4 +1,4 @@
-// Copyright © 2008-2009, Esko Luontola. All Rights Reserved.
+// Copyright © 2008-2010, Esko Luontola. All Rights Reserved.
 // This software is released under the MIT License.
 // The license may be viewed at http://dimdwarf.sourceforge.net/LICENSE
 
@@ -23,7 +23,7 @@ import java.util.*;
 public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
 
     private final EntityIdFactory idFactory;
-    private final EntityRepository repository;
+    private final EntitiesPersistedInDatabase persistedEntities;
     private final EntityApi entityApi;
 
     private final Map<EntityObject, EntityId> entities = new IdentityHashMap<EntityObject, EntityId>();
@@ -32,9 +32,9 @@ public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManager(EntityIdFactory idFactory, EntityRepository repository, EntityApi entityApi) {
+    public EntityManager(EntityIdFactory idFactory, EntitiesPersistedInDatabase persistedEntities, EntityApi entityApi) {
         this.idFactory = idFactory;
-        this.repository = repository;
+        this.persistedEntities = persistedEntities;
         this.entityApi = entityApi;
     }
 
@@ -84,7 +84,7 @@ public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
     }
 
     private EntityObject loadEntityFromDatabase(EntityId id) {
-        EntityObject entity = (EntityObject) repository.read(id);
+        EntityObject entity = (EntityObject) persistedEntities.read(id);
         register(entity, id);
         return entity;
     }
@@ -102,12 +102,12 @@ public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
 
     public EntityId firstKey() {
         checkStateIs(State.ACTIVE);
-        return repository.firstKey();
+        return persistedEntities.firstKey();
     }
 
     public EntityId nextKeyAfter(EntityId currentKey) {
         checkStateIs(State.ACTIVE);
-        return repository.nextKeyAfter(currentKey);
+        return persistedEntities.nextKeyAfter(currentKey);
     }
 
     public void flushToDatabase() {
@@ -127,7 +127,7 @@ public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
         EntityObject entity;
         while ((entity = flushQueue.poll()) != null) {
             EntityId id = entities.get(entity);
-            repository.update(id, entity);
+            persistedEntities.update(id, entity);
         }
     }
 

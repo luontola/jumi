@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
-    private EntityRepository repository;
+    private EntitiesPersistedInDatabase database;
     private AllEntities entities;
 
     private DummyEntity entity1 = new DummyEntity();
@@ -27,13 +27,13 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
     private EntityId id2 = new EntityObjectId(2);
 
     public void create() throws Exception {
-        repository = mock(EntityRepository.class);
-        entities = new EntityManager(mock(EntityIdFactory.class), repository, new DimdwarfEntityApi());
+        database = mock(EntitiesPersistedInDatabase.class);
+        entities = new EntityManager(mock(EntityIdFactory.class), database, new DimdwarfEntityApi());
     }
 
     private Expectations loadsFromRepository(final EntityId id, final DummyEntity entity) {
         return new Expectations() {{
-            one(repository).read(id); will(returnValue(entity));
+            one(database).read(id); will(returnValue(entity));
         }};
     }
 
@@ -55,8 +55,8 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
         public void entitiesCanBeIteratedById() {
             // TODO: remove the ability to iterate by ID?
             checking(new Expectations() {{
-                one(repository).firstKey(); will(returnValue(id1));
-                one(repository).nextKeyAfter(id1); will(returnValue(id2));
+                one(database).firstKey(); will(returnValue(id1));
+                one(database).nextKeyAfter(id1); will(returnValue(id2));
             }});
             specify(entities.firstKey(), should.equal(id1));
             specify(entities.nextKeyAfter(id1), should.equal(id2));
