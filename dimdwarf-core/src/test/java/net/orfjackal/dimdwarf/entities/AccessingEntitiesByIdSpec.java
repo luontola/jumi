@@ -27,7 +27,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         database = mock(EntitiesPersistedInDatabase.class);
-        entities = new EntityManager(mock(EntityIdFactory.class), database, new DimdwarfEntityApi());
+        entities = new EntityManager(null, database, new DimdwarfEntityApi());
     }
 
     private Expectations loadsFromDatabase(final EntityId id, final DummyEntity entity) {

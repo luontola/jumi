@@ -24,18 +24,16 @@ import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 @Group({"fast"})
 public class ReadingEntityReferencesSpec extends Specification<Object> {
 
-    private static final EntityId ENTITY_ID = new EntityObjectId(42);
+    private static final EntityId ID = new EntityObjectId(42);
 
-    private EntityIdFactory idFactory;
     private EntitiesPersistedInDatabase database;
     private EntityManager manager;
     private EntityReferenceFactory refFactory;
     private DummyEntity entity;
 
     public void create() throws Exception {
-        idFactory = mock(EntityIdFactory.class);
         database = mock(EntitiesPersistedInDatabase.class);
-        manager = new EntityManager(idFactory, database, new DimdwarfEntityApi());
+        manager = new EntityManager(new EntityIdFactoryImpl(0), database, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }
@@ -52,14 +50,11 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         private EntityReference<DummyEntity> ref;
 
         public void create() {
-            checking(new Expectations() {{
-                one(idFactory).newId(); will(returnValue(ENTITY_ID));
-            }});
             ref = refFactory.createReference(entity);
         }
 
-        public void theReferenceHasTheEntityId() {
-            specify(ref.getEntityId(), should.equal(ENTITY_ID));
+        public void theReferenceGetsAnEntityId() {
+            specify(ref.getEntityId(), should.not().equal(null));
         }
 
         public void theEntityIsCachedLocally() {
@@ -72,23 +67,23 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         private EntityReferenceImpl<DummyEntity> ref;
 
         public void create() throws IOException, ClassNotFoundException {
-            byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
+            byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ID, entity));
             ref = uncheckedCast(TestUtil.deserialize(bytes));
-            ref.setEntityManager(manager);
+            ref.setEntityLocator(manager);
         }
 
-        public void theReferenceHasTheEntityId() {
-            specify(ref.getEntityId(), should.equal(ENTITY_ID));
+        public void theReferenceHasTheSameEntityIdAsBefore() {
+            specify(ref.getEntityId(), should.equal(ID));
         }
 
         public void theEntityIsLazyLoadedFromDatabase() {
-            checking(loadsFromDatabase(ENTITY_ID, entity));
+            checking(loadsFromDatabase(ID, entity));
             specify(ref.get(), should.equal(entity));
         }
 
         public void theEntityIsRegisteredOnLoad() {
             specify(manager.getRegisteredEntities(), should.equal(0));
-            checking(loadsFromDatabase(ENTITY_ID, entity));
+            checking(loadsFromDatabase(ID, entity));
             ref.get();
             specify(manager.getRegisteredEntities(), should.equal(1));
         }
@@ -100,15 +95,15 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
         private EntityReferenceImpl<DummyEntity> ref2;
 
         public void create() throws IOException, ClassNotFoundException {
-            byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ENTITY_ID, entity));
+            byte[] bytes = TestUtil.serialize(new EntityReferenceImpl<DummyEntity>(ID, entity));
             ref1 = uncheckedCast(TestUtil.deserialize(bytes));
-            ref1.setEntityManager(manager);
+            ref1.setEntityLocator(manager);
             ref2 = uncheckedCast(TestUtil.deserialize(bytes));
-            ref2.setEntityManager(manager);
+            ref2.setEntityLocator(manager);
         }
 
         public void theEntityIsLoadedFromDatabaseOnlyOnce() {
-            checking(loadsFromDatabase(ENTITY_ID, entity));
+            checking(loadsFromDatabase(ID, entity));
             specify(ref1.get(), should.equal(entity));
             specify(ref2.get(), should.equal(entity));
         }

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Singleton
 @ThreadSafe
-public class EntityIdFactoryImpl implements EntityIdFactory {
+public class EntityIdFactoryImpl {
 
     private final AtomicLong counter = new AtomicLong();
 

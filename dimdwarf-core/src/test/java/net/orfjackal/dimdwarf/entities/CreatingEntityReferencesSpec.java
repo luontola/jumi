@@ -6,8 +6,8 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
-import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 /**
@@ -18,18 +18,12 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class CreatingEntityReferencesSpec extends Specification<Object> {
 
-    private static final EntitiesPersistedInDatabase UNUSED_DATABASE = null;
-
-    private EntityIdFactory idFactory;
     private EntityManager manager;
     private EntityReferenceFactory refFactory;
-    private EntityObject entity;
 
     public void create() throws Exception {
-        idFactory = mock(EntityIdFactory.class);
-        manager = new EntityManager(idFactory, UNUSED_DATABASE, new DimdwarfEntityApi());
+        manager = new EntityManager(new EntityIdFactoryImpl(0), null, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
-        entity = new DummyEntity();
     }
 
 
@@ -43,11 +37,9 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
     public class WhenAReferenceIsCreated {
 
         private EntityReference<EntityObject> ref;
+        private EntityObject entity = new DummyEntity();
 
         public void create() {
-            checking(new Expectations() {{
-                one(idFactory).newId(); will(returnValue(new EntityObjectId(42)));
-            }});
             ref = refFactory.createReference(entity);
         }
 
@@ -60,7 +52,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void theEntityGetsAnId() {
-            specify(ref.getEntityId(), should.equal(new EntityObjectId(42)));
+            specify(ref.getEntityId(), should.not().equal(null));
         }
 
         public void onMultipleCallsAllReferencesToTheSameObjectAreEqual() {
@@ -77,15 +69,11 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
 
     public class WhenReferencesToManyEntitiesAreCreated {
 
-        private EntityReference<EntityObject> ref1;
+        private EntityReference<DummyEntity> ref1;
         private EntityReference<DummyEntity> ref2;
 
         public void create() {
-            checking(new Expectations() {{
-                one(idFactory).newId(); will(returnValue(new EntityObjectId(1)));
-                one(idFactory).newId(); will(returnValue(new EntityObjectId(2)));
-            }});
-            ref1 = refFactory.createReference(entity);
+            ref1 = refFactory.createReference(new DummyEntity());
             ref2 = refFactory.createReference(new DummyEntity());
         }
 
@@ -98,8 +86,9 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
         }
 
         public void eachEntityGetsItsOwnId() {
-            specify(ref1.getEntityId(), should.equal(new EntityObjectId(1)));
-            specify(ref2.getEntityId(), should.equal(new EntityObjectId(2)));
+            EntityId id1 = ref1.getEntityId();
+            EntityId id2 = ref2.getEntityId();
+            specify(id1, should.not().equal(id2));
         }
     }
 }

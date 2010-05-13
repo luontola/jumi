@@ -121,14 +121,14 @@ public class EntityIdentitySpec extends Specification<Object> {
         }
 
         public void equalsMethodOnProxyWillNotDelegateToEntity() {
-            final EntityObject entity = mock(EntityObject.class);
+            EntityObject entity = mock(EntityObject.class);
             checking(referencesMayBeCreatedFor(entity, new EntityObjectId(3)));
             TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.equals(entity);
         }
 
         public void hashCodeMethodOnProxyWillNotDelegateToEntity() {
-            final EntityObject entity = mock(EntityObject.class);
+            EntityObject entity = mock(EntityObject.class);
             checking(referencesMayBeCreatedFor(entity, new EntityObjectId(3)));
             TransparentReference proxy = proxyFactory.createTransparentReference(entity);
             proxy.hashCode();

@@ -22,7 +22,7 @@ import java.util.*;
 @NotThreadSafe
 public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
 
-    private final EntityIdFactory idFactory;
+    private final EntityIdFactoryImpl idFactory;
     private final EntitiesPersistedInDatabase persistedEntities;
     private final EntityApi entityApi;
 
@@ -32,7 +32,7 @@ public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManager(EntityIdFactory idFactory, EntitiesPersistedInDatabase persistedEntities, EntityApi entityApi) {
+    public EntityManager(EntityIdFactoryImpl idFactory, EntitiesPersistedInDatabase persistedEntities, EntityApi entityApi) {
         this.idFactory = idFactory;
         this.persistedEntities = persistedEntities;
         this.entityApi = entityApi;

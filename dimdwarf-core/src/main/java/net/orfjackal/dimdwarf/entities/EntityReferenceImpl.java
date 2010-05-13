@@ -33,11 +33,11 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable 
 
     /**
      * Needs to be injected when the reference is deserialized. No need to inject when
-     * the reference is created, because then the entity is already cached locally.
+     * the reference is created directly, because then the entity is already cached locally.
      */
     @Inject
-    public void setEntityManager(AllEntities allEntities) {
-        this.entities = allEntities;
+    public void setEntityLocator(AllEntities entities) {
+        this.entities = entities;
     }
 
     public T get() {

@@ -29,7 +29,6 @@ public class EntityModule extends AbstractModule {
         bind(EntityReferenceFactory.class).to(EntityReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(TrefAwareEntityInfo.class);
 
-        bind(EntityIdFactory.class).to(EntityIdFactoryImpl.class);
         bind(Long.class)
                 .annotatedWith(MaxEntityId.class)
                 .toInstance(0L); // TODO: import from database
