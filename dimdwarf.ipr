@@ -573,27 +573,6 @@
       <SplitterProportionsDataImpl />
     </option>
   </component>
-  <component name="SvnBranchConfigurationManager">
-    <option name="myConfigurationMap">
-      <map>
-        <entry key="$PROJECT_DIR$">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchUrls">
-                <list>
-                  <option value="https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/branches" />
-                  <option value="https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="https://dimdwarf.svn.sourceforge.net/svnroot/dimdwarf/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
-  </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
   </component>
@@ -742,18 +721,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/jdave/jdave-core/1.1/jdave-core-1.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.mockito:mockito-all:1.7">
-      <CLASSES>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7.jar!/" />
-        <root url="jar://$M2_REPO$/org/mockito/mockito-all/1.7/mockito-all-1.7-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: junit:junit:4.7">
