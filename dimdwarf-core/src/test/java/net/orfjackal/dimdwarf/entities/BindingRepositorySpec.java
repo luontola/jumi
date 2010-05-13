@@ -25,7 +25,7 @@ public class BindingRepositorySpec extends Specification<Object> {
     private static final String INVALID_BINDING = "no-such-binding";
 
     private Executor taskContext;
-    private Provider<BindingRepositoryImpl> bindings;
+    private Provider<BindingRepository> bindings;
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
@@ -34,7 +34,7 @@ public class BindingRepositorySpec extends Specification<Object> {
                 new EntityModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
-        bindings = injector.getProvider(BindingRepositoryImpl.class);
+        bindings = injector.getProvider(BindingRepository.class);
     }
 
 

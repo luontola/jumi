@@ -15,14 +15,13 @@ import javax.annotation.concurrent.Immutable;
  * @since 12.9.2008
  */
 @Immutable
-public class BindingRepositoryImpl implements DatabaseTable<String, Object> {
+public class BindingRepository implements DatabaseTable<String, Object> {
 
     private final BindingDao bindings;
     private final ConvertEntityToEntityId entityToId;
 
     @Inject
-    public BindingRepositoryImpl(BindingDao bindings,
-                                 ConvertEntityToEntityId entityToId) {
+    public BindingRepository(BindingDao bindings, ConvertEntityToEntityId entityToId) {
         this.bindings = bindings;
         this.entityToId = entityToId;
     }

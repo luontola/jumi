@@ -23,10 +23,10 @@ public class RecoverableSetImpl<T> implements RecoverableSet<T> {
     // FIXME: RecoverableSetImpl will be removed/refactored in new architecture
 
     private final String prefix;
-    private final Provider<BindingRepositoryImpl> bindings;
+    private final Provider<BindingRepository> bindings;
     private final Provider<EntityInfo> info;
 
-    public RecoverableSetImpl(String prefix, Provider<BindingRepositoryImpl> bindings, Provider<EntityInfo> info) {
+    public RecoverableSetImpl(String prefix, Provider<BindingRepository> bindings, Provider<EntityInfo> info) {
         this.prefix = prefix + SEPARATOR;
         this.bindings = bindings;
         this.info = info;
