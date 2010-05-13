@@ -96,20 +96,6 @@ public class EntityRepositorySpec extends Specification<Object> {
             });
         }
 
-        public void deletesEntities() {
-            taskContext.execute(new Runnable() {
-                public void run() {
-                    entities.get().delete(ENTITY_ID);
-                    specify(entities.get().exists(ENTITY_ID), should.equal(false));
-                    specify(new Block() {
-                        public void run() throws Throwable {
-                            entities.get().read(ENTITY_ID);
-                        }
-                    }, should.raise(EntityNotFoundException.class));
-                }
-            });
-        }
-
         public void canNotReadNonexistentEntities() {
             taskContext.execute(new Runnable() {
                 public void run() {

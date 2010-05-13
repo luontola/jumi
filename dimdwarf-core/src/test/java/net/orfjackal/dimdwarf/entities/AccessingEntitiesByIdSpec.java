@@ -22,16 +22,15 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
     private EntitiesPersistedInDatabase database;
     private AllEntities entities;
 
-    private DummyEntity entity1 = new DummyEntity();
-    private EntityId id1 = new EntityObjectId(1);
-    private EntityId id2 = new EntityObjectId(2);
+    private DummyEntity entity = new DummyEntity();
+    private EntityId id = new EntityObjectId(1);
 
     public void create() throws Exception {
         database = mock(EntitiesPersistedInDatabase.class);
         entities = new EntityManager(mock(EntityIdFactory.class), database, new DimdwarfEntityApi());
     }
 
-    private Expectations loadsFromRepository(final EntityId id, final DummyEntity entity) {
+    private Expectations loadsFromDatabase(final EntityId id, final DummyEntity entity) {
         return new Expectations() {{
             one(database).read(id); will(returnValue(entity));
         }};
@@ -41,25 +40,15 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
     public class WhenThereAreEntitiesInTheDatabase {
 
         public void entitiesCanBeLoadedById() {
-            checking(loadsFromRepository(id1, entity1));
-            specify(entities.getEntityById(id1), should.equal(entity1));
+            checking(loadsFromDatabase(id, entity));
+            specify(entities.getEntityById(id), should.equal(entity));
         }
 
         public void entitiesAreRegisteredOnLoadById() {
-            checking(loadsFromRepository(id1, entity1));
-            Object load1 = entities.getEntityById(id1);
-            Object load2 = entities.getEntityById(id1);
+            checking(loadsFromDatabase(id, entity));
+            Object load1 = entities.getEntityById(id);
+            Object load2 = entities.getEntityById(id);
             specify(load1 == load2);
-        }
-
-        public void entitiesCanBeIteratedById() {
-            // TODO: remove the ability to iterate by ID?
-            checking(new Expectations() {{
-                one(database).firstKey(); will(returnValue(id1));
-                one(database).nextKeyAfter(id1); will(returnValue(id2));
-            }});
-            specify(entities.firstKey(), should.equal(id1));
-            specify(entities.nextKeyAfter(id1), should.equal(id2));
         }
     }
 }

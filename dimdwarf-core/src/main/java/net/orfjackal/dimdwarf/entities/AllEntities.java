@@ -6,13 +6,12 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObject;
-import net.orfjackal.dimdwarf.db.IterableKeys;
 
 /**
  * @author Esko Luontola
  * @since 31.8.2008
  */
-public interface AllEntities extends IterableKeys<EntityId> {
+public interface AllEntities {
 
     EntityId getEntityId(EntityObject entity);
 

@@ -100,16 +100,6 @@ public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
                 + " (Previous was: " + prevEntityWithSameId + ", " + prevIdOfSameEntity + ")";
     }
 
-    public EntityId firstKey() {
-        checkStateIs(State.ACTIVE);
-        return persistedEntities.firstKey();
-    }
-
-    public EntityId nextKeyAfter(EntityId currentKey) {
-        checkStateIs(State.ACTIVE);
-        return persistedEntities.nextKeyAfter(currentKey);
-    }
-
     public void flushToDatabase() {
         beginFlush();
         flush();

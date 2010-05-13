@@ -80,16 +80,6 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.firstKey();
-                }
-            }, should.raise(IllegalStateException.class));
-            specify(new Block() {
-                public void run() throws Throwable {
-                    manager.nextKeyAfter(ID1);
-                }
-            }, should.raise(IllegalStateException.class));
-            specify(new Block() {
-                public void run() throws Throwable {
                     manager.flushToDatabase();
                 }
             }, should.raise(IllegalStateException.class));

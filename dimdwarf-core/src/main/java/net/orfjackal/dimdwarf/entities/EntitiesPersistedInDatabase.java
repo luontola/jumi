@@ -6,7 +6,7 @@ package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.EntityId;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 /**
  * @author Esko Luontola
@@ -18,12 +18,4 @@ public interface EntitiesPersistedInDatabase {
     Object read(EntityId id) throws EntityNotFoundException;
 
     void update(EntityId id, Object entity);
-
-    // TODO: get rid of iteration?
-
-    @Nullable
-    EntityId firstKey();
-
-    @Nullable
-    EntityId nextKeyAfter(EntityId currentKey);
 }
