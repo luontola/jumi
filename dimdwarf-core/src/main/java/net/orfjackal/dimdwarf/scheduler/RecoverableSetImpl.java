@@ -13,10 +13,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 26.11.2008
- */
 @ThreadSafe
 public class RecoverableSetImpl<T> implements RecoverableSet<T> {
 

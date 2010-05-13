@@ -5,12 +5,9 @@
 package net.orfjackal.dimdwarf.aop;
 
 import org.objectweb.asm.*;
+
 import static org.objectweb.asm.Opcodes.*;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 public class AddEqualsAndHashCodeMethodsForEntities extends ClassAdapter {
 
     private final String entityAnnotationDesc;

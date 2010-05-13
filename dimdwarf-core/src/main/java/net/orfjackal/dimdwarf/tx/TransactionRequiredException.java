@@ -6,9 +6,6 @@ package net.orfjackal.dimdwarf.tx;
 
 /**
  * Thrown when a transaction is required but is not active.
- *
- * @author Esko Luontola
- * @since 19.8.2008
  */
 public class TransactionRequiredException extends TransactionException {
     private static final long serialVersionUID = 1L;

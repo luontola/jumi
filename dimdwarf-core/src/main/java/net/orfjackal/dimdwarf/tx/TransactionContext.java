@@ -12,10 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 
-/**
- * @author Esko Luontola
- * @since 15.8.2008
- */
 @ThreadSafe
 public class TransactionContext implements Transaction, TransactionCoordinator {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TransactionContext.class);

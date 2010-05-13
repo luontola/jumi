@@ -6,9 +6,6 @@ package net.orfjackal.dimdwarf.api;
 
 /**
  * The kind of proxy to generate for given a target class.
- *
- * @author Esko Luontola
- * @since 9.9.2008
  */
 public enum ProxyType {
 

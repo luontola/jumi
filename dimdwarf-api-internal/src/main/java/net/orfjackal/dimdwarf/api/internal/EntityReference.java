@@ -8,9 +8,6 @@ import net.orfjackal.dimdwarf.api.EntityId;
 
 /**
  * Reference to an entity, equivalent to Darkstar's ManagedReference.
- *
- * @author Esko Luontola
- * @since 15.8.2008
  */
 public interface EntityReference<T> {
 

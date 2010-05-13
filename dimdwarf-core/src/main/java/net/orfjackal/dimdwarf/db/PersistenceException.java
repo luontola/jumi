@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.db;
 
-/**
- * @author Esko Luontola
- * @since 19.8.2008
- */
 public class PersistenceException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 

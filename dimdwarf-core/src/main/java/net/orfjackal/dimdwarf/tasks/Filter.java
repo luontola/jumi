@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-/**
- * @author Esko Luontola
- * @since 12.11.2008
- */
 public interface Filter {
 
     void filter(Runnable nextInChain);

@@ -17,10 +17,6 @@ import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.lang.instrument.ClassFileTransformer;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class AddEqualsAndHashCodeMethodsForEntitiesSpec extends Specification<Object> {

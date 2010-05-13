@@ -12,10 +12,6 @@ import org.jetbrains.annotations.TestOnly;
 import javax.annotation.concurrent.*;
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 21.11.2008
- */
 @Singleton
 @ThreadSafe
 public class InMemoryDatabaseManager implements DatabaseManager {

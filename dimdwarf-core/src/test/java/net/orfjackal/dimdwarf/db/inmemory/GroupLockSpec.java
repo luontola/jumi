@@ -10,10 +10,6 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Esko Luontola
- * @since 19.11.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class GroupLockSpec extends Specification<Object> {

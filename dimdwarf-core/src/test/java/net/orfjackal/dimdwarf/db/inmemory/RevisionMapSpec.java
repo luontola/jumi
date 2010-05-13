@@ -8,10 +8,6 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 20.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class RevisionMapSpec extends Specification<Object> {

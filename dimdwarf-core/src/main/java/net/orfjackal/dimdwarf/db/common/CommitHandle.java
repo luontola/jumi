@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.db.common;
 
 import javax.annotation.WillClose;
 
-/**
- * @author Esko Luontola
- * @since 18.11.2008
- */
 public interface CommitHandle {
 
     @WillClose

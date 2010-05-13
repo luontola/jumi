@@ -8,10 +8,6 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 27.12.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ClassNameMatcherSpec extends Specification<Object> {

@@ -4,18 +4,14 @@
 
 package net.orfjackal.dimdwarf.db;
 
-import static net.orfjackal.dimdwarf.util.ByteUtil.asByteArray;
-
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-/**
- * @author Esko Luontola
- * @since 18.8.2008
- */
+import static net.orfjackal.dimdwarf.util.ByteUtil.asByteArray;
+
 @Immutable
 public final class Blob implements Comparable<Blob> {
 

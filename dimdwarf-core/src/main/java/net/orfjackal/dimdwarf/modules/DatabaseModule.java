@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
 import net.orfjackal.dimdwarf.tx.Transaction;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 public class DatabaseModule extends AbstractModule {
 
     protected void configure() {

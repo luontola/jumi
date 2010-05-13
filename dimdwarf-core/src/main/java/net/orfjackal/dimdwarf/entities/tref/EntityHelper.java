@@ -22,9 +22,6 @@ import javax.annotation.Nullable;
  *     return EntityHelper.hashCode(this);
  * }
  * </code></pre>
- *
- * @author Esko Luontola
- * @since 1.2.2008
  */
 public class EntityHelper {
 

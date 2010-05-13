@@ -20,9 +20,6 @@ import java.util.concurrent.*;
  * See:
  * <a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control">multiversion concurrency control</a>,
  * <a href="http://en.wikipedia.org/wiki/Snapshot_isolation">snapshot isolation</a>
- *
- * @author Esko Luontola
- * @since 18.8.2008
  */
 @ThreadSafe
 public class InMemoryDatabase implements PersistedDatabase<RevisionHandle> {

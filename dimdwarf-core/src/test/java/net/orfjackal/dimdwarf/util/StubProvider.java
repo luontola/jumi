@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.util;
 
 import com.google.inject.Provider;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 public class StubProvider<T> implements Provider<T> {
 
     private final T instance;

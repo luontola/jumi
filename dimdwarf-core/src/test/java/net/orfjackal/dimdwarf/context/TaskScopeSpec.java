@@ -14,10 +14,6 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TaskScopeSpec extends Specification<Object> {

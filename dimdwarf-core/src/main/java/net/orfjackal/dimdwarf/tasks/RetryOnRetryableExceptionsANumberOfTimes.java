@@ -8,10 +8,6 @@ import net.orfjackal.dimdwarf.tx.Retryable;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 @NotThreadSafe
 public class RetryOnRetryableExceptionsANumberOfTimes implements RetryPolicy {
 

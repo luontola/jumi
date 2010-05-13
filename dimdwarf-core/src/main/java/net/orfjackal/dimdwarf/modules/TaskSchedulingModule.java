@@ -12,10 +12,6 @@ import net.orfjackal.dimdwarf.util.*;
 
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 27.11.2008
- */
 public class TaskSchedulingModule extends AbstractModule {
 
     protected void configure() {

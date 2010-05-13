@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 4.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class EntityIdFactorySpec extends Specification<Object> {

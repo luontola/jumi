@@ -11,9 +11,6 @@ import java.lang.instrument.Instrumentation;
 /**
  * See http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html
  * for details on using agents.
- *
- * @author Esko Luontola
- * @since 9.9.2008
  */
 public class AopAgent {
 

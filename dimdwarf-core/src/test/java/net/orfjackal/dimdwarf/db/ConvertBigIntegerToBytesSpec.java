@@ -10,10 +10,6 @@ import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
 
-/**
- * @author Esko Luontola
- * @since 30.10.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ConvertBigIntegerToBytesSpec extends Specification<Object> {

@@ -10,10 +10,6 @@ import org.slf4j.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-/**
- * @author Esko Luontola
- * @since 28.11.2008
- */
 @Singleton
 @NotThreadSafe
 public class ServerLifecycleManager {

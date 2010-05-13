@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-/**
- * @author Esko Luontola
- * @since 13.5.2010
- */
 public interface EntitiesLoadedInMemory {
 
     /**

@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 public interface Retryable {
 
     boolean mayBeRetried();

@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.serial;
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 11.12.2008
- */
 @Immutable
 public class DeserializationResult extends ResultWithMetadata {
 

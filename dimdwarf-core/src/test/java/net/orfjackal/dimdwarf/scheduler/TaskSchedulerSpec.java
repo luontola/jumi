@@ -20,10 +20,6 @@ import java.util.Arrays;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Esko Luontola
- * @since 24.11.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TaskSchedulerSpec extends Specification<Object> {

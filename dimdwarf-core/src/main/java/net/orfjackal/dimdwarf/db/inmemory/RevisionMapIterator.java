@@ -8,10 +8,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.*;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 @NotThreadSafe
 public class RevisionMapIterator<K, V> implements Iterator<Map.Entry<K, V>> {
 

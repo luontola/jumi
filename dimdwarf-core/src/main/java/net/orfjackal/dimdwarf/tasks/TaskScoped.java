@@ -12,9 +12,7 @@ import java.lang.annotation.*;
  * Indicates that an object needs to be task scoped. Each task will run in a transaction
  * which is automatically committed when the task ends.
  *
- * @author Esko Luontola
  * @see net.orfjackal.dimdwarf.tasks.TaskExecutor
- * @since 13.9.2008
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

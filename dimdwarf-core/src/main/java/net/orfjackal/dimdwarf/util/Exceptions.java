@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.util;
 
-/**
- * @author Esko Luontola
- * @since 18.1.2009
- */
 public class Exceptions {
 
     private Exceptions() {

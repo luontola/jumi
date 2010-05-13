@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 28.12.2008
- */
 @NotThreadSafe
 public class MetadataBuilderImpl implements MetadataBuilder {
 

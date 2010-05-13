@@ -12,10 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-/**
- * @author Esko Luontola
- * @since 18.11.2008
- */
 @ThreadSafe
 public class TransientDatabaseTable<H> implements DatabaseTable<Blob, Blob> {
 

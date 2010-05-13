@@ -9,10 +9,6 @@ import org.objectweb.asm.tree.*;
 
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 @SuppressWarnings({"unchecked"})
 public class AddMarkerInterfaceForEntities extends ClassNode {
 

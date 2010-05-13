@@ -8,10 +8,6 @@ import com.google.inject.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 @Immutable
 public class ThreadScope implements Scope {
 

@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.context;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 public interface Context {
 
     <T> T get(Class<T> service);

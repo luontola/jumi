@@ -16,10 +16,6 @@ import java.util.concurrent.CyclicBarrier;
 
 import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 
-/**
- * @author Esko Luontola
- * @since 18.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ConcurrentDatabaseAccessSpec extends Specification<Object> {

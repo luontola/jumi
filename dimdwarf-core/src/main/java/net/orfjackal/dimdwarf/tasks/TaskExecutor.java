@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.context.*;
 import javax.annotation.concurrent.Immutable;
 import java.util.concurrent.Executor;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 @Immutable
 public class TaskExecutor implements Executor {
 

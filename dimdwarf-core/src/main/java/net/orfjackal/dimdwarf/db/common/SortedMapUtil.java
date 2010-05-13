@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.db.common;
 import javax.annotation.Nullable;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 3.12.2008
- */
 public class SortedMapUtil {
 
     private SortedMapUtil() {

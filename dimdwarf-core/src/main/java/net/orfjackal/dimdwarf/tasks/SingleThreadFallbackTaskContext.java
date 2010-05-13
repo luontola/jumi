@@ -8,10 +8,6 @@ import com.google.inject.BindingAnnotation;
 
 import java.lang.annotation.*;
 
-/**
- * @author Esko Luontola
- * @since 18.1.2009
- */
 @Retention(RetentionPolicy.RUNTIME)
 @BindingAnnotation
 public @interface SingleThreadFallbackTaskContext {

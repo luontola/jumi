@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.scheduler;
 import javax.annotation.CheckForNull;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 public interface SchedulingStrategy {
 
     @CheckForNull

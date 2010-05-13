@@ -13,10 +13,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.*;
 
-/**
- * @author Esko Luontola
- * @since 18.1.2009
- */
 @Singleton
 @ThreadSafe
 public class SingleThreadFallbackTaskExecutor implements Executor {

@@ -9,17 +9,14 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import net.orfjackal.dimdwarf.entities.dao.ConvertEntityIdToBytes;
-import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
+import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
+
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class DatabaseAdapterSpec extends Specification<Object> {

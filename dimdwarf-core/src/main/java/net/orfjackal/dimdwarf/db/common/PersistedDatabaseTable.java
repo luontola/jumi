@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.db.Blob;
 import javax.annotation.*;
 import java.util.Map;
 
-/**
- * @author Esko Luontola
- * @since 18.11.2008
- */
 public interface PersistedDatabaseTable<H> {
 
     @Nullable

@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 @Immutable
 public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
 

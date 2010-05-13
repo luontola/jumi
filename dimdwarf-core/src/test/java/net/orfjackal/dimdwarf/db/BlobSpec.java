@@ -11,10 +11,6 @@ import org.junit.runner.RunWith;
 import java.io.*;
 import java.nio.*;
 
-/**
- * @author Esko Luontola
- * @since 18.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class BlobSpec extends Specification<Blob> {

@@ -11,10 +11,6 @@ import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
-/**
- * @author Esko Luontola
- * @since 18.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class InMemoryDatabaseSpec extends Specification<Object> {

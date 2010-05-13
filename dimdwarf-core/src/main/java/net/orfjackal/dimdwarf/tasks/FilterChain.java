@@ -9,10 +9,6 @@ import com.google.inject.Inject;
 import javax.annotation.concurrent.Immutable;
 import java.util.concurrent.Executor;
 
-/**
- * @author Esko Luontola
- * @since 12.11.2008
- */
 @Immutable
 public class FilterChain implements Executor {
 

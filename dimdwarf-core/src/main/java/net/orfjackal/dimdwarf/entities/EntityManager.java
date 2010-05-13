@@ -14,10 +14,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 25.8.2008
- */
 @TaskScoped
 @NotThreadSafe
 public class EntityManager implements AllEntities, EntitiesLoadedInMemory {

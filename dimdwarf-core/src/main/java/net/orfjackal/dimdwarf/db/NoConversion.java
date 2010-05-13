@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.db;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 @Immutable
 public class NoConversion<T> implements Converter<T, T> {
 

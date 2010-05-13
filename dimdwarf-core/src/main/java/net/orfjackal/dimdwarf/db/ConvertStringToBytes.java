@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.db;
 import javax.annotation.concurrent.Immutable;
 import java.nio.charset.Charset;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 @Immutable
 public class ConvertStringToBytes implements Converter<String, Blob> {
 

@@ -8,10 +8,6 @@ import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 @Immutable
 public class SchedulingFuture implements ScheduledFuture<Object>, Serializable {
     private static final long serialVersionUID = 1L;

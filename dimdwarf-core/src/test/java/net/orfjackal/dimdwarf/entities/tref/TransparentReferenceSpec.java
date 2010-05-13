@@ -18,10 +18,6 @@ import org.junit.runner.RunWith;
 import java.io.*;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TransparentReferenceSpec extends Specification<Object> {

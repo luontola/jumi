@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.tasks.Filter;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 12.11.2008
- */
 @Immutable
 public class EntityFlushingFilter implements Filter {
 

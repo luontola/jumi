@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.entities.dao.BindingDao;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 @Immutable
 public class BindingRepository implements DatabaseTable<String, Object> {
 

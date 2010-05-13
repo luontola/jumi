@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.aop.conf;
 
 import net.orfjackal.dimdwarf.aop.AopApi;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 public class DimdwarfAopApi implements AopApi {
 
     public String getEntityAnnotation() {

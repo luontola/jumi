@@ -12,10 +12,6 @@ import net.orfjackal.dimdwarf.tx.*;
 
 import java.util.concurrent.Executor;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 public class TaskContextModule extends AbstractModule {
 
     private static final int MAX_RETRIES = 5;

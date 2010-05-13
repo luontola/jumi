@@ -9,10 +9,6 @@ import com.google.inject.*;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 17.8.2009
- */
 @NotThreadSafe
 public abstract class AbstractThreadContext implements Context {
 

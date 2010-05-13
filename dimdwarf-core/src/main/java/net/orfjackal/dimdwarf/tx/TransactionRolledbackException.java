@@ -6,9 +6,6 @@ package net.orfjackal.dimdwarf.tx;
 
 /**
  * Indicates that the transaction has been rolled back, or marked to roll back.
- *
- * @author Esko Luontola
- * @since 19.8.2008
  */
 public class TransactionRolledbackException extends TransactionException {
     private static final long serialVersionUID = 1L;

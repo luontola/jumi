@@ -11,10 +11,6 @@ import net.orfjackal.dimdwarf.db.Converter;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 
-/**
- * @author Esko Luontola
- * @since 13.8.2009
- */
 public class ConvertEntityIdToBigInteger implements Converter<EntityId, BigInteger> {
 
     @Nullable

@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-/**
- * @author Esko Luontola
- * @since 20.11.2008
- */
 public class RevisionHandle {
 
     private static final long UNDEFINED = RevisionList.NULL_REVISION - 1;

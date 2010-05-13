@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.aop.conf;
 import net.orfjackal.dimdwarf.aop.*;
 import org.objectweb.asm.ClassVisitor;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 public class AopTransformationChain extends AbstractTransformationChain {
 
     private final AopApi api;

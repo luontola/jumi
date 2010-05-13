@@ -11,10 +11,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Esko Luontola
- * @since 11.9.2008
- */
 @ThreadSafe
 public class RevisionCounter {
 

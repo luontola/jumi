@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.util;
 
-/**
- * @author Esko Luontola
- * @since 24.11.2008
- */
 public interface Clock {
 
     long currentTimeMillis();

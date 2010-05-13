@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.tasks.util;
 
 import java.util.Collection;
 
-/**
- * @author Esko Luontola
- * @since 29.11.2008
- */
 public interface IncrementalTask {
 
     Collection<? extends IncrementalTask> step();

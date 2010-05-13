@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.db.Blob;
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
 
-/**
- * @author Esko Luontola
- * @since 1.9.2008
- */
 @Immutable
 public class ObjectSerializer {
 

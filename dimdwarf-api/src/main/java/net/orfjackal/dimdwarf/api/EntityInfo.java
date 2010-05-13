@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.api;
 
-/**
- * @author Esko Luontola
- * @since 2.11.2008
- */
 public interface EntityInfo {
 
     /**

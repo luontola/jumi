@@ -17,10 +17,6 @@ import org.junit.runner.RunWith;
 import java.io.Serializable;
 import java.util.concurrent.Executor;
 
-/**
- * @author Esko Luontola
- * @since 26.11.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class RecoverableSetSpec extends Specification<Object> {

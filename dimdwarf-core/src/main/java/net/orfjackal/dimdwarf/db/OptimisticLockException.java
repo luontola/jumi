@@ -8,9 +8,6 @@ import net.orfjackal.dimdwarf.tx.Retryable;
 
 /**
  * Thrown when an optimistic locking conflict occurs.
- *
- * @author Esko Luontola
- * @since 19.8.2008
  */
 public class OptimisticLockException extends PersistenceException implements Retryable {
     private static final long serialVersionUID = 1L;

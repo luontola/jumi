@@ -12,10 +12,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
 
-/**
- * @author Esko Luontola
- * @since 25.8.2008
- */
 @NotThreadSafe
 public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable {
     private static final long serialVersionUID = 1L;

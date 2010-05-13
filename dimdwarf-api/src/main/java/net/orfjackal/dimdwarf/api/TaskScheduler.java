@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.api;
 
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 public interface TaskScheduler {
 
     // TODO: replace Future and ScheduledFuture with a custom interface, which does not have unnecessary operations (e.g. get)

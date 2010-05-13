@@ -18,10 +18,6 @@ import org.junit.runner.RunWith;
 import java.util.*;
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 27.11.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TaskSchedulingIntegrationSpec extends Specification<Object> {

@@ -13,9 +13,6 @@ import java.util.regex.Pattern;
  * foo.*   - All classes in package foo
  * foo.**  - All classes in package foo and its subpackages
  * </pre>
- *
- * @author Esko Luontola
- * @since 27.12.2008
  */
 public class ClassNameMatcher {
 

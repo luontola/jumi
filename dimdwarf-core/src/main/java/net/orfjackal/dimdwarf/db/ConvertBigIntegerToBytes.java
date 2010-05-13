@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.db;
 import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 @Immutable
 public class ConvertBigIntegerToBytes implements Converter<BigInteger, Blob> {
 

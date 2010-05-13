@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.util;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-/**
- * @author Esko Luontola
- * @since 18.8.2008
- */
 public class ByteUtil {
 
     private ByteUtil() {

@@ -8,10 +8,6 @@ import com.google.inject.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 14.9.2008
- */
 @Immutable
 public class InjectObjectsOnDeserialization extends SerializationAdapter {
 

@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.api.internal;
 
-/**
- * @author Esko Luontola
- * @since 31.1.2008
- */
 public interface TransparentReference {
 
     Object getEntity$TREF();

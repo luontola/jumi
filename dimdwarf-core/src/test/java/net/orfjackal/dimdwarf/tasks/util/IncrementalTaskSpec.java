@@ -17,10 +17,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 10.12.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class IncrementalTaskSpec extends Specification<Object> {

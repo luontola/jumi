@@ -14,10 +14,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author Esko Luontola
- * @since 26.11.2008
- */
 @Singleton
 @ThreadSafe
 public class TaskThreadPool {

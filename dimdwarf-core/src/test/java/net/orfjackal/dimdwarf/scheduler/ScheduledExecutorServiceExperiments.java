@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 public class ScheduledExecutorServiceExperiments {
 
     public static void main(String[] args) throws Exception {

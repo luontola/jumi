@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 public interface DummyInterface {
 
     Object getOther();

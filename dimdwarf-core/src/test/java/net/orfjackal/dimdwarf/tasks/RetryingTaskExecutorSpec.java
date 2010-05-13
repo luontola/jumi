@@ -14,10 +14,6 @@ import org.slf4j.Logger;
 
 import java.util.concurrent.Executor;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class RetryingTaskExecutorSpec extends Specification<Object> {

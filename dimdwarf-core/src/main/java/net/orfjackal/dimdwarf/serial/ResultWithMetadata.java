@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.util.Objects;
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 11.12.2008
- */
 @Immutable
 public abstract class ResultWithMetadata {
 

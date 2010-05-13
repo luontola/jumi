@@ -14,10 +14,6 @@ import net.orfjackal.dimdwarf.serial.*;
 
 import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 public class EntityModule extends AbstractModule {
 
     protected void configure() {

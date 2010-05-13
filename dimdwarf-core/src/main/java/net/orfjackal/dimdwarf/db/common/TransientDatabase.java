@@ -11,10 +11,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.Set;
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 18.11.2008
- */
 @ThreadSafe
 public class TransientDatabase<H> implements Database<Blob, Blob>, TransactionParticipant {
 

@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.tasks.util;
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 10.12.2008
- */
 public class MultiStepIncrementalTask implements IncrementalTask, Serializable {
     private static final long serialVersionUID = 1L;
 

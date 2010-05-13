@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.aop.conf.AbstractTransformationChain;
 import org.junit.runner.RunWith;
 import org.objectweb.asm.*;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ClassFileTransformerSpec extends Specification<Object> {

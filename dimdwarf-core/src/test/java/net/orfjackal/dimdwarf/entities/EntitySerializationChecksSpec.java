@@ -16,10 +16,6 @@ import org.junit.runner.RunWith;
 
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 
-/**
- * @author Esko Luontola
- * @since 4.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class EntitySerializationChecksSpec extends Specification<Object> {

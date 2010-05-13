@@ -12,15 +12,12 @@ import net.orfjackal.dimdwarf.tasks.*;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.slf4j.Logger;
 
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 26.11.2008
- */
+import static org.mockito.Mockito.verify;
+
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TaskThreadPoolSpec extends Specification2 {

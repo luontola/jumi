@@ -10,9 +10,6 @@ package net.orfjackal.dimdwarf.api.internal;
  * For performance and Darkstar compatibility reasons the system uses internally only this interface,
  * and not the {@link @Entity} annotation. Classes annotated with {@code @Entity} will be automatically
  * transformed to implement this interface.
- *
- * @author Esko Luontola
- * @since 15.8.2008
  */
 public interface EntityObject {
 }

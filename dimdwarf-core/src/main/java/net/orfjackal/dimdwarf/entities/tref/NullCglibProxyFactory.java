@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.entities.tref;
 
 import net.sf.cglib.proxy.*;
 
-/**
- * @author Esko Luontola
- * @since 27.12.2008
- */
 public abstract class NullCglibProxyFactory implements Factory {
 
     public Object newInstance(Callback callback) {

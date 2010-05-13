@@ -18,9 +18,6 @@ import java.math.BigInteger;
  * TODO: When that happens, there will be need to be more careful where EntityId and where EntityObjectId is used.
  * It will be necessary to make a distinction between different types of EntityIds in the
  * implementation level, but to the application programmer the IDs should not be visible.
- *
- * @author Esko Luontola
- * @since 13.8.2009
  */
 public class EntityObjectId implements EntityId, Serializable {
     private static final long serialVersionUID = 1L;

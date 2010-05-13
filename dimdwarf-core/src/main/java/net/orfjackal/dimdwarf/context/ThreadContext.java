@@ -10,9 +10,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Even though this class is thread-safe, the contexts themselves do not need to be thread-safe,
  * because this class will make sure that they are used in only one thread.
- *
- * @author Esko Luontola
- * @since 5.9.2008
  */
 @ThreadSafe
 public class ThreadContext {

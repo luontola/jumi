@@ -18,9 +18,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * than X. Modifying other keys concurrently in older revisions is allowed. The old revisions can be purged with
  * {@link #purgeRevisionsOlderThan(long)} when the user of this class is sure that those revisions will not be
  * accessed.
- *
- * @author Esko Luontola
- * @since 20.8.2008
  */
 @ThreadSafe
 public class RevisionMap<K, V> {

@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.util;
 
 import javax.annotation.Nullable;
 
-/**
- * @author Esko Luontola
- * @since 29.10.2008
- */
 public class Objects {
 
     private Objects() {

@@ -8,9 +8,6 @@ import net.orfjackal.dimdwarf.db.PersistenceException;
 
 /**
  * Thrown when trying to follow a reference to an entity which does not exist.
- *
- * @author Esko Luontola
- * @since 19.8.2008
  */
 public class EntityNotFoundException extends PersistenceException {
     private static final long serialVersionUID = 1L;

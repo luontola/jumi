@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.entities;
 import javax.annotation.concurrent.*;
 import java.util.Iterator;
 
-/**
- * @author Esko Luontola
- * @since 24.11.2008
- */
 @Immutable
 public class BindingWalker implements Iterable<String> {
 

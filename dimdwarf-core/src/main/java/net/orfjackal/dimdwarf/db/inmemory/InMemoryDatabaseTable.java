@@ -11,10 +11,6 @@ import org.jetbrains.annotations.TestOnly;
 import javax.annotation.concurrent.*;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 11.9.2008
- */
 @ThreadSafe
 public class InMemoryDatabaseTable implements PersistedDatabaseTable<RevisionHandle> {
 

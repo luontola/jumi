@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.entities;
 
 import java.io.Serializable;
 
-/**
- * @author Esko Luontola
- * @since 4.9.2008
- */
 public class DummyObject implements DummyInterface, Serializable {
     private static final long serialVersionUID = 1L;
 

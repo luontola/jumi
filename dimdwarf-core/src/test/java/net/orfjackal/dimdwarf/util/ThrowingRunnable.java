@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.util;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 public abstract class ThrowingRunnable implements Runnable {
 
     public final void run() {

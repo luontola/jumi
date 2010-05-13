@@ -16,10 +16,6 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Method;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 26.1.2008
- */
 @Singleton
 @Immutable
 public class TransparentReferenceFactory {

@@ -11,10 +11,6 @@ import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Esko Luontola
- * @since 4.9.2008
- */
 @Singleton
 @ThreadSafe
 public class EntityIdFactory {

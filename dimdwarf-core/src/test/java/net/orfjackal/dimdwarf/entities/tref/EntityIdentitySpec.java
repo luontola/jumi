@@ -13,10 +13,6 @@ import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class EntityIdentitySpec extends Specification<Object> {

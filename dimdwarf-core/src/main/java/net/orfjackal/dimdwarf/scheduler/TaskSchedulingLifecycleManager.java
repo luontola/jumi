@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.events.SystemLifecycleListener;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 28.11.2008
- */
 @Immutable
 public class TaskSchedulingLifecycleManager implements SystemLifecycleListener {
 

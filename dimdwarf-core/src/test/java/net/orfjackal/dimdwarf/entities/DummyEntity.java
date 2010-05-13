@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.api.internal.EntityObject;
 
 import java.io.Serializable;
 
-/**
- * @author Esko Luontola
- * @since 25.8.2008
- */
 @Entity
 public class DummyEntity implements DummyInterface, EntityObject, Serializable {
     private static final long serialVersionUID = 1L;

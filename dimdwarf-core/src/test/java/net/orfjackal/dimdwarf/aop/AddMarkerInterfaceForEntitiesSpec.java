@@ -14,10 +14,6 @@ import org.junit.runner.RunWith;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class AddMarkerInterfaceForEntitiesSpec extends Specification<Object> {

@@ -9,10 +9,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
-/**
- * @author Esko Luontola
- * @since 19.11.2008
- */
 @ThreadSafe
 public class GroupLock<T extends Comparable<T>> {
 

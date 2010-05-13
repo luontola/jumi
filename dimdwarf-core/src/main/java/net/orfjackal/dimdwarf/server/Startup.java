@@ -9,10 +9,6 @@ import org.slf4j.*;
 
 import java.io.IOException;
 
-/**
- * @author Esko Luontola
- * @since 15.8.2008
- */
 public class Startup {
     private static final Logger logger = LoggerFactory.getLogger(Startup.class);
 

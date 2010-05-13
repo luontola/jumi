@@ -8,10 +8,6 @@ import com.google.inject.AbstractModule;
 import jdave.Specification;
 import net.orfjackal.dimdwarf.entities.*;
 
-/**
- * @author Esko Luontola
- * @since 12.11.2008
- */
 public class FakeEntityModule extends AbstractModule {
 
     private final Specification<?> spec;

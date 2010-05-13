@@ -19,10 +19,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class RetryableExceptionsSpec extends Specification<Object> {

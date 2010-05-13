@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.db;
 
 import java.util.Set;
 
-/**
- * @author Esko Luontola
- * @since 11.9.2008
- */
 public interface Database<K, V> {
 
     IsolationLevel getIsolationLevel();

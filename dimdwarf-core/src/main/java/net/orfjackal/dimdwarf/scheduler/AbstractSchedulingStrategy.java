@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.util.Clock;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Esko Luontola
- * @since 24.11.2008
- */
 public abstract class AbstractSchedulingStrategy implements Serializable, SchedulingStrategy {
     private static final long serialVersionUID = 1L;
 

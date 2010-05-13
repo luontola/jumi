@@ -11,10 +11,6 @@ import net.orfjackal.dimdwarf.entities.AllEntities;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 2.11.2008
- */
 @Immutable
 public class TrefAwareEntityInfo implements EntityInfo {
 

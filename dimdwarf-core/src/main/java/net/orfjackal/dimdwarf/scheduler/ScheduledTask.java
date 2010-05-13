@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.scheduler;
 import javax.annotation.CheckReturnValue;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Esko Luontola
- * @since 26.11.2008
- */
 public interface ScheduledTask {
 
     @CheckReturnValue

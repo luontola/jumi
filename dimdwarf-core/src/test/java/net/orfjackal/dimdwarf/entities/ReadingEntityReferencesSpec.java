@@ -16,10 +16,6 @@ import java.io.IOException;
 
 import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 
-/**
- * @author Esko Luontola
- * @since 25.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ReadingEntityReferencesSpec extends Specification<Object> {

@@ -6,15 +6,12 @@ package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.scheduler.TaskThreadPool;
-import static net.orfjackal.dimdwarf.server.ServerLifecycleManager.State.STARTED;
 
 import java.util.*;
 import java.util.logging.*;
 
-/**
- * @author Esko Luontola
- * @since 10.12.2008
- */
+import static net.orfjackal.dimdwarf.server.ServerLifecycleManager.State.STARTED;
+
 public class TestServer {
 
     private final Injector injector;

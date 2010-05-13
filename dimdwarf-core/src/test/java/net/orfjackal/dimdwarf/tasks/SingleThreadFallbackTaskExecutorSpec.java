@@ -16,10 +16,6 @@ import org.slf4j.Logger;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Esko Luontola
- * @since 18.1.2009
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class SingleThreadFallbackTaskExecutorSpec extends Specification<Object> {

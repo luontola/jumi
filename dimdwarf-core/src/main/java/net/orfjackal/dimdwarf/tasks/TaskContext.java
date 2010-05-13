@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.context.AbstractThreadContext;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 @NotThreadSafe
 public class TaskContext extends AbstractThreadContext {
 

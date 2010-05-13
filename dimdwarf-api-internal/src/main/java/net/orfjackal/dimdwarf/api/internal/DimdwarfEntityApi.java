@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.api.internal;
 
-/**
- * @author Esko Luontola
- * @since 10.9.2008
- */
 public class DimdwarfEntityApi implements EntityApi {
 
     public boolean isEntity(Object obj) {

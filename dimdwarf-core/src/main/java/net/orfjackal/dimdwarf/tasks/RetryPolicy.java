@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 public interface RetryPolicy {
 
     void taskHasFailed(Throwable t);

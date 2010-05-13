@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.db.*;
 
 import javax.annotation.Nullable;
 
-/**
- * @author Esko Luontola
- * @since 13.8.2009
- */
 public class ConvertEntityIdToBytes implements Converter<EntityId, Blob> {
 
     // TODO: get rid of the conversion to BigInteger, convert EntityId straight to bytes

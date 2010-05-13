@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.db;
 
 import net.orfjackal.dimdwarf.tx.Transaction;
 
-/**
- * @author Esko Luontola
- * @since 13.9.2008
- */
 public interface DatabaseManager {
 
     Database<Blob, Blob> openConnection(Transaction tx);

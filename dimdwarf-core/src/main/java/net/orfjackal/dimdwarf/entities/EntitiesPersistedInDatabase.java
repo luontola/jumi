@@ -8,10 +8,6 @@ import net.orfjackal.dimdwarf.api.EntityId;
 
 import javax.annotation.Nonnull;
 
-/**
- * @author Esko Luontola
- * @since 31.8.2008
- */
 public interface EntitiesPersistedInDatabase {
 
     @Nonnull

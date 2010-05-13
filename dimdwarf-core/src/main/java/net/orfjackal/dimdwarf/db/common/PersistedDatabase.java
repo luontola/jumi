@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.db.IsolationLevel;
 import javax.annotation.CheckReturnValue;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 18.11.2008
- */
 public interface PersistedDatabase<H> {
 
     IsolationLevel getIsolationLevel();

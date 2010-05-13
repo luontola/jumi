@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.db;
 
-/**
- * @author Esko Luontola
- * @since 29.10.2008
- */
 public class LongOverflowTest {
 
     // TODO: overflowing long on C2Q6600 would take over 178000 days (487 years), so maybe it would be good enough to use longs as entity IDs?

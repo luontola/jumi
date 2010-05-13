@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-/**
- * @author Esko Luontola
- * @since 18.8.2008
- */
 public interface TransactionCoordinator {
 
     Transaction getTransaction();

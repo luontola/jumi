@@ -15,10 +15,6 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 1.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class EntityRepositorySpec extends Specification<Object> {

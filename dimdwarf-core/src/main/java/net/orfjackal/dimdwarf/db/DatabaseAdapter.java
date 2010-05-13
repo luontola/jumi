@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.db;
 import javax.annotation.concurrent.Immutable;
 import java.util.Set;
 
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 @Immutable
 public class DatabaseAdapter<K1, V1, K2, V2> implements Database<K1, V1> {
 

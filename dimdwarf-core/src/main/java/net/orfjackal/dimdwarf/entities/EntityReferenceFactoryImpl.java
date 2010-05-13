@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.api.internal.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 3.11.2008
- */
 @Immutable
 public class EntityReferenceFactoryImpl implements EntityReferenceFactory {
 

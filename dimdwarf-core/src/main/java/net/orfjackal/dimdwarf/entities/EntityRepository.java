@@ -13,10 +13,6 @@ import net.orfjackal.dimdwarf.tasks.TaskScoped;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-/**
- * @author Esko Luontola
- * @since 1.9.2008
- */
 @TaskScoped
 @NotThreadSafe
 public class EntityRepository implements EntitiesPersistedInDatabase {

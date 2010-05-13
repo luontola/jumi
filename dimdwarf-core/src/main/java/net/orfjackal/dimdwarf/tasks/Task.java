@@ -8,10 +8,6 @@ import com.google.inject.BindingAnnotation;
 
 import java.lang.annotation.*;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 @Retention(RetentionPolicy.RUNTIME)
 @BindingAnnotation
 public @interface Task {

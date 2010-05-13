@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import java.io.Serializable;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 public class DummyTask implements Runnable, Serializable {
     private static final long serialVersionUID = 1L;
 

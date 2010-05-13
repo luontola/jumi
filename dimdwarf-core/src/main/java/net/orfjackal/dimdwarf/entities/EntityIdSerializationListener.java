@@ -9,10 +9,6 @@ import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 11.12.2008
- */
 @Immutable
 public class EntityIdSerializationListener extends SerializationAdapter {
 

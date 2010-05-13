@@ -10,10 +10,6 @@ import java.io.*;
 import java.lang.instrument.*;
 import java.security.ProtectionDomain;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 public class TransformationTestClassLoader extends ClassLoader {
 
     private final ClassNameMatcher classesToInstrument;

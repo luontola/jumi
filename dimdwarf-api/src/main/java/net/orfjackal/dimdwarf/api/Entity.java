@@ -17,9 +17,6 @@ import java.lang.annotation.*;
  * See pages 31-36 of the book
  * <a href="http://www.infoq.com/minibooks/domain-driven-design-quickly">Domain Driven Design Quickly</a>
  * to learn more about the difference between entities and value objects.
- *
- * @author Esko Luontola
- * @since 9.9.2008
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

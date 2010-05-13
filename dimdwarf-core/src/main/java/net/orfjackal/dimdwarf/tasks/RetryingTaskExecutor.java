@@ -10,10 +10,6 @@ import org.slf4j.*;
 import javax.annotation.concurrent.Immutable;
 import java.util.concurrent.Executor;
 
-/**
- * @author Esko Luontola
- * @since 13.12.2008
- */
 @Immutable
 public class RetryingTaskExecutor implements Executor {
 

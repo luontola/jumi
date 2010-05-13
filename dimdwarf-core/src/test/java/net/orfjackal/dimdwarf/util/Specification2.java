@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.util;
 import jdave.*;
 import org.mockito.*;
 
-/**
- * @author Esko Luontola
- * @since 24.4.2009
- */
 public abstract class Specification2 extends Specification<Object> {
 
     private static final String MOCK_METHOD_DISABLED =

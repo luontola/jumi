@@ -21,10 +21,6 @@ import java.util.logging.*;
 
 import static net.orfjackal.dimdwarf.scheduler.TaskSchedulerSpec.takeNextTaskFrom;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TransactionalTaskSchedulerSpec extends Specification<Object> {

@@ -6,11 +6,6 @@ package net.orfjackal.dimdwarf.db;
 
 import javax.annotation.Nullable;
 
-
-/**
- * @author Esko Luontola
- * @since 12.9.2008
- */
 public interface Converter<T, U> {
 
     @Nullable

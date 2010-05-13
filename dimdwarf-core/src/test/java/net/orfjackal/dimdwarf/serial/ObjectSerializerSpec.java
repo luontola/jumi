@@ -11,10 +11,6 @@ import net.orfjackal.dimdwarf.entities.DummyEntity;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 1.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ObjectSerializerSpec extends Specification<Object> {

@@ -9,10 +9,6 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.entities.DummyInterface;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 5.9.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class ThreadContextSpec extends Specification<Object> {

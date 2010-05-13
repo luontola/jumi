@@ -15,10 +15,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.*;
 import java.util.concurrent.*;
 
-/**
- * @author Esko Luontola
- * @since 24.11.2008
- */
 @Singleton
 @ThreadSafe
 public class TaskSchedulerImpl implements TaskScheduler, TaskProducer {

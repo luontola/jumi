@@ -11,9 +11,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * Linked list which remembers multiple revisions of a value. The revisions are immutable, but revisions
  * older than the latest revision may be purged to free memory. Reading the latest revision is an O(1) operation
  * and reading older revisions is an O(N) operation.
- *
- * @author Esko Luontola
- * @since 19.8.2008
  */
 @ThreadSafe
 public class RevisionList<T> {

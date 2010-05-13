@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-/**
- * @author Esko Luontola
- * @since 17.8.2008
- */
 public class TransactionException extends RuntimeException implements Retryable {
     private static final long serialVersionUID = 1L;
 

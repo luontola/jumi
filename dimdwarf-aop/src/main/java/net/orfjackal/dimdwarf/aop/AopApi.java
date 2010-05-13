@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.aop;
 
-/**
- * @author Esko Luontola
- * @since 24.12.2008
- */
 public interface AopApi {
 
     String getEntityAnnotation();

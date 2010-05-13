@@ -4,14 +4,10 @@
 
 package net.orfjackal.dimdwarf.context;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
-/**
- * This class is NOT thread-safe.
- *
- * @author Esko Luontola
- * @since 5.9.2008
- */
+@NotThreadSafe
 public class FakeContext implements Context {
 
     private final Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();

@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 
-/**
- * @author Esko Luontola
- * @since 31.1.2008
- */
 @Immutable
 public class TransparentReferenceBackend implements TransparentReference, Serializable {
     private static final long serialVersionUID = 1L;

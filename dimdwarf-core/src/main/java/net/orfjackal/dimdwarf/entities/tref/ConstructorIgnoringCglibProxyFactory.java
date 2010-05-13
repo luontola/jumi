@@ -10,10 +10,6 @@ import org.objenesis.instantiator.ObjectInstantiator;
 
 import java.lang.reflect.Method;
 
-/**
- * @author Esko Luontola
- * @since 27.12.2008
- */
 public class ConstructorIgnoringCglibProxyFactory extends NullCglibProxyFactory {
 
     private final ObjectInstantiator instantiator;

@@ -11,10 +11,6 @@ import org.slf4j.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 12.11.2008
- */
 @Immutable
 public class TransactionFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(TransactionFilter.class);

@@ -13,10 +13,6 @@ import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
 import org.junit.runner.RunWith;
 
-/**
- * @author Esko Luontola
- * @since 25.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class FlushingEntitiesSpec extends Specification<Object> {

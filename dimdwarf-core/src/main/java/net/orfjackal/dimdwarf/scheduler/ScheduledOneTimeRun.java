@@ -6,10 +6,6 @@ package net.orfjackal.dimdwarf.scheduler;
 
 import net.orfjackal.dimdwarf.util.Clock;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 public class ScheduledOneTimeRun extends AbstractSchedulingStrategy {
     private static final long serialVersionUID = 1L;
 

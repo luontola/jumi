@@ -7,10 +7,6 @@ package net.orfjackal.dimdwarf.util;
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 10.12.2008
- */
 public class SerializableIterator<T> implements Iterator<T>, Serializable {
     private static final long serialVersionUID = 1L;
 

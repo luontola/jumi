@@ -6,12 +6,6 @@ package net.orfjackal.dimdwarf.api;
 
 import java.math.BigInteger;
 
-/**
- * Unique ID for an entity.
- *
- * @author Esko Luontola
- * @since 13.8.2009
- */
 public interface EntityId {
 
     BigInteger toBigInteger();

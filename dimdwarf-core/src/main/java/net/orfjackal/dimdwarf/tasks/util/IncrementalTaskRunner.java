@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.api.TaskScheduler;
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * @author Esko Luontola
- * @since 10.12.2008
- */
 public class IncrementalTaskRunner implements Runnable, Serializable {
     private static final long serialVersionUID = 1L;
 

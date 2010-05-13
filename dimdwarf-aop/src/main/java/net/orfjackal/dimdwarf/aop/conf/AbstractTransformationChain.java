@@ -9,10 +9,6 @@ import org.objectweb.asm.*;
 import java.lang.instrument.*;
 import java.security.ProtectionDomain;
 
-/**
- * @author Esko Luontola
- * @since 9.9.2008
- */
 public abstract class AbstractTransformationChain implements ClassFileTransformer {
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,

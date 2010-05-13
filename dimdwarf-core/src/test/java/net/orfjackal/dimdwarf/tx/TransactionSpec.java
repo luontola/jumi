@@ -14,10 +14,6 @@ import java.util.concurrent.CountDownLatch;
 
 import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 
-/**
- * @author Esko Luontola
- * @since 15.8.2008
- */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class TransactionSpec extends Specification<TransactionContext> {

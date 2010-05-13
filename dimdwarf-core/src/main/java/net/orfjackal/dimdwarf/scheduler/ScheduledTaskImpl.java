@@ -11,10 +11,6 @@ import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Esko Luontola
- * @since 25.11.2008
- */
 @Entity
 public class ScheduledTaskImpl implements EntityObject, Serializable, ScheduledTask {
     private static final long serialVersionUID = 1L;

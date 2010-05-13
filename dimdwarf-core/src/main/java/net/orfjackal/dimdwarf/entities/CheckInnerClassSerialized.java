@@ -8,10 +8,6 @@ import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
 
-/**
- * @author Esko Luontola
- * @since 4.9.2008
- */
 @Immutable
 public class CheckInnerClassSerialized extends SerializationAdapter {
 

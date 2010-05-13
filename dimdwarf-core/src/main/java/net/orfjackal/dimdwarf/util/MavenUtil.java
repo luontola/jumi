@@ -10,10 +10,6 @@ import javax.annotation.Nullable;
 import java.io.*;
 import java.util.Properties;
 
-/**
- * @author Esko Luontola
- * @since 15.8.2008
- */
 public class MavenUtil {
     private static final Logger logger = LoggerFactory.getLogger(MavenUtil.class);
 

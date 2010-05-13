@@ -8,10 +8,6 @@ import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.db.*;
 
-/**
- * @author Esko Luontola
- * @since 2.12.2008
- */
 public class BindingDao
         extends DatabaseTableAdapter<String, EntityId, Blob, Blob>
         implements DatabaseTable<String, EntityId> {

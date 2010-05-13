@@ -4,10 +4,6 @@
 
 package net.orfjackal.dimdwarf.serial;
 
-/**
- * @author Esko Luontola
- * @since 11.12.2008
- */
 public interface MetadataBuilder {
 
     void append(Class<?> key, Object value);
