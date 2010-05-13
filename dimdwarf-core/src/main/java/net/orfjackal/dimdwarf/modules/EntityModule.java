@@ -25,6 +25,7 @@ public class EntityModule extends AbstractModule {
 
         bind(AllEntities.class).to(EntityManager.class);
         bind(EntitiesLoadedInMemory.class).to(EntityManager.class);
+        bind(EntitiesPersistedInDatabase.class).to(EntityRepository.class);
         bind(EntityReferenceFactory.class).to(EntityReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(TrefAwareEntityInfo.class);
 
@@ -33,11 +34,9 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(MaxEntityId.class)
                 .toInstance(0L); // TODO: import from database
 
-        bind(EntitiesPersistedInDatabase.class).to(EntityRepositoryImpl.class);
         bind(databaseTableConnection())
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTable("entities"));
-
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));

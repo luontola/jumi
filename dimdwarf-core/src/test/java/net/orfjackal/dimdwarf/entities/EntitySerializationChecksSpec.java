@@ -11,9 +11,10 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.serial.*;
-import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 
 /**
  * @author Esko Luontola
@@ -26,7 +27,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
     private DatabaseTable<Blob, Blob> db;
-    private EntityRepositoryImpl repository;
+    private EntityRepository repository;
     private DummyEntity entity;
     private DelegatingSerializationReplacer replacer;
 
@@ -41,7 +42,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
         ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
 
         repository =
-                new EntityRepositoryImpl(
+                new EntityRepository(
                         new EntityDao(
                                 db,
                                 new ConvertEntityIdToBytes(),

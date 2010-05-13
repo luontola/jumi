@@ -27,7 +27,7 @@ public class EntityRepositorySpec extends Specification<Object> {
     private static final EntityId INVALID_ENTITY_ID = new EntityObjectId(999);
 
     private Executor taskContext;
-    private Provider<EntityRepositoryImpl> entities;
+    private Provider<EntityRepository> entities;
     private Provider<AllEntities> entityManager;
 
     public void create() throws Exception {
@@ -37,7 +37,7 @@ public class EntityRepositorySpec extends Specification<Object> {
                 new EntityModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
-        entities = injector.getProvider(EntityRepositoryImpl.class);
+        entities = injector.getProvider(EntityRepository.class);
         entityManager = injector.getProvider(AllEntities.class);
     }
 

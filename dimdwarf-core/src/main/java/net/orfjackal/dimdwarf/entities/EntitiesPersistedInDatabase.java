@@ -5,20 +5,25 @@
 package net.orfjackal.dimdwarf.entities;
 
 import net.orfjackal.dimdwarf.api.EntityId;
-import net.orfjackal.dimdwarf.db.DatabaseTable;
 
-import javax.annotation.Nonnull;
+import javax.annotation.*;
 
 /**
  * @author Esko Luontola
  * @since 31.8.2008
  */
-public interface EntitiesPersistedInDatabase extends DatabaseTable<EntityId, Object> {
+public interface EntitiesPersistedInDatabase {
 
     @Nonnull
     Object read(EntityId id) throws EntityNotFoundException;
 
     void update(EntityId id, Object entity);
 
-    void delete(EntityId id);
+    // TODO: get rid of iteration?
+
+    @Nullable
+    EntityId firstKey();
+
+    @Nullable
+    EntityId nextKeyAfter(EntityId currentKey);
 }
