@@ -27,7 +27,7 @@ public class ObjectSerializerSpec extends Specification<Object> {
         private DummyEntity deserialized;
 
         public void create() {
-            ObjectSerializer os = new ObjectSerializerImpl();
+            ObjectSerializerImpl os = new ObjectSerializerImpl();
             serialized = os.serialize(obj).getSerializedBytes();
             deserialized = (DummyEntity) os.deserialize(serialized).getDeserializedObject();
         }
@@ -44,7 +44,7 @@ public class ObjectSerializerSpec extends Specification<Object> {
     }
 
     public class SerializationListeners {
-        private ObjectSerializer os;
+        private ObjectSerializerImpl os;
         private SerializationListener listener;
         private Blob serialized;
 
@@ -76,7 +76,7 @@ public class ObjectSerializerSpec extends Specification<Object> {
     }
 
     public class SerializationReplacers {
-        private ObjectSerializer os;
+        private ObjectSerializerImpl os;
         private SerializationListener listener;
         private Blob serialized;
 
@@ -163,7 +163,7 @@ public class ObjectSerializerSpec extends Specification<Object> {
                     return obj;
                 }
             };
-            ObjectSerializer os = new ObjectSerializerImpl(
+            ObjectSerializerImpl os = new ObjectSerializerImpl(
                     new SerializationListener[]{listener},
                     new SerializationReplacer[]{replacer});
             ser = os.serialize("X");

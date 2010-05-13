@@ -39,8 +39,6 @@ public class EntityModule extends AbstractModule {
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));
-
-        bind(ObjectSerializer.class).to(ObjectSerializerImpl.class);
     }
 
     @Provides

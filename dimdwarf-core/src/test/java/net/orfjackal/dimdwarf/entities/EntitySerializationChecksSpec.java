@@ -39,7 +39,7 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
                 new CheckInnerClassSerialized()
         };
         replacer = new DelegatingSerializationReplacer();
-        ObjectSerializer serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
+        ObjectSerializerImpl serializer = new ObjectSerializerImpl(listeners, new SerializationReplacer[]{replacer});
 
         repository =
                 new EntityRepository(

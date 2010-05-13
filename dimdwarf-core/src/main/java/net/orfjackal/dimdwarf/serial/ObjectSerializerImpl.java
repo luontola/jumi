@@ -15,7 +15,7 @@ import java.io.*;
  * @since 1.9.2008
  */
 @Immutable
-public class ObjectSerializerImpl implements ObjectSerializer {
+public class ObjectSerializerImpl {
 
     private final SerializationListener[] listeners;
     private final SerializationReplacer[] replacers;

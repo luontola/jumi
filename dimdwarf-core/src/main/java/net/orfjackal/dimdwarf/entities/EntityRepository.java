@@ -22,10 +22,10 @@ import javax.annotation.concurrent.NotThreadSafe;
 public class EntityRepository implements EntitiesPersistedInDatabase {
 
     private final EntityDao database;
-    private final ObjectSerializer serializer;
+    private final ObjectSerializerImpl serializer;
 
     @Inject
-    public EntityRepository(EntityDao database, ObjectSerializer serializer) {
+    public EntityRepository(EntityDao database, ObjectSerializerImpl serializer) {
         this.database = database;
         this.serializer = serializer;
     }
