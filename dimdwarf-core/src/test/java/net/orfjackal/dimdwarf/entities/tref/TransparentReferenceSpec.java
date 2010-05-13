@@ -30,7 +30,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
     private static final EntityId ID2 = new EntityObjectId(2);
 
     private EntityReferenceFactory referenceFactory;
-    private TransparentReferenceFactory proxyFactory;
+    private TransparentReferenceFactoryImpl proxyFactory;
     private DummyEntity entity;
     private EntityApi entityApi = new DimdwarfEntityApi();
 

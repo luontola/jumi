@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 public class EntityIdentitySpec extends Specification<Object> {
 
     private EntityReferenceFactory referenceFactory;
-    protected TransparentReferenceFactory proxyFactory;
+    private TransparentReferenceFactoryImpl proxyFactory;
     private EntityObject ent1;
     private EntityObject ent2;
     private TransparentReference tref1;

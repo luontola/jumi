@@ -26,7 +26,7 @@ public class ProxyWithConcreteSuperclassSpec extends Specification<Object> {
     private static final EntityObjectId ID1 = new EntityObjectId(1);
 
     private EntityReferenceFactory referenceFactory;
-    private TransparentReferenceFactory proxyFactory;
+    private TransparentReferenceFactoryImpl proxyFactory;
     private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {

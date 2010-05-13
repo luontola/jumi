@@ -27,7 +27,6 @@ public class EntityModule extends AbstractModule {
         bind(EntitiesLoadedInMemory.class).to(EntityManager.class);
         bind(EntityReferenceFactory.class).to(EntityReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(TrefAwareEntityInfo.class);
-        bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);
 
         bind(EntityIdFactory.class).to(EntityIdFactoryImpl.class);
         bind(Long.class)

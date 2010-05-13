@@ -17,11 +17,11 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class ReplaceEntitiesWithTransparentReferences implements SerializationReplacer {
 
-    private final TransparentReferenceFactory factory;
+    private final TransparentReferenceFactoryImpl factory;
     private final EntityApi entityApi;
 
     @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory, EntityApi entityApi) {
+    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactoryImpl factory, EntityApi entityApi) {
         this.factory = factory;
         this.entityApi = entityApi;
     }

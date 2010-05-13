@@ -22,7 +22,7 @@ import java.util.*;
  */
 @Singleton
 @Immutable
-public class TransparentReferenceFactoryImpl implements TransparentReferenceFactory {
+public class TransparentReferenceFactoryImpl {
 
     private final CglibProxyFactoryCache proxyFactories = new CglibProxyFactoryCache();
     private final Provider<EntityReferenceFactory> referenceFactory;
@@ -32,12 +32,21 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
         this.referenceFactory = referenceFactory;
     }
 
+    /**
+     * Creates a proxy for the specified entity, so that the proxy will have the same
+     * external interface as the proxied entity, but the proxy itself does not need
+     * to be wrapped into an {@link EntityReference}.
+     */
     public TransparentReference createTransparentReference(Object entity) {
         Class<?> type = entity.getClass();
         EntityReference<?> ref = referenceFactory.get().createReference(entity);
         return newProxy(new TransparentReferenceBackend(type, ref));
     }
 
+    /**
+     * Creates a proxy from a {@link TransparentReferenceBackend} which is not yet proxied.
+     * This is needed only during deserialization and should not be called elsewhere.
+     */
     public TransparentReference newProxy(TransparentReferenceBackend tref) {
         Factory factory = proxyFactories.get(tref.getType$TREF());
         return (TransparentReference) factory.newInstance(new Callback[]{
@@ -108,6 +117,7 @@ public class TransparentReferenceFactoryImpl implements TransparentReferenceFact
     }
 
     // TODO: add one more callback that uses 'ManagedReference.getForUpdate' or 'markForUpdate' when target method has a special annotation  
+
     private static class EntityCallback implements LazyLoader {
 
         private final TransparentReference tref;
