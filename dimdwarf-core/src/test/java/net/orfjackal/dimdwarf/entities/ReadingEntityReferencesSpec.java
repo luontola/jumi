@@ -33,7 +33,7 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
     public void create() throws Exception {
         database = mock(EntitiesPersistedInDatabase.class);
-        manager = new EntityManager(new EntityIdFactoryImpl(0), database, new DimdwarfEntityApi());
+        manager = new EntityManager(new EntityIdFactory(0), database, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }

@@ -22,7 +22,7 @@ public class CreatingEntityReferencesSpec extends Specification<Object> {
     private EntityReferenceFactory refFactory;
 
     public void create() throws Exception {
-        manager = new EntityManager(new EntityIdFactoryImpl(0), null, new DimdwarfEntityApi());
+        manager = new EntityManager(new EntityIdFactory(0), null, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
     }
 

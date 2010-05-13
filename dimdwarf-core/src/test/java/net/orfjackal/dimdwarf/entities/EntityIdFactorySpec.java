@@ -20,10 +20,10 @@ public class EntityIdFactorySpec extends Specification<Object> {
 
     private static final long LARGEST_USED_ID = 42;
 
-    private EntityIdFactoryImpl factory;
+    private EntityIdFactory factory;
 
     public void create() throws Exception {
-        factory = new EntityIdFactoryImpl(LARGEST_USED_ID);
+        factory = new EntityIdFactory(LARGEST_USED_ID);
     }
 
 

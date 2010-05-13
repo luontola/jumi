@@ -9,7 +9,7 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.db.inmemory.InMemoryDatabaseManager;
-import net.orfjackal.dimdwarf.entities.EntityIdFactoryImpl;
+import net.orfjackal.dimdwarf.entities.EntityIdFactory;
 import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.server.TestServer;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
@@ -60,13 +60,13 @@ public class TaskSchedulingIntegrationSpec extends Specification<Object> {
     private void restartTheServer() {
         // XXX: add support for storing the database to a file (or byte array in here), and do not recycle these object instances
         final InMemoryDatabaseManager dbBackup = injector.getInstance(InMemoryDatabaseManager.class);
-        final EntityIdFactoryImpl idFactoryBackup = injector.getInstance(EntityIdFactoryImpl.class);
+        final EntityIdFactory idFactoryBackup = injector.getInstance(EntityIdFactory.class);
         startupTheServer(
                 new CommonModules(),
                 new AbstractModule() {
                     protected void configure() {
                         bind(InMemoryDatabaseManager.class).toInstance(dbBackup);
-                        bind(EntityIdFactoryImpl.class).toInstance(idFactoryBackup);
+                        bind(EntityIdFactory.class).toInstance(idFactoryBackup);
                     }
                 });
     }

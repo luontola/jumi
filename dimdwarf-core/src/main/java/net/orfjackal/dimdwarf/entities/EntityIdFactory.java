@@ -17,12 +17,12 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Singleton
 @ThreadSafe
-public class EntityIdFactoryImpl {
+public class EntityIdFactory {
 
     private final AtomicLong counter = new AtomicLong();
 
     @Inject
-    public EntityIdFactoryImpl(@MaxEntityId long largestUsedId) {
+    public EntityIdFactory(@MaxEntityId long largestUsedId) {
         counter.set(largestUsedId);
     }
 
