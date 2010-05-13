@@ -16,6 +16,8 @@ import java.util.*;
 @NotThreadSafe
 public class MetadataBuilderImpl implements MetadataBuilder {
 
+    // TODO: try to get rid of MetadataBuilder, because it complicates the serialization process even for listeners which do not use it 
+
     private final HashMap<Class<?>, List<Object>> metadata = new HashMap<Class<?>, List<Object>>();
 
     public void append(Class<?> key, Object value) {
