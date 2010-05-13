@@ -1,6 +1,6 @@
-// Copyright © 2008-2009, Esko Luontola. All Rights Reserved.
-// This software is released under the MIT License.
-// The license may be viewed at http://dimdwarf.sourceforge.net/LICENSE
+// Copyright © 2008-2010 Esko Luontola <www.orfjackal.net>
+// This software is released under the Apache License 2.0.
+// The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
 package net.orfjackal.dimdwarf.scheduler;
 
