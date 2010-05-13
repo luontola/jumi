@@ -17,29 +17,29 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class ConvertEntityToEntityId implements Converter<Object, EntityId> {
 
-    private final EntityManager entityManager;
-    private final EntityInfo entityInfo;
+    private final AllEntities entities;
+    private final EntityInfo info;
 
     @Inject
-    public ConvertEntityToEntityId(EntityManager entityManager, EntityInfo entityInfo) {
-        this.entityManager = entityManager;
-        this.entityInfo = entityInfo;
+    public ConvertEntityToEntityId(AllEntities entities, EntityInfo info) {
+        this.entities = entities;
+        this.info = info;
     }
 
     public Object back(EntityId id) {
         if (id == null) {
             return null;
         }
-        return entityManager.getEntityById(id);
+        return entities.getEntityById(id);
     }
 
     public EntityId forth(Object entity) {
         if (entity == null) {
             return null;
         }
-        // EntityInfo must be used instead of EntityManager, because the object
+        // HACK: EntityInfo must be used instead of EntityManager, because the object
         // could be a transparent reference proxy, and EntityManager does not
         // know how to handle transparent references.
-        return entityInfo.getEntityId(entity);
+        return info.getEntityId(entity);
     }
 }

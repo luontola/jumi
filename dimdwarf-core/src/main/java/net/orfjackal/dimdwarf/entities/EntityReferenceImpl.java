@@ -22,7 +22,7 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable 
 
     private final EntityId id;
     @Nullable private transient T entity;
-    @Nullable private transient EntityManager entityManager;
+    @Nullable private transient AllEntities entities;
 
     public EntityReferenceImpl(EntityId id, T entity) {
         assert id != null;
@@ -36,13 +36,13 @@ public class EntityReferenceImpl<T> implements EntityReference<T>, Serializable 
      * the reference is created, because then the entity is already cached locally.
      */
     @Inject
-    public void setEntityManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public void setEntityManager(AllEntities allEntities) {
+        this.entities = allEntities;
     }
 
     public T get() {
         if (entity == null) {
-            entity = (T) entityManager.getEntityById(id);
+            entity = (T) entities.getEntityById(id);
         }
         return entity;
     }

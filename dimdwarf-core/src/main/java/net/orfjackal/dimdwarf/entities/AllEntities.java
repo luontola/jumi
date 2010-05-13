@@ -12,7 +12,7 @@ import net.orfjackal.dimdwarf.db.IterableKeys;
  * @author Esko Luontola
  * @since 31.8.2008
  */
-public interface EntityManager extends IterableKeys<EntityId> {
+public interface AllEntities extends IterableKeys<EntityId> {
 
     EntityId getEntityId(EntityObject entity);
 

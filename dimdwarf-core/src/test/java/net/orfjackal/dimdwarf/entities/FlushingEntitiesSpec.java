@@ -46,17 +46,17 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(repository).update(ID1, entity);
             }});
-            manager.flushAllEntitiesToDatabase();
+            manager.flushToDatabase();
         }
 
         public void flushingTwiseIsNotAllowed() {
             checking(new Expectations() {{
                 one(repository).update(ID1, entity);
             }});
-            manager.flushAllEntitiesToDatabase();
+            manager.flushToDatabase();
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.flushAllEntitiesToDatabase();
+                    manager.flushToDatabase();
                 }
             }, should.raise(IllegalStateException.class));
         }
@@ -65,7 +65,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(repository).update(ID1, entity);
             }});
-            manager.flushAllEntitiesToDatabase();
+            manager.flushToDatabase();
 
             // try to call all public methods on the manager - all should fail
             specify(new Block() {
@@ -90,7 +90,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    manager.flushAllEntitiesToDatabase();
+                    manager.flushToDatabase();
                 }
             }, should.raise(IllegalStateException.class));
         }
@@ -103,7 +103,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
                 one(repository).update(ID1, entity); will(new RegisterEntity(newEntity));
                 one(repository).update(ID2, newEntity);
             }});
-            manager.flushAllEntitiesToDatabase();
+            manager.flushToDatabase();
         }
     }
 
@@ -113,7 +113,7 @@ public class FlushingEntitiesSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(repository).update(ID1, entity); will(new RegisterEntity(entity));
             }});
-            manager.flushAllEntitiesToDatabase();
+            manager.flushToDatabase();
         }
     }
 

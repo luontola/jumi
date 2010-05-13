@@ -21,10 +21,10 @@ public class FakeEntityModule extends AbstractModule {
     }
 
     protected void configure() {
-        EntityManagerImpl entityManager = spec.dummy(EntityManagerImpl.class);
+        EntitiesLoadedInMemory entities = spec.dummy(EntitiesLoadedInMemory.class);
 
         // TaskContextModule has a transitive dependency to these classes:
         bind(EntityFlushingFilter.class)
-                .toInstance(new EntityFlushingFilter(entityManager));
+                .toInstance(new EntityFlushingFilter(entities));
     }
 }

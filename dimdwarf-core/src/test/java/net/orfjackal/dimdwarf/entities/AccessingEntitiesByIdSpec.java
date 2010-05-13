@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     private EntityRepository repository;
-    private EntityManager manager;
+    private AllEntities entities;
 
     private DummyEntity entity1 = new DummyEntity();
     private EntityId id1 = new EntityObjectId(1);
@@ -28,7 +28,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(mock(EntityIdFactory.class), repository, new DimdwarfEntityApi());
+        entities = new EntityManagerImpl(mock(EntityIdFactory.class), repository, new DimdwarfEntityApi());
     }
 
     private Expectations loadsFromRepository(final EntityId id, final DummyEntity entity) {
@@ -42,23 +42,24 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
         public void entitiesCanBeLoadedById() {
             checking(loadsFromRepository(id1, entity1));
-            specify(manager.getEntityById(id1), should.equal(entity1));
+            specify(entities.getEntityById(id1), should.equal(entity1));
         }
 
         public void entitiesAreRegisteredOnLoadById() {
             checking(loadsFromRepository(id1, entity1));
-            Object load1 = manager.getEntityById(id1);
-            Object load2 = manager.getEntityById(id1);
+            Object load1 = entities.getEntityById(id1);
+            Object load2 = entities.getEntityById(id1);
             specify(load1 == load2);
         }
 
         public void entitiesCanBeIteratedById() {
+            // TODO: remove the ability to iterate by ID?
             checking(new Expectations() {{
                 one(repository).firstKey(); will(returnValue(id1));
                 one(repository).nextKeyAfter(id1); will(returnValue(id2));
             }});
-            specify(manager.firstKey(), should.equal(id1));
-            specify(manager.nextKeyAfter(id1), should.equal(id2));
+            specify(entities.firstKey(), should.equal(id1));
+            specify(entities.nextKeyAfter(id1), should.equal(id2));
         }
     }
 }

@@ -10,8 +10,9 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.entities.dao.*;
 import net.orfjackal.dimdwarf.entities.tref.*;
-import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 import net.orfjackal.dimdwarf.serial.*;
+
+import static net.orfjackal.dimdwarf.modules.DatabaseModule.*;
 
 /**
  * @author Esko Luontola
@@ -22,7 +23,8 @@ public class EntityModule extends AbstractModule {
     protected void configure() {
         bind(EntityApi.class).to(DimdwarfEntityApi.class);
 
-        bind(EntityManager.class).to(EntityManagerImpl.class);
+        bind(AllEntities.class).to(EntityManagerImpl.class);
+        bind(EntitiesLoadedInMemory.class).to(EntityManagerImpl.class);
         bind(EntityReferenceFactory.class).to(EntityReferenceFactoryImpl.class);
         bind(EntityInfo.class).to(EntityInfoImpl.class);
         bind(TransparentReferenceFactory.class).to(TransparentReferenceFactoryImpl.class);

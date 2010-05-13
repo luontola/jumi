@@ -7,7 +7,7 @@ package net.orfjackal.dimdwarf.entities.tref;
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.api.internal.*;
-import net.orfjackal.dimdwarf.entities.EntityManager;
+import net.orfjackal.dimdwarf.entities.AllEntities;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -18,12 +18,12 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class EntityInfoImpl implements EntityInfo {
 
-    private final EntityManager entityManager;
+    private final AllEntities entities;
     private final EntityApi entityApi;
 
     @Inject
-    public EntityInfoImpl(EntityManager entityManager, EntityApi entityApi) {
-        this.entityManager = entityManager;
+    public EntityInfoImpl(AllEntities entities, EntityApi entityApi) {
+        this.entities = entities;
         this.entityApi = entityApi;
     }
 
@@ -38,7 +38,7 @@ public class EntityInfoImpl implements EntityInfo {
     }
 
     private EntityId getIdFromEntity(Object entity) {
-        return entityManager.getEntityId((EntityObject) entity);
+        return entities.getEntityId((EntityObject) entity);
     }
 
     private EntityId getIdFromProxy(Object proxy) {

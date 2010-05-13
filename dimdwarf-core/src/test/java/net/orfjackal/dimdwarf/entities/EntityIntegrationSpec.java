@@ -51,8 +51,8 @@ public class EntityIntegrationSpec extends Specification<Object> {
             });
             taskExecutor.execute(new Runnable() {
                 public void run() {
-                    EntityManager manager = injector.getInstance(EntityManager.class);
-                    DummyEntity entity = (DummyEntity) manager.getEntityById(id.get());
+                    AllEntities entities = injector.getInstance(AllEntities.class);
+                    DummyEntity entity = (DummyEntity) entities.getEntityById(id.get());
                     specify(entity.getOther(), should.equal("foo"));
                 }
             });
@@ -113,12 +113,12 @@ public class EntityIntegrationSpec extends Specification<Object> {
             taskExecutor.execute(new Runnable() {
                 public void run() {
                     EntityReferenceFactory factory = injector.getInstance(EntityReferenceFactory.class);
-                    EntityManager manager = injector.getInstance(EntityManager.class);
+                    AllEntities entities = injector.getInstance(AllEntities.class);
 
                     DummyEntity entity = new DummyEntity();
                     EntityReference<DummyEntity> ref = factory.createReference(entity);
 
-                    DummyEntity loaded = (DummyEntity) manager.getEntityById(ref.getEntityId());
+                    DummyEntity loaded = (DummyEntity) entities.getEntityById(ref.getEntityId());
                     specify(loaded, should.equal(entity));
                 }
             });
@@ -129,7 +129,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
 
         public void bindingsCanBeCreatedForTransparentReferenceProxies() {
             // TODO: move this test to a better place, maybe the tests of the future EntityBindings in public API
-            // (the bug was in ConvertEntityToEntityId - it used EntityManager.getEntityId instead of EntityInfo.getEntityId
+            // (the bug was in ConvertEntityToEntityId - it used AllEntities.getEntityId instead of EntityInfo.getEntityId
             // - check that the new tests will notice that bug)
             taskExecutor.execute(new Runnable() {
                 public void run() {

@@ -16,15 +16,15 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class EntityFlushingFilter implements Filter {
 
-    private final EntityManagerImpl entityManager;
+    private final EntitiesLoadedInMemory entities;
 
     @Inject
-    public EntityFlushingFilter(EntityManagerImpl entityManager) {
-        this.entityManager = entityManager;
+    public EntityFlushingFilter(EntitiesLoadedInMemory entities) {
+        this.entities = entities;
     }
 
     public void filter(Runnable nextInChain) {
         nextInChain.run();
-        entityManager.flushAllEntitiesToDatabase();
+        entities.flushToDatabase();
     }
 }

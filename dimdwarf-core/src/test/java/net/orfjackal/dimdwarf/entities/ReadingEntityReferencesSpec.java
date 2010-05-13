@@ -8,12 +8,13 @@ import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
-import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 import net.orfjackal.dimdwarf.util.TestUtil;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+
+import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 
 /**
  * @author Esko Luontola

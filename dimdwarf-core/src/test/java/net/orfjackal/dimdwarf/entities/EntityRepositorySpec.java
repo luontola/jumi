@@ -28,7 +28,7 @@ public class EntityRepositorySpec extends Specification<Object> {
 
     private Executor taskContext;
     private Provider<EntityRepository> entities;
-    private Provider<EntityManager> entityManager;
+    private Provider<AllEntities> entityManager;
 
     public void create() throws Exception {
         Injector injector = Guice.createInjector(
@@ -38,7 +38,7 @@ public class EntityRepositorySpec extends Specification<Object> {
         );
         taskContext = injector.getInstance(TaskExecutor.class);
         entities = injector.getProvider(EntityRepository.class);
-        entityManager = injector.getProvider(EntityManager.class);
+        entityManager = injector.getProvider(AllEntities.class);
     }
 
     private void createDummyEntity(final EntityId entityId, final Object other) {

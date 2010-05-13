@@ -17,15 +17,15 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class EntityReferenceFactoryImpl implements EntityReferenceFactory {
 
-    private final EntityManager entityManager;
+    private final AllEntities entities;
 
     @Inject
-    public EntityReferenceFactoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public EntityReferenceFactoryImpl(AllEntities entities) {
+        this.entities = entities;
     }
 
     public <T> EntityReference<T> createReference(T entity) {
-        EntityId id = entityManager.getEntityId((EntityObject) entity);
+        EntityId id = entities.getEntityId((EntityObject) entity);
         return new EntityReferenceImpl<T>(id, entity);
     }
 }

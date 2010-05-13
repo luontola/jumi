@@ -25,19 +25,19 @@ public class GettingEntityIdSpec extends Specification<Object> {
     private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
     private EntityInfoImpl entityInfo;
-    private EntityManager entityManager;
+    private AllEntities entities;
     private EntityObject entity;
     private Object proxy;
 
     public void create() throws Exception {
-        entityManager = mock(EntityManager.class);
-        entityInfo = new EntityInfoImpl(entityManager, new DimdwarfEntityApi());
+        entities = mock(AllEntities.class);
+        entityInfo = new EntityInfoImpl(entities, new DimdwarfEntityApi());
 
         entity = new DummyEntity();
         checking(new Expectations() {{
-            allowing(entityManager).getEntityId(entity); will(returnValue(ENTITY_ID));
+            allowing(entities).getEntityId(entity); will(returnValue(ENTITY_ID));
         }});
-        Provider<EntityReferenceFactory> refFactory = StubProvider.<EntityReferenceFactory>wrap(new EntityReferenceFactoryImpl(entityManager));
+        Provider<EntityReferenceFactory> refFactory = StubProvider.<EntityReferenceFactory>wrap(new EntityReferenceFactoryImpl(entities));
         proxy = new TransparentReferenceFactoryImpl(refFactory).createTransparentReference(entity);
     }
 

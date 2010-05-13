@@ -20,7 +20,7 @@ import java.util.*;
  */
 @TaskScoped
 @NotThreadSafe
-public class EntityManagerImpl implements EntityManager {
+public class EntityManagerImpl implements AllEntities, EntitiesLoadedInMemory {
 
     private final EntityIdFactory idFactory;
     private final EntityRepository repository;
@@ -110,10 +110,7 @@ public class EntityManagerImpl implements EntityManager {
         return repository.nextKeyAfter(currentKey);
     }
 
-    /**
-     * Must be called before transaction deactivates, or the changes to entities will not be persisted.
-     */
-    public void flushAllEntitiesToDatabase() {
+    public void flushToDatabase() {
         beginFlush();
         flush();
         endFlush();
