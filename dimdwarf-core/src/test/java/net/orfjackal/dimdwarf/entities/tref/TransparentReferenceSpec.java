@@ -154,7 +154,7 @@ public class TransparentReferenceSpec extends Specification<Object> {
         private SerializationTestEntity deserialized;
 
         public void create() {
-            ObjectSerializerImpl serializer = new ObjectSerializerImpl(new SerializationListener[0], new SerializationReplacer[]{
+            ObjectSerializer serializer = new ObjectSerializer(new SerializationListener[0], new SerializationReplacer[]{
                     new ReplaceEntitiesWithTransparentReferences(proxyFactory, entityApi)
             });
             checking(referenceIsCreatedFor(entity, ID1));

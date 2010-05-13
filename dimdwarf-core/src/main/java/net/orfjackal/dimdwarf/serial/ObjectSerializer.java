@@ -15,17 +15,17 @@ import java.io.*;
  * @since 1.9.2008
  */
 @Immutable
-public class ObjectSerializerImpl {
+public class ObjectSerializer {
 
     private final SerializationListener[] listeners;
     private final SerializationReplacer[] replacers;
 
-    public ObjectSerializerImpl() {
+    public ObjectSerializer() {
         this(new SerializationListener[0], new SerializationReplacer[0]);
     }
 
     @Inject
-    public ObjectSerializerImpl(SerializationListener[] listeners, SerializationReplacer[] replacers) {
+    public ObjectSerializer(SerializationListener[] listeners, SerializationReplacer[] replacers) {
         this.listeners = listeners;
         this.replacers = replacers;
     }
