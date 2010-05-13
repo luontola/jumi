@@ -22,13 +22,13 @@ import java.util.*;
  */
 @Singleton
 @Immutable
-public class TransparentReferenceFactoryImpl {
+public class TransparentReferenceFactory {
 
     private final CglibProxyFactoryCache proxyFactories = new CglibProxyFactoryCache();
     private final Provider<EntityReferenceFactory> referenceFactory;
 
     @Inject
-    public TransparentReferenceFactoryImpl(Provider<EntityReferenceFactory> referenceFactory) {
+    public TransparentReferenceFactory(Provider<EntityReferenceFactory> referenceFactory) {
         this.referenceFactory = referenceFactory;
     }
 

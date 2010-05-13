@@ -30,13 +30,13 @@ public class TransparentReferenceSpec extends Specification<Object> {
     private static final EntityId ID2 = new EntityObjectId(2);
 
     private EntityReferenceFactory referenceFactory;
-    private TransparentReferenceFactoryImpl proxyFactory;
+    private TransparentReferenceFactory proxyFactory;
     private DummyEntity entity;
     private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
         referenceFactory = mock(EntityReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
+        proxyFactory = new TransparentReferenceFactory(StubProvider.wrap(referenceFactory));
         entity = new DummyEntity();
     }
 

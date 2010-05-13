@@ -38,7 +38,7 @@ public class GettingEntityIdSpec extends Specification<Object> {
             allowing(entities).getEntityId(entity); will(returnValue(ENTITY_ID));
         }});
         Provider<EntityReferenceFactory> refFactory = StubProvider.<EntityReferenceFactory>wrap(new EntityReferenceFactoryImpl(entities));
-        proxy = new TransparentReferenceFactoryImpl(refFactory).createTransparentReference(entity);
+        proxy = new TransparentReferenceFactory(refFactory).createTransparentReference(entity);
     }
 
 

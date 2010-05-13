@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 public class EntityIdentitySpec extends Specification<Object> {
 
     private EntityReferenceFactory referenceFactory;
-    private TransparentReferenceFactoryImpl proxyFactory;
+    private TransparentReferenceFactory proxyFactory;
     private EntityObject ent1;
     private EntityObject ent2;
     private TransparentReference tref1;
@@ -32,7 +32,7 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     public void create() throws Exception {
         referenceFactory = mock(EntityReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactoryImpl(StubProvider.wrap(referenceFactory));
+        proxyFactory = new TransparentReferenceFactory(StubProvider.wrap(referenceFactory));
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
         checking(referencesMayBeCreatedFor(ent1, new EntityObjectId(1)));
