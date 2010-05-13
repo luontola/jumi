@@ -24,14 +24,14 @@ public class GettingEntityIdSpec extends Specification<Object> {
 
     private static final EntityId ENTITY_ID = new EntityObjectId(42);
 
-    private EntityInfoImpl entityInfo;
+    private TrefAwareEntityInfo entityInfo;
     private AllEntities entities;
     private EntityObject entity;
     private Object proxy;
 
     public void create() throws Exception {
         entities = mock(AllEntities.class);
-        entityInfo = new EntityInfoImpl(entities, new DimdwarfEntityApi());
+        entityInfo = new TrefAwareEntityInfo(entities, new DimdwarfEntityApi());
 
         entity = new DummyEntity();
         checking(new Expectations() {{

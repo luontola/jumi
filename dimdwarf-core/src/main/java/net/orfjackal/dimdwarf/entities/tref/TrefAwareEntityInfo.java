@@ -16,13 +16,13 @@ import javax.annotation.concurrent.Immutable;
  * @since 2.11.2008
  */
 @Immutable
-public class EntityInfoImpl implements EntityInfo {
+public class TrefAwareEntityInfo implements EntityInfo {
 
     private final AllEntities entities;
     private final EntityApi entityApi;
 
     @Inject
-    public EntityInfoImpl(AllEntities entities, EntityApi entityApi) {
+    public TrefAwareEntityInfo(AllEntities entities, EntityApi entityApi) {
         this.entities = entities;
         this.entityApi = entityApi;
     }
