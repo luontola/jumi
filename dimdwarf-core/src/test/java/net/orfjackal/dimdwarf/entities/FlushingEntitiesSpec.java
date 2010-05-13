@@ -25,14 +25,14 @@ public class FlushingEntitiesSpec extends Specification<Object> {
     private static final EntityObjectId ID2 = new EntityObjectId(2);
 
     private EntityRepository repository;
-    private EntityManagerImpl manager;
+    private EntityManager manager;
     private EntityReferenceFactory refFactory;
     private DummyEntity entity;
     private DummyEntity newEntity;
 
     public void create() throws Exception {
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(new EntityIdFactoryImpl(0), repository, new DimdwarfEntityApi());
+        manager = new EntityManager(new EntityIdFactoryImpl(0), repository, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
 
         entity = new DummyEntity();

@@ -28,14 +28,14 @@ public class ReadingEntityReferencesSpec extends Specification<Object> {
 
     private EntityIdFactory idFactory;
     private EntityRepository repository;
-    private EntityManagerImpl manager;
+    private EntityManager manager;
     private EntityReferenceFactory refFactory;
     private DummyEntity entity;
 
     public void create() throws Exception {
         idFactory = mock(EntityIdFactory.class);
         repository = mock(EntityRepository.class);
-        manager = new EntityManagerImpl(idFactory, repository, new DimdwarfEntityApi());
+        manager = new EntityManager(idFactory, repository, new DimdwarfEntityApi());
         refFactory = new EntityReferenceFactoryImpl(manager);
         entity = new DummyEntity();
     }

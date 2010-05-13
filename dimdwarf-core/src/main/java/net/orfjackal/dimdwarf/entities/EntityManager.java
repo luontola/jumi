@@ -20,7 +20,7 @@ import java.util.*;
  */
 @TaskScoped
 @NotThreadSafe
-public class EntityManagerImpl implements AllEntities, EntitiesLoadedInMemory {
+public class EntityManager implements AllEntities, EntitiesLoadedInMemory {
 
     private final EntityIdFactory idFactory;
     private final EntityRepository repository;
@@ -32,7 +32,7 @@ public class EntityManagerImpl implements AllEntities, EntitiesLoadedInMemory {
     private State state = State.ACTIVE;
 
     @Inject
-    public EntityManagerImpl(EntityIdFactory idFactory, EntityRepository repository, EntityApi entityApi) {
+    public EntityManager(EntityIdFactory idFactory, EntityRepository repository, EntityApi entityApi) {
         this.idFactory = idFactory;
         this.repository = repository;
         this.entityApi = entityApi;

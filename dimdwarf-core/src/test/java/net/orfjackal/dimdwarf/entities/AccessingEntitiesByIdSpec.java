@@ -28,7 +28,7 @@ public class AccessingEntitiesByIdSpec extends Specification<Object> {
 
     public void create() throws Exception {
         repository = mock(EntityRepository.class);
-        entities = new EntityManagerImpl(mock(EntityIdFactory.class), repository, new DimdwarfEntityApi());
+        entities = new EntityManager(mock(EntityIdFactory.class), repository, new DimdwarfEntityApi());
     }
 
     private Expectations loadsFromRepository(final EntityId id, final DummyEntity entity) {
