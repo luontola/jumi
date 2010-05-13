@@ -39,7 +39,7 @@ public class IteratingDatabaseKeysSpec extends Specification<Object> {
     }
 
     private void beginNewTransaction() {
-        tx = new TransactionImpl(txLogger);
+        tx = new TransactionContext(txLogger);
         table = dbms.openConnection(tx.getTransaction()).openTable(TABLE);
     }
 

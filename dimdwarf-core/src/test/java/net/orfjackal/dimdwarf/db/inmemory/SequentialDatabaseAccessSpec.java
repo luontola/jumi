@@ -7,10 +7,11 @@ package net.orfjackal.dimdwarf.db.inmemory;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
-import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
+
+import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 
 /**
  * @author Esko Luontola
@@ -33,7 +34,7 @@ public class SequentialDatabaseAccessSpec extends Specification<Object> {
 
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
-        tx = new TransactionImpl(mock(Logger.class));
+        tx = new TransactionContext(mock(Logger.class));
         db = dbms.openConnection(tx.getTransaction());
         table = db.openTable(TABLE);
     }

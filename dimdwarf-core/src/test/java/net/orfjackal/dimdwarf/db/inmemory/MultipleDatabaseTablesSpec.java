@@ -37,14 +37,14 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
-        tx = new TransactionImpl(txLogger);
+        tx = new TransactionContext(txLogger);
         db = dbms.openConnection(tx.getTransaction());
         table1 = db.openTable(TABLE1);
         table2 = db.openTable(TABLE2);
     }
 
     private Blob readInNewTransaction(String table, Blob key) {
-        TransactionCoordinator tx = new TransactionImpl(txLogger);
+        TransactionCoordinator tx = new TransactionContext(txLogger);
         try {
             return dbms.openConnection(tx.getTransaction()).openTable(table).read(key);
         } finally {
@@ -53,7 +53,7 @@ public class MultipleDatabaseTablesSpec extends Specification<Object> {
     }
 
     private void updateInNewTransaction(String table, Blob key, Blob value) {
-        TransactionCoordinator tx = new TransactionImpl(txLogger);
+        TransactionCoordinator tx = new TransactionContext(txLogger);
         try {
             dbms.openConnection(tx.getTransaction()).openTable(table).update(key, value);
         } finally {

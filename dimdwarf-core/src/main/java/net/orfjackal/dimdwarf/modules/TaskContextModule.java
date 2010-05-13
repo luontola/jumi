@@ -25,7 +25,7 @@ public class TaskContextModule extends AbstractModule {
         bind(Context.class).annotatedWith(Task.class).to(TaskContext.class);
 
         bind(TransactionCoordinator.class)
-                .to(TransactionImpl.class)
+                .to(TransactionContext.class)
                 .in(TaskScoped.class);
 
         bind(RetryPolicy.class).toInstance(new RetryOnRetryableExceptionsANumberOfTimes(MAX_RETRIES));

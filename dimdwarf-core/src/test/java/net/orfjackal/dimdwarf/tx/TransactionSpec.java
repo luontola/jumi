@@ -6,12 +6,13 @@ package net.orfjackal.dimdwarf.tx;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.jmock.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
 import java.util.concurrent.CountDownLatch;
+
+import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 
 /**
  * @author Esko Luontola
@@ -19,9 +20,9 @@ import java.util.concurrent.CountDownLatch;
  */
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class TransactionSpec extends Specification<TransactionImpl> {
+public class TransactionSpec extends Specification<TransactionContext> {
 
-    private TransactionImpl tx;
+    private TransactionContext tx;
     private TransactionParticipant participant1;
     private TransactionParticipant participant2;
     private Logger txLogger;
@@ -30,7 +31,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
 
     public void create() throws Exception {
         txLogger = mock(Logger.class);
-        tx = new TransactionImpl(txLogger);
+        tx = new TransactionContext(txLogger);
         participant1 = mock(TransactionParticipant.class, "participant1");
         participant2 = mock(TransactionParticipant.class, "participant2");
     }
@@ -273,7 +274,7 @@ public class TransactionSpec extends Specification<TransactionImpl> {
         }
 
         public void canNotCommitTwiseConcurrently() throws InterruptedException {
-            tx = new TransactionImpl(txLogger);
+            tx = new TransactionContext(txLogger);
 
             final CountDownLatch commitIsInProgress = new CountDownLatch(1);
             tx.join(new DummyTransactionParticipant() {

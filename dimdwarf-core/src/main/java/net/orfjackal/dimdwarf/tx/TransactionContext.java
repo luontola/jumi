@@ -4,20 +4,21 @@
 
 package net.orfjackal.dimdwarf.tx;
 
-import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
+
 /**
  * @author Esko Luontola
  * @since 15.8.2008
  */
 @ThreadSafe
-public class TransactionImpl implements Transaction, TransactionCoordinator {
-    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TransactionImpl.class);
+public class TransactionContext implements Transaction, TransactionCoordinator {
+    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TransactionContext.class);
     private final Logger logger;
 
     private final Collection<TransactionParticipant> participants = new ConcurrentLinkedQueue<TransactionParticipant>();
@@ -27,11 +28,11 @@ public class TransactionImpl implements Transaction, TransactionCoordinator {
 
     // TODO: would it be better to separate TransactionCoordinator and Transaction implementations?
 
-    public TransactionImpl() {
+    public TransactionContext() {
         this(DEFAULT_LOGGER);
     }
 
-    public TransactionImpl(Logger logger) {
+    public TransactionContext(Logger logger) {
         this.logger = logger;
     }
 

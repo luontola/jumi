@@ -7,13 +7,14 @@ package net.orfjackal.dimdwarf.db.inmemory;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.db.*;
-import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 import net.orfjackal.dimdwarf.tx.*;
 import net.orfjackal.dimdwarf.util.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
 import java.util.concurrent.CyclicBarrier;
+
+import static net.orfjackal.dimdwarf.db.Blob.EMPTY_BLOB;
 
 /**
  * @author Esko Luontola
@@ -40,13 +41,13 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
-        tx1 = new TransactionImpl(txLogger);
-        tx2 = new TransactionImpl(txLogger);
+        tx1 = new TransactionContext(txLogger);
+        tx2 = new TransactionContext(txLogger);
         specify(dbms.getOpenConnections(), should.equal(0));
     }
 
     private Blob readInNewTransaction(Blob key) {
-        TransactionCoordinator tx = new TransactionImpl(txLogger);
+        TransactionCoordinator tx = new TransactionContext(txLogger);
         try {
             return dbms.openConnection(tx.getTransaction()).openTable(TABLE).read(key);
         } finally {
@@ -55,7 +56,7 @@ public class ConcurrentDatabaseAccessSpec extends Specification<Object> {
     }
 
     private void updateInNewTransaction(Blob key, Blob value) {
-        TransactionCoordinator tx = new TransactionImpl(txLogger);
+        TransactionCoordinator tx = new TransactionContext(txLogger);
         dbms.openConnection(tx.getTransaction()).openTable(TABLE).update(key, value);
         tx.prepareAndCommit();
     }

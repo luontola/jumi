@@ -37,12 +37,12 @@ public class IteratingDatabaseKeysConcurrentlySpec extends Specification<Object>
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         txLogger = mock(Logger.class);
-        tx1 = new TransactionImpl(txLogger);
-        tx2 = new TransactionImpl(txLogger);
+        tx1 = new TransactionContext(txLogger);
+        tx2 = new TransactionContext(txLogger);
     }
 
     private void updateInNewTransaction(Blob key, Blob value) {
-        TransactionCoordinator tx = new TransactionImpl(txLogger);
+        TransactionCoordinator tx = new TransactionContext(txLogger);
         dbms.openConnection(tx.getTransaction()).openTable(TABLE).update(key, value);
         tx.prepareAndCommit();
     }

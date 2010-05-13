@@ -31,8 +31,8 @@ public class InMemoryDatabaseSpec extends Specification<Object> {
     public void create() throws Exception {
         dbms = new InMemoryDatabaseManager();
         Logger txLogger = mock(Logger.class);
-        tx1 = new TransactionImpl(txLogger);
-        tx2 = new TransactionImpl(txLogger);
+        tx1 = new TransactionContext(txLogger);
+        tx2 = new TransactionContext(txLogger);
         specify(dbms.getOpenConnections(), should.equal(0));
     }
 
