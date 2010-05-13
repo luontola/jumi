@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TaskSchedulerSpec extends Specification<Object> {
 
     private TaskSchedulerImpl scheduler;
-    private Provider<BindingRepository> bindings;
+    private Provider<BindingRepositoryImpl> bindings;
     private Provider<EntityInfo> info;
     private Provider<Transaction> tx;
     private Executor taskContext;
@@ -51,7 +51,7 @@ public class TaskSchedulerSpec extends Specification<Object> {
                         bind(Clock.class).toInstance(clock);
                     }
                 });
-        bindings = injector.getProvider(BindingRepository.class);
+        bindings = injector.getProvider(BindingRepositoryImpl.class);
         info = injector.getProvider(EntityInfo.class);
         tx = injector.getProvider(Transaction.class);
         taskContext = injector.getInstance(TaskExecutor.class);

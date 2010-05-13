@@ -26,7 +26,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
 
     private Injector injector;
     private Executor taskExecutor;
-    private Provider<BindingRepository> bindings;
+    private Provider<BindingRepositoryImpl> bindings;
     private EntityApi entityApi = new DimdwarfEntityApi();
 
     public void create() throws Exception {
@@ -34,7 +34,7 @@ public class EntityIntegrationSpec extends Specification<Object> {
                 new CommonModules()
         );
         taskExecutor = injector.getInstance(TaskExecutor.class);
-        bindings = injector.getProvider(BindingRepository.class);
+        bindings = injector.getProvider(BindingRepositoryImpl.class);
     }
 
 

@@ -5,6 +5,7 @@
 package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.entities.dao.BindingDao;
 
 import javax.annotation.concurrent.Immutable;
@@ -14,7 +15,7 @@ import javax.annotation.concurrent.Immutable;
  * @since 12.9.2008
  */
 @Immutable
-public class BindingRepositoryImpl implements BindingRepository {
+public class BindingRepositoryImpl implements DatabaseTable<String, Object> {
 
     private final BindingDao bindings;
     private final ConvertEntityToEntityId entityToId;

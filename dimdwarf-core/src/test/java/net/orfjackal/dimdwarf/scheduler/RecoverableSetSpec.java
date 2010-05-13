@@ -28,7 +28,7 @@ public class RecoverableSetSpec extends Specification<Object> {
     private static final String PREFIX = "prefix";
 
     private Executor taskContext;
-    private Provider<BindingRepository> bindings;
+    private Provider<BindingRepositoryImpl> bindings;
     private Provider<EntityInfo> info;
 
     private RecoverableSet<StoredValue> set;
@@ -40,7 +40,7 @@ public class RecoverableSetSpec extends Specification<Object> {
                 new TaskContextModule()
         );
         taskContext = injector.getInstance(TaskExecutor.class);
-        bindings = injector.getProvider(BindingRepository.class);
+        bindings = injector.getProvider(BindingRepositoryImpl.class);
         info = injector.getProvider(EntityInfo.class);
         specify(thereMayBeBindingsInOtherNamespaces());
 

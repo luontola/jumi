@@ -38,7 +38,6 @@ public class EntityModule extends AbstractModule {
                 .annotatedWith(EntitiesTable.class)
                 .toProvider(databaseTable("entities"));
 
-        bind(BindingRepository.class).to(BindingRepositoryImpl.class);
         bind(databaseTableConnection())
                 .annotatedWith(BindingsTable.class)
                 .toProvider(databaseTable("bindings"));
