@@ -428,6 +428,7 @@
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" filepath="$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" filepath="$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-dist/dimdwarf-dist.iml" filepath="$PROJECT_DIR$/dimdwarf-dist/dimdwarf-dist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dimdwarf-end-to-end-test/dimdwarf-end-to-end-test.iml" filepath="$PROJECT_DIR$/dimdwarf-end-to-end-test/dimdwarf-end-to-end-test.iml" />
     </modules>
   </component>
   <component name="ProjectRootConfigurable.UI">
@@ -473,7 +474,7 @@
     <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <extension name="snapshooter" />
-      <module name="dimdwarf" />
+      <module name="dimdwarf-core" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="" />
@@ -486,7 +487,7 @@
       <option name="ENV_VARIABLES" />
       <option name="PASS_PARENT_ENVS" value="true" />
       <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
+        <value defaultName="moduleWithDependencies" />
       </option>
       <envs />
       <RunnerSettings RunnerId="Debug">
@@ -521,7 +522,7 @@
         </pattern>
       </extension>
       <extension name="snapshooter" />
-      <module name="dimdwarf" />
+      <module name="dimdwarf-core" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="" />
@@ -534,7 +535,7 @@
       <option name="ENV_VARIABLES" />
       <option name="PASS_PARENT_ENVS" value="true" />
       <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
+        <value defaultName="moduleWithDependencies" />
       </option>
       <envs />
       <RunnerSettings RunnerId="Debug">
@@ -559,6 +560,36 @@
       <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
+    </configuration>
+    <configuration default="false" name="End-to-end tests" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="true" merge="false" per_test_coverage_enabled="false" track_test_folders="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="net.orfjackal.dimdwarf.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="dimdwarf-end-to-end-test" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/dimdwarf-end-to-end-test" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="package" />
+      </method>
     </configuration>
   </component>
   <component name="ResourceManagerContainer">
@@ -831,6 +862,39 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/easymock/easymock/2.5.2/easymock-2.5.2-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.reddwarfserver.client:sgs-client:0.10.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/reddwarfserver/client/sgs-client/0.10.1/sgs-client-0.10.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/reddwarfserver/client/sgs-client/0.10.1/sgs-client-0.10.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/reddwarfserver/client/sgs-client/0.10.1/sgs-client-0.10.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.reddwarfserver.server:sgs-shared:1.12">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/reddwarfserver/server/sgs-shared/1.12/sgs-shared-1.12.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/reddwarfserver/server/sgs-shared/1.12/sgs-shared-1.12-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/reddwarfserver/server/sgs-shared/1.12/sgs-shared-1.12-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.apache.mina:mina-core:1.1.7">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/mina/mina-core/1.1.7/mina-core-1.1.7.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/mina/mina-core/1.1.7/mina-core-1.1.7-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/mina/mina-core/1.1.7/mina-core-1.1.7-sources.jar!/" />
       </SOURCES>
     </library>
   </component>

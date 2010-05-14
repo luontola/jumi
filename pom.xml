@@ -55,6 +55,10 @@
             <id>google-maven-repository</id>
             <url>http://google-maven-repository.googlecode.com/svn/repository</url>
         </repository>
+        <repository>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -70,6 +74,7 @@
         <module>dimdwarf-api-internal</module>
         <module>dimdwarf-core</module>
         <module>dimdwarf-dist</module>
+        <module>dimdwarf-end-to-end-test</module>
     </modules>
 
     <dependencies>
@@ -140,6 +145,19 @@
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-core</artifactId>
                 <version>${version}</version>
+            </dependency>
+
+            <!-- Project Darkstar / RedDwarf -->
+
+            <dependency>
+                <groupId>org.reddwarfserver.server</groupId>
+                <artifactId>sgs-shared</artifactId>
+                <version>1.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.reddwarfserver.client</groupId>
+                <artifactId>sgs-client</artifactId>
+                <version>0.10.1</version>
             </dependency>
 
             <!-- Dependency injection -->
