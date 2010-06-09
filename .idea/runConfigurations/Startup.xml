@@ -1,0 +1,33 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Startup" type="Application" factoryName="Application">
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+    <extension name="snapshooter" />
+    <option name="MAIN_CLASS_NAME" value="net.orfjackal.dimdwarf.server.Startup" />
+    <option name="VM_PARAMETERS" value="-ea" />
+    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="ALTERNATIVE_JRE_PATH" value="" />
+    <option name="ENABLE_SWING_INSPECTOR" value="false" />
+    <option name="ENV_VARIABLES" />
+    <option name="PASS_PARENT_ENVS" value="true" />
+    <module name="dimdwarf-core" />
+    <envs />
+    <RunnerSettings RunnerId="Profile CPU">
+      <option name="startFromMode" value="MAIN_CLASS" />
+      <option name="otherClassesToStartFrom" value="" />
+      <option name="profileNewRunnables" value="true" />
+      <option name="filteringMode" value="EXCLUDE" />
+      <option name="filterIncludeClasses" value="" />
+      <option name="filterExcludeClasses" value="java.*, javax.*,&#10;sun.*, sunw.*, com.sun.*" />
+    </RunnerSettings>
+    <RunnerSettings RunnerId="Profile Memory">
+      <option name="profileAllocMode" value="ALLOC_AND_GC" />
+      <option name="profileAllocInterval" value="10" />
+      <option name="recordAllocTraces" value="false" />
+    </RunnerSettings>
+    <RunnerSettings RunnerId="Run" />
+    <ConfigurationWrapper RunnerId="Run" />
+    <method />
+  </configuration>
+</component>
