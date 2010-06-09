@@ -66,8 +66,12 @@ public class ClientRunner {
     }
 
     public void disconnect() {
-        if (client.isConnected()) {
-            client.logout(true);
+        try {
+            if (client.isConnected()) {
+                client.logout(true);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 

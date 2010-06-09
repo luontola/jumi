@@ -19,6 +19,10 @@ public class ServerRunner {
     }
 
     public void shutdown() {
+        try {
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     public String getHost() {
