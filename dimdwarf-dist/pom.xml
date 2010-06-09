@@ -41,8 +41,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <finalName>dimdwarf-${version}</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <attach>false</attach>
                     <descriptors>
                         <descriptor>src/main/assembly/dist.xml</descriptor>
                     </descriptors>
@@ -52,7 +50,7 @@
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -14,16 +14,21 @@
 
     <name>dimdwarf-end-to-end-test</name>
 
+    <properties>
+        <test.sandbox>${project.build.directory}/test-deploy</test.sandbox>
+        <test.deployment>${test.sandbox}/dimdwarf-${version}</test.deployment>
+    </properties>
+
     <dependencies>
 
-        <!--
         <dependency>
             <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-dist</artifactId>
             <version>${version}</version>
+            <classifier>dist</classifier>
+            <type>zip</type>
             <scope>provided</scope>
         </dependency>
-        -->
 
         <dependency>
             <groupId>org.reddwarfserver.client</groupId>
@@ -38,7 +43,21 @@
     </dependencies>
 
     <build>
+
+        <!-- The tests will find out the locations of the sandbox
+             and deployment directories from a properties file. -->
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
         <plugins>
+
+            <!-- All tests in this module are run in the 'integration-test' phase.
+                 Use the `mvn verify` command to build the project. -->
 
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -60,6 +79,47 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Unpack the application's distribution package into the test sandbox.
+                 This way the tests exercise the full end-to-end deployment cycle. -->
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <!-- Clean any remains from previous integration test runs, hopefully
+                                     before 'maven-dependency-plugin' unpacks the latest code there. -->
+                                <delete dir="${test.sandbox}"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dist</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <!-- 'unpack-dependencies' is needed instead of 'unpack',
+                                 see comments of http://jira.codehaus.org/browse/MNG-4233 -->
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>dimdwarf-dist</includeArtifactIds>
+                            <outputDirectory>${test.sandbox}</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
