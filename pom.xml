@@ -155,7 +155,6 @@
                 <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-dist</artifactId>
                 <version>${version}</version>
-                <classifier>dist</classifier>
                 <type>zip</type>
             </dependency>
 

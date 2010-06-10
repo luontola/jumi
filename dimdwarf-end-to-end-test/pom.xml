@@ -24,7 +24,6 @@
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>dimdwarf-dist</artifactId>
-            <classifier>dist</classifier>
             <type>zip</type>
             <scope>provided</scope>
         </dependency>
