@@ -15,7 +15,8 @@ import java.util.Properties;
 import java.util.concurrent.*;
 
 import static net.orfjackal.dimdwarf.test.runner.ClientRunner.EventType.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 public class ClientRunner {
 
@@ -68,7 +69,7 @@ public class ClientRunner {
 
     public void receivesMessage(String expectedMessage) {
         Event event = expectEvent(RECEIVED_MESSAGE);
-        assertEquals("message", expectedMessage, event.arg);
+        assertThat("message", (String) event.arg, is(expectedMessage));
     }
 
     public void disconnect() {
@@ -84,8 +85,8 @@ public class ClientRunner {
     private Event expectEvent(EventType expectedType) {
         try {
             Event event = events.poll(5, TimeUnit.SECONDS);
-            assertNotNull("timed out while expecting event " + expectedType, event);
-            assertEquals("event", expectedType, event.type);
+            assertThat("timed out while expecting event " + expectedType, event, is(notNullValue()));
+            assertThat("event", event.type, is(expectedType));
             return event;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
