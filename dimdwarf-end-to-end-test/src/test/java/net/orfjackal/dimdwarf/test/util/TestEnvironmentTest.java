@@ -67,4 +67,11 @@ public class TestEnvironmentTest {
         f1.mkdir();
         f2.createNewFile();
     }
+
+    @Test
+    public void application_base_jar_with_classes_for_end_to_end_tests_is_provided() {
+        File applicationBaseJar = TestEnvironment.getApplicationBaseJar();
+
+        assertThat(applicationBaseJar, isJarFile());
+    }
 }

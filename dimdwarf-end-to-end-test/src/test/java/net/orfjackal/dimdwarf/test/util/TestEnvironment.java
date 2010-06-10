@@ -12,14 +12,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEnvironment {
 
+    private static final String FILE_NOT_SPECIFIED = "/dev/null";
+
+    private static final AtomicInteger tempDirCounter = new AtomicInteger(0);
     private static final File sandboxDir;
     private static final File deploymentDir;
-    private static final AtomicInteger tempDirCounter = new AtomicInteger(0);
+    private static final File applicationBaseJar;
 
     static {
         Properties p = testEnvironmentProperties();
-        sandboxDir = canonicalFile(p.getProperty("test.sandbox"));
-        deploymentDir = canonicalFile(p.getProperty("test.deployment"));
+        sandboxDir = canonicalFile(p.getProperty("test.sandbox", FILE_NOT_SPECIFIED));
+        deploymentDir = canonicalFile(p.getProperty("test.deployment", FILE_NOT_SPECIFIED));
+        applicationBaseJar = canonicalFile(p.getProperty("test.applicationBaseJar", FILE_NOT_SPECIFIED));
     }
 
     private static Properties testEnvironmentProperties() {
@@ -44,14 +48,6 @@ public class TestEnvironment {
         }
     }
 
-    public static File getSandboxDir() {
-        return sandboxDir;
-    }
-
-    public static File getDeploymentDir() {
-        return deploymentDir;
-    }
-
     public static File createTempDir() {
         File dir = new File(sandboxDir, "temp-" + tempDirCounter.incrementAndGet());
         if (!dir.mkdir()) {
@@ -69,5 +65,17 @@ public class TestEnvironment {
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete directory: " + dir, e);
         }
+    }
+
+    public static File getSandboxDir() {
+        return sandboxDir;
+    }
+
+    public static File getDeploymentDir() {
+        return deploymentDir;
+    }
+
+    public static File getApplicationBaseJar() {
+        return applicationBaseJar;
     }
 }
