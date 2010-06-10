@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 authors = []
-`git shortlog -s -n -e`.each_line do |line|
+`git shortlog -s -n`.each_line do |line|
   parts = line.chomp.split(' ', 2)
   count = parts[0].to_i
   name = parts[1]
