@@ -53,7 +53,9 @@
             <outputDirectory>/</outputDirectory>
             <directory>..</directory>
             <includes>
-                <include>*.txt</include>
+                <include>AUTHORS*</include>
+                <include>LICENSE*</include>
+                <include>README*</include>
             </includes>
         </fileSet>
 
