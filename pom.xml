@@ -127,29 +127,36 @@
             <!-- Dimdwarf -->
 
             <dependency>
-                <groupId>net.orfjackal.dimdwarf</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-agent</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>net.orfjackal.dimdwarf</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-aop</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>net.orfjackal.dimdwarf</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-api</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>net.orfjackal.dimdwarf</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-api-internal</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>net.orfjackal.dimdwarf</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-core</artifactId>
                 <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${groupId}</groupId>
+                <artifactId>dimdwarf-dist</artifactId>
+                <version>${version}</version>
+                <classifier>dist</classifier>
+                <type>zip</type>
             </dependency>
 
             <!-- Project Darkstar / RedDwarf -->

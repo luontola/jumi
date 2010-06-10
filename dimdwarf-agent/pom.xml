@@ -17,7 +17,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>net.orfjackal.dimdwarf</groupId>
+            <groupId>${groupId}</groupId>
             <artifactId>dimdwarf-aop</artifactId>
         </dependency>
 

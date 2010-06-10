@@ -17,11 +17,11 @@
     <dependencies>
 
         <dependency>
-            <groupId>net.orfjackal.dimdwarf</groupId>
+            <groupId>${groupId}</groupId>
             <artifactId>dimdwarf-agent</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.orfjackal.dimdwarf</groupId>
+            <groupId>${groupId}</groupId>
             <artifactId>dimdwarf-core</artifactId>
         </dependency>
 

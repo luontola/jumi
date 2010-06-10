@@ -22,9 +22,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>net.orfjackal.dimdwarf</groupId>
+            <groupId>${groupId}</groupId>
             <artifactId>dimdwarf-dist</artifactId>
-            <version>${version}</version>
             <classifier>dist</classifier>
             <type>zip</type>
             <scope>provided</scope>
