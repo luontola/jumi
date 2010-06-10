@@ -80,7 +80,7 @@
             <artifactId>annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.orfjackal.ext.javax.annotations</groupId>
+            <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
         </dependency>
 
