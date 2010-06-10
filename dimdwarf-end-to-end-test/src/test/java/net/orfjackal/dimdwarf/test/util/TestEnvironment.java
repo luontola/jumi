@@ -4,6 +4,8 @@
 
 package net.orfjackal.dimdwarf.test.util;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,17 +64,10 @@ public class TestEnvironment {
         if (!dir.getParentFile().equals(sandboxDir)) {
             throw new IllegalArgumentException("I did not create that file, deleting it would be dangerous: " + dir);
         }
-        deleteRecursively(dir);
-    }
-
-    private static void deleteRecursively(File file) {
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                deleteRecursively(f);
-            }
-        }
-        if (!file.delete()) {
-            throw new RuntimeException("Unable to delete file: " + file);
+        try {
+            FileUtils.forceDelete(dir);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to delete directory: " + dir, e);
         }
     }
 }
