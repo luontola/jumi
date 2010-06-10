@@ -5,8 +5,9 @@
 
     <parent>
         <groupId>net.orfjackal.dimdwarf</groupId>
-        <artifactId>dimdwarf</artifactId>
+        <artifactId>dimdwarf-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../dimdwarf-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>dimdwarf-agent</artifactId>
