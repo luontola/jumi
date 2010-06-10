@@ -51,7 +51,11 @@ public class ServerRunner {
         ProcessBuilder builder = new ProcessBuilder();
         builder.directory(TestEnvironment.getDeploymentDir());
         builder.redirectErrorStream(false);
-        builder.command("java", "-jar", "launcher.jar");
+        builder.command(
+                "java", "-jar", "launcher.jar",
+                "--port", String.valueOf(port),
+                "--app", applicationDir.getPath()
+        );
 
         serverProcess = builder.start();
         redirectStream(serverProcess.getInputStream(), System.out);
