@@ -2,9 +2,11 @@
   <dictionary name="ORFJackal">
     <words>
       <w>esko</w>
+      <w>login</w>
       <w>luontola</w>
       <w>orfjackal</w>
       <w>tref</w>
+      <w>username</w>
     </words>
   </dictionary>
 </component>
