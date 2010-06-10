@@ -24,7 +24,7 @@
     <orderEntry type="library" exported="" name="Maven: com.intellij:annotations:7.0.3" level="project" />
     <orderEntry type="library" exported="" name="Maven: net.orfjackal.ext.javax.annotations:jsr305:20080825" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.5.8" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jdave:jdave-junit4:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jdave:jdave-core:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jmock:jmock:2.4.0" level="project" />
@@ -34,7 +34,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit-dep:4.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:2.5.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.8.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.8.4" level="project" />
   </component>
   <component name="copyright">
     <Base>
