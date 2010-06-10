@@ -4,6 +4,7 @@
 
 package net.orfjackal.dimdwarf.test.runner;
 
+import com.google.inject.Module;
 import net.orfjackal.dimdwarf.test.util.TestEnvironment;
 import org.apache.commons.io.*;
 
@@ -21,7 +22,7 @@ public class ServerRunner {
         port = new Random().nextInt(10000) + 10000;
     }
 
-    public void startApplication(Class<?> application) throws IOException {
+    public void startApplication(Class<? extends Module> application) throws IOException {
         deployApplication(application);
         startServer();
     }

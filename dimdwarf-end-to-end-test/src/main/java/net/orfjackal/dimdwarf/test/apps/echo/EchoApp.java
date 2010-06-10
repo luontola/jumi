@@ -2,7 +2,11 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.test.apps;
+package net.orfjackal.dimdwarf.test.apps.echo;
 
-public class Echo {
+import com.google.inject.AbstractModule;
+
+public class EchoApp extends AbstractModule {
+    protected void configure() {
+    }
 }
