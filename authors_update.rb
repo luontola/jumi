@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-File.open('AUTHORS', 'w') do |file|
+File.open('AUTHORS.txt', 'w') do |file|
   file.puts <<-eos
 This is the official list of Dimdwarf authors for copyright purposes.
 
