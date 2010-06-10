@@ -4,7 +4,7 @@
 # The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
 
-# Startup script for Dimdwarf. Loads dynamically all JAR files
+# Main script for Dimdwarf. Loads dynamically all JAR files
 # in the library directories.
 if [ $# -ne 2 ]; then
     echo "Usage: dimdwarf APP_LIBRARY_DIR APP_CONFIG_FILE"

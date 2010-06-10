@@ -15,16 +15,27 @@
             <outputDirectory>lib</outputDirectory>
             <excludes>
                 <exclude>net.orfjackal.dimdwarf:dimdwarf-agent:jar</exclude>
+                <exclude>net.orfjackal.dimdwarf:dimdwarf-launcher:jar</exclude>
             </excludes>
         </dependencySet>
 
         <!-- Fixed name for agent -->
+        <!-- TODO: is the agent needed anymore? -->
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>net.orfjackal.dimdwarf:dimdwarf-agent:jar</include>
             </includes>
             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+        </dependencySet>
+
+        <!-- Fixed name for launcher -->
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>net.orfjackal.dimdwarf:dimdwarf-launcher:jar</include>
+            </includes>
+            <outputFileNameMapping>launcher.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
 
     </dependencySets>

@@ -11,20 +11,21 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dimdwarf-dist" scope="PROVIDED" />
-    <orderEntry type="module" module-name="dimdwarf-agent" scope="PROVIDED" />
-    <orderEntry type="module" module-name="dimdwarf-aop" scope="PROVIDED" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm:3.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm-tree:3.2" level="project" />
     <orderEntry type="module" module-name="dimdwarf-core" scope="PROVIDED" />
     <orderEntry type="module" module-name="dimdwarf-api" scope="PROVIDED" />
     <orderEntry type="module" module-name="dimdwarf-api-internal" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.inject:guice:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: cglib:cglib:2.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm:3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:1.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-api:1.5.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellij:annotations:7.0.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.orfjackal.ext.javax.annotations:jsr305:20080825" level="project" />
+    <orderEntry type="module" module-name="dimdwarf-launcher" scope="PROVIDED" />
+    <orderEntry type="module" module-name="dimdwarf-agent" scope="PROVIDED" />
+    <orderEntry type="module" module-name="dimdwarf-aop" scope="PROVIDED" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm-tree:3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.5.8" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.reddwarfserver.client:sgs-client:0.10.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.reddwarfserver.server:sgs-shared:1.12" level="project" />

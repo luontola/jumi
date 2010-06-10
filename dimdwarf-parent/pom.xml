@@ -122,6 +122,11 @@
                 <version>${version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>${groupId}</groupId>
+                <artifactId>dimdwarf-launcher</artifactId>
+                <version>${version}</version>
+            </dependency>
 
             <!-- Project Darkstar / RedDwarf -->
 

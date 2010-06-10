@@ -19,11 +19,16 @@
 
         <dependency>
             <groupId>${groupId}</groupId>
-            <artifactId>dimdwarf-agent</artifactId>
+            <artifactId>dimdwarf-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>dimdwarf-launcher</artifactId>
         </dependency>
         <dependency>
             <groupId>${groupId}</groupId>
-            <artifactId>dimdwarf-core</artifactId>
+            <artifactId>dimdwarf-agent</artifactId>
         </dependency>
 
         <!-- Logging implementation -->

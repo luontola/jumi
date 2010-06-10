@@ -43,6 +43,7 @@
         <module>dimdwarf-core</module>
         <module>dimdwarf-dist</module>
         <module>dimdwarf-end-to-end-test</module>
+        <module>dimdwarf-launcher</module>
         <module>dimdwarf-parent</module>
     </modules>
 
