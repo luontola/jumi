@@ -48,7 +48,7 @@ public class Matchers {
         };
     }
 
-    static Matcher<File> isDirectory() {
+    public static Matcher<File> isDirectory() {
         return new TypeSafeMatcher<File>() {
             public boolean matchesSafely(File dir) {
                 return dir.isDirectory();
