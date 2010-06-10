@@ -35,9 +35,16 @@
             <artifactId>sgs-client</artifactId>
         </dependency>
         <dependency>
+            <!-- sgs-client requires version 1.x, so we need to override
+                 the version inherited from parent pom's dependencyManagement. -->
             <groupId>org.apache.mina</groupId>
             <artifactId>mina-core</artifactId>
             <version>1.1.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
 
     </dependencies>
