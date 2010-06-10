@@ -21,15 +21,21 @@ public class ClientRunner {
 
     private static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 
+    private final BlockingQueue<Event> events = new LinkedBlockingQueue<Event>();
     private final SimpleClient client;
     private final String host;
     private final int port;
-    private final BlockingQueue<Event> events = new LinkedBlockingQueue<Event>();
+    private String username = "user";
+    private String password = "secret";
 
     public ClientRunner(ServerRunner server) {
         host = server.getHost();
         port = server.getPort();
         client = new SimpleClient(new MySimpleClientListener());
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void loginToServer() throws IOException {
@@ -110,7 +116,7 @@ public class ClientRunner {
     private class MySimpleClientListener implements SimpleClientListener {
 
         public PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication("johndoe", "secret".toCharArray());
+            return new PasswordAuthentication(username, password.toCharArray());
         }
 
         public void loggedIn() {

@@ -25,6 +25,7 @@ public class ClientConnectionTest {
     public void login_with_wrong_password_fails() throws IOException {
         server.startApplication(Echo.class);
 
+        client.setPassword("wrong-password");
         client.loginToServer();
         client.failsToLogin();
     }
