@@ -8,7 +8,8 @@ import org.junit.Test;
 
 import java.io.*;
 
-import static org.hamcrest.Matchers.*;
+import static net.orfjackal.dimdwarf.test.util.Matchers.*;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 public class TestEnvironmentTest {
@@ -17,8 +18,7 @@ public class TestEnvironmentTest {
     public void sandbox_directory_is_created() {
         File sandbox = TestEnvironment.getSandboxDir();
 
-        assertThat("sandbox: " + sandbox,
-                sandbox.isDirectory(), is(true));
+        assertThat(sandbox, isDirectory());
     }
 
     @Test
@@ -26,14 +26,14 @@ public class TestEnvironmentTest {
         File sandbox = TestEnvironment.getSandboxDir();
         File deployment = TestEnvironment.getDeploymentDir();
 
-        assertThat(sandbox.listFiles(), hasItemInArray(deployment));
+        assertThat(sandbox, containsFile(deployment));
     }
 
     @Test
     public void deployment_directory_contains_the_deployed_application() {
         File deployment = TestEnvironment.getDeploymentDir();
 
-        assertThat(deployment.list(), hasItemInArray("LICENSE.txt"));
+        assertThat(deployment, containsFile("LICENSE.txt"));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class TestEnvironmentTest {
         File temp = TestEnvironment.createTempDir();
 
         try {
-            assertThat(sandbox.listFiles(), hasItemInArray(temp));
+            assertThat(sandbox, containsFile(temp));
 
         } finally {
             TestEnvironment.deleteTempDir(temp);
@@ -57,7 +57,7 @@ public class TestEnvironmentTest {
 
         TestEnvironment.deleteTempDir(temp);
 
-        assertThat(sandbox.listFiles(), not(hasItemInArray(temp)));
+        assertThat(sandbox, not(containsFile(temp)));
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
