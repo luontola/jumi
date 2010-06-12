@@ -17,20 +17,27 @@ def rollback_changes()
   return system("git reset --hard #{REMOTE}/#{BRANCH}")
 end
 
-def print_results(msg)
+def success(message)
   puts
-  puts msg
+  puts message
+  exit 0
+end
+
+def failure(message)
+  puts
+  puts "Error: #{message}"
+  exit 1
 end
 
 Dir.chdir(PROJECT_HOME) do
   if clean_build()
     if push_changes()
-      print_results 'All OK'
+      success 'All OK'
     else
-      print_results 'Error: Failed to push changes - you should do it manually'
+      failure 'Failed to push changes - you should do it manually'
     end
   else
     rollback_changes()
-    print_results 'Error: Failed to build - changes rolled back (undo with `git reset --hard HEAD@{1}`)'
+    failure 'Failed to build - changes rolled back (undo with `git reset --hard HEAD@{1}`)'
   end
 end
