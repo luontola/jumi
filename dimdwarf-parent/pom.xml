@@ -23,6 +23,10 @@
             <url>http://repo.orfjackal.net/maven2</url>
         </repository>
         <repository>
+            <id>scala-tools.org</id>
+            <url>http://scala-tools.org/repo-releases</url>
+        </repository>
+        <repository>
             <id>laughing-panda</id>
             <url>http://www.laughingpanda.org/maven2</url>
         </repository>
@@ -36,6 +40,10 @@
         </repository>
     </repositories>
     <pluginRepositories>
+        <pluginRepository>
+            <id>scala-tools.org</id>
+            <url>http://scala-tools.org/repo-releases</url>
+        </pluginRepository>
         <pluginRepository>
             <id>codehaus</id>
             <url>http://repository.codehaus.org</url>
@@ -72,15 +80,30 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.0</version>
+            <groupId>org.scala-tools.testing</groupId>
+            <artifactId>specs</artifactId>
+            <version>1.6.2.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mocking -->
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -126,6 +149,20 @@
                 <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-launcher</artifactId>
                 <version>${version}</version>
+            </dependency>
+
+            <!-- Scala -->
+
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>2.7.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>2.7.7</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- Project Darkstar / RedDwarf -->
