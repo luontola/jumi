@@ -8,12 +8,28 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 
+/**
+ * Adds to classpath automatically all libraries which are part of the application,
+ * and then runs the application via its main method.
+ * <p/>
+ * This launcher should not contain any application logic (such as reading config files
+ * or parsing command line arguments), but it should delegate everything to the actual
+ * application. Also library dependencies should be minimized (preferably just the JRE).
+ * <p/>
+ * Also the application should be started in the same JVM as this class. This is to
+ * make it easier for IDEs to debug the application. If it were launched in a separate
+ * JVM, attaching a debugger or profiler to it would be much harder.
+ * <p/>
+ * Due to the previous requirement, this class cannot be used to set JVM options. They
+ * need to be set possibly in a shell script which runs this launcher.
+ */
 public class Main {
     private static final File LIBRARIES_DIR = new File("lib");
     private static final String ACTUAL_MAIN = "net.orfjackal.dimdwarf.server.Main";
 
-    // TODO: AOP bytecode manipulation
-    // TODO: remove the old startup scripts
+    // TODO: AOP bytecode manipulation? perhaps first loading the AOP libraries from a lib/boot/ directory
+    // TODO: remove/modify the old startup scripts
+
     public static void main(String[] args) throws Exception {
         URL[] libraries = asUrls(listJarsInDirectory(LIBRARIES_DIR));
         URLClassLoader loader = new URLClassLoader(libraries);
