@@ -31,6 +31,6 @@ Dir.chdir(PROJECT_HOME) do
     end
   else
     rollback_changes()
-    print_results 'Error: Failed to build - changes rolled back'
+    print_results 'Error: Failed to build - changes rolled back (undo with `git reset --hard HEAD@{1}`)'
   end
 end
