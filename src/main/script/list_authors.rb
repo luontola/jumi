@@ -8,7 +8,7 @@ authors = []
   authors << {:count => count, :name => name}
 end
 
-$total_count = authors.inject(0) {|sum, author| sum + author[:count]}
+$total_count = authors.inject(0) { |sum, author| sum + author[:count] }
 
 def author_to_s(author)
   percent = sprintf("%6.2f\%", author[:count].to_f / $total_count * 100)

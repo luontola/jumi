@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module MavenProjectsManager.isMavenModule="true" org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" relativePaths="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="JRUBY" name="JRuby">
+      <configuration number="0">
+        <JRUBY_FACET_CONFIG_ID NAME="JRUBY_SDK_NAME" VALUE="JRuby SDK 1.5.1" />
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -8,6 +15,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="JRuby SDK 1.5.1 facet library" level="application" />
   </component>
   <component name="copyright">
     <Base>
