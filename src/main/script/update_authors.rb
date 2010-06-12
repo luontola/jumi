@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
-
-SCRIPTS = File.dirname($0)
-PROJECT_HOME = File.expand_path('../../..', SCRIPTS)
+require File.dirname($0) + '/common'
 
 File.open("#{PROJECT_HOME}/AUTHORS.txt", 'w') do |file|
   file.puts <<-eos
