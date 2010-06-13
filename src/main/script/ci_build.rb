@@ -26,16 +26,16 @@ BRANCH = 'master'
 REMOTE = 'origin'
 
 def clean_build
-  return (system("git checkout -f #{BRANCH}") and
-          system("mvn clean verify"))
+  system("git checkout -f #{BRANCH}") and
+          system("mvn clean verify")
 end
 
 def push_changes
-  return system("git push #{REMOTE} #{BRANCH}")
+  system("git push #{REMOTE} #{BRANCH}")
 end
 
 def rollback_changes
-  return system("git reset --hard #{REMOTE}/#{BRANCH}")
+  system("git reset --hard #{REMOTE}/#{BRANCH}")
 end
 
 def success(message)
