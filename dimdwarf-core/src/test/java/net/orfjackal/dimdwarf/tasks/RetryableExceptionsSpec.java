@@ -35,6 +35,7 @@ public class RetryableExceptionsSpec extends Specification<Object> {
         server = new TestServer(
                 new CommonModules()
         );
+        // TODO: replace JDK logging with Lockback (or even better, decouple the code from logging)
         server.changeLoggingLevel(TransactionFilter.class, Level.WARNING);
         server.changeLoggingLevel(RetryingTaskExecutor.class, Level.WARNING);
 

@@ -34,8 +34,11 @@
         <!-- Logging implementation -->
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <!-- 'optional' prevents the loading of two SLF4J implementations
+                 in the end-to-end tests which depend on this module  -->
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

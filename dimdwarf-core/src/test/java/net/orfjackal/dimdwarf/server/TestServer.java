@@ -33,6 +33,7 @@ public class TestServer {
     }
 
     public void changeLoggingLevel(Class<?> clazz, Level level) {
+        // TODO: replace JDK logging with Lockback (or even better, decouple the code from logging)
         Logger logger = Logger.getLogger(clazz.getName());
         logger.setLevel(level);
         logsToReset.add(logger);

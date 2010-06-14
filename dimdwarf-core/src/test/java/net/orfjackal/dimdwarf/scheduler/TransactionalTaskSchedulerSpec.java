@@ -58,6 +58,7 @@ public class TransactionalTaskSchedulerSpec extends Specification<Object> {
         scheduler = new TaskSchedulerImpl(tx, clock, taskContext, rsf);
         scheduler.start();
 
+        // TODO: replace JDK logging with Lockback (or even better, decouple the code from logging)        
         hideTransactionFailedLogs = Logger.getLogger(TransactionFilter.class.getName());
         hideTransactionFailedLogs.setLevel(Level.SEVERE);
     }

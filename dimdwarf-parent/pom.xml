@@ -60,6 +60,9 @@
         <!-- Logging -->
 
         <dependency>
+            <!-- TODO: use Logback also in the tests and get rid of slf4j-jdk14 -->
+            <!--<groupId>ch.qos.logback</groupId>-->
+            <!--<artifactId>logback-classic</artifactId>-->
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <scope>test</scope>
@@ -239,7 +242,6 @@
 
             <!-- Logging -->
 
-            <!-- TODO: evaluate SLF4J + Logback -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -249,6 +251,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-jdk14</artifactId>
                 <version>1.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>0.9.21</version>
             </dependency>
 
             <!-- Misc -->
