@@ -17,6 +17,7 @@
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>net.orfjackal.dimdwarf:dimdwarf-core:jar</include>
+                <include>ch.qos.logback:logback-classic:jar</include>
             </includes>
         </dependencySet>
 
