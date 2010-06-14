@@ -42,8 +42,8 @@ public class ServerRunner {
     private void createAppConfig(Class<?> application) throws IOException {
         File configFile = new File(applicationDir, "classes/META-INF/app.properties");
         FileUtils.writeLines(configFile, Arrays.asList(
-                "app.name=" + application.getSimpleName(),
-                "app.module=" + application.getName()
+                "dimdwarf.app.name=" + application.getSimpleName(),
+                "dimdwarf.app.module=" + application.getName()
         ));
     }
 
