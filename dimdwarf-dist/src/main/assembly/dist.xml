@@ -35,7 +35,7 @@
         <dependencySet>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>net.orfjackal.dimdwarf:dimdwarf-agent:jar:*</include>
+                <include>net.orfjackal.dimdwarf:dimdwarf-agent:jar</include>
             </includes>
             <outputFileNameMapping>agent.${artifact.extension}</outputFileNameMapping>
         </dependencySet>

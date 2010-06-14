@@ -3,12 +3,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1 http://maven.apache.org/xsd/assembly-1.1.1.xsd">
 
-    <!-- Otherwise the same as the default 'jar-with-dependencies', but
-         with the <fileSets> removed, because that was producing duplicate
-         class files. (Also this makes it possible to use an empty ID as
-         classifier, if so desired.) -->
-
-    <id>nodep</id>
+    <id/>
     <formats>
         <format>jar</format>
     </formats>
@@ -20,14 +15,5 @@
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
-
-    <!--
-    <fileSets>
-        <fileSet>
-            <outputDirectory>/</outputDirectory>
-            <directory>${project.build.outputDirectory}</directory>
-        </fileSet>
-    </fileSets>
-    -->
 
 </assembly>
