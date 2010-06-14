@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1 http://maven.apache.org/xsd/assembly-1.1.1.xsd">
 
     <id/>
     <formats>
@@ -13,20 +14,29 @@
         <!-- Libraries -->
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
-            <excludes>
-                <exclude>net.orfjackal.dimdwarf:dimdwarf-agent:jar</exclude>
-                <exclude>net.orfjackal.dimdwarf:dimdwarf-launcher:jar</exclude>
-            </excludes>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>net.orfjackal.dimdwarf:dimdwarf-core:jar</include>
+            </includes>
+        </dependencySet>
+
+        <!-- Libraries in bootstrap classpath -->
+        <dependencySet>
+            <outputDirectory>lib/boot</outputDirectory>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>net.orfjackal.dimdwarf:dimdwarf-aop:jar</include>
+            </includes>
         </dependencySet>
 
         <!-- Fixed name for agent -->
         <!-- TODO: is the agent needed anymore? -->
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>net.orfjackal.dimdwarf:dimdwarf-agent:jar</include>
             </includes>
-            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+            <outputFileNameMapping>agent.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
 
         <!-- Fixed name for launcher -->
@@ -43,6 +53,7 @@
     <fileSets>
 
         <!-- Startup files -->
+        <!-- TODO: write new startup scripts -->
         <fileSet>
             <outputDirectory>/</outputDirectory>
             <directory>src/main/config</directory>
