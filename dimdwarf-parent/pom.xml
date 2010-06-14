@@ -121,6 +121,7 @@
                 <groupId>${groupId}</groupId>
                 <artifactId>dimdwarf-agent</artifactId>
                 <version>${version}</version>
+                <classifier>nodep</classifier>
             </dependency>
             <dependency>
                 <groupId>${groupId}</groupId>

@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>dimdwarf-agent</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>dimdwarf-agent</name>
 
@@ -28,10 +28,25 @@
         <plugins>
 
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Premain-Class>net.orfjackal.dimdwarf.agent.AopAgent</Premain-Class>
+                            <!--<Agent-Class>net.orfjackal.dimdwarf.agent.AopAgent</Agent-Class>-->
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/jar-with-dependencies.xml</descriptor>
+                        <descriptor>src/main/assembly/nodep.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifestEntries>
