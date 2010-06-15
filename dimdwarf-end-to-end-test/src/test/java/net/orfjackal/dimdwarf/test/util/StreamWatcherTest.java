@@ -19,8 +19,8 @@ public class StreamWatcherTest {
 
     @Before
     public void setUp() throws IOException {
-        PipedWriter w = new PipedWriter();
-        PipedReader r = new PipedReader(w);
+        PipedReader r = new PipedReader();
+        PipedWriter w = new LowLatencyPipedWriter(r);
         stream = new PrintWriter(w);
         watcher = new StreamWatcher(r);
     }

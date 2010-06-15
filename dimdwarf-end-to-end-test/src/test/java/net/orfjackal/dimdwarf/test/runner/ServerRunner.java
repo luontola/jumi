@@ -75,20 +75,20 @@ public class ServerRunner {
         );
         serverProcess = builder.start();
 
-        PipedOutputStream toWatcher = streamToWatcher();
+        OutputStream toWatcher = streamToWatcher();
         redirectStream(serverProcess.getInputStream(), System.out, toWatcher);
         redirectStream(serverProcess.getErrorStream(), System.err, toWatcher);
     }
 
-    private PipedOutputStream streamToWatcher() throws IOException {
+    private OutputStream streamToWatcher() throws IOException {
         assert outputWatcher == null;
         PipedInputStream in = new PipedInputStream();
-        PipedOutputStream toWatcher = new PipedOutputStream(in);
+        PipedOutputStream toWatcher = new LowLatencyPipedOutputStream(in);
         outputWatcher = new StreamWatcher(new InputStreamReader(in));
         return toWatcher;
     }
 
-    private static void redirectStream(InputStream input, OutputStream systemOut, PipedOutputStream toWatcher) {
+    private static void redirectStream(InputStream input, OutputStream systemOut, OutputStream toWatcher) {
         redirectStream(new TeeInputStream(input, toWatcher), new CloseShieldOutputStream(systemOut));
     }
 
