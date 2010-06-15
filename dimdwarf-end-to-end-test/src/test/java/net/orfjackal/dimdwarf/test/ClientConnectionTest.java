@@ -8,8 +8,6 @@ import net.orfjackal.dimdwarf.test.apps.echo.EchoApp;
 import net.orfjackal.dimdwarf.test.runner.*;
 import org.junit.*;
 
-import java.io.IOException;
-
 public class ClientConnectionTest {
 
     private final ServerRunner server = new ServerRunner();
@@ -22,7 +20,7 @@ public class ClientConnectionTest {
     }
 
     @Test
-    public void login_with_wrong_password_fails() throws IOException {
+    public void login_with_wrong_password_fails() throws Exception {
         server.startApplication(EchoApp.class);
 
         client.setPassword("wrong-password");
@@ -31,7 +29,7 @@ public class ClientConnectionTest {
     }
 
     //@Test
-    public void login_and_logout_successfully() throws IOException {
+    public void login_and_logout_successfully() throws Exception {
         server.startApplication(EchoApp.class);
 
         client.loginToServer();
@@ -42,7 +40,7 @@ public class ClientConnectionTest {
     }
 
     //@Test
-    public void send_and_receive_messages() throws IOException {
+    public void send_and_receive_messages() throws Exception {
         server.startApplication(EchoApp.class);
 
         client.loginToServer();

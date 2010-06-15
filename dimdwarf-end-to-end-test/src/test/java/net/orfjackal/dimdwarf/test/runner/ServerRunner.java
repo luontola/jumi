@@ -5,27 +5,35 @@
 package net.orfjackal.dimdwarf.test.runner;
 
 import com.google.inject.Module;
-import net.orfjackal.dimdwarf.test.util.TestEnvironment;
+import net.orfjackal.dimdwarf.test.util.*;
 import org.apache.commons.io.*;
+import org.apache.commons.io.input.TeeInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ServerRunner {
 
+    private static final int TIMEOUT = 5;
+    private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
+
     private final String host = "localhost";
     private final int port;
-    private Process serverProcess;
     private File applicationDir;
+    private Process serverProcess;
+    private StreamWatcher outputWatcher;
 
     public ServerRunner() {
+        // TODO: a smarter way to find an available port?
         port = new Random().nextInt(10000) + 10000;
     }
 
-    public void startApplication(Class<? extends Module> application) throws IOException {
+    public void startApplication(Class<? extends Module> application) throws IOException, InterruptedException {
         deployApplication(application);
         startServer();
-        // TODO: wait for the server to start - otherwise the client may try to connect before the socket is listening 
+        waitForServerToStart();
     }
 
     private void deployApplication(Class<?> application) throws IOException {
@@ -57,10 +65,23 @@ public class ServerRunner {
                 "--port", String.valueOf(port),
                 "--app", applicationDir.getPath()
         );
-
         serverProcess = builder.start();
-        redirectStream(serverProcess.getInputStream(), System.out);
-        redirectStream(serverProcess.getErrorStream(), System.err);
+
+        PipedOutputStream toWatcher = streamToWatcher();
+        redirectStream(serverProcess.getInputStream(), System.out, toWatcher);
+        redirectStream(serverProcess.getErrorStream(), System.err, toWatcher);
+    }
+
+    private PipedOutputStream streamToWatcher() throws IOException {
+        assert outputWatcher == null;
+        PipedInputStream in = new PipedInputStream();
+        PipedOutputStream toWatcher = new PipedOutputStream(in);
+        outputWatcher = new StreamWatcher(new InputStreamReader(in));
+        return toWatcher;
+    }
+
+    private static void redirectStream(InputStream input, OutputStream systemOut, PipedOutputStream toWatcher) {
+        redirectStream(new TeeInputStream(input, toWatcher), new CloseShieldOutputStream(systemOut));
     }
 
     private static void redirectStream(final InputStream in, final OutputStream out) {
@@ -70,11 +91,17 @@ public class ServerRunner {
                     IOUtils.copy(in, out);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    IOUtils.closeQuietly(out);
                 }
             }
         });
         t.setDaemon(true);
         t.start();
+    }
+
+    private void waitForServerToStart() throws InterruptedException {
+        outputWatcher.waitForLineContaining("Server started", TIMEOUT, TIMEOUT_UNIT);
     }
 
     public void shutdown() {

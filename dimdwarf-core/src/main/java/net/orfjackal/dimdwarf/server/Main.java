@@ -41,6 +41,7 @@ public class Main {
         acceptor.bind(new InetSocketAddress(port));
 
         // TODO: wait for the application to exit (or actually, wait indefinitely because it's meant to be crash-only software)
+        logger.info("Server started");
         Thread.sleep(1000);
 
         logger.info("Shutting down");
