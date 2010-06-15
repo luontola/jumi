@@ -25,6 +25,7 @@ public class ServerRunner {
     public void startApplication(Class<? extends Module> application) throws IOException {
         deployApplication(application);
         startServer();
+        // TODO: wait for the server to start - otherwise the client may try to connect before the socket is listening 
     }
 
     private void deployApplication(Class<?> application) throws IOException {
