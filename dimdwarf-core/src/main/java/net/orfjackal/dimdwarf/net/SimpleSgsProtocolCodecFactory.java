@@ -9,11 +9,14 @@ import org.apache.mina.filter.codec.*;
 
 public class SimpleSgsProtocolCodecFactory implements ProtocolCodecFactory {
 
+    private final SimpleSgsProtocolEncoder encoder = new SimpleSgsProtocolEncoder();
+    private final SimpleSgsProtocolDecoder decoder = new SimpleSgsProtocolDecoder();
+
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-        return new SimpleSgsProtocolEncoder();
+        return encoder;
     }
 
     public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-        return new SimpleSgsProtocolDecoder();
+        return decoder;
     }
 }

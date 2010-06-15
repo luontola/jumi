@@ -9,9 +9,12 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.*;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
  * Decodes {@link com.sun.sgs.protocol.simple.SimpleSgsProtocol} messages.
  */
+@Immutable
 public class SimpleSgsProtocolDecoder extends CumulativeProtocolDecoder {
 
     // TODO: ensure compatibility with com.sun.sgs.impl.sharedutil.MessageBuffer
