@@ -179,6 +179,12 @@
                 <groupId>org.reddwarfserver.client</groupId>
                 <artifactId>sgs-client</artifactId>
                 <version>0.10.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Dependency injection -->

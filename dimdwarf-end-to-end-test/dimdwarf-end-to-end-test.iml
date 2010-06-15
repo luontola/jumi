@@ -30,8 +30,8 @@
     <orderEntry type="module" module-name="dimdwarf-aop" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm-tree:3.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.reddwarfserver.client:sgs-client:0.10.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.6.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-io:commons-io:1.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.6.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jdave:jdave-junit4:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jdave:jdave-core:1.1" level="project" />
