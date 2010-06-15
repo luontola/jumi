@@ -9,6 +9,9 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.*;
 
+/**
+ * Encodes {@link com.sun.sgs.protocol.simple.SimpleSgsProtocol} messages.
+ */
 public class SimpleSgsProtocolEncoder implements ProtocolEncoder {
 
     // TODO: ensure compatibility with com.sun.sgs.impl.sharedutil.MessageBuffer

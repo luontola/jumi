@@ -8,9 +8,6 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.*;
 
-/**
- * Handler for the {@link com.sun.sgs.protocol.simple.SimpleSgsProtocol} server-side protocol.
- */
 public class SimpleSgsProtocolIoHandler extends IoHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleSgsProtocolIoHandler.class);
