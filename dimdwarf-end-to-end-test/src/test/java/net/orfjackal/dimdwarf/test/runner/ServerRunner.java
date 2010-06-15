@@ -11,7 +11,7 @@ import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.io.output.CloseShieldOutputStream;
 
 import java.io.*;
-import java.util.*;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class ServerRunner {
@@ -19,15 +19,23 @@ public class ServerRunner {
     private static final int TIMEOUT = 5;
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
 
-    private final String host = "localhost";
+    private final String host;
     private final int port;
     private File applicationDir;
     private Process serverProcess;
     private StreamWatcher outputWatcher;
 
     public ServerRunner() {
-        // TODO: a smarter way to find an available port?
-        port = new Random().nextInt(10000) + 10000;
+        this(SocketUtil.anyFreePort());
+    }
+
+    public ServerRunner(int port) {
+        this("localhost", port);
+    }
+
+    public ServerRunner(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
     public void startApplication(Class<? extends Module> application) throws IOException, InterruptedException {
