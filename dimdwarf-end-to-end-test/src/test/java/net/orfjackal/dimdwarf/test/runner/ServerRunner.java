@@ -69,7 +69,9 @@ public class ServerRunner {
         builder.directory(TestEnvironment.getDeploymentDir());
         builder.redirectErrorStream(false);
         builder.command(
-                "java", "-jar", "launcher.jar",
+                "java",
+                "-ea",
+                "-jar", "launcher.jar",
                 "--port", String.valueOf(port),
                 "--app", applicationDir.getPath()
         );

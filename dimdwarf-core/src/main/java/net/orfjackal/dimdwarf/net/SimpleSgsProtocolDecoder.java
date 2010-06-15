@@ -18,14 +18,14 @@ public class SimpleSgsProtocolDecoder extends CumulativeProtocolDecoder {
 
     protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (in.prefixedDataAvailable(2, SimpleSgsProtocol.MAX_PAYLOAD_LENGTH)) {
-            int length = in.getUnsignedShort();
+            int payloadLength = in.getUnsignedShort();
             byte op = in.get();
-            assert op != SimpleSgsProtocol.LOGIN_REQUEST;
 
-            for (int i = 1; i < length; i++) {
+            assert op == SimpleSgsProtocol.LOGIN_REQUEST;
+            for (int i = 1; i < payloadLength; i++) {
                 in.get();
             }
-            LoginRequest message = new LoginRequest();
+            Object message = new LoginRequest();
 
             out.write(message);
             return true;
