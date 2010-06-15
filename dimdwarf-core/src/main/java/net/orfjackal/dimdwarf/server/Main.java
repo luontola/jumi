@@ -4,10 +4,11 @@
 
 package net.orfjackal.dimdwarf.server;
 
-import net.orfjackal.dimdwarf.net.SimpleSgsProtocolIoHandler;
+import net.orfjackal.dimdwarf.net.*;
 import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.*;
@@ -33,6 +34,7 @@ public class Main {
         // TODO: move connection handling to another class
         IoAcceptor acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
+        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new SimpleSgsProtocolCodecFactory()));
         acceptor.setHandler(new SimpleSgsProtocolIoHandler());
         acceptor.getSessionConfig().setReadBufferSize(2048);
         acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
