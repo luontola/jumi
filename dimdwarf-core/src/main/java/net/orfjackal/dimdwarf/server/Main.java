@@ -4,7 +4,10 @@
 
 package net.orfjackal.dimdwarf.server;
 
+import com.google.inject.*;
+import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.net.*;
+import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
@@ -22,8 +25,13 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.info("Dimdwarf {} starting up", getVersion());
 
-        // TODO: start up server etc.
-        // Guice.createInjector(Stage.PRODUCTION, ...)
+        Injector injector = Guice.createInjector(Stage.PRODUCTION, new CommonModules());
+        logger.info("Modules loaded");
+
+        injector.getInstance(TaskExecutor.class);
+        logger.info("Bootstrapper instantiated");
+
+        // TODO: delegate all the following to a bootsrapper class
 
         // TODO: parse args properly
         int port = Integer.valueOf(args[1]);
@@ -39,15 +47,15 @@ public class Main {
         acceptor.getSessionConfig().setReadBufferSize(2048);
         acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
-        logger.info("Begin listening on port " + port);
+        logger.info("Begin listening on port {}", port);
         acceptor.bind(new InetSocketAddress(port));
 
-        // TODO: wait for the application to exit (or actually, wait indefinitely because it's meant to be crash-only software)
         logger.info("Server started");
-        Thread.sleep(1000);
 
-        logger.info("Shutting down");
-        acceptor.unbind();
+        // the server is meant to be crash-only software, so it shall never exit cleanly
+        while (true) {
+            Thread.sleep(Integer.MAX_VALUE);
+        }
     }
 
     private static String getVersion() {
