@@ -7,13 +7,15 @@ package net.orfjackal.dimdwarf.test.util;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
-import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEnvironment {
 
     private static final String FILE_NOT_SPECIFIED = "/dev/null";
 
+    private static final String uniqueJvmId = new SimpleDateFormat("yyyy-MM-dd-HHmmss.SSS").format(new Date());
     private static final AtomicInteger tempDirCounter = new AtomicInteger(0);
     private static final File sandboxDir;
     private static final File deploymentDir;
@@ -49,7 +51,7 @@ public class TestEnvironment {
     }
 
     public static File createTempDir() {
-        File dir = new File(sandboxDir, "temp-" + tempDirCounter.incrementAndGet());
+        File dir = new File(sandboxDir, "temp_" + uniqueJvmId + "_" + tempDirCounter.incrementAndGet());
         if (!dir.mkdir()) {
             throw new IllegalStateException("Directory with the same name already exists: " + dir);
         }
