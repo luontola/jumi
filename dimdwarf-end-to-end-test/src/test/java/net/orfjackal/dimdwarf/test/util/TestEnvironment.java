@@ -53,7 +53,7 @@ public class TestEnvironment {
     public static File createTempDir() {
         File dir = new File(sandboxDir, "temp_" + uniqueJvmId + "_" + tempDirCounter.incrementAndGet());
         if (!dir.mkdir()) {
-            throw new IllegalStateException("Directory with the same name already exists: " + dir);
+            throw new IllegalStateException("Unable to create directory: " + dir);
         }
         return dir;
     }
