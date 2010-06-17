@@ -27,7 +27,7 @@ REMOTE = 'origin'
 
 def clean_build
   system("git checkout -f #{BRANCH}") and
-          system("mvn clean verify")
+  system("mvn clean verify")
 end
 
 def push_changes
@@ -51,14 +51,7 @@ def failure(message)
 end
 
 Dir.chdir(PROJECT_HOME) do
-  if clean_build
-    if push_changes
-      success 'All OK'
-    else
-      failure 'Failed to push changes - you should do it manually'
-    end
-  else
-    rollback_changes
-    failure 'Failed to build - changes rolled back (undo with `git reset --hard HEAD@{1}`)'
-  end
+  clean_build   or (rollback_changes; failure 'Failed to build - changes rolled back (undo with `git reset --hard HEAD@{1}`)')
+  push_changes  or failure 'Failed to push changes - you should do it manually'
+  success 'All OK'
 end
