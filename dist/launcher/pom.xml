@@ -5,15 +5,22 @@
 
     <parent>
         <groupId>net.orfjackal.dimdwarf</groupId>
-        <artifactId>dimdwarf-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../dimdwarf-parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>dimdwarf-launcher</artifactId>
+    <groupId>net.orfjackal.dimdwarf.dist</groupId>
+    <artifactId>launcher</artifactId>
     <packaging>jar</packaging>
 
-    <name>dimdwarf-launcher</name>
+    <name>dist/launcher</name>
+
+    <dependencies>
+
+        <!-- No dependencies -->
+
+    </dependencies>
 
     <build>
         <plugins>

@@ -5,9 +5,9 @@
 
     <parent>
         <groupId>net.orfjackal.dimdwarf</groupId>
-        <artifactId>dimdwarf-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../dimdwarf-parent/pom.xml</relativePath>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>dimdwarf-end-to-end-test</artifactId>
@@ -26,8 +26,9 @@
         <!-- System under test -->
 
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>net.orfjackal.dimdwarf.dist</groupId>
             <artifactId>dimdwarf-dist</artifactId>
+            <version>${version}</version>
             <type>zip</type>
             <scope>provided</scope>
         </dependency>

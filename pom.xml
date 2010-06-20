@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.orfjackal.dimdwarf</groupId>
-    <artifactId>dimdwarf</artifactId>
+    <artifactId>project</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Dimdwarf</name>
+    <name>Dimdwarf Application Server</name>
     <description>
         A lightweight application container for Java with the same programming model as Project Darkstar
     </description>
@@ -36,15 +36,39 @@
     </scm>
 
     <modules>
-        <module>dimdwarf-agent</module>
         <module>dimdwarf-aop</module>
         <module>dimdwarf-api</module>
         <module>dimdwarf-api-internal</module>
         <module>dimdwarf-core</module>
-        <module>dimdwarf-dist</module>
         <module>dimdwarf-end-to-end-test</module>
-        <module>dimdwarf-launcher</module>
-        <module>dimdwarf-parent</module>
+        <module>dist</module>
+        <module>parent</module>
     </modules>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>dimdwarf-${version}</finalName>
+                    <descriptors>
+                        <descriptor>src/main/assembly/src.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
 
 </project>

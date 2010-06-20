@@ -41,18 +41,18 @@
         <dependencySet>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>net.orfjackal.dimdwarf:dimdwarf-agent:jar</include>
+                <include>net.orfjackal.dimdwarf.dist:agent:jar</include>
             </includes>
-            <outputFileNameMapping>agent.${artifact.extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
 
         <!-- Fixed name for launcher -->
         <dependencySet>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>net.orfjackal.dimdwarf:dimdwarf-launcher:jar</include>
+                <include>net.orfjackal.dimdwarf.dist:launcher:jar</include>
             </includes>
-            <outputFileNameMapping>launcher.${artifact.extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
 
     </dependencySets>
@@ -69,7 +69,7 @@
         <!-- Documentation -->
         <fileSet>
             <outputDirectory>/</outputDirectory>
-            <directory>..</directory>
+            <directory>../..</directory>
             <includes>
                 <include>AUTHORS*</include>
                 <include>LICENSE*</include>

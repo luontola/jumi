@@ -2,16 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf.iml" filepath="$PROJECT_DIR$/dimdwarf.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-agent/dimdwarf-agent.iml" filepath="$PROJECT_DIR$/dimdwarf-agent/dimdwarf-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dist/agent/agent.iml" filepath="$PROJECT_DIR$/dist/agent/agent.iml" group="dist and modules" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-aop/dimdwarf-aop.iml" filepath="$PROJECT_DIR$/dimdwarf-aop/dimdwarf-aop.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api/dimdwarf-api.iml" filepath="$PROJECT_DIR$/dimdwarf-api/dimdwarf-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" filepath="$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" filepath="$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-dist/dimdwarf-dist.iml" filepath="$PROJECT_DIR$/dimdwarf-dist/dimdwarf-dist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dist/dimdwarf-dist/dimdwarf-dist.iml" filepath="$PROJECT_DIR$/dist/dimdwarf-dist/dimdwarf-dist.iml" group="dist and modules" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-end-to-end-test/dimdwarf-end-to-end-test.iml" filepath="$PROJECT_DIR$/dimdwarf-end-to-end-test/dimdwarf-end-to-end-test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-launcher/dimdwarf-launcher.iml" filepath="$PROJECT_DIR$/dimdwarf-launcher/dimdwarf-launcher.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-parent/dimdwarf-parent.iml" filepath="$PROJECT_DIR$/dimdwarf-parent/dimdwarf-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dist/dist.iml" filepath="$PROJECT_DIR$/dist/dist.iml" group="dist and modules" />
+      <module fileurl="file://$PROJECT_DIR$/dist/launcher/launcher.iml" filepath="$PROJECT_DIR$/dist/launcher/launcher.iml" group="dist and modules" />
+      <module fileurl="file://$PROJECT_DIR$/parent/parent.iml" filepath="$PROJECT_DIR$/parent/parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/project.iml" filepath="$PROJECT_DIR$/project.iml" />
     </modules>
   </component>
 </project>

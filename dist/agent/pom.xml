@@ -5,20 +5,21 @@
 
     <parent>
         <groupId>net.orfjackal.dimdwarf</groupId>
-        <artifactId>dimdwarf-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../dimdwarf-parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>dimdwarf-agent</artifactId>
+    <groupId>net.orfjackal.dimdwarf.dist</groupId>
+    <artifactId>agent</artifactId>
     <packaging>pom</packaging>
 
-    <name>dimdwarf-agent</name>
+    <name>dist/agent</name>
 
     <dependencies>
 
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-aop</artifactId>
         </dependency>
 

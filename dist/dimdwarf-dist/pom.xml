@@ -5,30 +5,37 @@
 
     <parent>
         <groupId>net.orfjackal.dimdwarf</groupId>
-        <artifactId>dimdwarf-parent</artifactId>
+        <artifactId>parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../dimdwarf-parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
+    <groupId>net.orfjackal.dimdwarf.dist</groupId>
     <artifactId>dimdwarf-dist</artifactId>
     <packaging>pom</packaging>
 
-    <name>dimdwarf-dist</name>
+    <name>dist/dimdwarf-dist</name>
 
     <dependencies>
 
+        <!-- Server libraries -->
+
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-core</artifactId>
         </dependency>
 
+        <!-- Distribution executables -->
+
         <dependency>
             <groupId>${groupId}</groupId>
-            <artifactId>dimdwarf-launcher</artifactId>
+            <artifactId>launcher</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>${groupId}</groupId>
-            <artifactId>dimdwarf-agent</artifactId>
+            <artifactId>agent</artifactId>
+            <version>${version}</version>
         </dependency>
 
         <!-- Logging implementation -->

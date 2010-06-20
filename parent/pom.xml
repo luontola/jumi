@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.orfjackal.dimdwarf</groupId>
-    <artifactId>dimdwarf-parent</artifactId>
+    <artifactId>parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>dimdwarf-parent</name>
+    <name>parent</name>
 
     <distributionManagement>
         <repository>
@@ -115,42 +115,26 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- Dimdwarf -->
+            <!-- Dimdwarf core modules -->
 
             <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>dimdwarf-agent</artifactId>
-                <version>${version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId}</groupId>
+                <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-aop</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>${groupId}</groupId>
+                <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-api</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>${groupId}</groupId>
+                <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-api-internal</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>${groupId}</groupId>
+                <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-core</artifactId>
-                <version>${version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>dimdwarf-dist</artifactId>
-                <version>${version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>dimdwarf-launcher</artifactId>
                 <version>${version}</version>
             </dependency>
 
