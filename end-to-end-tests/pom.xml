@@ -10,10 +10,10 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>dimdwarf-end-to-end-test</artifactId>
+    <artifactId>end-to-end-tests</artifactId>
     <packaging>jar</packaging>
 
-    <name>dimdwarf-end-to-end-test</name>
+    <name>end-to-end-tests</name>
 
     <properties>
         <test.sandbox>${project.build.directory}/test-deploy</test.sandbox>

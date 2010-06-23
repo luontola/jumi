@@ -8,8 +8,8 @@
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" filepath="$PROJECT_DIR$/dimdwarf-api-internal/dimdwarf-api-internal.iml" />
       <module fileurl="file://$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" filepath="$PROJECT_DIR$/dimdwarf-core/dimdwarf-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/dist/dimdwarf-dist/dimdwarf-dist.iml" filepath="$PROJECT_DIR$/dist/dimdwarf-dist/dimdwarf-dist.iml" group="dist and modules" />
-      <module fileurl="file://$PROJECT_DIR$/dimdwarf-end-to-end-test/dimdwarf-end-to-end-test.iml" filepath="$PROJECT_DIR$/dimdwarf-end-to-end-test/dimdwarf-end-to-end-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/dist/dist.iml" filepath="$PROJECT_DIR$/dist/dist.iml" group="dist and modules" />
+      <module fileurl="file://$PROJECT_DIR$/end-to-end-tests/end-to-end-tests.iml" filepath="$PROJECT_DIR$/end-to-end-tests/end-to-end-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/dist/launcher/launcher.iml" filepath="$PROJECT_DIR$/dist/launcher/launcher.iml" group="dist and modules" />
       <module fileurl="file://$PROJECT_DIR$/parent/parent.iml" filepath="$PROJECT_DIR$/parent/parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/project.iml" filepath="$PROJECT_DIR$/project.iml" />

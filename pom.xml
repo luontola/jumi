@@ -40,8 +40,8 @@
         <module>dimdwarf-api</module>
         <module>dimdwarf-api-internal</module>
         <module>dimdwarf-core</module>
-        <module>dimdwarf-end-to-end-test</module>
         <module>dist</module>
+        <module>end-to-end-tests</module>
         <module>parent</module>
     </modules>
 

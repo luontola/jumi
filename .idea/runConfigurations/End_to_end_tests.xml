@@ -7,7 +7,7 @@
       </pattern>
     </extension>
     <extension name="snapshooter" />
-    <module name="dimdwarf-end-to-end-test" />
+    <module name="end-to-end-tests" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />
     <option name="PACKAGE_NAME" value="" />
@@ -16,7 +16,7 @@
     <option name="TEST_OBJECT" value="package" />
     <option name="VM_PARAMETERS" value="-ea" />
     <option name="PARAMETERS" value="" />
-    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/dimdwarf-end-to-end-test" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/end-to-end-tests" />
     <option name="ENV_VARIABLES" />
     <option name="PASS_PARENT_ENVS" value="true" />
     <option name="TEST_SEARCH_SCOPE">
