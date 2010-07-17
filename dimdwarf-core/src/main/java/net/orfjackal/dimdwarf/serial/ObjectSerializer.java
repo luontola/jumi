@@ -13,6 +13,13 @@ import java.io.*;
 @Immutable
 public class ObjectSerializer {
 
+    // TODO: simplify by injecting just one SerializationReplacer
+    // - Bind all listeners statically in one class (EntitySerializationReplacer/Filter), instead of the DI configuration.
+    // - Move the metadata collecting also to that class. That would require the caller of this class to instantiate it.
+    //   In that case making SerializationReplacer a parameter of serialize()/deserialize() might improve the design,
+    //   and at the same time make it possible to plug in a different ObjectSerializer.
+    // - Make ObjectSerializer an interface, rename impl to JavaSerializationObjectSerializer? 
+
     private final SerializationListener[] listeners;
     private final SerializationReplacer[] replacers;
 
