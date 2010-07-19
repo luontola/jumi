@@ -7,27 +7,21 @@ package net.orfjackal.dimdwarf.entities;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.internal.*;
-import net.orfjackal.dimdwarf.entities.tref.*;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.serial.*;
 import org.junit.runner.RunWith;
 
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
-public class EntitySerializationChecksSpec extends Specification<Object> {
+public class SerializationAllowedPolicySpec extends Specification<Object> {
 
-    private static final ReplaceEntitiesWithTransparentReferences DISABLE_TREF_CREATION = new ReplaceEntitiesWithTransparentReferences(null, null) {
+    private final ObjectSerializer serializer = new ObjectSerializer();
+    private final SerializationAllowedPolicy policy = new SerializationAllowedPolicy(new DimdwarfEntityApi());
+    private final SerializationFilter filter = new NullSerializationFilter() {
         public Object replaceSerialized(Object rootObject, Object obj) {
+            policy.checkSerializationAllowed(rootObject, obj);
             return obj;
         }
     };
-
-    private final ObjectSerializer serializer = new ObjectSerializer();
-    private final TrefAwareEntitySerializationFilter filter = new TrefAwareEntitySerializationFilter(
-            DISABLE_TREF_CREATION,
-            new CheckDirectlyReferredEntitySerialized(new DimdwarfEntityApi()),
-            new CheckInnerClassSerialized(),
-            null
-    );
 
     private final DummyEntity entity = new DummyEntity();
 

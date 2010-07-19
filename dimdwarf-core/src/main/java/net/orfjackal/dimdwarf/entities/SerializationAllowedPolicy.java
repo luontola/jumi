@@ -4,12 +4,30 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import javax.annotation.concurrent.Immutable;
+import com.google.inject.Inject;
+import net.orfjackal.dimdwarf.api.internal.EntityApi;
 
-@Immutable
-public class CheckInnerClassSerialized {
+public class SerializationAllowedPolicy {
 
-    public void checkBeforeSerialized(Object obj) {
+    private final EntityApi entityApi;
+
+    @Inject
+    public SerializationAllowedPolicy(EntityApi entityApi) {
+        this.entityApi = entityApi;
+    }
+
+    public void checkSerializationAllowed(Object rootObject, Object obj) {
+        checkIfDirectlyReferredEntity(rootObject, obj);
+        checkIfInnerClass(obj);
+    }
+
+    private void checkIfDirectlyReferredEntity(Object rootObject, Object obj) {
+        if (obj != rootObject && entityApi.isEntity(obj)) {
+            throw new IllegalArgumentException("Entity referred directly without an entity reference: " + obj.getClass());
+        }
+    }
+
+    private void checkIfInnerClass(Object obj) {
         // Serializing anonymous and local classes is dangerous, because their class names are generated
         // automatically ($1, $2, $1Local, $2Local etc.), which means that the next time that such an
         // object is deserialized from database, the class name might have changed because of

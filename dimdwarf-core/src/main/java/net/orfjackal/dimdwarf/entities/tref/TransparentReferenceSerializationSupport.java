@@ -6,23 +6,22 @@ package net.orfjackal.dimdwarf.entities.tref;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.*;
-import net.orfjackal.dimdwarf.serial.SerializationFilter;
 
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class ReplaceEntitiesWithTransparentReferences implements SerializationFilter {
+public class TransparentReferenceSerializationSupport {
 
     private final TransparentReferenceFactory factory;
     private final EntityApi entityApi;
 
     @Inject
-    public ReplaceEntitiesWithTransparentReferences(TransparentReferenceFactory factory, EntityApi entityApi) {
+    public TransparentReferenceSerializationSupport(TransparentReferenceFactory factory, EntityApi entityApi) {
         this.factory = factory;
         this.entityApi = entityApi;
     }
 
-    public Object replaceSerialized(Object rootObject, Object obj) {
+    public Object replaceDirectlyReferredEntityWithTransparentReference(Object rootObject, Object obj) {
         if (obj != rootObject && entityApi.isEntity(obj)) {
             return createTransparentReferenceForSerialization(obj);
         }
@@ -36,7 +35,7 @@ public class ReplaceEntitiesWithTransparentReferences implements SerializationFi
         return notSerializableProxy.writeReplace();
     }
 
-    public Object resolveDeserialized(Object obj) {
+    public Object initDeserializedTransparentReference(Object obj) {
         if (obj instanceof TransparentReferenceBackend) {
             return factory.newProxy((TransparentReferenceBackend) obj);
         }

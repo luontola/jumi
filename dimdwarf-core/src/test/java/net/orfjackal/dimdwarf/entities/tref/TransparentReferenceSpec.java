@@ -4,13 +4,14 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
+import com.google.inject.Injector;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.serial.ObjectSerializer;
+import net.orfjackal.dimdwarf.serial.*;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -150,7 +151,15 @@ public class TransparentReferenceSpec extends Specification<Object> {
         private SerializationTestEntity deserialized;
 
         public void create() {
-            ReplaceEntitiesWithTransparentReferences filter = new ReplaceEntitiesWithTransparentReferences(proxyFactory, entityApi);
+            final Injector injector = mock(Injector.class);
+            SerializationFilter filter = new TrefAwareEntitySerializationFilter(
+                    new TransparentReferenceSerializationSupport(proxyFactory, entityApi),
+                    new SerializationAllowedPolicy(entityApi),
+                    injector
+            );
+            checking(new Expectations() {{
+                allowing(injector).injectMembers(with(any(Object.class)));
+            }});
             ObjectSerializer serializer = new ObjectSerializer();
 
             checking(referenceIsCreatedFor(entity, ID1));
