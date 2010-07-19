@@ -9,7 +9,7 @@ import com.google.inject.*;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class InjectObjectsOnDeserialization extends SerializationAdapter {
+public class InjectObjectsOnDeserialization {
 
     private final Injector injector;
 
@@ -18,9 +18,7 @@ public class InjectObjectsOnDeserialization extends SerializationAdapter {
         this.injector = injector;
     }
 
-    @Override
-    public void afterResolve(Object obj, MetadataBuilder meta) {
-        // TODO: Would afterDeserialize be better? May this accidentally inject transparent reference proxies?
+    public void injectMembers(Object obj) {
         injector.injectMembers(obj);
     }
 }

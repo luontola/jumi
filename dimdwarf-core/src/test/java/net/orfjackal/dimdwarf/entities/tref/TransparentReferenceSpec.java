@@ -10,7 +10,7 @@ import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.serial.*;
+import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -150,12 +150,13 @@ public class TransparentReferenceSpec extends Specification<Object> {
         private SerializationTestEntity deserialized;
 
         public void create() {
-            ObjectSerializer serializer = new ObjectSerializer(new SerializationListener[0], new SerializationReplacer[]{
-                    new ReplaceEntitiesWithTransparentReferences(proxyFactory, entityApi)
-            });
+            ReplaceEntitiesWithTransparentReferences filter = new ReplaceEntitiesWithTransparentReferences(proxyFactory, entityApi);
+            ObjectSerializer serializer = new ObjectSerializer();
+
             checking(referenceIsCreatedFor(entity, ID1));
-            Blob data = serializer.serialize(new SerializationTestEntity(entity, new DummyObject())).getSerializedBytes();
-            deserialized = (SerializationTestEntity) serializer.deserialize(data).getDeserializedObject();
+            SerializationTestEntity original = new SerializationTestEntity(entity, new DummyObject());
+            Blob data = serializer.serialize(original, filter);
+            deserialized = (SerializationTestEntity) serializer.deserialize(data, filter);
         }
 
         public void directlyReferredEntitiesAreReplacedWithTransparentReferences() {

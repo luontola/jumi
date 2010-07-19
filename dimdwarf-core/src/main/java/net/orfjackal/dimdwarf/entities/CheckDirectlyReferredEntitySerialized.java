@@ -6,12 +6,11 @@ package net.orfjackal.dimdwarf.entities;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityApi;
-import net.orfjackal.dimdwarf.serial.*;
 
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class CheckDirectlyReferredEntitySerialized extends SerializationAdapter {
+public class CheckDirectlyReferredEntitySerialized {
 
     private final EntityApi entityApi;
 
@@ -20,8 +19,7 @@ public class CheckDirectlyReferredEntitySerialized extends SerializationAdapter 
         this.entityApi = entityApi;
     }
 
-    @Override
-    public void beforeSerialize(Object rootObject, Object obj, MetadataBuilder meta) {
+    public void checkBeforeSerialized(Object rootObject, Object obj) {
         if (obj != rootObject && entityApi.isEntity(obj)) {
             throw new IllegalArgumentException("Entity referred directly without an entity reference: " + obj.getClass());
         }

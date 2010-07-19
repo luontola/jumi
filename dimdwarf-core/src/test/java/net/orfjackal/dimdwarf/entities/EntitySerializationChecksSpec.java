@@ -6,92 +6,48 @@ package net.orfjackal.dimdwarf.entities;
 
 import jdave.*;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
-import net.orfjackal.dimdwarf.db.*;
-import net.orfjackal.dimdwarf.entities.dao.*;
-import net.orfjackal.dimdwarf.serial.*;
-import org.jmock.Expectations;
+import net.orfjackal.dimdwarf.entities.tref.*;
+import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import org.junit.runner.RunWith;
-
-import static net.orfjackal.dimdwarf.util.Objects.uncheckedCast;
 
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
 public class EntitySerializationChecksSpec extends Specification<Object> {
 
-    private static final EntityId ENTITY_ID = new EntityObjectId(42);
+    private static final ReplaceEntitiesWithTransparentReferences DISABLE_TREF_CREATION = new ReplaceEntitiesWithTransparentReferences(null, null) {
+        public Object replaceSerialized(Object rootObject, Object obj) {
+            return obj;
+        }
+    };
 
-    private DatabaseTable<Blob, Blob> db;
-    private EntityRepository repository;
-    private DummyEntity entity;
-    private DelegatingSerializationReplacer replacer;
+    private final ObjectSerializer serializer = new ObjectSerializer();
+    private final TrefAwareEntitySerializationFilter filter = new TrefAwareEntitySerializationFilter(
+            DISABLE_TREF_CREATION,
+            new CheckDirectlyReferredEntitySerialized(new DimdwarfEntityApi()),
+            new CheckInnerClassSerialized(),
+            null
+    );
 
-    public void create() throws Exception {
-        // TODO: would it be better for this class to use Guice, to make sure that the EntityModule has all listeners configured?
-        db = uncheckedCast(mock(DatabaseTable.class));
-        SerializationListener[] listeners = {
-                new CheckDirectlyReferredEntitySerialized(new DimdwarfEntityApi()),
-                new CheckInnerClassSerialized()
-        };
-        replacer = new DelegatingSerializationReplacer();
-        ObjectSerializer serializer = new ObjectSerializer(listeners, new SerializationReplacer[]{replacer});
-
-        repository =
-                new EntityRepository(
-                        new EntityDao(
-                                db,
-                                new ConvertEntityIdToBytes(),
-                                new NoConversion<Blob>()),
-                        serializer);
-        entity = new DummyEntity();
-    }
-
-    private Expectations entityIsUpdated(final EntityId entityId) {
-        return new Expectations() {{
-            one(db).update(with(equal(asBytes(entityId))), with(aNonNull(Blob.class)));
-            allowing(db).read(asBytes(entityId)); will(returnValue(Blob.EMPTY_BLOB));
-        }};
-    }
-
-    private static Blob asBytes(EntityId id) {
-        return new ConvertEntityIdToBytes().forth(id);
-    }
+    private final DummyEntity entity = new DummyEntity();
 
 
     public class ReferringEntities {
 
         public void referringAnEntityDirectlyIsForbidden() {
             entity.other = new DummyEntity();
+
             specify(new Block() {
                 public void run() throws Throwable {
-                    repository.update(ENTITY_ID, entity);
+                    serializer.serialize(entity, filter);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
 
         public void referringAnEntityThroughAnEntityReferenceIsAllowed() {
-            checking(entityIsUpdated(ENTITY_ID));
-            entity.other = new EntityReferenceImpl<DummyEntity>(new EntityObjectId(123), new DummyEntity());
-            repository.update(ENTITY_ID, entity);
-        }
+            entity.other = referenceTo(new DummyEntity());
 
-        public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
-            entity.other = "tmp";
-            replacer.delegate = new SerializationReplacerAdapter() {
-                @Override
-                public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
-                    if (obj.equals("tmp")) {
-                        return new DummyEntity();
-                    }
-                    return obj;
-                }
-            };
-            specify(new Block() {
-                public void run() throws Throwable {
-                    repository.update(ENTITY_ID, entity);
-                }
-            }, should.raise(IllegalArgumentException.class));
+            serializer.serialize(entity, filter);
         }
     }
 
@@ -104,47 +60,35 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
 
         public void serializingAnonymousClassesIsForbidden() {
             entity.other = newAnonymousClassInstance();
+
             specify(new Block() {
                 public void run() throws Throwable {
-                    repository.update(ENTITY_ID, entity);
+                    serializer.serialize(entity, filter);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
 
         public void serializingLocalClassesIsForbidden() {
             entity.other = newLocalClassInstance();
+
             specify(new Block() {
                 public void run() throws Throwable {
-                    repository.update(ENTITY_ID, entity);
+                    serializer.serialize(entity, filter);
                 }
             }, should.raise(IllegalArgumentException.class));
         }
 
         public void serializingStaticMemberClassesIsAllowed() {
-            checking(entityIsUpdated(ENTITY_ID));
             entity.other = new StaticMemberClass();
-            repository.update(ENTITY_ID, entity);
-        }
 
-        public void checksAreDoneAfterAnyObjectsHaveBeenReplaced() {
-            entity.other = "tmp";
-            replacer.delegate = new SerializationReplacerAdapter() {
-                @Override
-                public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
-                    if (obj.equals("tmp")) {
-                        return newAnonymousClassInstance();
-                    }
-                    return obj;
-                }
-            };
-            specify(new Block() {
-                public void run() throws Throwable {
-                    repository.update(ENTITY_ID, entity);
-                }
-            }, should.raise(IllegalArgumentException.class));
+            serializer.serialize(entity, filter);
         }
     }
 
+
+    private static EntityReferenceImpl<DummyEntity> referenceTo(DummyEntity entity) {
+        return new EntityReferenceImpl<DummyEntity>(new EntityObjectId(entity.hashCode()), entity);
+    }
 
     private static Object newAnonymousClassInstance() {
         return new DummyObject() {
@@ -158,24 +102,6 @@ public class EntitySerializationChecksSpec extends Specification<Object> {
     }
 
     private static class StaticMemberClass extends DummyObject {
-    }
-
-    private static class DelegatingSerializationReplacer implements SerializationReplacer {
-        private SerializationReplacer delegate = null;
-
-        public Object replaceSerialized(Object rootObject, Object obj, MetadataBuilder meta) {
-            if (delegate != null) {
-                return delegate.replaceSerialized(rootObject, obj, meta);
-            }
-            return obj;
-        }
-
-        public Object resolveDeserialized(Object obj, MetadataBuilder meta) {
-            if (delegate != null) {
-                return delegate.resolveDeserialized(obj, meta);
-            }
-            return obj;
-        }
     }
 
     // TODO: warn about 'writeReplace' and 'readResolve' in an entity class (or is dimdwarf affected by this at all?). See: com.sun.sgs.impl.service.data.ClassesTable.checkObjectReplacement

@@ -4,7 +4,9 @@
 
 package net.orfjackal.dimdwarf.serial;
 
-public interface MetadataBuilder {
+public interface SerializationFilter {
 
-    void append(Class<?> key, Object value);
+    Object replaceSerialized(Object rootObject, Object obj);
+
+    Object resolveDeserialized(Object obj);
 }
