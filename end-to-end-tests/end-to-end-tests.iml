@@ -17,9 +17,9 @@
     <orderEntry type="module" module-name="dimdwarf-api-internal" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.inject:guice:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: aopalliance:aopalliance:1.0" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.apache.mina:mina-core:1.1.7" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.reddwarfserver.server:sgs-shared:1.12" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-core:1.1.7" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: org.reddwarfserver.server:sgs-shared:1.12" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: cglib:cglib:2.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm:3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:1.2" level="project" />
@@ -29,7 +29,7 @@
     <orderEntry type="module" module-name="agent" scope="PROVIDED" />
     <orderEntry type="module" module-name="dimdwarf-aop" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm-tree:3.2" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.reddwarfserver.client:sgs-client:0.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.reddwarfserver.client:sgs-client:0.10.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
