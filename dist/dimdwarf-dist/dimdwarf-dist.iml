@@ -15,7 +15,7 @@
     <orderEntry type="library" exported="" name="Maven: com.google.inject:guice:2.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.apache.mina:mina-core:2.0.0-RC1" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-api:1.6.0" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.reddwarfserver.server:sgs-shared:1.12" level="project" />
     <orderEntry type="library" exported="" name="Maven: cglib:cglib:2.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: asm:asm:3.2" level="project" />
@@ -26,9 +26,9 @@
     <orderEntry type="module" module-name="agent" exported="" />
     <orderEntry type="module" module-name="dimdwarf-aop" exported="" />
     <orderEntry type="library" exported="" name="Maven: asm:asm-tree:3.2" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:0.9.21" level="project" />
-    <orderEntry type="library" exported="" name="Maven: ch.qos.logback:logback-core:0.9.21" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.6.0" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:0.9.24" level="project" />
+    <orderEntry type="library" exported="" name="Maven: ch.qos.logback:logback-core:0.9.24" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jdave:jdave-junit4:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jdave:jdave-core:1.1" level="project" />
@@ -38,8 +38,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.jmock:jmock-legacy:2.4.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:2.1_3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit-dep:4.4" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.scala-tools.testing:specs:1.6.2.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.scalatest:scalatest:1.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.scala-tools.testing:specs_2.8.0:1.6.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.scalatest:scalatest:1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.8.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:3.0" level="project" />
   </component>
