@@ -25,6 +25,15 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         logger.info("Dimdwarf {} starting up", getVersion());
 
+        // TODO: speed up startup by loading classes in parallel
+        // Loading the classes is what takes most of the time in startup - on JDK 7 it can be speeded up
+        // by loading the classes in parallel. Preliminary tests promise 50% speedup (and 15% slowdown on JDK 6).
+        // Doing the following operations in different threads might be able to parallelize the class loading:
+        // - create a Guice injector for an empty module (loads Guice's classes)
+        // - open a MINA socket acceptor in a random port and close it (loads MINA's classes)
+        // - instantiate and run Dimdwarf's modules outside Guice (loads some of Dimdwarf's classes)
+        // - create the actual injector with Dimdwarf's modules and return it via a Future (what we really wanted)
+
         Injector injector = Guice.createInjector(Stage.PRODUCTION, new CommonModules());
         logger.info("Modules loaded");
 
