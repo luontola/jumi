@@ -11,7 +11,7 @@ import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.io.output.CloseShieldOutputStream;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ServerRunner {
@@ -19,8 +19,12 @@ public class ServerRunner {
     private static final int TIMEOUT = 5;
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
 
+    private static final String JAVA_EXECUTABLE = "java";
+    private static final List<String> JAR_TO_EXECUTE = Arrays.asList("-jar", "launcher.jar");
+    private final List<String> jvmOptions = new ArrayList<String>();
     private final String host;
     private final int port;
+
     private File applicationDir;
     private Process serverProcess;
     private StreamWatcher outputWatcher;
@@ -36,6 +40,11 @@ public class ServerRunner {
     public ServerRunner(String host, int port) {
         this.host = host;
         this.port = port;
+        addJvmOptions("-ea");
+    }
+
+    public void addJvmOptions(String... options) {
+        Collections.addAll(jvmOptions, options);
     }
 
     public void startApplication(Class<? extends Module> application) throws IOException, InterruptedException {
@@ -68,18 +77,26 @@ public class ServerRunner {
         ProcessBuilder builder = new ProcessBuilder();
         builder.directory(TestEnvironment.getDeploymentDir());
         builder.redirectErrorStream(false);
-        builder.command(
-                "java",
-                "-ea",
-                "-jar", "launcher.jar",
-                "--port", String.valueOf(port),
-                "--app", applicationDir.getPath()
-        );
+        builder.command(commandToStartServer());
         serverProcess = builder.start();
 
         OutputStream toWatcher = streamToWatcher();
         redirectStream(serverProcess.getInputStream(), System.out, toWatcher);
         redirectStream(serverProcess.getErrorStream(), System.err, toWatcher);
+    }
+
+    private List<String> commandToStartServer() {
+        List<String> arguments = Arrays.asList(
+                "--port", String.valueOf(port),
+                "--app", applicationDir.getPath()
+        );
+
+        List<String> command = new ArrayList<String>();
+        command.add(JAVA_EXECUTABLE);
+        command.addAll(jvmOptions);
+        command.addAll(JAR_TO_EXECUTE);
+        command.addAll(arguments);
+        return command;
     }
 
     private OutputStream streamToWatcher() throws IOException {
