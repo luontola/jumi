@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="End-to-end tests (no rebuild)" type="JUnit" factoryName="JUnit">
     <extension name="coverage" enabled="true" merge="false" per_test_coverage_enabled="false" track_test_folders="true" runner="idea">
       <pattern>
         <option name="PATTERN" value="net.orfjackal.dimdwarf.*" />
@@ -7,30 +7,26 @@
       </pattern>
     </extension>
     <extension name="snapshooter" />
-    <module name="dimdwarf-core" />
+    <module name="end-to-end-tests" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />
     <option name="PACKAGE_NAME" value="" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="package" />
-    <option name="VM_PARAMETERS" value="-ea -Dsun.io.serialization.extendedDebugInfo=true" />
+    <option name="VM_PARAMETERS" value="-ea" />
     <option name="PARAMETERS" value="" />
-    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/end-to-end-tests" />
     <option name="ENV_VARIABLES" />
     <option name="PASS_PARENT_ENVS" value="true" />
     <option name="TEST_SEARCH_SCOPE">
-      <value defaultName="moduleWithDependencies" />
+      <value defaultName="singleModule" />
     </option>
     <envs />
-    <RunnerSettings RunnerId="Debug">
-      <option name="DEBUG_PORT" value="2162" />
-      <option name="TRANSPORT" value="0" />
-      <option name="LOCAL" value="true" />
-    </RunnerSettings>
     <RunnerSettings RunnerId="Run" />
-    <ConfigurationWrapper RunnerId="Debug" />
     <ConfigurationWrapper RunnerId="Run" />
-    <method />
+    <method>
+      <option name="Maven.BeforeRunTask" enabled="false" file="$PROJECT_DIR$/pom.xml" goal="pre-integration-test" />
+    </method>
   </configuration>
 </component>
