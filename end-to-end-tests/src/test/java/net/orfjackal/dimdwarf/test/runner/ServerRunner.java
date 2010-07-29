@@ -6,18 +6,13 @@ package net.orfjackal.dimdwarf.test.runner;
 
 import com.google.inject.Module;
 import net.orfjackal.dimdwarf.test.util.*;
-import org.apache.commons.io.*;
-import org.apache.commons.io.input.TeeInputStream;
-import org.apache.commons.io.output.CloseShieldOutputStream;
-import org.slf4j.*;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ServerRunner {
-
-    private static final Logger logger = LoggerFactory.getLogger(ServerRunner.class);
 
     private static final int TIMEOUT = 5;
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
@@ -29,8 +24,7 @@ public class ServerRunner {
     private final int port;
 
     private File applicationDir;
-    private Process serverProcess;
-    private StreamWatcher outputWatcher;
+    private ProcessRunner serverProcess;
 
     public ServerRunner() {
         this(SocketUtil.anyFreePort());
@@ -77,13 +71,8 @@ public class ServerRunner {
     }
 
     private void startServer() throws IOException {
-        serverProcess = startProcess(
-                TestEnvironment.getDeploymentDir(),
-                commandToStartServer()
-        );
-        OutputStream toWatcher = streamToWatcher();
-        redirectStream(serverProcess.getInputStream(), System.out, toWatcher);
-        redirectStream(serverProcess.getErrorStream(), System.err, toWatcher);
+        serverProcess = new ProcessRunner(TestEnvironment.getDeploymentDir(), commandToStartServer());
+        serverProcess.start();
     }
 
     private List<String> commandToStartServer() {
@@ -100,68 +89,14 @@ public class ServerRunner {
         return command;
     }
 
-    private static Process startProcess(File workingDir, List<String> command) throws IOException {
-        logger.info("Starting process in working directory {}\n\t{}", workingDir, formatForCommandLine(command));
-
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.directory(workingDir);
-        builder.redirectErrorStream(false);
-        builder.command(command);
-        return builder.start();
-    }
-
-    private static String formatForCommandLine(List<String> command) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < command.size(); i++) {
-            if (i > 0) {
-                sb.append(' ');
-            }
-            String arg = command.get(i);
-            if (arg.contains(" ") || arg.contains("\\")) {
-                arg = '"' + arg + '"';
-            }
-            sb.append(arg);
-        }
-        return sb.toString();
-    }
-
-    private OutputStream streamToWatcher() throws IOException {
-        assert outputWatcher == null;
-        PipedInputStream in = new PipedInputStream();
-        PipedOutputStream toWatcher = new LowLatencyPipedOutputStream(in);
-        outputWatcher = new StreamWatcher(new InputStreamReader(in));
-        return toWatcher;
-    }
-
-    private static void redirectStream(InputStream input, OutputStream systemOut, OutputStream toWatcher) {
-        redirectStream(new TeeInputStream(input, toWatcher), new CloseShieldOutputStream(systemOut));
-    }
-
-    private static void redirectStream(final InputStream in, final OutputStream out) {
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    IOUtils.copy(in, out);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    IOUtils.closeQuietly(out);
-                }
-            }
-        });
-        t.setDaemon(true);
-        t.start();
-    }
-
     private void waitForServerToStart() throws InterruptedException {
-        outputWatcher.waitForLineContaining("Server started", TIMEOUT, TIMEOUT_UNIT);
+        serverProcess.waitForOutput("Server started", TIMEOUT, TIMEOUT_UNIT);
     }
 
     public void shutdown() {
         try {
             if (serverProcess != null) {
-                serverProcess.destroy();
-                serverProcess.waitFor();
+                serverProcess.kill();
             }
             if (applicationDir != null) {
                 TestEnvironment.deleteTempDir(applicationDir);
