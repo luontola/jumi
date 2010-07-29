@@ -9,12 +9,15 @@ import net.orfjackal.dimdwarf.test.util.*;
 import org.apache.commons.io.*;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.io.output.CloseShieldOutputStream;
+import org.slf4j.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ServerRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServerRunner.class);
 
     private static final int TIMEOUT = 5;
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
@@ -74,12 +77,10 @@ public class ServerRunner {
     }
 
     private void startServer() throws IOException {
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.directory(TestEnvironment.getDeploymentDir());
-        builder.redirectErrorStream(false);
-        builder.command(commandToStartServer());
-        serverProcess = builder.start();
-
+        serverProcess = startProcess(
+                TestEnvironment.getDeploymentDir(),
+                commandToStartServer()
+        );
         OutputStream toWatcher = streamToWatcher();
         redirectStream(serverProcess.getInputStream(), System.out, toWatcher);
         redirectStream(serverProcess.getErrorStream(), System.err, toWatcher);
@@ -97,6 +98,31 @@ public class ServerRunner {
         command.addAll(JAR_TO_EXECUTE);
         command.addAll(arguments);
         return command;
+    }
+
+    private static Process startProcess(File workingDir, List<String> command) throws IOException {
+        logger.info("Starting process: {}\n    in working directory {}", formatForCommandLine(command), workingDir);
+
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.directory(workingDir);
+        builder.redirectErrorStream(false);
+        builder.command(command);
+        return builder.start();
+    }
+
+    private static String formatForCommandLine(List<String> command) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < command.size(); i++) {
+            if (i > 0) {
+                sb.append(' ');
+            }
+            String arg = command.get(i);
+            if (arg.contains(" ") || arg.contains("\\")) {
+                arg = '"' + arg + '"';
+            }
+            sb.append(arg);
+        }
+        return sb.toString();
     }
 
     private OutputStream streamToWatcher() throws IOException {
