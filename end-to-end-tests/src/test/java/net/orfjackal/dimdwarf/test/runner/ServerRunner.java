@@ -22,7 +22,7 @@ public class ServerRunner {
     private static final int TIMEOUT = 5;
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
 
-    private static final String JAVA_EXECUTABLE = "java";
+    private static final String JAVA_EXECUTABLE = new File(System.getProperty("java.home"), "bin/java").getAbsolutePath();
     private static final List<String> JAR_TO_EXECUTE = Arrays.asList("-jar", "launcher.jar");
     private final List<String> jvmOptions = new ArrayList<String>();
     private final String host;
@@ -101,7 +101,7 @@ public class ServerRunner {
     }
 
     private static Process startProcess(File workingDir, List<String> command) throws IOException {
-        logger.info("Starting process: {}\n    in working directory {}", formatForCommandLine(command), workingDir);
+        logger.info("Starting process in working directory {}\n\t{}", workingDir, formatForCommandLine(command));
 
         ProcessBuilder builder = new ProcessBuilder();
         builder.directory(workingDir);
