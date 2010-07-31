@@ -84,6 +84,7 @@
 
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
