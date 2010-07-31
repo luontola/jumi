@@ -10,6 +10,11 @@
 
     <name>parent</name>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
     <distributionManagement>
         <repository>
             <id>orfjackal</id>
@@ -19,41 +24,58 @@
 
     <repositories>
         <repository>
-            <id>orfjackal</id>
+            <id>orfjackal.net</id>
             <url>http://repo.orfjackal.net/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>scala-tools.org</id>
             <url>http://scala-tools.org/repo-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
-            <id>laughing-panda</id>
+            <id>laughingpanda.org</id>
             <url>http://www.laughingpanda.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>google-maven-repository</id>
             <url>http://google-maven-repository.googlecode.com/svn/repository</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>java.net</id>
             <url>http://download.java.net/maven/2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>scala-tools.org</id>
             <url>http://scala-tools.org/repo-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>codehaus</id>
             <url>http://repository.codehaus.org</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
 
     <dependencies>
 
