@@ -3,6 +3,23 @@
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="Scala">
+        <modules>
+          <module name="dimdwarf-api-internal" />
+          <module name="dimdwarf-api" />
+          <module name="parent" />
+          <module name="agent" />
+          <module name="dimdwarf-dist" />
+          <module name="end-to-end-tests" />
+          <module name="dimdwarf-core" />
+          <module name="launcher" />
+          <module name="dimdwarf-aop" />
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
     <option name="OPTION_SCOPE" value="protected" />

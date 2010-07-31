@@ -9,5 +9,5 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(SimpleSgsProtocolSpec.class)
-public class PackageTests {
+public class ScalaSpecs {
 }
