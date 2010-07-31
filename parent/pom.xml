@@ -314,7 +314,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <includes>
-                        <include>**/*Spec.java</include>
+                        <include>**/*Spec.class</include>
                     </includes>
                     <systemProperties>
                         <property>
