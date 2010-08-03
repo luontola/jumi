@@ -13,6 +13,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 @Singleton
 @NotThreadSafe
 public class ServerLifecycleManager {
+
+    // FIXME: ServerLifecycleManager will be removed/refactored in new architecture
+
     private static final Logger logger = LoggerFactory.getLogger(ServerLifecycleManager.class);
 
     private final SystemLifecycleListener[] listeners;

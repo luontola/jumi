@@ -14,6 +14,9 @@ import static net.orfjackal.dimdwarf.tx.TransactionStatus.*;
 
 @ThreadSafe
 public class TransactionContext implements Transaction, TransactionCoordinator {
+
+    // FIXME: TransactionContext will be removed/refactored in new architecture
+
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(TransactionContext.class);
     private final Logger logger;
 

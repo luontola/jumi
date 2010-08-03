@@ -8,6 +8,8 @@ import java.util.EventListener;
 
 public interface SystemLifecycleListener extends EventListener {
 
+    // FIXME: SystemLifecycleListener will be removed/refactored in new architecture
+
     public void onStartup();
 
     public void onShutdown();
