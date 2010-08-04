@@ -18,13 +18,13 @@ public class TestEnvironment {
     private static final String uniqueJvmId = new SimpleDateFormat("yyyy-MM-dd-HHmmss.SSS").format(new Date());
     private static final AtomicInteger tempDirCounter = new AtomicInteger(0);
     private static final File sandboxDir;
-    private static final File deploymentDir;
+    private static final File serverHomeDir;
     private static final File applicationBaseJar;
 
     static {
         Properties p = testEnvironmentProperties();
         sandboxDir = canonicalFile(p.getProperty("test.sandbox", FILE_NOT_SPECIFIED));
-        deploymentDir = canonicalFile(p.getProperty("test.deployment", FILE_NOT_SPECIFIED));
+        serverHomeDir = canonicalFile(p.getProperty("test.serverHome", FILE_NOT_SPECIFIED));
         applicationBaseJar = canonicalFile(p.getProperty("test.applicationBaseJar", FILE_NOT_SPECIFIED));
     }
 
@@ -73,8 +73,8 @@ public class TestEnvironment {
         return sandboxDir;
     }
 
-    public static File getDeploymentDir() {
-        return deploymentDir;
+    public static File getServerHomeDir() {
+        return serverHomeDir;
     }
 
     public static File getApplicationBaseJar() {

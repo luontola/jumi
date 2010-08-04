@@ -22,18 +22,18 @@ public class TestEnvironmentTest {
     }
 
     @Test
-    public void sandbox_contains_the_deployment_directory() {
+    public void sandbox_contains_the_server_home_directory() {
         File sandbox = TestEnvironment.getSandboxDir();
-        File deployment = TestEnvironment.getDeploymentDir();
+        File serverHome = TestEnvironment.getServerHomeDir();
 
-        assertThat(sandbox, containsFile(deployment));
+        assertThat(sandbox, containsFile(serverHome));
     }
 
     @Test
-    public void deployment_directory_contains_the_deployed_application() {
-        File deployment = TestEnvironment.getDeploymentDir();
+    public void server_home_directory_contains_the_server_distribution() {
+        File serverHome = TestEnvironment.getServerHomeDir();
 
-        assertThat(deployment, containsFile("LICENSE.txt"));
+        assertThat(serverHome, containsFile("LICENSE.txt"));
     }
 
     @Test

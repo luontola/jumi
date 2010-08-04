@@ -71,7 +71,7 @@ public class ServerRunner {
     }
 
     private void startServer() throws IOException {
-        serverProcess = new ProcessRunner(TestEnvironment.getDeploymentDir(), commandToStartServer());
+        serverProcess = new ProcessRunner(TestEnvironment.getServerHomeDir(), commandToStartServer());
         serverProcess.start();
     }
 

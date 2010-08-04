@@ -17,7 +17,7 @@
 
     <properties>
         <test.sandbox>${project.build.directory}/test-deploy</test.sandbox>
-        <test.deployment>${test.sandbox}/dimdwarf-${version}</test.deployment>
+        <test.serverHome>${test.sandbox}/dimdwarf-${version}</test.serverHome>
         <test.applicationBaseJar>${project.build.directory}/${project.build.finalName}.jar</test.applicationBaseJar>
     </properties>
 
