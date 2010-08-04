@@ -21,7 +21,7 @@ public class SimpleSgsProtocolEncoder implements ProtocolEncoder {
 
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         if (message instanceof LoginFailure) {
-            IoBuffer buffer = IoBuffer.allocate(SimpleSgsProtocol.MAX_MESSAGE_LENGTH);
+            IoBuffer buffer = IoBuffer.allocate(5);
             buffer.putShort((short) 3); // payload length
             buffer.put(SimpleSgsProtocol.LOGIN_FAILURE);
             buffer.putShort((short) 0); // (String) message for login failure (length = 0)
