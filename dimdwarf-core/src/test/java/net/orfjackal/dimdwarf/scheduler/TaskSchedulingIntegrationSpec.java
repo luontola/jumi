@@ -22,6 +22,8 @@ import java.util.concurrent.*;
 @Group({"fast"})
 public class TaskSchedulingIntegrationSpec extends Specification<Object> {
 
+    // FIXME: task scheduling will be removed/refactored in new architecture
+
     private Injector injector;
     private Executor taskContext;
     private Provider<TaskScheduler> scheduler;

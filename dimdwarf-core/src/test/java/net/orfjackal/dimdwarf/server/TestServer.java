@@ -14,6 +14,8 @@ import static net.orfjackal.dimdwarf.server.ServerLifecycleManager.State.STARTED
 
 public class TestServer {
 
+    // FIXME: ServerLifecycleManager will be removed/refactored in new architecture
+
     private final Injector injector;
     private final ServerLifecycleManager server;
     private final List<Logger> logsToReset = new ArrayList<Logger>();
