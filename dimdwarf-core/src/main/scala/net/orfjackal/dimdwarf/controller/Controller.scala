@@ -9,19 +9,34 @@ class Controller extends Service {
   private var toNetwork: MessageSender[Any] = null
   private var toAuthenticator: MessageSender[Any] = null
 
-  def process(message: Any) {
-    message match {
-      case RegisterNetworkService(toService) =>
-        toNetwork = toService // TODO: figure out a better way to register network services; perhaps one MQ per client?
-      case RegisterAuthenticatorService(toService) =>
-        toAuthenticator = toService
+  // TODO: make registering services generic
+  // TODO: make it possible for ServiceControllers to call each other directly; hide the service's MQ behind the service's controller
 
-      case LoginRequest() =>
-        toAuthenticator.send(IsUserAuthenticated())
-      case YesUserIsAuthenticated() =>
-      // TODO
-      case NoUserIsNotAuthenticated() =>
-        toNetwork.send(LoginFailure())
+  private val serviceController: PartialFunction[Any, Unit] = {
+    case RegisterNetworkService(toService) =>
+      toNetwork = toService
+    case RegisterAuthenticatorService(toService) =>
+      toAuthenticator = toService
+  }
+  private val authenticatorController: PartialFunction[Any, Unit] = {
+    case YesUserIsAuthenticated() => // TODO
+    case NoUserIsNotAuthenticated() =>
+      toNetwork.send(LoginFailure()) // TODO: implement as a callback to decouple authenticator from network
+  }
+  private val networkController: PartialFunction[Any, Unit] = {
+    case LoginRequest() =>
+      toAuthenticator.send(IsUserAuthenticated())
+  }
+
+  def process(message: Any) {
+    if (serviceController.isDefinedAt(message)) {
+      serviceController.apply(message)
+    }
+    if (authenticatorController.isDefinedAt(message)) {
+      authenticatorController.apply(message)
+    }
+    if (networkController.isDefinedAt(message)) {
+      networkController.apply(message)
     }
   }
 }
