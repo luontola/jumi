@@ -5,21 +5,26 @@
 package net.orfjackal.dimdwarf.server;
 
 import net.orfjackal.dimdwarf.controller.Controller;
+import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import org.slf4j.*;
 
 public class ControllerMainLoop implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ControllerMainLoop.class);
 
     private final Controller controller;
+    private final MessageReceiver<Object> toController;
 
-    public ControllerMainLoop(Controller controller) {
+    public ControllerMainLoop(Controller controller, MessageReceiver<Object> toController) {
         this.controller = controller;
+        this.toController = toController;
     }
 
     public void run() {
         try {
             while (true) {
-                controller.processNextMessage();
+                Object message = toController.take();
+                logger.debug("Processing message: {}", message);
+                controller.process(message);
             }
         } catch (Throwable t) {
             logger.error("Internal error", t);

@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.controller.Controller;
+import net.orfjackal.dimdwarf.mq.MessageQueue;
 import net.orfjackal.dimdwarf.net.*;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
@@ -21,6 +22,7 @@ public class ServerBootstrap {
     private static final Logger logger = LoggerFactory.getLogger(ServerBootstrap.class);
 
     private final Controller controller;
+    private MessageQueue<Object> toController = new MessageQueue<Object>(); // TODO: organize the message queues somehow
 
     private int port;
     private String applicationDir;
@@ -41,7 +43,7 @@ public class ServerBootstrap {
 
         bindClientSocket();
 
-        Thread mainLoop = new Thread(new ControllerMainLoop(controller), "Controller");
+        Thread mainLoop = new Thread(new ControllerMainLoop(controller, toController), "Controller");
         mainLoop.start();
     }
 
@@ -50,7 +52,7 @@ public class ServerBootstrap {
         IoAcceptor acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
         acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new SimpleSgsProtocolCodecFactory()));
-        acceptor.setHandler(new SimpleSgsProtocolIoHandler(controller));
+        acceptor.setHandler(new SimpleSgsProtocolIoHandler(toController));
         acceptor.getSessionConfig().setReadBufferSize(2048);
         acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
