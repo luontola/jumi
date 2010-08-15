@@ -12,4 +12,8 @@ class MessageQueue[T] extends MessageSender[T] with MessageReceiver[T] {
   def take(): T = {
     queue.take()
   }
+
+  def poll(): T = {
+    queue.poll()
+  }
 }
