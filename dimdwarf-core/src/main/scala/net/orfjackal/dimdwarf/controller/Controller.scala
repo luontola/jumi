@@ -19,9 +19,9 @@ class Controller extends Service {
       toAuthenticator = toService
   }
   private val authenticatorController: PartialFunction[Any, Unit] = {
-    case YesUserIsAuthenticated() => // TODO
     case NoUserIsNotAuthenticated() =>
       toNetwork.send(LoginFailure()) // TODO: implement as a callback to decouple authenticator from network
+    case YesUserIsAuthenticated() => // TODO
   }
   private val networkController: PartialFunction[Any, Unit] = {
     case LoginRequest() =>
