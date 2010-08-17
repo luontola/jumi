@@ -5,17 +5,17 @@
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
-      <facet-type id="Scala">
+      <facet-type id="scala">
         <modules>
-          <module name="dimdwarf-api-internal" />
-          <module name="dimdwarf-api" />
-          <module name="parent" />
           <module name="agent" />
-          <module name="dimdwarf-dist" />
+          <module name="dimdwarf-api-internal" />
+          <module name="dimdwarf-aop" />
+          <module name="launcher" />
+          <module name="dimdwarf-api" />
           <module name="end-to-end-tests" />
           <module name="dimdwarf-core" />
-          <module name="launcher" />
-          <module name="dimdwarf-aop" />
+          <module name="parent" />
+          <module name="dimdwarf-dist" />
         </modules>
       </facet-type>
     </autodetection-disabled>
