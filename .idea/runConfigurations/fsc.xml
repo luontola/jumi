@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="fsc" type="ScalaCompilationServerRunConfiguration" factoryName="Scala Compilation Server">
+    <module name="agent" />
+    <setting name="vmparams" value="-Xmx512m -verbose" />
+    <RunnerSettings RunnerId="Run" />
+    <ConfigurationWrapper RunnerId="Run" />
+    <method>
+      <option name="Make" enabled="false" />
+    </method>
+  </configuration>
+</component>
