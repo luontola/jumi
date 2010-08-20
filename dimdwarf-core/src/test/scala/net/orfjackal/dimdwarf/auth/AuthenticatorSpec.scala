@@ -10,25 +10,25 @@ import net.orfjackal.dimdwarf.mq._
 
 @RunWith(classOf[Specsy])
 class AuthenticatorSpec extends Spec with SpecsMatchers {
-  val toController = new MessageQueue[Any]
-  val controller = new ControllerHub
+  val toHub = new MessageQueue[Any]
+  val hub = new ControllerHub
 
   val toAuthenticator = new MessageQueue[Any]
-  val authenticator = new Authenticator(toController)
+  val authenticator = new Authenticator(toHub)
   val authenticatorCtrl = new AuthenticatorController(toAuthenticator)
-  controller.addService(authenticatorCtrl)
+  hub.addController(authenticatorCtrl)
 
   val toNetwork = new MessageQueue[Any]
   val networkCtrl = new NetworkController(toNetwork, authenticatorCtrl)
-  controller.addService(networkCtrl)
+  hub.addController(networkCtrl)
 
   // TODO: decouple the authenticator and this test from the network service and controller
 
   "Logging with the wrong password fails" >> {
-    toController.send(LoginRequest())
+    toHub.send(LoginRequest())
 
     processMessagesUntilEmpty(Map(
-      toController -> controller,
+      toHub -> hub,
       toAuthenticator -> authenticator))
 
     val response = toNetwork.poll()

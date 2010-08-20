@@ -1,5 +1,5 @@
 package net.orfjackal.dimdwarf.controller
 
-trait NonBlockingService {
+trait Controller {
   def process(message: Any)
 }

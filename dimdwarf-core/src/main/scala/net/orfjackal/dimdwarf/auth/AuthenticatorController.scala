@@ -1,9 +1,9 @@
 package net.orfjackal.dimdwarf.auth
 
-import net.orfjackal.dimdwarf.controller.NonBlockingService
+import net.orfjackal.dimdwarf.controller.Controller
 import net.orfjackal.dimdwarf.mq.MessageSender
 
-class AuthenticatorController(toAuthenticator: MessageSender[Any]) extends NonBlockingService {
+class AuthenticatorController(toAuthenticator: MessageSender[Any]) extends Controller {
   private var yesCallbacks = List[Function0[Unit]]()
   private var noCallbacks = List[Function0[Unit]]()
 

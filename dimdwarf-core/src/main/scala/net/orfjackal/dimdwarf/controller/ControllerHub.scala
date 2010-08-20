@@ -5,15 +5,15 @@ import com.google.inject.Singleton
 
 @Singleton
 class ControllerHub extends Service {
-  private var services = List[NonBlockingService]()
+  private var controllers = List[Controller]()
 
   def process(message: Any) {
-    for (service <- services) {
-      service.process(message)
+    for (controller <- controllers) {
+      controller.process(message)
     }
   }
 
-  def addService(service: NonBlockingService) {
-    services = service :: services
+  def addController(service: Controller) {
+    controllers = service :: controllers
   }
 }

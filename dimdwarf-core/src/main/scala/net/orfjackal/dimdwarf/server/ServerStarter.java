@@ -59,13 +59,13 @@ public class ServerStarter {
         Thread authLoop = new Thread(new ServiceRunner(authenticator, toAuthenticator), "Authenticator");
         authLoop.start();
         AuthenticatorController authenticatorCtrl = new AuthenticatorController(toAuthenticator);
-        hub.addService(authenticatorCtrl);
+        hub.addController(authenticatorCtrl);
 
         // TODO: run network in its own thread?
 //        MessageQueue<Object> toNetwork = new MessageQueue<Object>();
         bindClientSocket();
         NetworkController networkCtrl = new NetworkController(network, authenticatorCtrl);
-        hub.addService(networkCtrl);
+        hub.addController(networkCtrl);
 
         Thread mainLoop = new Thread(new ServiceRunner(hub, (MessageReceiver<Object>) toHub), "Controller");
         mainLoop.start();
