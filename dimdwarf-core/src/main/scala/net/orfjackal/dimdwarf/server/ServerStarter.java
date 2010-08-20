@@ -5,7 +5,7 @@
 package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.Inject;
-import net.orfjackal.dimdwarf.auth.Authenticator;
+import net.orfjackal.dimdwarf.auth.*;
 import net.orfjackal.dimdwarf.controller.*;
 import net.orfjackal.dimdwarf.mq.*;
 import net.orfjackal.dimdwarf.net.*;
@@ -53,15 +53,19 @@ public class ServerStarter {
     public void start() throws Exception {
         // TODO: load the application from the applicationDir
 
+        // XXX: organize the service wiring and startup
+
         MessageQueue<Object> toAuthenticator = new MessageQueue<Object>();
         Thread authLoop = new Thread(new ServiceRunner(authenticator, toAuthenticator), "Authenticator");
         authLoop.start();
-        toController.send(new RegisterAuthenticatorService(toAuthenticator));
+        AuthenticatorController authenticatorCtrl = new AuthenticatorController(toAuthenticator);
+        controller.addService(authenticatorCtrl);
 
         // TODO: run network in its own thread?
-        //val toNetwork = new MessageQueue[Any]
+//        MessageQueue<Object> toNetwork = new MessageQueue<Object>();
         bindClientSocket();
-        toController.send(new RegisterNetworkService(network));
+        NetworkController networkCtrl = new NetworkController(network, authenticatorCtrl);
+        controller.addService(networkCtrl);
 
         Thread mainLoop = new Thread(new ServiceRunner(controller, (MessageReceiver<Object>) toController), "Controller");
         mainLoop.start();
