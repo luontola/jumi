@@ -10,7 +10,9 @@ public class KillProcessOnUncaughtException implements Thread.UncaughtExceptionH
     private static final Logger logger = LoggerFactory.getLogger(KillProcessOnUncaughtException.class);
 
     public void uncaughtException(Thread t, Throwable e) {
-        // the server is meant to be crash-only software, so it shall never exit cleanly
+        // The server is meant to be crash-only software, so it shall never exit cleanly.
+        // The halt() method is used instead of exit() because that way no shutdown hooks
+        // or finalizers will be executed - it better resembles a crash.
         logger.error("Uncaught exception in thread {}; the server will halt now", t.getName(), e);
         Runtime.getRuntime().halt(1);
     }

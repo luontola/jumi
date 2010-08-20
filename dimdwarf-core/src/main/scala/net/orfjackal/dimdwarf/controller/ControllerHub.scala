@@ -3,9 +3,11 @@ package net.orfjackal.dimdwarf.controller
 import net.orfjackal.dimdwarf.mq._
 import net.orfjackal.dimdwarf.net._
 import net.orfjackal.dimdwarf.auth._
-import net.orfjackal.dimdwarf.services.Service
+import net.orfjackal.dimdwarf.services._
+import com.google.inject.Singleton
 
-class Controller extends Service {
+@Singleton
+class ControllerHub extends Service {
   private var toNetwork: MessageSender[Any] = null
   private var toAuthenticator: MessageSender[Any] = null
 

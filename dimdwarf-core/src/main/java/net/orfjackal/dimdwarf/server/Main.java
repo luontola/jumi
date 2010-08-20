@@ -9,12 +9,12 @@ import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.slf4j.*;
 
-import java.io.IOException;
-
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
+        Thread.setDefaultUncaughtExceptionHandler(new KillProcessOnUncaughtException());
+
         logger.info("Dimdwarf {} starting up", getVersion());
 
         // TODO: speed up startup by loading classes in parallel
@@ -29,7 +29,7 @@ public class Main {
         Injector injector = Guice.createInjector(Stage.PRODUCTION, new CommonModules());
         logger.info("Modules loaded");
 
-        ServerBootstrap server = injector.getInstance(ServerBootstrap.class);
+        ServerConfigurer server = injector.getInstance(ServerConfigurer.class);
         logger.info("Bootstrapper created");
 
         server.configure(args);

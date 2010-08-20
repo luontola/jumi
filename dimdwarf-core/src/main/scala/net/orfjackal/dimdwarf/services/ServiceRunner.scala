@@ -10,7 +10,7 @@ class ServiceRunner(service: Service, toService: MessageReceiver[Any]) extends R
     try {
       while (true) {
         val message = toService.take()
-        logger.debug("Processing: {}", message)
+        logger.debug("PROCESS: {}", message)
         service.process(message)
       }
     } catch {

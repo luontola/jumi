@@ -8,6 +8,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses(SimpleSgsProtocolSpec.class)
+@Suite.SuiteClasses({
+        SimpleSgsProtocolSpec.class
+})
 public class ScalaSpecs {
 }

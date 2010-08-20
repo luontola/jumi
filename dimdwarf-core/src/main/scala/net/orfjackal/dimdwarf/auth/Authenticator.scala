@@ -2,8 +2,10 @@ package net.orfjackal.dimdwarf.auth
 
 import net.orfjackal.dimdwarf.mq.MessageSender
 import net.orfjackal.dimdwarf.services.Service
+import com.google.inject.Inject
+import net.orfjackal.dimdwarf.controller.Controller
 
-class Authenticator(toController: MessageSender[Any]) extends Service {
+class Authenticator @Inject()(@Controller toController: MessageSender[Any]) extends Service {
   def process(message: Any) {
     message match {
       case IsUserAuthenticated() =>

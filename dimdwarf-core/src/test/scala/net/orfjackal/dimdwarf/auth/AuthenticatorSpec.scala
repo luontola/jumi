@@ -10,7 +10,7 @@ import net.orfjackal.dimdwarf.mq._
 
 @RunWith(classOf[Specsy])
 class AuthenticatorSpec extends Spec with SpecsMatchers {
-  val controller = new Controller
+  val controller = new ControllerHub
   val toController = new MessageQueue[Any]
 
   val authenticator = new Authenticator(toController)
@@ -35,7 +35,7 @@ class AuthenticatorSpec extends Spec with SpecsMatchers {
   }
 
 
-  def processMessagesUntilEmpty(queues: Map[MessageReceiver[Any], Service]) {
+  def processMessagesUntilEmpty(queues: Map[MessageQueue[Any], Service]) {
     var hadWork = false
     do {
       hadWork = false
@@ -47,7 +47,7 @@ class AuthenticatorSpec extends Spec with SpecsMatchers {
     } while (hadWork)
   }
 
-  private def processIfNonEmpty(queue: MessageReceiver[Any], service: Service): Boolean = {
+  private def processIfNonEmpty(queue: MessageQueue[Any], service: Service): Boolean = {
     val message = queue.poll()
     val hasMessages = message != null
     if (hasMessages) {
