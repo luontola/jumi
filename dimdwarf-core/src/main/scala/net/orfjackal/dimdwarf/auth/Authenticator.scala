@@ -3,14 +3,14 @@ package net.orfjackal.dimdwarf.auth
 import net.orfjackal.dimdwarf.mq.MessageSender
 import net.orfjackal.dimdwarf.services.Service
 import com.google.inject.Inject
-import net.orfjackal.dimdwarf.controller.Controller
+import net.orfjackal.dimdwarf.controller.Hub
 
-class Authenticator @Inject()(@Controller toController: MessageSender[Any]) extends Service {
+class Authenticator @Inject()(@Hub toHub: MessageSender[Any]) extends Service {
   def process(message: Any) {
     message match {
       case IsUserAuthenticated() =>
         // (here may connect to DB or do similar blocking activity)
-        toController.send(NoUserIsNotAuthenticated())
+        toHub.send(NoUserIsNotAuthenticated())
     }
   }
 }

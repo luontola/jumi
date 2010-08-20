@@ -5,7 +5,7 @@ import org.apache.mina.core.session.IoSession
 import org.slf4j._
 import SimpleSgsProtocolIoHandler._
 import net.orfjackal.dimdwarf.mq.MessageSender
-import net.orfjackal.dimdwarf.controller.Controller
+import net.orfjackal.dimdwarf.controller.Hub
 import com.google.inject._
 
 object SimpleSgsProtocolIoHandler {
@@ -13,7 +13,7 @@ object SimpleSgsProtocolIoHandler {
 }
 
 @Singleton
-class SimpleSgsProtocolIoHandler @Inject()(@Controller toController: MessageSender[Any]) extends IoHandlerAdapter with MessageSender[Any] {
+class SimpleSgsProtocolIoHandler @Inject()(@Hub toHub: MessageSender[Any]) extends IoHandlerAdapter with MessageSender[Any] {
   private var lastSession: IoSession = null // TODO: support multiple clients, give an ID for each session
 
   def send(message: Any) {
@@ -26,6 +26,6 @@ class SimpleSgsProtocolIoHandler @Inject()(@Controller toController: MessageSend
     logger.debug("RECEIVED: {}", message)
 
     lastSession = session
-    toController.send(message)
+    toHub.send(message)
   }
 }

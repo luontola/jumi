@@ -5,12 +5,12 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.controller.Controller;
+import net.orfjackal.dimdwarf.controller.Hub;
 import net.orfjackal.dimdwarf.mq.*;
 
 public class ControllerModule extends AbstractModule {
 
     protected void configure() {
-        bind(new TypeLiteral<MessageSender<Object>>() {}).annotatedWith(Controller.class).toInstance(new MessageQueue<Object>());
+        bind(new TypeLiteral<MessageSender<Object>>() {}).annotatedWith(Hub.class).toInstance(new MessageQueue<Object>());
     }
 }

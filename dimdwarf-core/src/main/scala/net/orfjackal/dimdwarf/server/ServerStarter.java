@@ -23,8 +23,8 @@ import java.net.InetSocketAddress;
 public class ServerStarter {
     private static final Logger logger = LoggerFactory.getLogger(ServerStarter.class);
 
-    private final MessageSender<Object> toController;
-    private final ControllerHub controller;
+    private final MessageSender<Object> toHub;
+    private final ControllerHub hub;
     private final Authenticator authenticator;
     private final SimpleSgsProtocolIoHandler network;
 
@@ -32,12 +32,12 @@ public class ServerStarter {
     private String applicationDir;
 
     @Inject
-    public ServerStarter(@Controller MessageSender<Object> toController,
-                         ControllerHub controller,
+    public ServerStarter(@Hub MessageSender<Object> toHub,
+                         ControllerHub hub,
                          Authenticator authenticator,
                          SimpleSgsProtocolIoHandler network) {
-        this.toController = toController;
-        this.controller = controller;
+        this.toHub = toHub;
+        this.hub = hub;
         this.authenticator = authenticator;
         this.network = network;
     }
@@ -59,15 +59,15 @@ public class ServerStarter {
         Thread authLoop = new Thread(new ServiceRunner(authenticator, toAuthenticator), "Authenticator");
         authLoop.start();
         AuthenticatorController authenticatorCtrl = new AuthenticatorController(toAuthenticator);
-        controller.addService(authenticatorCtrl);
+        hub.addService(authenticatorCtrl);
 
         // TODO: run network in its own thread?
 //        MessageQueue<Object> toNetwork = new MessageQueue<Object>();
         bindClientSocket();
         NetworkController networkCtrl = new NetworkController(network, authenticatorCtrl);
-        controller.addService(networkCtrl);
+        hub.addService(networkCtrl);
 
-        Thread mainLoop = new Thread(new ServiceRunner(controller, (MessageReceiver<Object>) toController), "Controller");
+        Thread mainLoop = new Thread(new ServiceRunner(hub, (MessageReceiver<Object>) toHub), "Controller");
         mainLoop.start();
     }
 

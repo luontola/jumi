@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @BindingAnnotation
-public @interface Controller {
+public @interface Hub {
 }
