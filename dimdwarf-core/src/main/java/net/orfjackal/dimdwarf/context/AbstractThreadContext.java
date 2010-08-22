@@ -15,7 +15,7 @@ public abstract class AbstractThreadContext implements Context {
     private final Map<Key<?>, Object> cache = new HashMap<Key<?>, Object>();
     private final Injector injector;
 
-    protected AbstractThreadContext(Injector injector) {
+    public AbstractThreadContext(Injector injector) {
         this.injector = injector;
     }
 
