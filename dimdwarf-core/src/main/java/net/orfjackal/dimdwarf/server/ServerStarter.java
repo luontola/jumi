@@ -9,7 +9,7 @@ import net.orfjackal.dimdwarf.auth.*;
 import net.orfjackal.dimdwarf.controller.*;
 import net.orfjackal.dimdwarf.mq.*;
 import net.orfjackal.dimdwarf.net.*;
-import net.orfjackal.dimdwarf.services.ServiceRunner;
+import net.orfjackal.dimdwarf.services.ServiceMessageLoop;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -56,7 +56,7 @@ public class ServerStarter {
         // XXX: organize the service wiring and startup
 
         MessageQueue<Object> toAuthenticator = new MessageQueue<Object>();
-        Thread authLoop = new Thread(new ServiceRunner(authenticator, toAuthenticator), "Authenticator");
+        Thread authLoop = new Thread(new ServiceMessageLoop(authenticator, toAuthenticator), "Authenticator");
         authLoop.start();
         AuthenticatorController authenticatorCtrl = new AuthenticatorController(toAuthenticator);
         hub.addController(authenticatorCtrl);
@@ -67,7 +67,7 @@ public class ServerStarter {
         NetworkController networkCtrl = new NetworkController(network, authenticatorCtrl);
         hub.addController(networkCtrl);
 
-        Thread mainLoop = new Thread(new ServiceRunner(hub, (MessageReceiver<Object>) toHub), "Controller");
+        Thread mainLoop = new Thread(new ServiceMessageLoop(hub, (MessageReceiver<Object>) toHub), "Controller");
         mainLoop.start();
     }
 
