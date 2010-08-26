@@ -9,7 +9,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        InstallingServicesSpec.class
+        InstallingServicesSpec.class,
+        ServiceStarterSpec.class
 })
 public class ScalaSpecs {
 }

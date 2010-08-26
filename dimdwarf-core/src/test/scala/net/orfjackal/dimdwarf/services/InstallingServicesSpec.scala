@@ -25,6 +25,7 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
   services.foreach(service => {
     println("Starting service " + service.getName)
     val t = new Thread(new ServiceRunner(service), service.getName)
+    t.setUncaughtExceptionHandler(new HideInterruptedExceptions)
     t.start()
     threads.add(t)
   })
