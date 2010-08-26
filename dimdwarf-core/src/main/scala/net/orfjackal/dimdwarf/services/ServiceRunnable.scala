@@ -1,7 +1,7 @@
 package net.orfjackal.dimdwarf.services
 
-trait Service {
+trait ServiceRunnable {
   def start()
 
-  def process(message: Any)
+  def run()
 }

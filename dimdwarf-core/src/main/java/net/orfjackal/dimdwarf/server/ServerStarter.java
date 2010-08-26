@@ -55,8 +55,12 @@ public class ServerStarter {
 
         // XXX: organize the service wiring and startup
 
-        MessageQueue<Object> toAuthenticator = new MessageQueue<Object>();
-        Thread authLoop = new Thread(new ServiceMessageLoop(authenticator, toAuthenticator), "Authenticator");
+        final MessageQueue<Object> toAuthenticator = new MessageQueue<Object>();
+        Thread authLoop = new Thread(new Runnable() {
+            public void run() {
+                new ServiceMessageLoop(authenticator, toAuthenticator).run();
+            }
+        }, "Authenticator");
         authLoop.start();
         AuthenticatorController authenticatorCtrl = new AuthenticatorController(toAuthenticator);
         hub.addController(authenticatorCtrl);
@@ -67,7 +71,11 @@ public class ServerStarter {
         NetworkController networkCtrl = new NetworkController(network, authenticatorCtrl);
         hub.addController(networkCtrl);
 
-        Thread mainLoop = new Thread(new ServiceMessageLoop(hub, (MessageReceiver<Object>) toHub), "Controller");
+        Thread mainLoop = new Thread(new Runnable() {
+            public void run() {
+                new ServiceMessageLoop(hub, (MessageReceiver<Object>) toHub).run();
+            }
+        }, "Controller");
         mainLoop.start();
     }
 

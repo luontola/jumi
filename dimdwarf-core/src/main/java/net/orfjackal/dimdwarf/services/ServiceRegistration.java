@@ -11,11 +11,11 @@ public class ServiceRegistration {
 
     private final String name;
     private final Provider<? extends Context> context;
-    private final Provider<? extends Runnable> service;
+    private final Provider<? extends ServiceRunnable> service;
 
     public ServiceRegistration(String name,
                                Provider<? extends Context> context,
-                               Provider<? extends Runnable> service) {
+                               Provider<? extends ServiceRunnable> service) {
         this.name = name;
         this.context = context;
         this.service = service;
@@ -29,7 +29,7 @@ public class ServiceRegistration {
         return context;
     }
 
-    public Provider<? extends Runnable> getService() {
+    public Provider<? extends ServiceRunnable> getService() {
         return service;
     }
 }

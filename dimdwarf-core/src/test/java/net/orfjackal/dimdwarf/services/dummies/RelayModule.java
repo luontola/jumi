@@ -31,12 +31,12 @@ public class RelayModule extends ServiceModule {
 
     @Provides
     ServiceRegistration serviceRegistration(Provider<ServiceContext> context,
-                                            Provider<Runnable> service) {
+                                            Provider<ServiceRunnable> service) {
         return new ServiceRegistration(serviceName, context, service);
     }
 
     @Provides
-    Runnable service(Service service, MessageReceiver<Object> toService) {
+    ServiceRunnable service(Service service, MessageReceiver<Object> toService) {
         return new ServiceMessageLoop(service, toService);
     }
 }

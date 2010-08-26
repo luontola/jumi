@@ -11,23 +11,21 @@ import java.util.concurrent.ConcurrentHashMap
 class ServiceStarterSpec extends Spec with ShouldMatchers {
   "When services are started" >> {
     val threadOfService = new ConcurrentHashMap[String, Thread]
+    val serviceA = makeService("Service A", {threadOfService.put("A", Thread.currentThread)})
+    val serviceB = makeService("Service B", {threadOfService.put("B", Thread.currentThread)})
+    val services = asSet(serviceA, serviceB)
 
-    val serviceA = makeService("Service A", {
-      threadOfService.put("A", Thread.currentThread)
-    })
-    val serviceB = makeService("Service B", {
-      threadOfService.put("B", Thread.currentThread)
-    })
-
-    val starter = new ServiceStarter(asSet(serviceA, serviceB)) {
+    val starter = new ServiceStarter(services) {
       override def configureThread(t: Thread) {
         t.setUncaughtExceptionHandler(new HideInterruptedExceptions)
       }
     }
     starter.start()
-    Thread.sleep(500) // TODO: create a start method and wait for its completion
-    starter.stop()
+    defer {starter.stop()}
 
+    "the starter waits for the start() method of services to finish execution" >> {
+      threadOfService.size should be(2) // look mom, no Thread.sleep()
+    }
     val threadA = threadOfService.get("A")
     val threadB = threadOfService.get("B")
     "each service runs in its own thread" >> {
@@ -54,12 +52,15 @@ class ServiceStarterSpec extends Spec with ShouldMatchers {
   }
 
 
-  def makeService(name: String, action: => Unit): ServiceRegistration = {
+  def makeService(name: String, onStart: => Unit): ServiceRegistration = {
     new ServiceRegistration(name,
       providerOf(new ServiceContext(null)),
-      providerOf(new Runnable {
+      providerOf(new ServiceRunnable {
+        def start() {
+          onStart
+        }
+
         def run() {
-          action
         }
       }))
   }

@@ -27,12 +27,12 @@ public class ControllerModule extends ServiceModule {
     }
 
     @Provides
-    ServiceRegistration serviceRegistration(Provider<ControllerContext> context, Provider<Runnable> service) {
+    ServiceRegistration serviceRegistration(Provider<ControllerContext> context, Provider<ServiceRunnable> service) {
         return new ServiceRegistration(serviceName, context, service);
     }
 
     @Provides
-    Runnable service(ControllerHub hub, @Hub MessageReceiver<Object> toHub, Set<ControllerRegistration> controllerRegs) {
+    ServiceRunnable service(ControllerHub hub, @Hub MessageReceiver<Object> toHub, Set<ControllerRegistration> controllerRegs) {
         // TODO: move registration out of modules
         // TODO: randomize the controller order to prevent temporal coupling
         for (ControllerRegistration reg : controllerRegs) {

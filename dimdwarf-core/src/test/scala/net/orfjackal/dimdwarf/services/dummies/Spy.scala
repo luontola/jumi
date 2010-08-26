@@ -12,6 +12,6 @@ class Spy {
   }
 
   def nextMessage(): String = {
-    messages.poll(1000, TimeUnit.MILLISECONDS)
+    messages.take()
   }
 }

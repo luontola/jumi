@@ -7,6 +7,9 @@ import net.orfjackal.dimdwarf.services._
 
 @ServiceScoped
 class RelayService @Inject()(@Hub toHub: MessageSender[Any], spy: Spy) extends Service {
+  def start() {
+  }
+
   def process(message: Any) {
     message match {
       case MessageToController(m) => {

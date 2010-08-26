@@ -6,6 +6,9 @@ import com.google.inject.Inject
 import net.orfjackal.dimdwarf.controller.Hub
 
 class Authenticator @Inject()(@Hub toHub: MessageSender[Any]) extends Service {
+  def start() {
+  }
+
   def process(message: Any) {
     message match {
       case IsUserAuthenticated() =>

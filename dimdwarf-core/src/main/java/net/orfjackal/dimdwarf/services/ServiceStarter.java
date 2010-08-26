@@ -4,16 +4,14 @@
 
 package net.orfjackal.dimdwarf.services;
 
-import org.apache.mina.util.ConcurrentHashSet;
-
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
-@ThreadSafe
+@NotThreadSafe
 public class ServiceStarter {
 
     private final Set<ServiceRegistration> services;
-    private final Set<Thread> serviceThreads = new ConcurrentHashSet<Thread>();
+    private final Set<Thread> serviceThreads = new HashSet<Thread>();
 
     public ServiceStarter(Set<ServiceRegistration> services) {
         checkForDuplicateNames(services);
@@ -31,12 +29,26 @@ public class ServiceStarter {
         }
     }
 
-    public void start() {
+    public void start() throws InterruptedException {
+        List<ServiceRunner> runners = new ArrayList<ServiceRunner>();
         for (ServiceRegistration service : services) {
-            Thread t = new Thread(new ServiceRunner(service), service.getName());
-            configureThread(t);
-            t.start();
-            serviceThreads.add(t);
+            ServiceRunner r = new ServiceRunner(service);
+            startNewThread(r, service.getName());
+            runners.add(r);
+        }
+        waitForServicesToStart(runners);
+    }
+
+    private void startNewThread(Runnable target, String name) {
+        Thread t = new Thread(target, name);
+        configureThread(t);
+        t.start();
+        serviceThreads.add(t);
+    }
+
+    private static void waitForServicesToStart(List<ServiceRunner> runners) throws InterruptedException {
+        for (ServiceRunner runner : runners) {
+            runner.awaitStarted();
         }
     }
 
