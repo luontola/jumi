@@ -10,9 +10,10 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import static net.orfjackal.dimdwarf.util.StubProvider.providerOf;
 
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
@@ -33,7 +34,7 @@ public class GettingEntityIdSpec extends Specification<Object> {
         checking(new Expectations() {{
             allowing(entities).getEntityId(entity); will(returnValue(ENTITY_ID));
         }});
-        Provider<EntityReferenceFactory> refFactory = StubProvider.<EntityReferenceFactory>wrap(new EntityReferenceFactoryImpl(entities));
+        Provider<EntityReferenceFactory> refFactory = providerOf((EntityReferenceFactory) new EntityReferenceFactoryImpl(entities));
         proxy = new TransparentReferenceFactory(refFactory).createTransparentReference(entity);
     }
 

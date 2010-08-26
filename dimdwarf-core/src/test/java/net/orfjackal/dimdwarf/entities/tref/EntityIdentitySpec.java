@@ -9,9 +9,10 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.entities.*;
-import net.orfjackal.dimdwarf.util.StubProvider;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import static net.orfjackal.dimdwarf.util.StubProvider.providerOf;
 
 @RunWith(JDaveRunner.class)
 @Group({"fast"})
@@ -28,7 +29,7 @@ public class EntityIdentitySpec extends Specification<Object> {
 
     public void create() throws Exception {
         referenceFactory = mock(EntityReferenceFactory.class);
-        proxyFactory = new TransparentReferenceFactory(StubProvider.wrap(referenceFactory));
+        proxyFactory = new TransparentReferenceFactory(providerOf(referenceFactory));
         ent1 = new DummyEntity();
         ent2 = new DummyEntity();
         checking(referencesMayBeCreatedFor(ent1, new EntityObjectId(1)));

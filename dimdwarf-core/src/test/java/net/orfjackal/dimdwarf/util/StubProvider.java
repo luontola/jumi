@@ -18,7 +18,7 @@ public class StubProvider<T> implements Provider<T> {
         return instance;
     }
 
-    public static <T> Provider<T> wrap(T instance) {
+    public static <T> Provider<T> providerOf(T instance) {
         return new StubProvider<T>(instance);
     }
 }
