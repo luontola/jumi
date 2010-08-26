@@ -9,6 +9,7 @@ public class HideInterruptedExceptions implements Thread.UncaughtExceptionHandle
         if (e instanceof InterruptedException) {
             return;
         }
+        System.err.printf("Exception in thread \"%s\" ", t.getName());
         e.printStackTrace();
     }
 }

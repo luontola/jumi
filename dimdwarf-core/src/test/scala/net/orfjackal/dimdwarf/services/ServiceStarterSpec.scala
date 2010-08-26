@@ -15,11 +15,7 @@ class ServiceStarterSpec extends Spec with ShouldMatchers {
     val serviceB = makeService("Service B", {threadOfService.put("B", Thread.currentThread)})
     val services = asSet(serviceA, serviceB)
 
-    val starter = new ServiceStarter(services) {
-      override def configureThread(t: Thread) {
-        t.setUncaughtExceptionHandler(new HideInterruptedExceptions)
-      }
-    }
+    val starter = new SilentlyStoppableServiceStarter(services)
     starter.start()
     defer {starter.stop()}
 

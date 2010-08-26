@@ -4,6 +4,8 @@
 
 package net.orfjackal.dimdwarf.services;
 
+import com.google.inject.Inject;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
@@ -13,6 +15,7 @@ public class ServiceStarter {
     private final Set<ServiceRegistration> services;
     private final Set<Thread> serviceThreads = new HashSet<Thread>();
 
+    @Inject
     public ServiceStarter(Set<ServiceRegistration> services) {
         checkForDuplicateNames(services);
         this.services = services;
@@ -54,7 +57,7 @@ public class ServiceStarter {
 
     @SuppressWarnings({"UnusedDeclaration"})
     protected void configureThread(Thread t) {
-        // override to for example configure in tests
+        // override to for example set an UncaughtExceptionHandler
     }
 
     public void stop() throws InterruptedException {

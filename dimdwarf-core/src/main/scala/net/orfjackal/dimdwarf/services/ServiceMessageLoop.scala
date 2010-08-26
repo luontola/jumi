@@ -13,16 +13,10 @@ class ServiceMessageLoop @Inject()(service: Service, toService: MessageReceiver[
   }
 
   def run() {
-    try {
-      while (true) {
-        val message = toService.take()
-        logger.debug("PROCESS: {}", message)
-        service.process(message)
-      }
-    } catch {
-      case e =>
-        logger.error("Internal error, service died", e)
-        throw e
+    while (true) {
+      val message = toService.take()
+      logger.debug("PROCESS: {}", message)
+      service.process(message)
     }
   }
 }

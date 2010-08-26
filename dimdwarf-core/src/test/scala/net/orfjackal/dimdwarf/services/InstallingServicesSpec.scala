@@ -8,7 +8,6 @@ import org.scalatest.matchers.ShouldMatchers
 import java.util.Set
 import net.orfjackal.dimdwarf.services.dummies._
 import net.orfjackal.dimdwarf.controller._
-import scala.collection.mutable.Buffer
 import net.orfjackal.dimdwarf.modules._
 import net.orfjackal.dimdwarf.mq._
 
@@ -19,29 +18,17 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
   val toHub = injector.getInstance(Key.get(new TypeLiteral[MessageSender[Any]] {}, classOf[Hub]))
   val spy = injector.getInstance(classOf[Spy])
 
-  // TODO: extract starting services to its own class (and stopping - for tests only) 
-  val services = injector.getInstance(Key.get(new TypeLiteral[Set[ServiceRegistration]] {}))
-  val threads = Buffer[Thread]()
-  services.foreach(service => {
-    println("Starting service " + service.getName)
-    val t = new Thread(new ServiceRunner(service), service.getName)
-    t.setUncaughtExceptionHandler(new HideInterruptedExceptions)
-    t.start()
-    threads.add(t)
-  })
-  defer {
-    threads.foreach(t => {
-      t.interrupt()
-      t.join()
-    })
-  }
+  val starter = injector.getInstance(classOf[SilentlyStoppableServiceStarter])
+  starter.start()
+  defer {starter.stop()}
 
   "Service thread is named after the service" >> {
+    val services = injector.getInstance(Key.get(new TypeLiteral[Set[ServiceRegistration]] {}))
     val serviceNames = services.map(_.getName)
 
+    serviceNames should contain("Relay")
     //assertThat(serviceNames, hasItem("Relay")) // TODO: doesn't compile, create a Scala wrapper
     //assertTrue(serviceNames.toString, serviceNames.contains("Relay"))
-    serviceNames should contain("Relay") // TODO: evaluate the different matchers
   }
 
   "Controllers can send messages to services" >> {
