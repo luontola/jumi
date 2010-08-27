@@ -1,9 +1,8 @@
 package net.orfjackal.dimdwarf.controller
 
 import net.orfjackal.dimdwarf.services._
-import com.google.inject.Singleton
 
-@Singleton
+@ControllerScoped
 class ControllerHub extends Service {
   private var controllers = List[Controller]()
 
@@ -16,7 +15,7 @@ class ControllerHub extends Service {
     }
   }
 
-  def addController(service: Controller) {
-    controllers = service :: controllers
+  def addController(controller: Controller) {
+    controllers = controller :: controllers
   }
 }

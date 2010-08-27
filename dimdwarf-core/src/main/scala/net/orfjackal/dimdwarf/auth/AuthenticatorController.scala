@@ -1,9 +1,11 @@
 package net.orfjackal.dimdwarf.auth
 
-import net.orfjackal.dimdwarf.controller.Controller
 import net.orfjackal.dimdwarf.mq.MessageSender
+import com.google.inject.Inject
+import net.orfjackal.dimdwarf.controller._
 
-class AuthenticatorController(toAuthenticator: MessageSender[Any]) extends Controller {
+@ControllerScoped
+class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) extends Controller {
   private var yesCallbacks = List[Function0[Unit]]()
   private var noCallbacks = List[Function0[Unit]]()
 

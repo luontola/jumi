@@ -1,10 +1,12 @@
 package net.orfjackal.dimdwarf.net
 
-import net.orfjackal.dimdwarf.controller.Controller
-import net.orfjackal.dimdwarf.auth.AuthenticatorController
 import net.orfjackal.dimdwarf.mq.MessageSender
+import com.google.inject.Inject
+import net.orfjackal.dimdwarf.controller._
+import net.orfjackal.dimdwarf.auth._
 
-class NetworkController(toNetwork: MessageSender[Any], authenticator: AuthenticatorController) extends Controller {
+@ControllerScoped
+class NetworkController @Inject()(toNetwork: MessageSender[Any], authenticator: AuthenticatorController) extends Controller {
   def process(message: Any) {
     message match {
       case LoginRequest() =>

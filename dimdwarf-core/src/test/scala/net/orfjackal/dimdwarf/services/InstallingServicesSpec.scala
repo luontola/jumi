@@ -10,6 +10,7 @@ import net.orfjackal.dimdwarf.services.dummies._
 import net.orfjackal.dimdwarf.controller._
 import net.orfjackal.dimdwarf.modules._
 import net.orfjackal.dimdwarf.mq._
+import net.orfjackal.dimdwarf.context.ThreadContext
 
 @RunWith(classOf[Specsy])
 class InstallingServicesSpec extends Spec with ShouldMatchers {
@@ -46,10 +47,101 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
     spy.nextMessage() should be("controller got message")
   }
 
-  // TODO
-  "Controllers of one module can access controllers of other modules" // make Bar depend on Foo
-  "Other modules cannot directly access the services" // use a nested PrivateModule
-  "Other modules cannot directly access the message queues" // use a nested PrivateModule
-  "The main thread can know when the services have started up" // add a start() method to the Service trait
-  "Controllers do not necessarily need to be backed by a service"
+  "Controllers must be ControllerScoped" >> {
+    class NotControllerScopedController extends Controller {
+      def process(message: Any) {}
+    }
+
+    evaluating {
+      new ServiceModule("Dummy") {
+        def configure() {
+          bindControllerTo(classOf[NotControllerScopedController])
+        }
+      }.configure()
+    } should produce[IllegalArgumentException]
+  }
+
+  "Services must be ServiceScoped" >> {
+    class NotServiceScopedService extends Service {
+      def start() {}
+
+      def process(message: Any) {}
+    }
+
+    evaluating {
+      new ServiceModule("Dummy") {
+        def configure() {
+          bindServiceTo(classOf[NotServiceScopedService])
+        }
+      }.configure()
+    } should produce[IllegalArgumentException]
+  }
+
+  "Controllers can be dependant on other controllers, but their message queues are isolated" >> {
+    // Test against the bug mentioned in
+    // http://groups.google.com/group/google-guice/browse_thread/thread/5f61266829554993
+
+    class DependantModule extends ServiceModule("Dependant") {
+      def configure() {
+        bindControllerTo(classOf[DependantController])
+        bindMessageQueueOfType(classOf[Any])
+      }
+
+      @Provides def controllerRegistration(controller: Provider[Controller]) = new ControllerRegistration(serviceName, controller)
+    }
+    class DependeeModule extends ServiceModule("Dependee") {
+      def configure() {
+        bindControllerTo(classOf[DependeeController])
+        bindMessageQueueOfType(classOf[Any])
+      }
+
+      @Provides def controllerRegistration(controller: Provider[Controller]) = new ControllerRegistration(serviceName, controller)
+    }
+
+    val injector = Guice.createInjector(new ServiceInstallerModule(new DependantModule, new DependeeModule))
+    val controllers = injector.getInstance(Key.get(new TypeLiteral[Set[ControllerRegistration]] {}))
+    val dependantProvider = controllers.filter(_.getName == "Dependant").head.getController
+    val dependeeProvider = controllers.filter(_.getName == "Dependee").head.getController
+
+    def eachControllerGetsItsPersonalMessageQueue(dependant: DependantController, dependee: DependeeController) {
+      val injectedDependee = dependant.dependee
+      dependant.queue should not be (injectedDependee.queue)
+      dependee.queue should be(injectedDependee.queue)
+    }
+
+    "When dependant is instantiated first, each controller gets its personal message queue" >> {
+      runInControllerContext(injector, {
+        val dependant = dependantProvider.get.asInstanceOf[DependantController]
+        val dependee = dependeeProvider.get.asInstanceOf[DependeeController]
+
+        eachControllerGetsItsPersonalMessageQueue(dependant, dependee)
+      })
+    }
+    "When dependee is instantiated first, each controller gets its personal message queue" >> {
+      runInControllerContext(injector, {
+        val dependee = dependeeProvider.get.asInstanceOf[DependeeController]
+        val dependant = dependantProvider.get.asInstanceOf[DependantController]
+
+        eachControllerGetsItsPersonalMessageQueue(dependant, dependee)
+      })
+    }
+  }
+
+  def runInControllerContext(injector: Injector, action: => Unit) {
+    val context = injector.getInstance(classOf[ControllerContext])
+    ThreadContext.runInContext(context, new Runnable {
+      def run() {
+        action
+      }
+    })
+  }
+}
+
+@ControllerScoped
+class DependantController @Inject()(val dependee: DependeeController, val queue: MessageSender[Any]) extends Controller {
+  def process(message: Any) {}
+}
+@ControllerScoped
+class DependeeController @Inject()(val queue: MessageSender[Any]) extends Controller {
+  def process(message: Any) {}
 }

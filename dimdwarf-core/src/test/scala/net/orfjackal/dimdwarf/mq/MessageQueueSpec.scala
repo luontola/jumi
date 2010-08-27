@@ -6,7 +6,7 @@ import org.specs.SpecsMatchers
 
 @RunWith(classOf[Specsy])
 class MessageQueueSpec extends Spec with SpecsMatchers {
-  val queue = new MessageQueue[String]
+  val queue = new MessageQueue[String]("Unnamed")
 
   "Messages are read from the queue in FIFO order" >> {
     queue.send("sent first")

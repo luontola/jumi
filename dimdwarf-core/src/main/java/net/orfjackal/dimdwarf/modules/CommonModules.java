@@ -14,9 +14,10 @@ public class CommonModules extends AbstractModule {
         install(new EntityModule());
         install(new TaskSchedulingModule());
         install(new LifecycleModule());
-        // TODO: service module for authenticator
         install(new ServiceInstallerModule(
-                new ControllerModule()
+                new ControllerModule(),
+                new AuthenticatorModule(),
+                new NetworkModule()
         ));
     }
 }

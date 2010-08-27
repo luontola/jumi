@@ -10,15 +10,15 @@ import net.orfjackal.dimdwarf.mq._
 
 @RunWith(classOf[Specsy])
 class AuthenticatorSpec extends Spec with SpecsMatchers {
-  val toHub = new MessageQueue[Any]
+  val toHub = new MessageQueue[Any]("toHub")
   val hub = new ControllerHub
 
-  val toAuthenticator = new MessageQueue[Any]
-  val authenticator = new Authenticator(toHub)
+  val toAuthenticator = new MessageQueue[Any]("toAuthenticator")
+  val authenticator = new AuthenticatorService(toHub)
   val authenticatorCtrl = new AuthenticatorController(toAuthenticator)
   hub.addController(authenticatorCtrl)
 
-  val toNetwork = new MessageQueue[Any]
+  val toNetwork = new MessageQueue[Any]("toNetwork")
   val networkCtrl = new NetworkController(toNetwork, authenticatorCtrl)
   hub.addController(networkCtrl)
 

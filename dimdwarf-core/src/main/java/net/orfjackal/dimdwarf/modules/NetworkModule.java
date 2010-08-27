@@ -2,22 +2,23 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.services.dummies;
+package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.controller.Controller;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
+import net.orfjackal.dimdwarf.net.*;
 import net.orfjackal.dimdwarf.services.*;
 
-public class RelayModule extends ServiceModule {
+public class NetworkModule extends ServiceModule {
 
-    public RelayModule() {
-        super("Relay");
+    public NetworkModule() {
+        super("Network");
     }
 
     protected void configure() {
-        bindControllerTo(RelayController.class);
-        bindServiceTo(RelayService.class);
+        bindControllerTo(NetworkController.class);
+        bindServiceTo(NetworkService.class);
         bindMessageQueueOfType(Object.class);
     }
 

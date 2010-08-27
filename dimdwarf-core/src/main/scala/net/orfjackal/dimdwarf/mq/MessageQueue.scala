@@ -2,7 +2,7 @@ package net.orfjackal.dimdwarf.mq
 
 import java.util.concurrent._
 
-class MessageQueue[T] extends MessageSender[T] with MessageReceiver[T] {
+class MessageQueue[T](name: String) extends MessageSender[T] with MessageReceiver[T] {
   private val queue = new LinkedBlockingQueue[T]
 
   def send(message: T) {
@@ -20,4 +20,6 @@ class MessageQueue[T] extends MessageSender[T] with MessageReceiver[T] {
   def poll(timeoutMillis: Long): T = {
     queue.poll(timeoutMillis, TimeUnit.MILLISECONDS)
   }
+
+  override def toString = String.format("%s(%s)", getClass.getSimpleName, name)
 }
