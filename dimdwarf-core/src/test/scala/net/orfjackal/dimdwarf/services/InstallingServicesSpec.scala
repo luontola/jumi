@@ -86,16 +86,12 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
         bindControllerTo(classOf[DependantController])
         bindMessageQueueOfType(classOf[Any])
       }
-
-      @Provides def controllerRegistration(controller: Provider[Controller]) = new ControllerRegistration(serviceName, controller)
     }
     class DependeeModule extends ServiceModule("Dependee") {
       def configure() {
         bindControllerTo(classOf[DependeeController])
         bindMessageQueueOfType(classOf[Any])
       }
-
-      @Provides def controllerRegistration(controller: Provider[Controller]) = new ControllerRegistration(serviceName, controller)
     }
 
     val injector = Guice.createInjector(new ServiceInstallerModule(new DependantModule, new DependeeModule))

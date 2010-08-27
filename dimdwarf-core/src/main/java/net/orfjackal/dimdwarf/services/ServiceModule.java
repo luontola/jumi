@@ -7,6 +7,7 @@ package net.orfjackal.dimdwarf.services;
 import com.google.inject.*;
 import com.google.inject.name.*;
 import com.google.inject.util.Types;
+import net.orfjackal.dimdwarf.context.Context;
 import net.orfjackal.dimdwarf.controller.*;
 import net.orfjackal.dimdwarf.mq.*;
 
@@ -41,30 +42,54 @@ public abstract class ServiceModule extends PrivateModule {
 
     protected void bindControllerTo(Class<? extends Controller> controller) {
         checkHasAnnotation(controller, ControllerScoped.class);
+
         bind(controller);
         expose(controller); // allow other controllers to use the controller directly, while still making sure that it's part of this private module
         bind(Controller.class).to(controller);
 
-        Key<ControllerRegistration> key = Key.get(ControllerRegistration.class, uniqueId());
-        bind(key).to(ControllerRegistration.class);
-        expose(key);
-        controllers.add(key);
+        controllers.add(exposeUniqueKey(ControllerRegistration.class, controllerRegistrationProvider()));
     }
 
     protected void bindServiceTo(Class<? extends Service> service) {
         checkHasAnnotation(service, serviceScope);
+
         bind(Service.class).to(service);
 
-        Key<ServiceRegistration> key = Key.get(ServiceRegistration.class, uniqueId());
-        bind(key).to(ServiceRegistration.class);
-        expose(key);
-        services.add(key);
+        services.add(exposeUniqueKey(ServiceRegistration.class, serviceRegistrationProvider()));
+    }
+
+    private Provider<ControllerRegistration> controllerRegistrationProvider() {
+        final Provider<Controller> controller = getProvider(Controller.class);
+        return new Provider<ControllerRegistration>() {
+            public ControllerRegistration get() {
+                return new ControllerRegistration(serviceName, controller);
+            }
+        };
+    }
+
+    private Provider<ServiceRegistration> serviceRegistrationProvider() {
+        final Provider<Context> context = getProvider(Key.get(Context.class, serviceScope));
+        final Provider<ServiceRunnable> service = getProvider(ServiceRunnable.class);
+        return new Provider<ServiceRegistration>() {
+            public ServiceRegistration get() {
+                return new ServiceRegistration(serviceName, context, service);
+            }
+        };
     }
 
     private static void checkHasAnnotation(Class<?> target, Class<? extends Annotation> annotation) {
         if (target.getAnnotation(annotation) == null) {
             throw new IllegalArgumentException(target.getName() + " must be annotated with " + annotation.getName());
         }
+    }
+
+    private <T> Key<T> exposeUniqueKey(Class<T> type, Provider<T> provider) {
+        bind(type).toProvider(provider);
+
+        Key<T> key = Key.get(type, uniqueId());
+        bind(key).to(type);
+        expose(key);
+        return key;
     }
 
     private Named uniqueId() {

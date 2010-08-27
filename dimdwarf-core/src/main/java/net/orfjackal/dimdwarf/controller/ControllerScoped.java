@@ -4,12 +4,13 @@
 
 package net.orfjackal.dimdwarf.controller;
 
-import com.google.inject.ScopeAnnotation;
+import com.google.inject.*;
 
 import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ScopeAnnotation
+@BindingAnnotation
 public @interface ControllerScoped {
 }

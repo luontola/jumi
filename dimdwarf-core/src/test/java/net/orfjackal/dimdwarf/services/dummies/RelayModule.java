@@ -4,8 +4,7 @@
 
 package net.orfjackal.dimdwarf.services.dummies;
 
-import com.google.inject.*;
-import net.orfjackal.dimdwarf.controller.Controller;
+import com.google.inject.Provides;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import net.orfjackal.dimdwarf.services.*;
 
@@ -19,17 +18,6 @@ public class RelayModule extends ServiceModule {
         bindControllerTo(RelayController.class);
         bindServiceTo(RelayService.class);
         bindMessageQueueOfType(Object.class);
-    }
-
-    @Provides
-    ControllerRegistration controllerRegistration(Provider<Controller> controller) {
-        return new ControllerRegistration(serviceName, controller);
-    }
-
-    @Provides
-    ServiceRegistration serviceRegistration(Provider<ServiceContext> context,
-                                            Provider<ServiceRunnable> service) {
-        return new ServiceRegistration(serviceName, context, service);
     }
 
     @Provides

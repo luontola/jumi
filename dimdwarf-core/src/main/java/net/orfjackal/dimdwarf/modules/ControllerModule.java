@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.*;
+import com.google.inject.Provides;
 import net.orfjackal.dimdwarf.controller.*;
 import net.orfjackal.dimdwarf.mq.*;
 import net.orfjackal.dimdwarf.services.*;
@@ -27,11 +27,6 @@ public class ControllerModule extends ServiceModule {
         bind(messageSenderOf(Object.class)).annotatedWith(Hub.class).toInstance(toHub);
         bind(messageReceiverOf(Object.class)).annotatedWith(Hub.class).toInstance(toHub);
         expose(messageSenderOf(Object.class)).annotatedWith(Hub.class);
-    }
-
-    @Provides
-    ServiceRegistration serviceRegistration(Provider<ControllerContext> context, Provider<ServiceRunnable> service) {
-        return new ServiceRegistration(serviceName, context, service);
     }
 
     @Provides

@@ -6,7 +6,7 @@ package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
-import net.orfjackal.dimdwarf.context.ThreadScope;
+import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.controller.*;
 import net.orfjackal.dimdwarf.services.*;
 
@@ -20,7 +20,10 @@ public class ServiceInstallerModule extends AbstractModule {
 
     protected void configure() {
         bindScope(ControllerScoped.class, new ThreadScope(ControllerContext.class));
+        bind(Context.class).annotatedWith(ControllerScoped.class).to(ControllerContext.class);
+
         bindScope(ServiceScoped.class, new ThreadScope(ServiceContext.class));
+        bind(Context.class).annotatedWith(ServiceScoped.class).to(ServiceContext.class);
 
         Multibinder<ControllerRegistration> controllerBindings = Multibinder.newSetBinder(binder(), ControllerRegistration.class);
         Multibinder<ServiceRegistration> serviceBindings = Multibinder.newSetBinder(binder(), ServiceRegistration.class);
