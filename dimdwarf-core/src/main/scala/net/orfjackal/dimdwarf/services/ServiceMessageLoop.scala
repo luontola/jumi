@@ -8,7 +8,7 @@ class ServiceMessageLoop @Inject()(service: Service, toService: MessageReceiver[
   private val logger = LoggerFactory.getLogger(getClass)
 
   def start() {
-    logger.debug("START: {}", service.getClass)
+    logger.debug("START: {}", service.getClass.getName)
     service.start()
   }
 
