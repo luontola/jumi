@@ -108,7 +108,7 @@
         <dependency>
             <groupId>net.orfjackal.specsy</groupId>
             <artifactId>specsy</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
