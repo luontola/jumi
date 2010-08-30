@@ -5,17 +5,23 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import net.orfjackal.dimdwarf.net.*;
 import net.orfjackal.dimdwarf.services.*;
 
 public class NetworkModule extends ServiceModule {
 
-    public NetworkModule() {
+    private final int port;
+
+    public NetworkModule(int port) {
         super("Network");
+        this.port = port;
     }
 
     protected void configure() {
+        bindConstant().annotatedWith(Names.named("port")).to(port);
+
         bindControllerTo(NetworkController.class);
         bindServiceTo(NetworkService.class);
         bindMessageQueueOfType(Object.class);

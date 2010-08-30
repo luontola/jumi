@@ -8,16 +8,13 @@ import com.google.inject.AbstractModule;
 
 public class CommonModules extends AbstractModule {
 
+    // FIXME: CommonModules will be removed/refactored in new architecture
+
     protected void configure() {
         install(new TaskContextModule());
         install(new DatabaseModule());
         install(new EntityModule());
         install(new TaskSchedulingModule());
         install(new LifecycleModule());
-        install(new ServiceInstallerModule(
-                new ControllerModule(),
-                new AuthenticatorModule(),
-                new NetworkModule()
-        ));
     }
 }

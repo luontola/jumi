@@ -5,9 +5,12 @@
 package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.modules.CommonModules;
+import net.orfjackal.dimdwarf.modules.*;
+import net.orfjackal.dimdwarf.services.ServiceStarter;
 import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.slf4j.*;
+
+import java.util.*;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -16,6 +19,13 @@ public class Main {
         Thread.setDefaultUncaughtExceptionHandler(new KillProcessOnUncaughtException());
 
         logger.info("Dimdwarf {} starting up", getVersion());
+
+        // TODO: parse args properly
+        int port = Integer.parseInt(args[1]);
+        String applicationDir = args[3];
+
+        List<Module> modules = configureServerModules(port);
+        logger.info("Modules configured");
 
         // TODO: speed up startup by loading classes in parallel
         // Loading the classes is what takes most of the time in startup - on JDK 7 it can be speeded up
@@ -26,15 +36,21 @@ public class Main {
         // - instantiate and run Dimdwarf's modules outside Guice (loads some of Dimdwarf's classes)
         // - create the actual injector with Dimdwarf's modules and return it via a Future (what we really wanted)
 
-        Injector injector = Guice.createInjector(Stage.PRODUCTION, new CommonModules());
+        Injector injector = Guice.createInjector(Stage.PRODUCTION, modules);
         logger.info("Modules loaded");
 
-        ServerConfigurer server = injector.getInstance(ServerConfigurer.class);
-        logger.info("Bootstrapper created");
-
-        server.configure(args);
-        server.start();
+        injector.getInstance(ServiceStarter.class).start();
         logger.info("Server started");
+    }
+
+    private static List<Module> configureServerModules(int port) {
+        List<Module> modules = new ArrayList<Module>();
+        modules.add(new ServiceInstallerModule(
+                new ControllerModule(),
+                new AuthenticatorModule(),
+                new NetworkModule(port)
+        ));
+        return modules;
     }
 
     private static String getVersion() {
