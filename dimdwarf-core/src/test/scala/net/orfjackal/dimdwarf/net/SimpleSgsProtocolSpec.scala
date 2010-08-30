@@ -5,11 +5,9 @@ import org.hamcrest.CoreMatchers._
 import org.junit.runner.RunWith
 import net.orfjackal.specsy._
 import org.apache.mina.core.session._
-import org.apache.mina.core.buffer._
 import org.mockito.Mockito._
-import com.sun.sgs.protocol.simple.SimpleSgsProtocol
-import com.sun.sgs.impl.sharedutil.MessageBuffer
 import org.apache.mina.filter.codec._
+import SimpleSgsProtocolReferenceMessages._
 
 @RunWith(classOf[Specsy])
 class SimpleSgsProtocolSpec extends Spec {
@@ -36,33 +34,5 @@ class SimpleSgsProtocolSpec extends Spec {
     encoder.encode(session, message, encoded)
 
     verify(encoded).write(loginFailure("")) // TODO: add reason
-  }
-
-  def loginRequest(user: String, pass: String): IoBuffer = {
-    val length = 2 +
-            MessageBuffer.getSize(user) +
-            MessageBuffer.getSize(pass)
-    val message = new MessageBuffer(length).
-            putByte(SimpleSgsProtocol.LOGIN_REQUEST).
-            putByte(SimpleSgsProtocol.VERSION).
-            putString(user).
-            putString(pass)
-    asIoBuffer(message.getBuffer)
-  }
-
-  def loginFailure(reason: String): IoBuffer = {
-    val length = 1 +
-            MessageBuffer.getSize(reason)
-    val message = new MessageBuffer(length).
-            putByte(SimpleSgsProtocol.LOGIN_FAILURE).
-            putString(reason)
-    asIoBuffer(message.getBuffer)
-  }
-
-  private def asIoBuffer(bytes: Array[Byte]): IoBuffer = {
-    IoBuffer.allocate(2 + bytes.length).
-            putShort(bytes.length.asInstanceOf[Short]).
-            put(bytes).
-            flip()
   }
 }

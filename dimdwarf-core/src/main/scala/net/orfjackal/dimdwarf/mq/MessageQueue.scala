@@ -21,5 +21,9 @@ class MessageQueue[T](name: String) extends MessageSender[T] with MessageReceive
     queue.poll(timeoutMillis, TimeUnit.MILLISECONDS)
   }
 
+  def size: Int = queue.size
+
+  def isEmpty: Boolean = queue.isEmpty
+
   override def toString = String.format("%s(%s)", getClass.getSimpleName, name)
 }

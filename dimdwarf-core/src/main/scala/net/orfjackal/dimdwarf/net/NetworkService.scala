@@ -13,21 +13,21 @@ import com.google.inject.name.Named
 @ServiceScoped
 class NetworkService @Inject()(@Named("port") port: Int, ioHandler: SimpleSgsProtocolIoHandler) extends Service {
   private val logger = LoggerFactory.getLogger(classOf[NetworkService])
+  private val acceptor = new NioSocketAcceptor
+
+  acceptor.getFilterChain.addLast("logger", new LoggingFilter)
+  acceptor.getFilterChain.addLast("codec", new ProtocolCodecFilter(new SimpleSgsProtocolCodecFactory))
+  acceptor.setHandler(ioHandler)
+  acceptor.getSessionConfig.setReadBufferSize(2048)
+  acceptor.getSessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 10)
 
   def start() {
-    bindClientSocket()
-  }
-
-  private def bindClientSocket() {
-    val acceptor = new NioSocketAcceptor
-    acceptor.getFilterChain.addLast("logger", new LoggingFilter)
-    acceptor.getFilterChain.addLast("codec", new ProtocolCodecFilter(new SimpleSgsProtocolCodecFactory))
-    acceptor.setHandler(ioHandler)
-    acceptor.getSessionConfig.setReadBufferSize(2048)
-    acceptor.getSessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 10)
-
     logger.info("Begin listening on port {}", port)
     acceptor.bind(new InetSocketAddress(port))
+  }
+
+  def stop() {
+    acceptor.unbind()
   }
 
   def process(message: Any) {
