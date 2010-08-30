@@ -19,6 +19,9 @@ public class AuthenticatorModule extends ServiceModule {
         bindControllerTo(AuthenticatorController.class);
         bindServiceTo(AuthenticatorService.class);
         bindMessageQueueOfType(Object.class);
+
+        bind(Authenticator.class).to(AuthenticatorController.class);
+        expose(Authenticator.class);
     }
 
     @Provides
