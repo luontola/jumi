@@ -6,7 +6,6 @@ import org.apache.mina.filter.codec._
 import org.apache.mina.core.session.IoSession
 import javax.annotation.concurrent.Immutable
 import java.nio.charset.Charset
-import com.sun.sgs.impl.sharedutil.MessageBuffer
 
 @Immutable
 class SimpleSgsProtocolDecoder extends CumulativeProtocolDecoder {
@@ -14,12 +13,12 @@ class SimpleSgsProtocolDecoder extends CumulativeProtocolDecoder {
 
   protected def doDecode(session: IoSession, in: IoBuffer, out: ProtocolDecoderOutput): Boolean = {
     if (in.prefixedDataAvailable(2, SimpleSgsProtocol.MAX_PAYLOAD_LENGTH)) {
-      val payloadLength = in.getUnsignedShort()
-      val op = in.get()
+      val payloadLength = readUnsignedShort(in)
+      val op = readByte(in)
 
       val message = op match {
         case SimpleSgsProtocol.LOGIN_REQUEST =>
-          val version = in.get()
+          val version = readByte(in)
           require(version == SimpleSgsProtocol.VERSION, "incompatible version: " + version)
           val username = readString(in)
           val password = readString(in)
@@ -33,15 +32,9 @@ class SimpleSgsProtocolDecoder extends CumulativeProtocolDecoder {
     }
   }
 
-  private def readString(in: IoBuffer): String = {
-    val length = in.getUnsignedShort()
-    val bytes = new Array[Byte](length)
-    in.get(bytes)
+  private def readUnsignedShort(in: IoBuffer): Int = in.getUnsignedShort()
 
-    val buf = new MessageBuffer(2 + length).
-            putShort(length).
-            putBytes(bytes)
-    buf.rewind()
-    buf.getString()
-  }
+  private def readByte(in: IoBuffer): Byte = in.get()
+
+  private def readString(in: IoBuffer): String = in.getPrefixedString(2, stringCharset.newDecoder)
 }
