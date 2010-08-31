@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.*;
+import com.google.inject.Provides;
 import net.orfjackal.dimdwarf.auth.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import net.orfjackal.dimdwarf.services.*;
@@ -23,11 +23,15 @@ public class AuthenticatorModule extends ServiceModule {
         bind(Authenticator.class).to(AuthenticatorController.class);
         expose(Authenticator.class);
 
-        bind(new TypeLiteral<CredentialsChecker<Credentials>>() {}).toInstance(new CredentialsChecker<Credentials>() {
-            public boolean isValid(Credentials credentials) {
-                return false; // TODO
-            }
-        });
+        requireBinding(CredentialsChecker.class);
+    }
+
+    @Provides
+    @SuppressWarnings({"unchecked"})
+    CredentialsChecker<Credentials> credentialsChecker(CredentialsChecker checker) {
+        // To make it easier to write bindings in the application code (no TypeLiterals),
+        // we create a binding from the raw type to the generic type.
+        return checker;
     }
 
     @Provides

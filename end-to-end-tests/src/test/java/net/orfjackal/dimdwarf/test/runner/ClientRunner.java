@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.test.runner;
 
 import com.sun.sgs.client.*;
 import com.sun.sgs.client.simple.*;
+import net.orfjackal.dimdwarf.test.apps.FakeCredentialsChecker;
 
 import java.io.IOException;
 import java.net.PasswordAuthentication;
@@ -27,7 +28,7 @@ public class ClientRunner {
     private final String host;
     private final int port;
     private String username = "user";
-    private String password = "secret";
+    private String password = FakeCredentialsChecker.CORRECT_PASSWORD;
 
     public ClientRunner(ServerRunner server) {
         host = server.getHost();

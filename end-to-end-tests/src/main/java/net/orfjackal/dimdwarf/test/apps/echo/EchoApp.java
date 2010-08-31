@@ -5,8 +5,12 @@
 package net.orfjackal.dimdwarf.test.apps.echo;
 
 import com.google.inject.AbstractModule;
+import net.orfjackal.dimdwarf.auth.CredentialsChecker;
+import net.orfjackal.dimdwarf.test.apps.FakeCredentialsChecker;
 
 public class EchoApp extends AbstractModule {
+
     protected void configure() {
+        bind(CredentialsChecker.class).to(FakeCredentialsChecker.class);
     }
 }

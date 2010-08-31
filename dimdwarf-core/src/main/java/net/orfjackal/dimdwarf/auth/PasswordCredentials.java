@@ -23,7 +23,7 @@ public final class PasswordCredentials implements Credentials {
     }
 
     public String toString() {
-        return String.format("%s(%s, %X)", getClass().getSimpleName(), username, password.hashCode());
+        return String.format("%s(%s,%s)", getClass().getSimpleName(), username, password);
     }
 
     @Override
