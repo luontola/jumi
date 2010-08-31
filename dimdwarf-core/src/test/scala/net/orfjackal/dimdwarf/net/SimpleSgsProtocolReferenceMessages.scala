@@ -26,6 +26,15 @@ object SimpleSgsProtocolReferenceMessages {
     asIoBuffer(message.getBuffer)
   }
 
+  def loginSuccess(reconnectionKey: Array[Byte]): IoBuffer = {
+    val length = 1 +
+            2 + reconnectionKey.length
+    val message = new MessageBuffer(length).
+            putByte(SimpleSgsProtocol.LOGIN_SUCCESS).
+            putByteArray(reconnectionKey)
+    asIoBuffer(message.getBuffer)
+  }
+
   def loginFailure(reason: String): IoBuffer = {
     val length = 1 +
             MessageBuffer.getSize(reason)

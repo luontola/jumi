@@ -9,8 +9,10 @@ import net.orfjackal.dimdwarf.auth._
 class NetworkController @Inject()(toNetwork: MessageSender[Any], authenticator: Authenticator) extends Controller {
   def process(message: Any) {
     message match {
-      case LoginRequest() =>
-        authenticator.isUserAuthenticated({toNetwork.send(LoginFailure())})
+      case LoginRequest(username, password) =>
+        authenticator.isUserAuthenticated(new PasswordCredentials(username, password),
+          onYes = {toNetwork.send(LoginSuccess())},
+          onNo = {toNetwork.send(LoginFailure())})
       case _ =>
     }
   }

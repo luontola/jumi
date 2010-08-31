@@ -9,14 +9,23 @@ import javax.annotation.concurrent.Immutable
 @Immutable
 class SimpleSgsProtocolEncoder extends ProtocolEncoder {
   def encode(session: IoSession, message: Any, out: ProtocolEncoderOutput) {
-    if (message.isInstanceOf[LoginFailure]) {
-      val buffer = IoBuffer.allocate(5).
-              putShort(3.asInstanceOf[Short]).
-              put(SimpleSgsProtocol.LOGIN_FAILURE).
-              putShort(0.asInstanceOf[Short]).
-              flip()
-      out.write(buffer)
+    val encoded = message match {
+
+      case LoginSuccess() =>
+        IoBuffer.allocate(5).
+                putShort(3.asInstanceOf[Short]).
+                put(SimpleSgsProtocol.LOGIN_SUCCESS).
+                putShort(0.asInstanceOf[Short]).
+                flip()
+
+      case LoginFailure() =>
+        IoBuffer.allocate(5).
+                putShort(3.asInstanceOf[Short]).
+                put(SimpleSgsProtocol.LOGIN_FAILURE).
+                putShort(0.asInstanceOf[Short]).
+                flip()
     }
+    out.write(encoded)
   }
 
   def dispose(session: IoSession) {

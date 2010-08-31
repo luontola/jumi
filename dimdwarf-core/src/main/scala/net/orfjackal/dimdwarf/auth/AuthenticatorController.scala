@@ -9,9 +9,11 @@ class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) ext
   private var yesCallbacks = List[Function0[Unit]]()
   private var noCallbacks = List[Function0[Unit]]()
 
-  def isUserAuthenticated(onNo: => Unit) {
-    toAuthenticator.send(IsUserAuthenticated())
-    // TODO: on yes
+  // TODO: support more than one client
+  // TODO: remove old callbacks
+  def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit) {
+    toAuthenticator.send(IsUserAuthenticated(credentials))
+    yesCallbacks = onYes _ :: yesCallbacks
     noCallbacks = onNo _ :: noCallbacks
   }
 

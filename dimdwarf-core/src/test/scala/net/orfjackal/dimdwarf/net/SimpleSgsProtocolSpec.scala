@@ -25,7 +25,15 @@ class SimpleSgsProtocolSpec extends Spec {
 
     decoder.decode(session, in, decoded)
 
-    verify(decoded).write(LoginRequest()) // TODO: add username and password
+    verify(decoded).write(LoginRequest("username", "password"))
+  }
+
+  "Encode LOGIN_SUCCESS" >> {
+    val message = LoginSuccess()
+
+    encoder.encode(session, message, encoded)
+
+    verify(encoded).write(loginSuccess(new Array[Byte](0))) // TODO: add reconnectionKey
   }
 
   "Encode LOGIN_FAILURE" >> {

@@ -1,5 +1,5 @@
 package net.orfjackal.dimdwarf.auth
 
 trait Authenticator {
-  def isUserAuthenticated(onNo: => Unit)
+  def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit)
 }

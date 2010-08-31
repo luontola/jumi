@@ -2,33 +2,49 @@ package net.orfjackal.dimdwarf.auth
 
 import org.junit.runner.RunWith
 import net.orfjackal.specsy._
-import net.orfjackal.dimdwarf.net._
-import org.specs.SpecsMatchers
 import net.orfjackal.dimdwarf.mq._
 import net.orfjackal.dimdwarf.services._
+import org.mockito.Mockito._
+import org.junit.Assert._
+import org.hamcrest.CoreMatchers._
 
 @RunWith(classOf[Specsy])
-class AuthenticatorSpec extends Spec with SpecsMatchers {
+class AuthenticatorSpec extends Spec {
   val queues = new DeterministicMessageQueues
 
+  val credentialsChecker = mock(classOf[CredentialsChecker[Credentials]])
+  val validCredentials = new PasswordCredentials("username", "corrent-password")
+  val invalidCredentials = new PasswordCredentials("username", "wrong-password")
+  when(credentialsChecker.isValid(validCredentials)).thenReturn(true)
+  when(credentialsChecker.isValid(invalidCredentials)).thenReturn(false)
+
   val toAuthenticator = new MessageQueue[Any]("toAuthenticator")
-  val authenticator = new AuthenticatorService(queues.toHub)
-  val authenticatorCtrl = new AuthenticatorController(toAuthenticator)
-  queues.addController(authenticatorCtrl)
-  queues.addService(authenticator, toAuthenticator)
+  val authService = new AuthenticatorService(queues.toHub, credentialsChecker)
+  val authController = new AuthenticatorController(toAuthenticator)
+  queues.addController(authController)
+  queues.addService(authService, toAuthenticator)
 
-  val toNetwork = new MessageQueue[Any]("toNetwork")
-  val networkCtrl = new NetworkController(toNetwork, authenticatorCtrl)
-  queues.addController(networkCtrl)
+  "Logging with valid credentials succeeds" >> {
+    var response = "-"
 
-  // TODO: decouple the authenticator and this test from the network service and controller
-
-  "Logging with the wrong password fails" >> {
-    queues.toHub.send(LoginRequest())
-
+    authController.isUserAuthenticated(validCredentials,
+      onYes = {response = "yes"},
+      onNo = {response = "no"})
     queues.processMessagesUntilIdle()
 
-    val response = toNetwork.poll()
-    response must_== LoginFailure()
+    verify(credentialsChecker).isValid(validCredentials)
+    assertThat(response, is("yes"))
+  }
+
+  "Logging with invalid credentials fails" >> {
+    var response = "-"
+
+    authController.isUserAuthenticated(invalidCredentials,
+      onYes = {response = "yes"},
+      onNo = {response = "no"})
+    queues.processMessagesUntilIdle()
+
+    verify(credentialsChecker).isValid(invalidCredentials)
+    assertThat(response, is("no"))
   }
 }

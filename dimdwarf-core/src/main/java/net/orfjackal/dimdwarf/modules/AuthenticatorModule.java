@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.Provides;
+import com.google.inject.*;
 import net.orfjackal.dimdwarf.auth.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import net.orfjackal.dimdwarf.services.*;
@@ -22,6 +22,12 @@ public class AuthenticatorModule extends ServiceModule {
 
         bind(Authenticator.class).to(AuthenticatorController.class);
         expose(Authenticator.class);
+
+        bind(new TypeLiteral<CredentialsChecker<Credentials>>() {}).toInstance(new CredentialsChecker<Credentials>() {
+            public boolean isValid(Credentials credentials) {
+                return false; // TODO
+            }
+        });
     }
 
     @Provides

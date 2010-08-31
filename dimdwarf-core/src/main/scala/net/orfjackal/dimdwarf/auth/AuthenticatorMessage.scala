@@ -2,8 +2,6 @@ package net.orfjackal.dimdwarf.auth
 
 abstract sealed class AuthenticatorMessage
 
-case class IsUserAuthenticated()
-
-case class YesUserIsAuthenticated()
-
-case class NoUserIsNotAuthenticated()
+case class IsUserAuthenticated(credentials: Credentials)
+case class YesUserIsAuthenticated() // TODO: identify the user
+case class NoUserIsNotAuthenticated() // TODO: identify the user
