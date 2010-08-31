@@ -13,7 +13,7 @@ class AuthenticatorSpec extends Spec {
   val queues = new DeterministicMessageQueues
 
   val credentialsChecker = mock(classOf[CredentialsChecker[Credentials]])
-  val validCredentials = new PasswordCredentials("username", "corrent-password")
+  val validCredentials = new PasswordCredentials("username", "correct-password")
   val invalidCredentials = new PasswordCredentials("username", "wrong-password")
   when(credentialsChecker.isValid(validCredentials)).thenReturn(true)
   when(credentialsChecker.isValid(invalidCredentials)).thenReturn(false)
