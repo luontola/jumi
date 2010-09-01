@@ -12,9 +12,11 @@ public class ClientConnectionTest {
 
     private final ServerRunner server = new ServerRunner();
     private final ClientRunner client = new ClientRunner(server);
+    private final ClientRunner client2 = new ClientRunner(server);
 
     @After
     public void shutdownServer() {
+        client2.disconnect();
         client.disconnect();
         server.shutdown();
     }
@@ -48,5 +50,25 @@ public class ClientConnectionTest {
 
         client.sendMessage("hello");
         client.receivesMessage("hello");
+    }
+
+    //@Test
+    public void multiple_clients_can_be_connected_to_the_server() throws Exception {
+        server.startApplication(EchoApp.class);
+
+        client.loginToServer();
+        client2.loginToServer();
+        client.isLoggedIn();
+        client2.isLoggedIn();
+
+        client.sendMessage("hello 1");
+        client2.sendMessage("hello 2");
+        client.receivesMessage("hello 1");
+        client2.receivesMessage("hello 2");
+
+        client.logout();
+        client2.logout();
+        client.isLoggedOut();
+        client2.isLoggedOut();
     }
 }
