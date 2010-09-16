@@ -23,6 +23,7 @@
         <dependency>
             <groupId>net.orfjackal.dimdwarf</groupId>
             <artifactId>dimdwarf-core</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Distribution executables -->
@@ -31,11 +32,13 @@
             <groupId>${groupId}</groupId>
             <artifactId>launcher</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>agent</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Logging implementation -->
@@ -43,8 +46,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <!-- 'optional' prevents the loading of two SLF4J implementations
-                 in the end-to-end tests which depend on this module  -->
             <optional>true</optional>
         </dependency>
 

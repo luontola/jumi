@@ -10,6 +10,10 @@
 
     <name>dist</name>
 
+    <!-- The dependencies of all "dist" modules should be optional
+         to prevent transitive dependencies to them. -->
+    <!-- TODO: write a test for checking that they are optional -->
+
     <modules>
         <module>agent</module>
         <module>launcher</module>

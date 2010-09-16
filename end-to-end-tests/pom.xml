@@ -50,6 +50,17 @@
         <!-- Dependencies for Dimdwarf server applications -->
 
         <dependency>
+            <groupId>net.orfjackal.dimdwarf</groupId>
+            <artifactId>dimdwarf-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <!-- TODO: move the auth interfaces which applications use from core to api module -->
+            <groupId>net.orfjackal.dimdwarf</groupId>
+            <artifactId>dimdwarf-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <scope>provided</scope>
