@@ -30,7 +30,7 @@
             <artifactId>dimdwarf-dist</artifactId>
             <version>${version}</version>
             <type>zip</type>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
 
         <!-- Dependencies for Dimdwarf client applications -->
@@ -38,6 +38,7 @@
         <dependency>
             <groupId>org.reddwarfserver.client</groupId>
             <artifactId>sgs-client</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <!-- sgs-client requires version 1.x, so we need to override
@@ -45,6 +46,7 @@
             <groupId>org.apache.mina</groupId>
             <artifactId>mina-core</artifactId>
             <version>1.1.7</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Dependencies for Dimdwarf server applications -->
