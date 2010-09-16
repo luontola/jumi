@@ -19,25 +19,9 @@
                 <include>net.orfjackal.dimdwarf:dimdwarf-core:jar</include>
                 <include>ch.qos.logback:logback-classic:jar</include>
             </includes>
-            <excludes>
-                <exclude>asm:*</exclude>
-            </excludes>
-        </dependencySet>
-
-        <!-- Libraries in bootstrap classpath -->
-        <dependencySet>
-            <outputDirectory>lib/boot</outputDirectory>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>net.orfjackal.dimdwarf:dimdwarf-aop:jar</include>
-                <!-- AOP's dependency to ASM must be declared explicitly, or it may end
-                     up with the regular libraries, because also CGLIB depends on it. -->
-                <include>asm:*</include>
-            </includes>
         </dependencySet>
 
         <!-- Fixed name for agent -->
-        <!-- TODO: is the agent needed anymore? it might be useful for starting up the server inside an IDE -->
         <dependencySet>
             <outputDirectory>/</outputDirectory>
             <includes>
