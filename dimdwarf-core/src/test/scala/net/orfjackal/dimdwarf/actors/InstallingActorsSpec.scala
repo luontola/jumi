@@ -1,4 +1,4 @@
-package net.orfjackal.dimdwarf.services
+package net.orfjackal.dimdwarf.actors
 
 import org.junit.runner.RunWith
 import net.orfjackal.specsy._
@@ -6,44 +6,44 @@ import com.google.inject._
 import collection.JavaConversions._
 import org.scalatest.matchers.ShouldMatchers
 import java.util.Set
-import net.orfjackal.dimdwarf.services.dummies._
+import net.orfjackal.dimdwarf.actors.dummies._
 import net.orfjackal.dimdwarf.controller._
 import net.orfjackal.dimdwarf.modules._
 import net.orfjackal.dimdwarf.mq._
 import net.orfjackal.dimdwarf.context.ThreadContext
 
 @RunWith(classOf[Specsy])
-class InstallingServicesSpec extends Spec with ShouldMatchers {
-  val injector = Guice.createInjector(new ServiceInstallerModule(new ControllerModule, new RelayModule))
+class InstallingActorsSpec extends Spec with ShouldMatchers {
+  val injector = Guice.createInjector(new ActorInstallerModule(new ControllerModule, new RelayModule))
 
   val toHub = injector.getInstance(Key.get(new TypeLiteral[MessageSender[Any]] {}, classOf[Hub]))
   val spy = injector.getInstance(classOf[Spy])
 
-  val starter = injector.getInstance(classOf[SilentlyStoppableServiceStarter])
+  val starter = injector.getInstance(classOf[SilentlyStoppableActorStarter])
   starter.start()
   defer {starter.stop()}
 
-  "Service thread is named after the service" >> {
-    val services = injector.getInstance(Key.get(new TypeLiteral[Set[ServiceRegistration]] {}))
-    val serviceNames = services.map(_.getName)
+  "Actor thread is named after the actor" >> {
+    val actors = injector.getInstance(Key.get(new TypeLiteral[Set[ActorRegistration]] {}))
+    val actorNames = actors.map(_.getName)
 
-    serviceNames should contain("Relay")
-    //assertThat(serviceNames, hasItem("Relay")) // TODO: doesn't compile, create a Scala wrapper
-    //assertTrue(serviceNames.toString, serviceNames.contains("Relay"))
+    actorNames should contain("Relay")
+    //assertThat(actorNames, hasItem("Relay")) // TODO: doesn't compile, create a Scala wrapper
+    //assertTrue(actorNames.toString, actorNames.contains("Relay"))
   }
 
-  "Controllers can send messages to services" >> {
-    toHub.send(MessageToService("message"))
+  "Controllers can send messages to actors" >> {
+    toHub.send(MessageToActor("message"))
 
     spy.nextMessage() should be("controller forwarded message")
-    spy.nextMessage() should be("service got message")
+    spy.nextMessage() should be("actor got message")
   }
 
-  "Services can send messages to controllers" >> {
-    toHub.send(MessageToService(MessageToController("message")))
-    spy.nextMessage() // ignore the sending from controller to service
+  "Actors can send messages to controllers" >> {
+    toHub.send(MessageToActor(MessageToController("message")))
+    spy.nextMessage() // ignore the sending from controller to actor
 
-    spy.nextMessage() should be("service forwarded message")
+    spy.nextMessage() should be("actor forwarded message")
     spy.nextMessage() should be("controller got message")
   }
 
@@ -53,7 +53,7 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
     }
 
     evaluating {
-      new ServiceModule("Dummy") {
+      new ActorModule("Dummy") {
         def configure() {
           bindControllerTo(classOf[NotControllerScopedController])
         }
@@ -61,17 +61,17 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
     } should produce[IllegalArgumentException]
   }
 
-  "Services must be ServiceScoped" >> {
-    class NotServiceScopedService extends Service {
+  "Actors must be ActorScoped" >> {
+    class NotActorScopedActor extends Actor {
       def start() {}
 
       def process(message: Any) {}
     }
 
     evaluating {
-      new ServiceModule("Dummy") {
+      new ActorModule("Dummy") {
         def configure() {
-          bindServiceTo(classOf[NotServiceScopedService])
+          bindActorTo(classOf[NotActorScopedActor])
         }
       }.configure()
     } should produce[IllegalArgumentException]
@@ -81,20 +81,20 @@ class InstallingServicesSpec extends Spec with ShouldMatchers {
     // Test against the bug mentioned in
     // http://groups.google.com/group/google-guice/browse_thread/thread/5f61266829554993
 
-    class DependantModule extends ServiceModule("Dependant") {
+    class DependantModule extends ActorModule("Dependant") {
       def configure() {
         bindControllerTo(classOf[DependantController])
         bindMessageQueueOfType(classOf[Any])
       }
     }
-    class DependeeModule extends ServiceModule("Dependee") {
+    class DependeeModule extends ActorModule("Dependee") {
       def configure() {
         bindControllerTo(classOf[DependeeController])
         bindMessageQueueOfType(classOf[Any])
       }
     }
 
-    val injector = Guice.createInjector(new ServiceInstallerModule(new DependantModule, new DependeeModule))
+    val injector = Guice.createInjector(new ActorInstallerModule(new DependantModule, new DependeeModule))
     val controllers = injector.getInstance(Key.get(new TypeLiteral[Set[ControllerRegistration]] {}))
     val dependantProvider = controllers.filter(_.getName == "Dependant").head.getController
     val dependeeProvider = controllers.filter(_.getName == "Dependee").head.getController

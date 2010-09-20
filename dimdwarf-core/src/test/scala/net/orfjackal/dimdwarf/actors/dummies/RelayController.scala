@@ -1,16 +1,16 @@
-package net.orfjackal.dimdwarf.services.dummies
+package net.orfjackal.dimdwarf.actors.dummies
 
 import net.orfjackal.dimdwarf.mq.MessageSender
 import net.orfjackal.dimdwarf.controller._
 import com.google.inject.Inject
 
 @ControllerScoped
-class RelayController @Inject()(toService: MessageSender[Any], spy: Spy) extends Controller {
+class RelayController @Inject()(toActor: MessageSender[Any], spy: Spy) extends Controller {
   def process(message: Any) {
     message match {
-      case MessageToService(m) => {
+      case MessageToActor(m) => {
         spy.log("controller forwarded " + m)
-        toService.send(m)
+        toActor.send(m)
       }
       case m => spy.log("controller got " + m)
     }

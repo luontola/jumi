@@ -8,18 +8,18 @@ import net.orfjackal.dimdwarf.util.SocketUtil
 import net.orfjackal.dimdwarf.mq.MessageQueue
 import java.net.Socket
 import SimpleSgsProtocolReferenceMessages._
-import net.orfjackal.dimdwarf.services.DeterministicMessageQueues
+import net.orfjackal.dimdwarf.actors.DeterministicMessageQueues
 import net.orfjackal.dimdwarf.auth._
 
 @RunWith(classOf[Specsy])
-class NetworkServiceSpec extends Spec {
+class NetworkSpec extends Spec {
   val queues = new DeterministicMessageQueues
   val port = SocketUtil.anyFreePort
   val authenticator = new SpyAuthenticator
 
-  val network = new NetworkService(port, new SimpleSgsProtocolIoHandler(queues.toHub))
+  val network = new NetworkActor(port, new SimpleSgsProtocolIoHandler(queues.toHub))
   val toNetwork = new MessageQueue[Any]("toNetwork")
-  queues.addService(network, toNetwork)
+  queues.addActor(network, toNetwork)
   val networkCtrl = new NetworkController(toNetwork, authenticator)
   queues.addController(networkCtrl)
 
@@ -38,7 +38,7 @@ class NetworkServiceSpec extends Spec {
     queues.waitForMessages()
     queues.processMessagesUntilIdle()
 
-    "Service sends the login request to Controller" >> {
+    "Actor sends the login request to Controller" >> {
       assertThat(queues.seenIn(queues.toHub).head, is(LoginRequest(USERNAME, PASSWORD): Any))
     }
 
@@ -51,10 +51,10 @@ class NetworkServiceSpec extends Spec {
       authenticator.lastOnYes.apply()
       queues.processMessagesUntilIdle()
 
-      "Controller sends a success message to Service" >> {
+      "Controller sends a success message to Actor" >> {
         assertThat(queues.seenIn(toNetwork).head, is(LoginSuccess(): Any))
       }
-      "Service sends the success message to Client" >> {
+      "Actor sends the success message to Client" >> {
         val reconnectionKey = new Array[Byte](0) // TODO: create a reconnectionKey
         assertThat(nextMessage(in), is(loginSuccess(reconnectionKey)))
       }
@@ -64,10 +64,10 @@ class NetworkServiceSpec extends Spec {
       authenticator.lastOnNo.apply()
       queues.processMessagesUntilIdle()
 
-      "Controller sends a failure message to Service" >> {
+      "Controller sends a failure message to Actor" >> {
         assertThat(queues.seenIn(toNetwork).head, is(LoginFailure(): Any))
       }
-      "Service sends the failure message to Client" >> {
+      "Actor sends the failure message to Client" >> {
         val reason = ""
         assertThat(nextMessage(in), is(loginFailure(reason)))
       }

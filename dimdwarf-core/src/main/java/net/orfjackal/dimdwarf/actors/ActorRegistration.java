@@ -2,23 +2,23 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.services;
+package net.orfjackal.dimdwarf.actors;
 
 import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
 
-public class ServiceRegistration {
+public class ActorRegistration {
 
     private final String name;
     private final Provider<? extends Context> context;
-    private final Provider<? extends ServiceRunnable> service;
+    private final Provider<? extends ActorRunnable> actor;
 
-    public ServiceRegistration(String name,
+    public ActorRegistration(String name,
                                Provider<? extends Context> context,
-                               Provider<? extends ServiceRunnable> service) {
+                               Provider<? extends ActorRunnable> actor) {
         this.name = name;
         this.context = context;
-        this.service = service;
+        this.actor = actor;
     }
 
     public String getName() {
@@ -29,7 +29,7 @@ public class ServiceRegistration {
         return context;
     }
 
-    public Provider<? extends ServiceRunnable> getService() {
-        return service;
+    public Provider<? extends ActorRunnable> getActor() {
+        return actor;
     }
 }

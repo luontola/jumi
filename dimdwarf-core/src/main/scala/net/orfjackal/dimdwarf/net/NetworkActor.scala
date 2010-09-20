@@ -6,13 +6,13 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor
 import org.apache.mina.filter.codec.ProtocolCodecFilter
 import org.apache.mina.core.session.IdleStatus
 import org.slf4j.LoggerFactory
-import net.orfjackal.dimdwarf.services._
+import net.orfjackal.dimdwarf.actors._
 import com.google.inject.name.Named
 import org.apache.mina.filter.logging._
 
-@ServiceScoped
-class NetworkService @Inject()(@Named("port") port: Int, ioHandler: SimpleSgsProtocolIoHandler) extends Service {
-  private val logger = LoggerFactory.getLogger(classOf[NetworkService])
+@ActorScoped
+class NetworkActor @Inject()(@Named("port") port: Int, ioHandler: SimpleSgsProtocolIoHandler) extends Actor {
+  private val logger = LoggerFactory.getLogger(classOf[NetworkActor])
   private val acceptor = createAcceptor
 
   private def createAcceptor = {

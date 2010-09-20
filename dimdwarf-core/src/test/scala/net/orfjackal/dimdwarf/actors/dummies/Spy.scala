@@ -1,4 +1,4 @@
-package net.orfjackal.dimdwarf.services.dummies
+package net.orfjackal.dimdwarf.actors.dummies
 
 import com.google.inject.Singleton
 import java.util.concurrent._

@@ -6,11 +6,11 @@ package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
+import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import net.orfjackal.dimdwarf.net.*;
-import net.orfjackal.dimdwarf.services.*;
 
-public class NetworkModule extends ServiceModule {
+public class NetworkModule extends ActorModule {
 
     private final int port;
 
@@ -23,12 +23,12 @@ public class NetworkModule extends ServiceModule {
         bindConstant().annotatedWith(Names.named("port")).to(port);
 
         bindControllerTo(NetworkController.class);
-        bindServiceTo(NetworkService.class);
+        bindActorTo(NetworkActor.class);
         bindMessageQueueOfType(Object.class);
     }
 
     @Provides
-    ServiceRunnable service(Service service, MessageReceiver<Object> toService) {
-        return new ServiceMessageLoop(service, toService);
+    ActorRunnable actor(Actor actor, MessageReceiver<Object> toActor) {
+        return new ActorMessageLoop(actor, toActor);
     }
 }

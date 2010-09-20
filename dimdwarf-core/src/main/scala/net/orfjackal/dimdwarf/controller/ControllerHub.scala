@@ -1,10 +1,10 @@
 package net.orfjackal.dimdwarf.controller
 
-import net.orfjackal.dimdwarf.services._
 import scala.collection.mutable.ArrayBuffer
+import net.orfjackal.dimdwarf.actors.Actor
 
 @ControllerScoped
-class ControllerHub extends Service {
+class ControllerHub extends Actor {
   private val controllers = new ArrayBuffer[Controller]
 
   def start() {

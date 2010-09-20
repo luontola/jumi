@@ -5,11 +5,11 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.Provides;
+import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.auth.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
-import net.orfjackal.dimdwarf.services.*;
 
-public class AuthenticatorModule extends ServiceModule {
+public class AuthenticatorModule extends ActorModule {
 
     public AuthenticatorModule() {
         super("Authenticator");
@@ -17,7 +17,7 @@ public class AuthenticatorModule extends ServiceModule {
 
     protected void configure() {
         bindControllerTo(AuthenticatorController.class);
-        bindServiceTo(AuthenticatorService.class);
+        bindActorTo(AuthenticatorActor.class);
         bindMessageQueueOfType(Object.class);
 
         bind(Authenticator.class).to(AuthenticatorController.class);
@@ -35,7 +35,7 @@ public class AuthenticatorModule extends ServiceModule {
     }
 
     @Provides
-    ServiceRunnable service(Service service, MessageReceiver<Object> toService) {
-        return new ServiceMessageLoop(service, toService);
+    ActorRunnable actor(Actor actor, MessageReceiver<Object> toActor) {
+        return new ActorMessageLoop(actor, toActor);
     }
 }

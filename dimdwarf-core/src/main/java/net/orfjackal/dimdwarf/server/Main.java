@@ -5,8 +5,8 @@
 package net.orfjackal.dimdwarf.server;
 
 import com.google.inject.*;
+import net.orfjackal.dimdwarf.actors.ActorStarter;
 import net.orfjackal.dimdwarf.modules.*;
-import net.orfjackal.dimdwarf.services.ServiceStarter;
 import net.orfjackal.dimdwarf.util.MavenUtil;
 import org.slf4j.*;
 
@@ -45,7 +45,7 @@ public class Main {
         Injector injector = Guice.createInjector(Stage.PRODUCTION, modules);
         logger.info("Modules loaded");
 
-        injector.getInstance(ServiceStarter.class).start();
+        injector.getInstance(ActorStarter.class).start();
         logger.info("Server started");
     }
 
@@ -56,7 +56,7 @@ public class Main {
 
     private static List<Module> configureServerModules(int port, String applicationDir) throws Exception {
         List<Module> modules = new ArrayList<Module>();
-        modules.add(new ServiceInstallerModule(
+        modules.add(new ActorInstallerModule(
                 new ControllerModule(),
                 new AuthenticatorModule(),
                 new NetworkModule(port)

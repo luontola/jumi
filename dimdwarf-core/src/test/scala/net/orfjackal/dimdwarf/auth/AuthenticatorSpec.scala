@@ -3,7 +3,7 @@ package net.orfjackal.dimdwarf.auth
 import org.junit.runner.RunWith
 import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.mq._
-import net.orfjackal.dimdwarf.services._
+import net.orfjackal.dimdwarf.actors._
 import org.mockito.Mockito._
 import org.junit.Assert._
 import org.hamcrest.CoreMatchers._
@@ -19,10 +19,10 @@ class AuthenticatorSpec extends Spec {
   when(credentialsChecker.isValid(invalidCredentials)).thenReturn(false)
 
   val toAuthenticator = new MessageQueue[Any]("toAuthenticator")
-  val authService = new AuthenticatorService(queues.toHub, credentialsChecker)
+  val authActor = new AuthenticatorActor(queues.toHub, credentialsChecker)
   val authController = new AuthenticatorController(toAuthenticator)
   queues.addController(authController)
-  queues.addService(authService, toAuthenticator)
+  queues.addActor(authActor, toAuthenticator)
 
   "Logging with valid credentials succeeds" >> {
     var response = "-"

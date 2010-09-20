@@ -2,7 +2,7 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.services;
+package net.orfjackal.dimdwarf.actors;
 
 import com.google.inject.*;
 import com.google.inject.name.*;
@@ -15,29 +15,29 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public abstract class ServiceModule extends PrivateModule {
+public abstract class ActorModule extends PrivateModule {
 
-    protected final String serviceName;
+    protected final String actorName;
 
     private final List<Key<ControllerRegistration>> controllers = new ArrayList<Key<ControllerRegistration>>();
-    private final List<Key<ServiceRegistration>> services = new ArrayList<Key<ServiceRegistration>>();
-    private final Class<? extends Annotation> serviceScope;
+    private final List<Key<ActorRegistration>> actors = new ArrayList<Key<ActorRegistration>>();
+    private final Class<? extends Annotation> actorScope;
 
-    public ServiceModule(String serviceName) {
-        this(serviceName, ServiceScoped.class);
+    public ActorModule(String actorName) {
+        this(actorName, ActorScoped.class);
     }
 
-    public ServiceModule(String serviceName, Class<? extends Annotation> serviceScope) {
-        this.serviceName = serviceName;
-        this.serviceScope = serviceScope;
+    public ActorModule(String actorName, Class<? extends Annotation> actorScope) {
+        this.actorName = actorName;
+        this.actorScope = actorScope;
     }
 
     public List<Key<ControllerRegistration>> getControllers() {
         return Collections.unmodifiableList(controllers);
     }
 
-    public List<Key<ServiceRegistration>> getServices() {
-        return Collections.unmodifiableList(services);
+    public List<Key<ActorRegistration>> getActors() {
+        return Collections.unmodifiableList(actors);
     }
 
     protected void bindControllerTo(Class<? extends Controller> controller) {
@@ -50,29 +50,29 @@ public abstract class ServiceModule extends PrivateModule {
         controllers.add(exposeUniqueKey(ControllerRegistration.class, controllerRegistrationProvider()));
     }
 
-    protected void bindServiceTo(Class<? extends Service> service) {
-        checkHasAnnotation(service, serviceScope);
+    protected void bindActorTo(Class<? extends Actor> actor) {
+        checkHasAnnotation(actor, actorScope);
 
-        bind(Service.class).to(service);
+        bind(Actor.class).to(actor);
 
-        services.add(exposeUniqueKey(ServiceRegistration.class, serviceRegistrationProvider()));
+        actors.add(exposeUniqueKey(ActorRegistration.class, actorRegistrationProvider()));
     }
 
     private Provider<ControllerRegistration> controllerRegistrationProvider() {
         final Provider<Controller> controller = getProvider(Controller.class);
         return new Provider<ControllerRegistration>() {
             public ControllerRegistration get() {
-                return new ControllerRegistration(serviceName, controller);
+                return new ControllerRegistration(actorName, controller);
             }
         };
     }
 
-    private Provider<ServiceRegistration> serviceRegistrationProvider() {
-        final Provider<Context> context = getProvider(Key.get(Context.class, serviceScope));
-        final Provider<ServiceRunnable> service = getProvider(ServiceRunnable.class);
-        return new Provider<ServiceRegistration>() {
-            public ServiceRegistration get() {
-                return new ServiceRegistration(serviceName, context, service);
+    private Provider<ActorRegistration> actorRegistrationProvider() {
+        final Provider<Context> context = getProvider(Key.get(Context.class, actorScope));
+        final Provider<ActorRunnable> actor = getProvider(ActorRunnable.class);
+        return new Provider<ActorRegistration>() {
+            public ActorRegistration get() {
+                return new ActorRegistration(actorName, context, actor);
             }
         };
     }
@@ -93,11 +93,11 @@ public abstract class ServiceModule extends PrivateModule {
     }
 
     private Named uniqueId() {
-        return Names.named(serviceName + "/" + UUID.randomUUID().toString());
+        return Names.named(actorName + "/" + UUID.randomUUID().toString());
     }
 
     protected void bindMessageQueueOfType(Type messageType) {
-        MessageQueue<?> mq = new MessageQueue<Object>(serviceName);
+        MessageQueue<?> mq = new MessageQueue<Object>(actorName);
         bind(messageSenderOf(messageType)).toInstance(mq);
         bind(messageReceiverOf(messageType)).toInstance(mq);
     }

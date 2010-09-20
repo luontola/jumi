@@ -6,34 +6,34 @@ package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
+import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.context.*;
 import net.orfjackal.dimdwarf.controller.*;
-import net.orfjackal.dimdwarf.services.*;
 
-public class ServiceInstallerModule extends AbstractModule {
+public class ActorInstallerModule extends AbstractModule {
 
-    private final ServiceModule[] serviceModules;
+    private final ActorModule[] actorModules;
 
-    public ServiceInstallerModule(ServiceModule... serviceModules) {
-        this.serviceModules = serviceModules;
+    public ActorInstallerModule(ActorModule... actorModules) {
+        this.actorModules = actorModules;
     }
 
     protected void configure() {
         bindScope(ControllerScoped.class, new ThreadScope(ControllerContext.class));
         bind(Context.class).annotatedWith(ControllerScoped.class).to(ControllerContext.class);
 
-        bindScope(ServiceScoped.class, new ThreadScope(ServiceContext.class));
-        bind(Context.class).annotatedWith(ServiceScoped.class).to(ServiceContext.class);
+        bindScope(ActorScoped.class, new ThreadScope(ActorContext.class));
+        bind(Context.class).annotatedWith(ActorScoped.class).to(ActorContext.class);
 
         Multibinder<ControllerRegistration> controllerBindings = Multibinder.newSetBinder(binder(), ControllerRegistration.class);
-        Multibinder<ServiceRegistration> serviceBindings = Multibinder.newSetBinder(binder(), ServiceRegistration.class);
-        for (ServiceModule module : serviceModules) {
+        Multibinder<ActorRegistration> actorBindings = Multibinder.newSetBinder(binder(), ActorRegistration.class);
+        for (ActorModule module : actorModules) {
             install(module);
             for (Key<ControllerRegistration> key : module.getControllers()) {
                 controllerBindings.addBinding().to(key);
             }
-            for (Key<ServiceRegistration> key : module.getServices()) {
-                serviceBindings.addBinding().to(key);
+            for (Key<ActorRegistration> key : module.getActors()) {
+                actorBindings.addBinding().to(key);
             }
         }
     }

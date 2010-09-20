@@ -2,7 +2,7 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.services;
+package net.orfjackal.dimdwarf.actors;
 
 import net.orfjackal.dimdwarf.context.*;
 
@@ -10,13 +10,13 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.CountDownLatch;
 
 @ThreadSafe
-public class ServiceRunner implements Runnable {
+public class ActorRunner implements Runnable {
 
-    private final ServiceRegistration service;
+    private final ActorRegistration actor;
     private final CountDownLatch started = new CountDownLatch(1);
 
-    public ServiceRunner(ServiceRegistration service) {
-        this.service = service;
+    public ActorRunner(ActorRegistration actor) {
+        this.actor = actor;
     }
 
     public void awaitStarted() throws InterruptedException {
@@ -24,13 +24,13 @@ public class ServiceRunner implements Runnable {
     }
 
     public void run() {
-        Context context = service.getContext().get();
+        Context context = actor.getContext().get();
         ThreadContext.runInContext(context, new Runnable() {
             public void run() {
-                ServiceRunnable sr = service.getService().get();
-                sr.start();
+                ActorRunnable r = actor.getActor().get();
+                r.start();
                 started.countDown();
-                sr.run();
+                r.run();
             }
         });
     }

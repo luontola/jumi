@@ -2,7 +2,7 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.services;
+package net.orfjackal.dimdwarf.actors;
 
 import com.google.inject.*;
 import net.orfjackal.dimdwarf.context.AbstractThreadContext;
@@ -10,10 +10,10 @@ import net.orfjackal.dimdwarf.context.AbstractThreadContext;
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
-public class ServiceContext extends AbstractThreadContext {
+public class ActorContext extends AbstractThreadContext {
 
     @Inject
-    public ServiceContext(Injector injector) {
+    public ActorContext(Injector injector) {
         super(injector);
     }
 }

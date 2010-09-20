@@ -3,10 +3,10 @@ package net.orfjackal.dimdwarf.auth
 import net.orfjackal.dimdwarf.mq.MessageSender
 import com.google.inject.Inject
 import net.orfjackal.dimdwarf.controller.Hub
-import net.orfjackal.dimdwarf.services._
+import net.orfjackal.dimdwarf.actors._
 
-@ServiceScoped
-class AuthenticatorService @Inject()(@Hub toHub: MessageSender[Any], credentialsChecker: CredentialsChecker[Credentials]) extends Service {
+@ActorScoped
+class AuthenticatorActor @Inject()(@Hub toHub: MessageSender[Any], credentialsChecker: CredentialsChecker[Credentials]) extends Actor {
   def start() {
   }
 
