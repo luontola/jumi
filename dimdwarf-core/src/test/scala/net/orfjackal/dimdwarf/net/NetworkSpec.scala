@@ -36,45 +36,44 @@ class NetworkSpec extends Spec {
   val USERNAME = "John Doe"
   val PASSWORD = "secret"
 
-  "When Client sends a login request" >> {
+  "When a client sends a login request" >> {
     clientSends(loginRequest(USERNAME, PASSWORD))
 
-    "Actor sends the login request to Controller" >> {
+    "NetworkActor sends the login request to NetworkController" >> {
       assertMessageSent(toController, LoginRequest(USERNAME, PASSWORD))
     }
-
-    "Controller authenticates the username and password with Authenticator" >> {
+    "NetworkController authenticates the username and password with Authenticator" >> {
       assertThat(authenticator.lastMethod, is("isUserAuthenticated"))
       assertThat(authenticator.lastCredentials, is(new PasswordCredentials(USERNAME, PASSWORD): Credentials))
     }
 
-    "When authentication succeeds" >> {
+    "If authentication succeeds" >> {
       authenticator.lastOnYes.apply()
       queues.processMessagesUntilIdle()
 
-      "Controller sends a success message to Actor" >> {
+      "NetworkController sends a success message to NetworkActor" >> {
         assertMessageSent(toNetwork, LoginSuccess())
       }
-      "Actor sends the success message to Client" >> {
+      "NetworkActor sends the success message to the client" >> {
         val reconnectionKey = new Array[Byte](0) // TODO: create a reconnectionKey
         assertClientReceived(loginSuccess(reconnectionKey))
       }
     }
 
-    "When authentication fails" >> {
+    "If authentication fails" >> {
       authenticator.lastOnNo.apply()
       queues.processMessagesUntilIdle()
 
-      "Controller sends a failure message to Actor" >> {
+      "NetworkController sends a failure message to NetworkActor" >> {
         assertMessageSent(toNetwork, LoginFailure())
       }
-      "Actor sends the failure message to Client" >> {
+      "NetworkActor sends the failure message to the client" >> {
         assertClientReceived(loginFailure(reason = ""))
       }
     }
   }
 
-  "When Client sends a logout request" >> {
+  "When a client sends a logout request" >> {
     //    queues.toHub.send(LoginRequest(USERNAME, PASSWORD))
     //    queues.processMessagesUntilIdle()
     //    assertThat(networkCtrl.loggedInClients)
@@ -82,16 +81,15 @@ class NetworkSpec extends Spec {
 
     clientSends(logoutRequest())
 
-    "Actor sends the logout request to Controller" >> {
+    "NetworkActor sends the logout request to NetworkController" >> {
       assertMessageSent(toController, LogoutRequest())
     }
+    "NetworkController logs out the client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
 
-    "Controller logs out the Client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
-
-    "Controller sends a logout message to Actor" >> {
+    "NetworkController sends a logout success message to NetworkActor" >> {
       assertMessageSent(toNetwork, LogoutSuccess())
     }
-    "Actor sends the logout message to Client" >> {
+    "NetworkActor sends the logout success message to the client" >> {
       assertClientReceived(logoutSuccess())
     }
   }
