@@ -23,25 +23,24 @@ class NetworkSpec extends Spec {
   queues.addActor(networkActor, toNetwork)
   val networkCtrl = new NetworkController(toNetwork, authenticator)
   queues.addController(networkCtrl)
+  val toController = queues.toHub
 
   networkActor.start()
   defer {networkActor.stop()}
 
   val client = new Socket("localhost", port)
   defer {client.close()}
-  val out = client.getOutputStream
-  val in = client.getInputStream
+  val clientToServer = client.getOutputStream
+  val clientFromServer = client.getInputStream
 
   val USERNAME = "John Doe"
   val PASSWORD = "secret"
 
   "When Client sends a login request" >> {
-    out.write(loginRequest(USERNAME, PASSWORD).array)
-    queues.waitForMessages()
-    queues.processMessagesUntilIdle()
+    clientSends(loginRequest(USERNAME, PASSWORD))
 
     "Actor sends the login request to Controller" >> {
-      assertThat(queues.seenIn(queues.toHub).head, is(LoginRequest(USERNAME, PASSWORD): Any))
+      assertMessageSent(toController, LoginRequest(USERNAME, PASSWORD))
     }
 
     "Controller authenticates the username and password with Authenticator" >> {
@@ -54,11 +53,11 @@ class NetworkSpec extends Spec {
       queues.processMessagesUntilIdle()
 
       "Controller sends a success message to Actor" >> {
-        assertThat(queues.seenIn(toNetwork).head, is(LoginSuccess(): Any))
+        assertMessageSent(toNetwork, LoginSuccess())
       }
       "Actor sends the success message to Client" >> {
         val reconnectionKey = new Array[Byte](0) // TODO: create a reconnectionKey
-        assertThat(nextMessage(in), is(loginSuccess(reconnectionKey)))
+        assertClientReceived(loginSuccess(reconnectionKey))
       }
     }
 
@@ -67,11 +66,10 @@ class NetworkSpec extends Spec {
       queues.processMessagesUntilIdle()
 
       "Controller sends a failure message to Actor" >> {
-        assertThat(queues.seenIn(toNetwork).head, is(LoginFailure(): Any))
+        assertMessageSent(toNetwork, LoginFailure())
       }
       "Actor sends the failure message to Client" >> {
-        val reason = ""
-        assertThat(nextMessage(in), is(loginFailure(reason)))
+        assertClientReceived(loginFailure(reason = ""))
       }
     }
   }
@@ -82,29 +80,41 @@ class NetworkSpec extends Spec {
     //    assertThat(networkCtrl.loggedInClients)
     // TODO: login the client
 
-    out.write(logoutRequest().array)
-    queues.waitForMessages()
-    queues.processMessagesUntilIdle()
+    clientSends(logoutRequest())
 
     "Actor sends the logout request to Controller" >> {
-      assertThat(queues.seenIn(queues.toHub).head, is(LogoutRequest(): Any))
+      assertMessageSent(toController, LogoutRequest())
     }
 
     "Controller logs out the Client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
 
     "Controller sends a logout message to Actor" >> {
-      assertThat(queues.seenIn(toNetwork).head, is(LogoutSuccess(): Any))
+      assertMessageSent(toNetwork, LogoutSuccess())
     }
     "Actor sends the logout message to Client" >> {
-      assertThat(nextMessageToClient(), is(logoutSuccess(): Any))
+      assertClientReceived(logoutSuccess())
     }
   }
 
   // TODO: when a client is not logged in, do not allow a logout request (or any other messages)
 
+  private def assertMessageSent(queue: MessageQueue[Any], expected: Any) {
+    assertThat(queues.seenIn(queue).head, is(expected))
+  }
+
+  private def clientSends(message: IoBuffer): Unit = {
+    clientToServer.write(message.array)
+    queues.waitForMessages()
+    queues.processMessagesUntilIdle()
+  }
+
+  private def assertClientReceived(expected: IoBuffer): Unit = {
+    assertThat(nextMessageToClient(), is(expected: Any))
+  }
+
   private def nextMessageToClient(): IoBuffer = {
     // TODO: write a utility class for asynchronous tests, which timeout when there is no event
-    nextMessage(in)
+    nextMessage(clientFromServer)
   }
 
   class SpyAuthenticator extends Authenticator {
