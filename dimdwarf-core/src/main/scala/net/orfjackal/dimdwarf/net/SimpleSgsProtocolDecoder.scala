@@ -23,6 +23,9 @@ class SimpleSgsProtocolDecoder extends CumulativeProtocolDecoder {
           val username = readString(in)
           val password = readString(in)
           LoginRequest(username, password)
+
+        case SimpleSgsProtocol.LOGOUT_REQUEST =>
+          LogoutRequest()
       }
 
       out.write(message)

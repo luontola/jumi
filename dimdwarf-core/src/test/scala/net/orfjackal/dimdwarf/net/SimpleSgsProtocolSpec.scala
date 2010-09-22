@@ -28,6 +28,14 @@ class SimpleSgsProtocolSpec extends Spec {
     verify(decoded).write(LoginRequest("username", "password"))
   }
 
+  "Decode LOGOUT_REQUEST" >> {
+    val in = logoutRequest()
+
+    decoder.decode(session, in, decoded)
+
+    verify(decoded).write(LogoutRequest())
+  }
+
   "Encode LOGIN_SUCCESS" >> {
     val message = LoginSuccess()
 
