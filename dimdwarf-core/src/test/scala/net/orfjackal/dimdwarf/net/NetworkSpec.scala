@@ -10,6 +10,7 @@ import java.net.Socket
 import SimpleSgsProtocolReferenceMessages._
 import net.orfjackal.dimdwarf.actors.DeterministicMessageQueues
 import net.orfjackal.dimdwarf.auth._
+import org.apache.mina.core.buffer.IoBuffer
 
 @RunWith(classOf[Specsy])
 class NetworkSpec extends Spec {
@@ -17,23 +18,24 @@ class NetworkSpec extends Spec {
   val port = SocketUtil.anyFreePort
   val authenticator = new SpyAuthenticator
 
-  val network = new NetworkActor(port, new SimpleSgsProtocolIoHandler(queues.toHub))
+  val networkActor = new NetworkActor(port, new SimpleSgsProtocolIoHandler(queues.toHub))
   val toNetwork = new MessageQueue[Any]("toNetwork")
-  queues.addActor(network, toNetwork)
+  queues.addActor(networkActor, toNetwork)
   val networkCtrl = new NetworkController(toNetwork, authenticator)
   queues.addController(networkCtrl)
 
-  network.start()
-  defer {network.stop()}
+  networkActor.start()
+  defer {networkActor.stop()}
+
+  val client = new Socket("localhost", port)
+  defer {client.close()}
+  val out = client.getOutputStream
+  val in = client.getInputStream
+
+  val USERNAME = "John Doe"
+  val PASSWORD = "secret"
 
   "When Client sends a login request" >> {
-    val client = new Socket("localhost", port)
-    defer {client.close()}
-    val out = client.getOutputStream
-    val in = client.getInputStream
-
-    val USERNAME = "John Doe"
-    val PASSWORD = "secret"
     out.write(loginRequest(USERNAME, PASSWORD).array)
     queues.waitForMessages()
     queues.processMessagesUntilIdle()
@@ -72,6 +74,37 @@ class NetworkSpec extends Spec {
         assertThat(nextMessage(in), is(loginFailure(reason)))
       }
     }
+  }
+
+  "When Client sends a logout request" >> {
+    //    queues.toHub.send(LoginRequest(USERNAME, PASSWORD))
+    //    queues.processMessagesUntilIdle()
+    //    assertThat(networkCtrl.loggedInClients)
+    // TODO: login the client
+
+    out.write(logoutRequest().array)
+    queues.waitForMessages()
+    queues.processMessagesUntilIdle()
+
+    "Actor sends the logout request to Controller" >> {
+      assertThat(queues.seenIn(queues.toHub).head, is(LogoutRequest(): Any))
+    }
+
+    "Controller logs out the Client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
+
+    "Controller sends a logout message to Actor" >> {
+      assertThat(queues.seenIn(toNetwork).head, is(LogoutSuccess(): Any))
+    }
+    "Actor sends the logout message to Client" >> {
+      assertThat(nextMessageToClient(), is(logoutSuccess(): Any))
+    }
+  }
+
+  // TODO: when a client is not logged in, do not allow a logout request (or any other messages)
+
+  private def nextMessageToClient(): IoBuffer = {
+    // TODO: write a utility class for asynchronous tests, which timeout when there is no event
+    nextMessage(in)
   }
 
   class SpyAuthenticator extends Authenticator {

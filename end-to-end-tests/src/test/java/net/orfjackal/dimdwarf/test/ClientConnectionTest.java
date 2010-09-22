@@ -30,7 +30,7 @@ public class ClientConnectionTest {
         client.failsToLogin();
     }
 
-    //@Test
+    @Test
     public void login_and_logout_successfully() throws Exception {
         server.startApplication(EchoApp.class);
 

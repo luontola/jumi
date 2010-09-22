@@ -48,6 +48,10 @@ object SimpleSgsProtocolReferenceMessages {
     asIoBuffer(Array[Byte](SimpleSgsProtocol.LOGOUT_REQUEST))
   }
 
+  def logoutSuccess(): IoBuffer = {
+    asIoBuffer(Array[Byte](SimpleSgsProtocol.LOGOUT_SUCCESS))
+  }
+
   private def asIoBuffer(bytes: Array[Byte]): IoBuffer = {
     IoBuffer.allocate(2 + bytes.length).
             putShort(bytes.length.asInstanceOf[Short]).
