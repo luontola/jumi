@@ -100,13 +100,13 @@ class NetworkSpec extends Spec {
     assertThat(queues.seenIn(queue).head, is(expected))
   }
 
-  private def clientSends(message: IoBuffer): Unit = {
+  private def clientSends(message: IoBuffer) {
     clientToServer.write(message.array)
     queues.waitForMessages()
     queues.processMessagesUntilIdle()
   }
 
-  private def assertClientReceived(expected: IoBuffer): Unit = {
+  private def assertClientReceived(expected: IoBuffer) {
     assertThat(nextMessageToClient(), is(expected: Any))
   }
 
