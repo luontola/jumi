@@ -42,7 +42,7 @@ class NetworkSpec extends Spec {
     "NetworkActor sends the login request to NetworkController" >> {
       assertMessageSent(toController, LoginRequest(USERNAME, PASSWORD))
     }
-    "NetworkController authenticates the username and password with Authenticator" >> {
+    "and NetworkController authenticates the username and password with Authenticator" >> {
       assertThat(authenticator.lastMethod, is("isUserAuthenticated"))
       assertThat(authenticator.lastCredentials, is(new PasswordCredentials(USERNAME, PASSWORD): Credentials))
     }
@@ -54,7 +54,7 @@ class NetworkSpec extends Spec {
       "NetworkController sends a success message to NetworkActor" >> {
         assertMessageSent(toNetwork, LoginSuccess())
       }
-      "NetworkActor sends the success message to the client" >> {
+      "after which NetworkActor forwards the success message to the client" >> {
         val reconnectionKey = new Array[Byte](0) // TODO: create a reconnectionKey
         assertClientReceived(loginSuccess(reconnectionKey))
       }
@@ -67,7 +67,7 @@ class NetworkSpec extends Spec {
       "NetworkController sends a failure message to NetworkActor" >> {
         assertMessageSent(toNetwork, LoginFailure())
       }
-      "NetworkActor sends the failure message to the client" >> {
+      "after which NetworkActor forwards the failure message to the client" >> {
         assertClientReceived(loginFailure(reason = ""))
       }
     }
@@ -84,12 +84,12 @@ class NetworkSpec extends Spec {
     "NetworkActor sends the logout request to NetworkController" >> {
       assertMessageSent(toController, LogoutRequest())
     }
-    "NetworkController logs out the client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
+    "and NetworkController logs out the client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
 
-    "NetworkController sends a logout success message to NetworkActor" >> {
+    "after which NetworkController sends a logout success message to NetworkActor" >> {
       assertMessageSent(toNetwork, LogoutSuccess())
     }
-    "NetworkActor sends the logout success message to the client" >> {
+    "after which NetworkActor forwards the logout success message to the client" >> {
       assertClientReceived(logoutSuccess())
     }
   }
