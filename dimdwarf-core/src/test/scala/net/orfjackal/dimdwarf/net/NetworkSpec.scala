@@ -14,6 +14,8 @@ import org.apache.mina.core.buffer.IoBuffer
 
 @RunWith(classOf[Specsy])
 class NetworkSpec extends Spec {
+  // TODO: split test class: session management logic vs. MINA integration
+
   val queues = new DeterministicMessageQueues
   val port = SocketUtil.anyFreePort
   val authenticator = new SpyAuthenticator

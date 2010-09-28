@@ -59,7 +59,7 @@ public class AsynchronouslyMatchingOneMessageTest {
         t.start();
     }
 
-    // TODO: exception messages
+    // TODO: exception messages (testable with org.junit.rules.ExpectedException)
     // TODO: use case: reading a network socket
     // TODO: (use case: multiple events, wait until one of them matches)
 }
