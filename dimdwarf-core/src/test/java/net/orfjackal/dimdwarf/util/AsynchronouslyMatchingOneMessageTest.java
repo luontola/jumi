@@ -6,9 +6,8 @@ package net.orfjackal.dimdwarf.util;
 
 import org.junit.Test;
 
-import static net.orfjackal.dimdwarf.util.CustomMatchers.eventuallyFirstEvent;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static net.orfjackal.dimdwarf.util.CustomMatchers.*;
+import static org.hamcrest.Matchers.is;
 
 public class AsynchronouslyMatchingOneMessageTest {
 
@@ -21,7 +20,7 @@ public class AsynchronouslyMatchingOneMessageTest {
 
         events.update("event");
 
-        assertThat(events, eventuallyFirstEvent(is("event")));
+        assertEventually(events, firstEvent(is("event")));
     }
 
     @Test
@@ -34,7 +33,7 @@ public class AsynchronouslyMatchingOneMessageTest {
             }
         });
 
-        assertThat(events, eventuallyFirstEvent(is("event")));
+        assertEventually(events, firstEvent(is("event")));
     }
 
     @Test(expected = AssertionError.class)
@@ -43,14 +42,14 @@ public class AsynchronouslyMatchingOneMessageTest {
 
         events.update("non matching event");
 
-        assertThat(events, eventuallyFirstEvent(is("event")));
+        assertEventually(events, firstEvent(is("event")));
     }
 
     @Test(expected = AssertionError.class)
     public void fails_due_to_timeout_when_there_are_no_events() throws InterruptedException {
         EventSink<String> events = new EventSink<String>(SHORT_TIMEOUT);
 
-        assertThat(events, eventuallyFirstEvent(is("event")));
+        assertEventually(events, firstEvent(is("event")));
     }
 
     private static void runAsynchronously(Runnable target) {

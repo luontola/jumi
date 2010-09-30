@@ -21,7 +21,7 @@ public class EventSink<T> implements SelfDescribing {
         events.add(event);
     }
 
-    public boolean firstEventMatches(Matcher<T> matcher) throws InterruptedException {
+    public boolean firstEventMatches(Matcher<?> matcher) throws InterruptedException {
         Object first = events.poll(timeout, TimeUnit.MILLISECONDS);
         return matcher.matches(first);
     }

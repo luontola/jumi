@@ -6,24 +6,18 @@ package net.orfjackal.dimdwarf.util;
 
 import org.hamcrest.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class CustomMatchers {
 
-    public static <T> Matcher<T> instanceOf(final Class<?> expected) {
-        return new TypeSafeMatcher<T>() {
-            public boolean matchesSafely(T item) {
-                return expected.isInstance(item);
-            }
-
-            public void describeTo(Description description) {
-                description.appendText("an instance of ").appendText(expected.getName());
-            }
-        };
+    public static <T> void assertEventually(EventSink<T> events, Matcher<? super EventSink<T>> matcher) {
+        assertThat(events, matcher);
     }
 
-    public static <T> Matcher<EventSink<T>> eventuallyFirstEvent(final Matcher<T> matcher) {
-        return new TypeSafeMatcher<EventSink<T>>() {
+    public static <T> Matcher<EventSink<? super T>> firstEvent(final Matcher<? super T> matcher) {
+        return new TypeSafeMatcher<EventSink<? super T>>() {
 
-            public boolean matchesSafely(EventSink<T> item) {
+            protected boolean matchesSafely(EventSink<? super T> item) {
                 try {
                     return item.firstEventMatches(matcher);
                 } catch (InterruptedException e) {

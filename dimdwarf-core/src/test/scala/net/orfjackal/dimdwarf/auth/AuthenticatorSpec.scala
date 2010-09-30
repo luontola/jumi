@@ -5,8 +5,8 @@ import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.mq._
 import net.orfjackal.dimdwarf.actors._
 import org.mockito.Mockito._
-import org.junit.Assert._
-import org.hamcrest.CoreMatchers._
+import org.hamcrest.Matchers._
+import org.hamcrest.MatcherAssert.assertThat
 
 @RunWith(classOf[Specsy])
 class AuthenticatorSpec extends Spec {

@@ -1,8 +1,8 @@
 package net.orfjackal.dimdwarf.net
 
 import org.junit.runner.RunWith
-import org.junit.Assert._
-import org.hamcrest.CoreMatchers._
+import org.hamcrest.Matchers._
+import org.hamcrest.MatcherAssert.assertThat
 import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.util.SocketUtil
 import net.orfjackal.dimdwarf.mq.MessageQueue

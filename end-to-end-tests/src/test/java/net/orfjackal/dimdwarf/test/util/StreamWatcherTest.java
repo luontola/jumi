@@ -9,8 +9,9 @@ import org.junit.*;
 import java.io.*;
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 public class StreamWatcherTest {
 

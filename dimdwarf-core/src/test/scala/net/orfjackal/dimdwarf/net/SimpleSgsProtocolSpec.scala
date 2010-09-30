@@ -1,7 +1,7 @@
 package net.orfjackal.dimdwarf.net
 
-import org.junit.Assert._
-import org.hamcrest.CoreMatchers._
+import org.hamcrest.Matchers._
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
 import net.orfjackal.specsy._
 import org.apache.mina.core.session._
