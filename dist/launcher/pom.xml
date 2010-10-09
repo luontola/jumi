@@ -27,7 +27,6 @@
 
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3</version>
                 <configuration>
                     <archive>
                         <manifest>
