@@ -174,22 +174,22 @@
             <dependency>
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-aop</artifactId>
-                <version>${version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-api</artifactId>
-                <version>${version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-api-internal</artifactId>
-                <version>${version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-core</artifactId>
-                <version>${version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- Scala -->
@@ -335,6 +335,7 @@
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -344,7 +345,7 @@
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
-                <version>2.14</version>
+                <version>2.14.1</version>
                 <configuration>
                     <jvmArgs>
                         <jvmArg>-Xmx512m</jvmArg>
@@ -371,6 +372,7 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <includes>
                         <include>**/*Spec.class</include>
@@ -395,6 +397,7 @@
 
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

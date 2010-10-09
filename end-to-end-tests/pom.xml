@@ -17,7 +17,7 @@
 
     <properties>
         <test.sandbox>${project.build.directory}/test-deploy</test.sandbox>
-        <test.serverHome>${test.sandbox}/dimdwarf-${version}</test.serverHome>
+        <test.serverHome>${test.sandbox}/dimdwarf-${project.version}</test.serverHome>
         <test.applicationBaseJar>${project.build.directory}/${project.build.finalName}.jar</test.applicationBaseJar>
     </properties>
 
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.orfjackal.dimdwarf.dist</groupId>
             <artifactId>dimdwarf-dist</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
             <scope>test</scope>
         </dependency>
@@ -100,7 +100,7 @@
                 <version>2.5</version>
                 <configuration>
                     <includes>
-                        <include>**/*Test.java</include>
+                        <include>**/*Test.class</include>
                     </includes>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>

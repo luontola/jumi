@@ -29,15 +29,15 @@
         <!-- Distribution executables -->
 
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>launcher</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>agent</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -57,7 +57,7 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>dimdwarf-${version}</finalName>
+                    <finalName>dimdwarf-${project.version}</finalName>
                     <descriptors>
                         <descriptor>src/main/assembly/dist.xml</descriptor>
                     </descriptors>
