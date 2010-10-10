@@ -90,6 +90,7 @@ public class ServerRunner {
     }
 
     private void waitForServerToStart() throws InterruptedException {
+        // TODO: add management hooks for monitoring server state (program arguments: --management-port, --client-port)
         serverProcess.waitForOutput("Server started", TIMEOUT, TIMEOUT_UNIT);
     }
 
