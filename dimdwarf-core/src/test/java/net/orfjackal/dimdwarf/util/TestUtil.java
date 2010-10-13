@@ -25,4 +25,10 @@ public class TestUtil {
         in.close();
         return obj;
     }
+
+    public static void runAsynchronously(Runnable target) {
+        Thread t = new Thread(target);
+        t.setDaemon(true);
+        t.start();
+    }
 }

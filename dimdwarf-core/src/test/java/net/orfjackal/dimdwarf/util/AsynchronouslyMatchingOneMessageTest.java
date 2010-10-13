@@ -7,16 +7,17 @@ package net.orfjackal.dimdwarf.util;
 import org.junit.Test;
 
 import static net.orfjackal.dimdwarf.util.CustomMatchers.*;
+import static net.orfjackal.dimdwarf.util.TestUtil.runAsynchronously;
 import static org.hamcrest.Matchers.is;
 
 public class AsynchronouslyMatchingOneMessageTest {
 
-    public static final long LONG_TIMEOUT = 100;
-    public static final long SHORT_TIMEOUT = 1;
+    public static final long TIMEOUT_NOT_REACHED = 100;
+    public static final long TIMEOUT_IS_REACHED = 1;
 
     @Test
     public void passes_when_a_matching_event_has_already_arrived() throws InterruptedException {
-        EventSink<String> events = new EventSink<String>(LONG_TIMEOUT);
+        EventSink<String> events = new EventSink<String>(TIMEOUT_NOT_REACHED);
 
         events.update("event");
 
@@ -25,7 +26,7 @@ public class AsynchronouslyMatchingOneMessageTest {
 
     @Test
     public void passes_when_a_matching_event_arrives_asynchronously() throws InterruptedException {
-        final EventSink<String> events = new EventSink<String>(LONG_TIMEOUT);
+        final EventSink<String> events = new EventSink<String>(TIMEOUT_NOT_REACHED);
 
         runAsynchronously(new Runnable() {
             public void run() {
@@ -38,7 +39,7 @@ public class AsynchronouslyMatchingOneMessageTest {
 
     @Test(expected = AssertionError.class)
     public void fails_when_there_is_a_non_matching_event() throws Throwable {
-        EventSink<String> events = new EventSink<String>(SHORT_TIMEOUT);
+        EventSink<String> events = new EventSink<String>(TIMEOUT_NOT_REACHED);
 
         events.update("non matching event");
 
@@ -47,15 +48,9 @@ public class AsynchronouslyMatchingOneMessageTest {
 
     @Test(expected = AssertionError.class)
     public void fails_due_to_timeout_when_there_are_no_events() throws InterruptedException {
-        EventSink<String> events = new EventSink<String>(SHORT_TIMEOUT);
+        EventSink<String> events = new EventSink<String>(TIMEOUT_IS_REACHED);
 
         assertEventually(events, firstEvent(is("event")));
-    }
-
-    private static void runAsynchronously(Runnable target) {
-        Thread t = new Thread(target);
-        t.setDaemon(true);
-        t.start();
     }
 
     // TODO: exception messages (testable with org.junit.rules.ExpectedException)
