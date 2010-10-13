@@ -19,7 +19,7 @@ public class AsynchronouslyMatchingOneMessageTest {
     public void passes_when_a_matching_event_has_already_arrived() throws InterruptedException {
         EventSink<String> events = new EventSink<String>(TIMEOUT_NOT_REACHED);
 
-        events.update("event");
+        events.append("event");
 
         assertEventually(events, firstEvent(is("event")));
     }
@@ -30,7 +30,7 @@ public class AsynchronouslyMatchingOneMessageTest {
 
         runAsynchronously(new Runnable() {
             public void run() {
-                events.update("event");
+                events.append("event");
             }
         });
 
@@ -41,7 +41,7 @@ public class AsynchronouslyMatchingOneMessageTest {
     public void fails_when_there_is_a_non_matching_event() throws Throwable {
         EventSink<String> events = new EventSink<String>(TIMEOUT_NOT_REACHED);
 
-        events.update("non matching event");
+        events.append("non matching event");
 
         assertEventually(events, firstEvent(is("event")));
     }

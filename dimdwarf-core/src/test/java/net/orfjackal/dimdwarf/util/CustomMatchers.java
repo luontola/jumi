@@ -8,6 +8,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.hamcrest.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class CustomMatchers {
 
@@ -23,11 +24,7 @@ public class CustomMatchers {
         return new TypeSafeMatcher<EventSink<? super T>>() {
 
             protected boolean matchesSafely(EventSink<? super T> item) {
-                try {
-                    return item.firstEventMatches(matcher);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                return item.matches(matcher);
             }
 
             public void describeTo(Description description) {
@@ -39,10 +36,11 @@ public class CustomMatchers {
     public static Matcher<ByteSink> startsWithBytes(final IoBuffer expected) {
         return new TypeSafeMatcher<ByteSink>() {
             protected boolean matchesSafely(ByteSink item) {
-                return item.startsWithBytes(expected);
+                return item.matches(is(expected));
             }
 
             public void describeTo(Description description) {
+                // TODO
             }
         };
     }

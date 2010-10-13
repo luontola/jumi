@@ -5,19 +5,27 @@
 package net.orfjackal.dimdwarf.util;
 
 public class Timeout {
+
     private final long endOfTimeout;
 
     public Timeout(long timeout) {
         endOfTimeout = System.currentTimeMillis() + timeout;
     }
 
-    public boolean hasNotTimedOut() {
-        return System.currentTimeMillis() <= endOfTimeout;
+    public boolean hasTimedOut() {
+        return millisUntilTimeout() <= 0;
     }
 
-    public void waitUntilTimeout(Object lock) throws InterruptedException {
-        long untilEnd = endOfTimeout - System.currentTimeMillis();
-        lock.wait(nonZero(untilEnd));
+    public void waitUntilTimeout(Object notification) {
+        try {
+            notification.wait(nonZero(millisUntilTimeout()));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private long millisUntilTimeout() {
+        return endOfTimeout - System.currentTimeMillis();
     }
 
     private static long nonZero(long i) {

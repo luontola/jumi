@@ -8,31 +8,30 @@ import org.hamcrest.*;
 
 import java.util.concurrent.*;
 
-public class EventSink<T> implements SelfDescribing {
+public class EventSink<T> extends AbstractSink<T> {
+
+    // TODO: could be replaced with a non-synchronized collection
     private final BlockingQueue<T> events = new LinkedBlockingQueue<T>();
 
-    private final long timeout;
-
     public EventSink(long timeout) {
-        this.timeout = timeout;
+        super(timeout);
     }
 
-    public void update(T event) {
+    protected void doAppend(T event) {
         events.add(event);
     }
 
-    public boolean firstEventMatches(Matcher<?> matcher) throws InterruptedException {
-        Object first = events.poll(timeout, TimeUnit.MILLISECONDS);
+    protected boolean doMatch(Matcher<?> matcher) {
+        if (events.isEmpty()) {
+            return false;
+        }
+        Object first = events.peek();
         return matcher.matches(first);
     }
 
     public String toString() {
         StringDescription desc = new StringDescription();
-        describeTo(desc);
+        desc.appendText("received events ").appendValue(events);
         return desc.toString();
-    }
-
-    public void describeTo(Description description) {
-        description.appendText("received events ").appendValue(events);
     }
 }

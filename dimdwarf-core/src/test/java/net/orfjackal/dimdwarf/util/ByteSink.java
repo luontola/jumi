@@ -5,46 +5,26 @@
 package net.orfjackal.dimdwarf.util;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.hamcrest.Matcher;
 
-public class ByteSink {
+public class ByteSink extends AbstractSink<IoBuffer> {
 
     private final IoBuffer sink = IoBuffer.allocate(100).setAutoExpand(true);
-    private final long timeout;
 
     public ByteSink(long timeout) {
-        this.timeout = timeout;
+        super(timeout);
     }
 
-    public void append(IoBuffer bytes) {
-        synchronized (sink) {
-            sink.put(bytes.duplicate());
-            sink.notifyAll();
-        }
+    protected void doAppend(IoBuffer bytes) {
+        sink.put(bytes.duplicate());
     }
 
-    public boolean startsWithBytes(IoBuffer expected) {
-        Timeout timeout = new Timeout(this.timeout);
-
-        synchronized (sink) {
-            waitForDataOrTimeout(expected, timeout);
-            IoBuffer actual = sink.duplicate().flip();
-            return actual.equals(expected);
-        }
+    protected boolean doMatch(Matcher<?> matcher) {
+        IoBuffer actual = sink.duplicate().flip();
+        return matcher.matches(actual);
     }
-
-    private void waitForDataOrTimeout(IoBuffer expected, Timeout timeout) {
-        try {
-            while (sink.position() < expected.limit() && timeout.hasNotTimedOut()) {
-                timeout.waitUntilTimeout(sink);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public String toString() {
         return sink.toString();
     }
-
 }
