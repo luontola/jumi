@@ -111,12 +111,14 @@
             <artifactId>jdave-junit4</artifactId>
             <version>1.1</version>
             <scope>test</scope>
+            <!-- JDave cannot work without cglib-nodep, because JDave depends on CGLIB's embedded ASM library (net.sf.cglib.asm)
             <exclusions>
                 <exclusion>
                     <groupId>cglib</groupId>
                     <artifactId>cglib-nodep</artifactId>
                 </exclusion>
             </exclusions>
+            -->
         </dependency>
 
         <dependency>
@@ -162,6 +164,7 @@
             <artifactId>easymock</artifactId>
             <version>3.0</version>
             <scope>test</scope>
+            <!-- cglib-nodep duplicates cglib -->
             <exclusions>
                 <exclusion>
                     <groupId>cglib</groupId>
