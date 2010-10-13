@@ -93,7 +93,7 @@
         <!-- Testing -->
 
         <dependency>
-            <!-- Must be declared before JUnit to be in the classpath before JUnit's embedded Hamcrest 1.1 -->
+            <!-- Must be declared before JUnit to use hamcrest-core 1.2 instead of the 1.1 which junit-dep depends on -->
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>
             <version>1.2</version>
@@ -102,8 +102,8 @@
 
         <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <artifactId>junit-dep</artifactId>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -111,12 +111,6 @@
             <artifactId>jdave-junit4</artifactId>
             <version>1.1</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit-dep</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
