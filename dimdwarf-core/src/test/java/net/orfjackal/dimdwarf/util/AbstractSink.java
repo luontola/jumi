@@ -6,6 +6,7 @@ package net.orfjackal.dimdwarf.util;
 
 import org.hamcrest.Matcher;
 
+// TODO: implement SelfDescribing here instead of the subclasses?
 public abstract class AbstractSink<T> {
 
     private final Object lock = new Object();
@@ -28,7 +29,7 @@ public abstract class AbstractSink<T> {
         Timeout timeout = new Timeout(this.timeout);
 
         synchronized (lock) {
-            while (!doMatch(matcher)) {
+            while (!matcher.matches(getContent())) {
                 if (timeout.hasTimedOut()) {
                     return false;
                 }
@@ -38,6 +39,5 @@ public abstract class AbstractSink<T> {
         }
     }
 
-    // TODO: change type to Matcher<T>
-    protected abstract boolean doMatch(Matcher<?> matcher);
+    protected abstract T getContent();
 }

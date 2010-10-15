@@ -19,16 +19,12 @@ public class ByteSink extends AbstractSink<IoBuffer> implements SelfDescribing {
         sink.put(bytes.duplicate());
     }
 
-    protected boolean doMatch(Matcher<?> matcher) {
-        return matcher.matches(receivedThisFar());
-    }
-
-    private IoBuffer receivedThisFar() {
+    protected IoBuffer getContent() {
         return sink.duplicate().flip();
     }
 
     public void describeTo(Description description) {
-        IoBuffer buf = receivedThisFar();
+        IoBuffer buf = getContent();
         description
                 .appendText(buf.remaining() + " bytes: ")
                 .appendText(buf.getHexDump());

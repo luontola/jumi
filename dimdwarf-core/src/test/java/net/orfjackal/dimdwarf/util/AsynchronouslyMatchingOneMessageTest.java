@@ -7,6 +7,8 @@ package net.orfjackal.dimdwarf.util;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
+
 import static net.orfjackal.dimdwarf.util.CustomMatchers.*;
 import static net.orfjackal.dimdwarf.util.TestUtil.runAsynchronously;
 import static org.hamcrest.Matchers.is;
@@ -23,7 +25,7 @@ public class AsynchronouslyMatchingOneMessageTest {
     public void passes_when_a_matching_event_has_already_arrived() throws InterruptedException {
         EventSink<String> events = new EventSink<String>(TIMEOUT_NEVER_REACHED);
 
-        events.append("event");
+        events.append(Arrays.asList("event"));
 
         assertEventually(events, firstEvent(is("event")));
     }
@@ -34,7 +36,7 @@ public class AsynchronouslyMatchingOneMessageTest {
 
         runAsynchronously(new Runnable() {
             public void run() {
-                events.append("event");
+                events.append(Arrays.asList("event"));
             }
         });
 
@@ -45,7 +47,7 @@ public class AsynchronouslyMatchingOneMessageTest {
     public void fails_when_there_is_a_non_matching_event() throws Throwable {
         EventSink<String> events = new EventSink<String>(TIMEOUT_NEVER_REACHED);
 
-        events.append("non matching event");
+        events.append(Arrays.asList("non matching event"));
 
         thrown.expect(AssertionError.class);
         thrown.expectMessage("\"event\"");                  // expected
