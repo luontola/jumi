@@ -38,5 +38,6 @@ public abstract class AbstractSink<T> {
         }
     }
 
+    // TODO: change type to Matcher<T>
     protected abstract boolean doMatch(Matcher<?> matcher);
 }

@@ -8,6 +8,7 @@ import org.hamcrest.*;
 
 import java.util.*;
 
+// TODO: change type to AbstractSink<List<T>>
 public class EventSink<T> extends AbstractSink<T> implements SelfDescribing {
 
     private final List<T> events = new ArrayList<T>();
@@ -21,12 +22,7 @@ public class EventSink<T> extends AbstractSink<T> implements SelfDescribing {
     }
 
     protected boolean doMatch(Matcher<?> matcher) {
-        // TODO: move this code inside the matcher
-        if (events.isEmpty()) {
-            return false;
-        }
-        Object first = events.get(0);
-        return matcher.matches(first);
+        return matcher.matches(events);
     }
 
     public void describeTo(Description description) {

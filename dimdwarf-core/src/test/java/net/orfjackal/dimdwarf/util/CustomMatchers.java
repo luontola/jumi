@@ -6,7 +6,7 @@ package net.orfjackal.dimdwarf.util;
 
 import net.orfjackal.dimdwarf.util.matchers.*;
 import org.apache.mina.core.buffer.IoBuffer;
-import org.hamcrest.*;
+import org.hamcrest.Matcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -21,29 +21,10 @@ public class CustomMatchers {
     }
 
     public static <T> Matcher<EventSink<? super T>> firstEvent(final Matcher<? super T> matcher) {
-        return new TypeSafeMatcher<EventSink<? super T>>() {
-
-            protected boolean matchesSafely(EventSink<? super T> item) {
-                return item.matches(matcher);
-            }
-
-            public void describeTo(Description description) {
-                description
-                        .appendText("first event ")
-                        .appendDescriptionOf(matcher);
-            }
-
-            protected void describeMismatchSafely(EventSink<? super T> item, Description mismatchDescription) {
-                mismatchDescription
-                        .appendText("received ")
-                        .appendDescriptionOf(item);
-            }
-        };
+        return new EventSinkContentMatcher<T>(new ListStartsWithElementMatcher(matcher));
     }
 
     public static Matcher<ByteSink> startsWithBytes(final IoBuffer expected) {
         return new ByteSinkContentMatcher(new IoBufferStartsWithBytesMatcher(expected));
     }
-
-    // TODO: move inner classes to upper level
 }
