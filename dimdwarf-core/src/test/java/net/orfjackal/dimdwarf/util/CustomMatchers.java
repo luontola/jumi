@@ -28,7 +28,15 @@ public class CustomMatchers {
             }
 
             public void describeTo(Description description) {
-                // TODO
+                description
+                        .appendText("first event ")
+                        .appendDescriptionOf(matcher);
+            }
+
+            protected void describeMismatchSafely(EventSink<? super T> item, Description mismatchDescription) {
+                mismatchDescription
+                        .appendText("received ")
+                        .appendDescriptionOf(item);
             }
         };
     }
@@ -40,8 +48,19 @@ public class CustomMatchers {
             }
 
             public void describeTo(Description description) {
-                // TODO
+                description
+                        .appendText("starts with " + expected.remaining() + " bytes: ")
+                        .appendText(expected.getHexDump());
+
+            }
+
+            protected void describeMismatchSafely(ByteSink item, Description mismatchDescription) {
+                mismatchDescription
+                        .appendText("received ")
+                        .appendDescriptionOf(item);
             }
         };
     }
+
+    // TODO: move inner classes to upper level
 }

@@ -6,12 +6,11 @@ package net.orfjackal.dimdwarf.util;
 
 import org.hamcrest.*;
 
-import java.util.concurrent.*;
+import java.util.*;
 
-public class EventSink<T> extends AbstractSink<T> {
+public class EventSink<T> extends AbstractSink<T> implements SelfDescribing {
 
-    // TODO: could be replaced with a non-synchronized collection
-    private final BlockingQueue<T> events = new LinkedBlockingQueue<T>();
+    private final List<T> events = new ArrayList<T>();
 
     public EventSink(long timeout) {
         super(timeout);
@@ -22,16 +21,17 @@ public class EventSink<T> extends AbstractSink<T> {
     }
 
     protected boolean doMatch(Matcher<?> matcher) {
+        // TODO: move this code inside the matcher
         if (events.isEmpty()) {
             return false;
         }
-        Object first = events.peek();
+        Object first = events.get(0);
         return matcher.matches(first);
     }
 
-    public String toString() {
-        StringDescription desc = new StringDescription();
-        desc.appendText("received events ").appendValue(events);
-        return desc.toString();
+    public void describeTo(Description description) {
+        description
+                .appendText("events ")
+                .appendValueList("[", ", ", "]", events);
     }
 }

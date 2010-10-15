@@ -5,9 +5,9 @@
 package net.orfjackal.dimdwarf.util;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.hamcrest.Matcher;
+import org.hamcrest.*;
 
-public class ByteSink extends AbstractSink<IoBuffer> {
+public class ByteSink extends AbstractSink<IoBuffer> implements SelfDescribing {
 
     private final IoBuffer sink = IoBuffer.allocate(100).setAutoExpand(true);
 
@@ -26,5 +26,12 @@ public class ByteSink extends AbstractSink<IoBuffer> {
 
     public String toString() {
         return sink.toString();
+    }
+
+    public void describeTo(Description description) {
+        IoBuffer actual = sink.duplicate().flip();
+        description
+                .appendText(actual.remaining() + " bytes: ")
+                .appendText(actual.getHexDump());
     }
 }
