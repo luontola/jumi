@@ -44,6 +44,16 @@ public class AsynchronouslyMatchingBytesFromInputStreamTest {
     }
 
     @Test
+    public void passes_when_expected_bytes_and_some_more_bytes_arrive() {
+        ByteSink sink = new ByteSink(TIMEOUT_NEVER_REACHED);
+
+        sink.append(IoBuffer.wrap(new byte[]{0x01, 0x02, 0x03}));
+        sink.append(IoBuffer.wrap(new byte[]{0x04, 0x05}));
+
+        assertEventually(sink, startsWithBytes(IoBuffer.wrap(new byte[]{0x01, 0x02, 0x03})));
+    }
+
+    @Test
     public void fails_when_different_bytes_have_arrived() {
         ByteSink sink = new ByteSink(TIMEOUT_NEVER_REACHED);
 
@@ -76,6 +86,4 @@ public class AsynchronouslyMatchingBytesFromInputStreamTest {
         thrown.expectMessage("2 bytes: 01 02");     // actual
         assertEventually(sink, startsWithBytes(IoBuffer.wrap(new byte[]{0x01, 0x02, 0x03})));
     }
-
-    // TODO: receive more data than what is checked 
 }
