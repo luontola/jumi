@@ -24,7 +24,7 @@
     <orderEntry type="library" name="Maven: com.google.inject:guice:2.0" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.inject.extensions:guice-multibindings:2.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.mina:mina-core:2.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.mina:mina-core:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.reddwarfserver.server:sgs-shared:1.12" level="project" />
     <orderEntry type="library" name="Maven: cglib:cglib:2.2" level="project" />
@@ -34,8 +34,8 @@
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
     <orderEntry type="module" module-name="launcher" />
     <orderEntry type="module" module-name="agent" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:0.9.24" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:0.9.24" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:0.9.26" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:0.9.26" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-jdk14:1.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-library:1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.2" level="project" />
