@@ -15,18 +15,19 @@ public class ByteSink extends AsynchronousSink<IoBuffer> implements SelfDescribi
         super(timeout);
     }
 
-    protected void doAppend(IoBuffer bytes) {
-        sink.put(bytes.duplicate());
+    public synchronized void append(IoBuffer event) {
+        sink.put(event.duplicate());
+        notifyAll();
     }
 
-    protected IoBuffer getContent() {
+    public synchronized IoBuffer getContent() {
         return sink.duplicate().flip();
     }
 
     public void describeTo(Description description) {
         IoBuffer buf = getContent();
         description
-                .appendText(buf.remaining() + " bytes: ")
+                .appendText("had " + buf.remaining() + " bytes: ")
                 .appendText(buf.getHexDump());
     }
 }

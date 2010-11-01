@@ -16,11 +16,12 @@ public class EventSink<T> extends AsynchronousSink<List<T>> implements SelfDescr
         super(timeout);
     }
 
-    protected void doAppend(List<T> event) {
+    public synchronized void append(List<T> event) {
         events.addAll(event);
+        notifyAll();
     }
 
-    protected List<T> getContent() {
+    public synchronized List<T> getContent() {
         return events;
     }
 

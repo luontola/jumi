@@ -11,7 +11,7 @@ import org.junit.rules.ExpectedException;
 import static net.orfjackal.dimdwarf.util.CustomMatchers.*;
 import static net.orfjackal.dimdwarf.util.TestUtil.runAsynchronously;
 
-public class AsynchronouslyMatchingBytesFromInputStreamTest {
+public class AsynchronouslyMatchingByteStreamsTest {
 
     public static final long TIMEOUT_NEVER_REACHED = 100;
     public static final long TIMEOUT_IS_REACHED = 1;

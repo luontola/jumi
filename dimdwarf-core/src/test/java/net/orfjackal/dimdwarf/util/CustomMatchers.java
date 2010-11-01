@@ -10,10 +10,28 @@ import org.hamcrest.Matcher;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class CustomMatchers {
 
-    public static <T> void assertEventually(AsynchronousSink<T> sink, Matcher<?> matcher) {
-        sink.assertEventually(matcher);
+    @SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter"})
+    public static void assertEventually(AsynchronousSink<?> sink, Matcher<?> matcher) {
+        synchronized (sink) {
+            Timeout timeout = new Timeout(sink.getTimeout());
+            if (!matchesWithinTimeout(sink, matcher, timeout)) {
+                assertThat(sink, new FailureMessageFormatter(matcher));
+            }
+        }
+    }
+
+    private static boolean matchesWithinTimeout(AsynchronousSink<?> sink, Matcher<?> matcher, Timeout timeout) {
+        while (!matcher.matches(sink.getContent())) {
+            if (timeout.hasTimedOut()) {
+                return false;
+            }
+            timeout.waitUntilTimeout(sink);
+        }
+        return true;
     }
 
     public static <T> Matcher<List<T>> firstEvent(Matcher<? super T> matcher) {
