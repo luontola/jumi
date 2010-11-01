@@ -18,6 +18,10 @@ public abstract class AsynchronousSink<T> implements SelfDescribing {
         return timeout;
     }
 
+    /**
+     * Implementations of this method should be synchronized on {@code this}
+     * and they should call {@code this.notifyAll()} after updating their content.
+     */
     public abstract void append(T event);
 
     public abstract T getContent();
