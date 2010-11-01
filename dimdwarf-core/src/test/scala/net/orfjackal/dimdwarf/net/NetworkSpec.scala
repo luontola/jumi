@@ -4,13 +4,15 @@ import org.junit.runner.RunWith
 import org.hamcrest.Matchers._
 import org.hamcrest.MatcherAssert.assertThat
 import net.orfjackal.specsy._
-import net.orfjackal.dimdwarf.util.SocketUtil
 import net.orfjackal.dimdwarf.mq.MessageQueue
 import java.net.Socket
 import SimpleSgsProtocolReferenceMessages._
 import net.orfjackal.dimdwarf.actors.DeterministicMessageQueues
 import net.orfjackal.dimdwarf.auth._
 import org.apache.mina.core.buffer.IoBuffer
+import net.orfjackal.dimdwarf.util._
+import CustomMatchers._
+import java.io.InputStream
 
 @RunWith(classOf[Specsy])
 class NetworkSpec extends Spec {
@@ -33,7 +35,8 @@ class NetworkSpec extends Spec {
   val client = new Socket("localhost", port)
   defer {client.close()}
   val clientToServer = client.getOutputStream
-  val clientFromServer = client.getInputStream
+  val clientFromServer = new ByteSink(100L)
+  copyInBackground(client.getInputStream, clientFromServer)
 
   val USERNAME = "John Doe"
   val PASSWORD = "secret"
@@ -109,12 +112,7 @@ class NetworkSpec extends Spec {
   }
 
   private def assertClientReceived(expected: IoBuffer) {
-    assertThat(nextMessageToClient(), is(expected: Any))
-  }
-
-  private def nextMessageToClient(): IoBuffer = {
-    // TODO: write a utility class for asynchronous tests, which timeout when there is no event
-    nextMessage(clientFromServer)
+    assertEventually(clientFromServer, startsWithBytes(expected))
   }
 
   class SpyAuthenticator extends Authenticator {
@@ -129,5 +127,26 @@ class NetworkSpec extends Spec {
       lastOnYes = onYes _
       lastOnNo = onNo _
     }
+  }
+
+  private def copyInBackground(source: InputStream, target: ByteSink) {
+    // TODO: try using Apache MINA's client library to get event-driven IoBuffers for free
+    val t = new Thread(new Runnable {
+      def run() {
+        val buf = new Array[Byte](100);
+        var len = 0;
+        try {
+          do {
+            // TODO: handle "java.net.SocketException: socket closed"
+            len = source.read(buf)
+            target.append(IoBuffer.wrap(buf, 0, len))
+          } while (len >= 0)
+        } finally {
+          source.close()
+        }
+      }
+    })
+    t.setDaemon(true)
+    t.start()
   }
 }
