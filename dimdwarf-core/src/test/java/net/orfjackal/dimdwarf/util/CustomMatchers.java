@@ -8,22 +8,19 @@ import net.orfjackal.dimdwarf.util.matchers.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.hamcrest.Matcher;
 
+import java.util.List;
+
 public class CustomMatchers {
-    // XXX: eliminate this duplication; only one assertEventually should be enough
 
-    public static <T> void assertEventually(EventSink<T> sink, Matcher<? super EventSink<T>> matcher) {
-        sink.assertEventually((Matcher<? super AsynchronousSink<?>>) matcher);
+    public static <T> void assertEventually(AsynchronousSink<T> sink, Matcher<?> matcher) {
+        sink.assertEventually(matcher);
     }
 
-    public static void assertEventually(ByteSink sink, Matcher<? super ByteSink> matcher) {
-        sink.assertEventually((Matcher<? super AsynchronousSink<?>>) matcher);
+    public static <T> Matcher<List<T>> firstEvent(Matcher<? super T> matcher) {
+        return new ListStartsWithElementMatcher<T>(matcher);
     }
 
-    public static <T> Matcher<EventSink<? super T>> firstEvent(final Matcher<? super T> matcher) {
-        return new EventSinkContentMatcher<T>(new ListStartsWithElementMatcher(matcher));
-    }
-
-    public static Matcher<ByteSink> startsWithBytes(final IoBuffer expected) {
-        return new ByteSinkContentMatcher(new IoBufferStartsWithBytesMatcher(expected));
+    public static Matcher<IoBuffer> startsWithBytes(IoBuffer expected) {
+        return new IoBufferStartsWithBytesMatcher(expected);
     }
 }

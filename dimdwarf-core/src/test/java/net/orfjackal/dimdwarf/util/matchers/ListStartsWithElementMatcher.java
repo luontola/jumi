@@ -10,9 +10,9 @@ import java.util.List;
 
 public class ListStartsWithElementMatcher<T> extends TypeSafeMatcher<List<T>> {
 
-    private final Matcher<T> firstElementMatcher;
+    private final Matcher<? super T> firstElementMatcher;
 
-    public ListStartsWithElementMatcher(Matcher<T> firstElementMatcher) {
+    public ListStartsWithElementMatcher(Matcher<? super T> firstElementMatcher) {
         this.firstElementMatcher = firstElementMatcher;
     }
 
@@ -23,7 +23,7 @@ public class ListStartsWithElementMatcher<T> extends TypeSafeMatcher<List<T>> {
 
     public void describeTo(Description description) {
         description
-                .appendText("start with ")
+                .appendText("start with: ")
                 .appendDescriptionOf(firstElementMatcher);
     }
 }
