@@ -7,12 +7,12 @@ package net.orfjackal.dimdwarf.util;
 import org.hamcrest.Matcher;
 
 // TODO: implement SelfDescribing here instead of the subclasses?
-public abstract class AbstractSink<T> {
+public abstract class AsynchronousSink<T> {
 
     private final Object lock = new Object();
     private final long timeout;
 
-    public AbstractSink(long timeout) {
+    public AsynchronousSink(long timeout) {
         this.timeout = timeout;
     }
 

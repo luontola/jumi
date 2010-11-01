@@ -8,7 +8,7 @@ import org.hamcrest.*;
 
 import java.util.*;
 
-public class EventSink<T> extends AbstractSink<List<T>> implements SelfDescribing {
+public class EventSink<T> extends AsynchronousSink<List<T>> implements SelfDescribing {
 
     private final List<T> events = new ArrayList<T>();
 

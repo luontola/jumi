@@ -7,7 +7,7 @@ package net.orfjackal.dimdwarf.util;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.hamcrest.*;
 
-public class ByteSink extends AbstractSink<IoBuffer> implements SelfDescribing {
+public class ByteSink extends AsynchronousSink<IoBuffer> implements SelfDescribing {
 
     private final IoBuffer sink = IoBuffer.allocate(100).setAutoExpand(true);
 
