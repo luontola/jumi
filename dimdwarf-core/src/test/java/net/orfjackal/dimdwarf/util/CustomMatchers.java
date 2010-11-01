@@ -8,16 +8,15 @@ import net.orfjackal.dimdwarf.util.matchers.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.hamcrest.Matcher;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
 public class CustomMatchers {
+    // XXX: eliminate this duplication; only one assertEventually should be enough
 
     public static <T> void assertEventually(EventSink<T> sink, Matcher<? super EventSink<T>> matcher) {
-        assertThat(sink, matcher);
+        sink.assertEventually((Matcher<? super AsynchronousSink<?>>) matcher);
     }
 
-    public static void assertEventually(ByteSink sink, Matcher<ByteSink> matcher) {
-        assertThat(sink, matcher);
+    public static void assertEventually(ByteSink sink, Matcher<? super ByteSink> matcher) {
+        sink.assertEventually((Matcher<? super AsynchronousSink<?>>) matcher);
     }
 
     public static <T> Matcher<EventSink<? super T>> firstEvent(final Matcher<? super T> matcher) {

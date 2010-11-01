@@ -6,6 +6,8 @@ package net.orfjackal.dimdwarf.util;
 
 import org.hamcrest.Matcher;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 // TODO: implement SelfDescribing here instead of the subclasses?
 public abstract class AsynchronousSink<T> {
 
@@ -14,6 +16,12 @@ public abstract class AsynchronousSink<T> {
 
     public AsynchronousSink(long timeout) {
         this.timeout = timeout;
+    }
+
+    public void assertEventually(Matcher<? super AsynchronousSink<?>> matcher) {
+        synchronized (lock) {
+            assertThat(this, matcher);
+        }
     }
 
     public final void append(T event) {
@@ -26,6 +34,7 @@ public abstract class AsynchronousSink<T> {
     protected abstract void doAppend(T event);
 
     public final boolean matches(Matcher<?> matcher) {
+        // TODO: consider moving the code from this class to an external assertEventually method
         Timeout timeout = new Timeout(this.timeout);
 
         synchronized (lock) {
