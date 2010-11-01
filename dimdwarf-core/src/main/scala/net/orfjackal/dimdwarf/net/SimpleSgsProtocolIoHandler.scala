@@ -14,7 +14,8 @@ object SimpleSgsProtocolIoHandler {
 
 @Singleton
 class SimpleSgsProtocolIoHandler @Inject()(@Hub toHub: MessageSender[Any]) extends IoHandlerAdapter with MessageSender[Any] {
-  private var lastSession: IoSession = null // TODO: support multiple clients, give an ID for each session
+  // XXX: support multiple clients, give an ID for each session
+  private var lastSession: IoSession = null
 
   def send(message: Any) {
     if (lastSession != null) {

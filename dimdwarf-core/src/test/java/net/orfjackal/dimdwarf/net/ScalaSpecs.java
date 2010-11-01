@@ -9,7 +9,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        NetworkSpec.class,
+        LoginLogoutSpec.class,
+        NetworkActorSpec.class,
         SimpleSgsProtocolSpec.class
 })
 public class ScalaSpecs {
