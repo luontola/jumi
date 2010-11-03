@@ -12,6 +12,8 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertTrue;
+
 public class ServerRunner {
 
     private static final int TIMEOUT = 5;
@@ -95,6 +97,9 @@ public class ServerRunner {
     }
 
     public void shutdown() {
+        if (serverProcess != null) {
+            assertTrue("Server had died unexpectedly", serverProcess.isAlive());
+        }
         try {
             if (serverProcess != null) {
                 serverProcess.kill();

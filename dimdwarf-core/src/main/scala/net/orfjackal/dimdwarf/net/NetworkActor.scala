@@ -19,6 +19,7 @@ class NetworkActor @Inject()(@Named("port") port: Int, ioHandler: SimpleSgsProto
     val acceptor = new NioSocketAcceptor
     acceptor.getFilterChain.addLast("logger", createLoggingFilter)
     acceptor.getFilterChain.addLast("codec", new ProtocolCodecFilter(new SimpleSgsProtocolCodecFactory))
+    acceptor.getFilterChain.addLast("client-identity", new ClientIdentifyingIoFilter)
     acceptor.setHandler(ioHandler)
     acceptor.getSessionConfig.setReadBufferSize(2048)
     acceptor.getSessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 10)
@@ -46,6 +47,9 @@ class NetworkActor @Inject()(@Named("port") port: Int, ioHandler: SimpleSgsProto
   }
 
   def process(message: Any) {
-    ioHandler.send(message)
+    message match {
+      case SendToClient(message) =>
+        ioHandler.send(message)
+    }
   }
 }

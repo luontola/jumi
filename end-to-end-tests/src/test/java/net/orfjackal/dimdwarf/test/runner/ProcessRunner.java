@@ -49,6 +49,15 @@ public class ProcessRunner {
         outputWatcher.waitForLineContaining(expected, timeout, unit);
     }
 
+    public boolean isAlive() {
+        try {
+            process.exitValue();
+            return false;
+        } catch (IllegalThreadStateException e) {
+            return true;
+        }
+    }
+
     public void kill() throws InterruptedException {
         if (process != null) {
             process.destroy();

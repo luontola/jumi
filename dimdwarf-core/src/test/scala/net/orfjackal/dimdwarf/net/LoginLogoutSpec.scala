@@ -35,7 +35,7 @@ class LoginLogoutSpec extends Spec {
       queues.processMessagesUntilIdle()
 
       "NetworkController sends a success message to the client" >> {
-        assertMessageSent(toNetwork, LoginSuccess())
+        assertMessageSent(toNetwork, SendToClient(LoginSuccess()))
       }
     }
 
@@ -44,7 +44,7 @@ class LoginLogoutSpec extends Spec {
       queues.processMessagesUntilIdle()
 
       "NetworkController sends a failure message to the client" >> {
-        assertMessageSent(toNetwork, LoginFailure())
+        assertMessageSent(toNetwork, SendToClient(LoginFailure()))
       }
     }
   }
@@ -60,7 +60,7 @@ class LoginLogoutSpec extends Spec {
     "and NetworkController logs out the client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
 
     "after which NetworkController sends a logout success message to the client" >> {
-      assertMessageSent(toNetwork, LogoutSuccess())
+      assertMessageSent(toNetwork, SendToClient(LogoutSuccess()))
     }
   }
 
@@ -70,8 +70,8 @@ class LoginLogoutSpec extends Spec {
     assertThat(queues.seenIn(queue).head, is(expected))
   }
 
-  private def clientSends(message: Any) {
-    queues.toHub.send(message)
+  private def clientSends(message: ClientMessage) {
+    queues.toHub.send(ReceivedFromClient(message))
     queues.processMessagesUntilIdle()
   }
 
