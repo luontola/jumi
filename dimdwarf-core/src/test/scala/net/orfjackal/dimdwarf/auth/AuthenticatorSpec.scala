@@ -19,7 +19,7 @@ class AuthenticatorSpec extends Spec {
   when(credentialsChecker.isValid(validCredentials)).thenReturn(true)
   when(credentialsChecker.isValid(invalidCredentials)).thenReturn(false)
 
-  val toAuthenticator = new MessageQueue[Any]("toAuthenticator")
+  val toAuthenticator = new MessageQueue[AuthenticatorMessage]("toAuthenticator")
   val authActor = new AuthenticatorActor(queues.toHub, credentialsChecker)
   val authController = new AuthenticatorController(toAuthenticator)
   queues.addController(authController)

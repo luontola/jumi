@@ -18,7 +18,7 @@ public class AuthenticatorModule extends ActorModule {
     protected void configure() {
         bindControllerTo(AuthenticatorController.class);
         bindActorTo(AuthenticatorActor.class);
-        bindMessageQueueOfType(Object.class);
+        bindMessageQueueOfType(AuthenticatorMessage.class);
 
         bind(Authenticator.class).to(AuthenticatorController.class);
         expose(Authenticator.class);
@@ -35,7 +35,7 @@ public class AuthenticatorModule extends ActorModule {
     }
 
     @Provides
-    ActorRunnable actor(Actor actor, MessageReceiver<Object> toActor) {
+    ActorRunnable actor(Actor actor, MessageReceiver<AuthenticatorMessage> toActor) {
         return new ActorMessageLoop(actor, toActor);
     }
 }

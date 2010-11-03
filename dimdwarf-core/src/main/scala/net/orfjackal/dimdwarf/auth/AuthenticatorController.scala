@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import net.orfjackal.dimdwarf.controller._
 
 @ControllerScoped
-class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) extends Controller with Authenticator {
+class AuthenticatorController @Inject()(toAuthenticator: MessageSender[AuthenticatorMessage]) extends Controller with Authenticator {
   private var pending = Map[Credentials, Seq[Callback]]().withDefaultValue(Seq())
 
   def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit) {
