@@ -5,14 +5,14 @@ import net.orfjackal.dimdwarf.mq._
 import scala.collection.mutable.Buffer
 
 class DeterministicMessageQueues {
-  private var actors = Map[MessageQueue[_], Actor]()
+  private var actors = Map[MessageQueue[_], Actor[_]]()
   private var seenMessages = Map[MessageQueue[_], Buffer[Any]]()
 
   private val hub = new ControllerHub
   val toHub = new MessageQueue[Any]("toHub")
   addActor(hub, toHub)
 
-  def addActor(actor: Actor, toActor: MessageQueue[_]) { // TODO: type parameterize Actor
+  def addActor[T](actor: Actor[T], toActor: MessageQueue[T]) {
     actors = actors.updated(toActor, actor)
     seenMessages = seenMessages.updated(toActor, Buffer())
   }
@@ -45,12 +45,12 @@ class DeterministicMessageQueues {
     } while (hadWork)
   }
 
-  private def processIfNonEmpty(toActor: MessageQueue[_], actor: Actor): Boolean = {
+  private def processIfNonEmpty[T](toActor: MessageQueue[_], actor: Actor[_]): Boolean = {
     val message = toActor.poll()
     val hasMessages = message != null
     if (hasMessages) {
       seenMessages(toActor).append(message)
-      actor.process(message)
+      actor.asInstanceOf[Actor[Any]].process(message)
     }
     hasMessages
   }

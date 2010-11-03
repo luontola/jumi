@@ -15,7 +15,7 @@ import net.orfjackal.dimdwarf.controller.Hub
 import net.orfjackal.dimdwarf.net.sgs._
 
 @ActorScoped
-class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender[Any]) extends IoHandlerAdapter with Actor {
+class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender[Any]) extends IoHandlerAdapter with Actor[NetworkMessage] {
   private val logger = LoggerFactory.getLogger(classOf[NetworkActor])
   private val acceptor = createAcceptor()
 
@@ -49,7 +49,7 @@ class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender
     acceptor.unbind()
   }
 
-  def process(message: Any) {
+  def process(message: NetworkMessage) {
     message match {
       case SendToClient(message, IoSessionHandle(session)) =>
         session.write(message)

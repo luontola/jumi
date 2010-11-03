@@ -50,7 +50,7 @@ public abstract class ActorModule extends PrivateModule {
         controllers.add(exposeUniqueKey(ControllerRegistration.class, controllerRegistrationProvider()));
     }
 
-    protected void bindActorTo(Class<? extends Actor> actor) {
+    protected void bindActorTo(Class<? extends Actor<?>> actor) {
         checkHasAnnotation(actor, actorScope);
 
         bind(Actor.class).to(actor);

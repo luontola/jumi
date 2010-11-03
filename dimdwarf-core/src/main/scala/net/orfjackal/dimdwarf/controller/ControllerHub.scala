@@ -4,11 +4,10 @@ import scala.collection.mutable.ArrayBuffer
 import net.orfjackal.dimdwarf.actors.Actor
 
 @ControllerScoped
-class ControllerHub extends Actor {
+class ControllerHub extends Actor[Any] {
   private val controllers = new ArrayBuffer[Controller]
 
-  def start() {
-  }
+  def start() {}
 
   def process(message: Any) {
     controllers.foreach(_.process(message))

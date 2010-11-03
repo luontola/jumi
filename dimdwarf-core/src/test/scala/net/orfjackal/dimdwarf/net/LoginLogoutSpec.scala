@@ -92,10 +92,10 @@ class LoginLogoutSpec extends Spec {
     }
   }
 
-  class DummyNetworkActor extends Actor {
+  class DummyNetworkActor extends Actor[NetworkMessage] {
     def start() {}
 
-    def process(message: Any) {}
+    def process(message: NetworkMessage) {}
   }
 
   case class DummySessionHandle() extends SessionHandle

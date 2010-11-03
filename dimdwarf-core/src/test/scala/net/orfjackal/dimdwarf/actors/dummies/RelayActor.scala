@@ -6,9 +6,8 @@ import net.orfjackal.dimdwarf.mq.MessageSender
 import net.orfjackal.dimdwarf.actors._
 
 @ActorScoped
-class RelayActor @Inject()(@Hub toHub: MessageSender[Any], spy: Spy) extends Actor {
-  def start() {
-  }
+class RelayActor @Inject()(@Hub toHub: MessageSender[Any], spy: Spy) extends Actor[Any] {
+  def start() {}
 
   def process(message: Any) {
     message match {

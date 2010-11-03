@@ -1,8 +1,7 @@
 package net.orfjackal.dimdwarf.actors
 
-trait Actor {
+trait Actor[T] {
   def start()
 
-  // TODO: parameterize the message type
-  def process(message: Any)
+  def process(message: T)
 }

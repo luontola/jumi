@@ -62,7 +62,7 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
   }
 
   "Actors must be ActorScoped" >> {
-    class NotActorScopedActor extends Actor {
+    class NotActorScopedActor extends Actor[Any] {
       def start() {}
 
       def process(message: Any) {}

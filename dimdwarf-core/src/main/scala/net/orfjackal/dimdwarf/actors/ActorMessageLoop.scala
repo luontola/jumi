@@ -4,7 +4,7 @@ import net.orfjackal.dimdwarf.mq.MessageReceiver
 import org.slf4j.LoggerFactory
 import com.google.inject.Inject
 
-class ActorMessageLoop @Inject()(actor: Actor, toActor: MessageReceiver[_]) extends ActorRunnable {
+class ActorMessageLoop[T] @Inject()(actor: Actor[T], toActor: MessageReceiver[T]) extends ActorRunnable {
   private val logger = LoggerFactory.getLogger(getClass)
 
   def start() {

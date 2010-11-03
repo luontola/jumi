@@ -6,14 +6,13 @@ import net.orfjackal.dimdwarf.controller.Hub
 import net.orfjackal.dimdwarf.actors._
 
 @ActorScoped
-class AuthenticatorActor @Inject()(@Hub toHub: MessageSender[Any], credentialsChecker: CredentialsChecker[Credentials]) extends Actor {
-  def start() {
-  }
+class AuthenticatorActor @Inject()(@Hub toHub: MessageSender[Any], checker: CredentialsChecker[Credentials]) extends Actor[AuthenticatorMessage] {
+  def start() {}
 
-  def process(message: Any) {
+  def process(message: AuthenticatorMessage) {
     message match {
       case IsUserAuthenticated(credentials) =>
-        if (credentialsChecker.isValid(credentials)) {
+        if (checker.isValid(credentials)) {
           toHub.send(YesUserIsAuthenticated(credentials))
         } else {
           toHub.send(NoUserIsNotAuthenticated(credentials))
