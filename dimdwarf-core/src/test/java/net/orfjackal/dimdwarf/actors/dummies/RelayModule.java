@@ -21,7 +21,7 @@ public class RelayModule extends ActorModule {
     }
 
     @Provides
-    ActorRunnable actor(Actor actor, MessageReceiver<Object> toActor) {
-        return new ActorMessageLoop(actor, toActor);
+    ActorRunnable actor(Actor<Object> actor, MessageReceiver<Object> toActor) {
+        return new ActorMessageLoop<Object>(actor, toActor);
     }
 }

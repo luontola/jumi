@@ -28,7 +28,7 @@ public class NetworkModule extends ActorModule {
     }
 
     @Provides
-    ActorRunnable actor(Actor actor, MessageReceiver<NetworkMessage> toActor) {
-        return new ActorMessageLoop(actor, toActor);
+    ActorRunnable actor(Actor<NetworkMessage> actor, MessageReceiver<NetworkMessage> toActor) {
+        return new ActorMessageLoop<NetworkMessage>(actor, toActor);
     }
 }

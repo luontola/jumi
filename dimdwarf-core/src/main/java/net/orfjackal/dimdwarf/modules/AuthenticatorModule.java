@@ -35,7 +35,7 @@ public class AuthenticatorModule extends ActorModule {
     }
 
     @Provides
-    ActorRunnable actor(Actor actor, MessageReceiver<AuthenticatorMessage> toActor) {
-        return new ActorMessageLoop(actor, toActor);
+    ActorRunnable actor(Actor<AuthenticatorMessage> actor, MessageReceiver<AuthenticatorMessage> toActor) {
+        return new ActorMessageLoop<AuthenticatorMessage>(actor, toActor);
     }
 }

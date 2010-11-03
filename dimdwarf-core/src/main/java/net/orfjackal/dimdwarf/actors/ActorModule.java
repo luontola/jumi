@@ -12,7 +12,7 @@ import net.orfjackal.dimdwarf.controller.*;
 import net.orfjackal.dimdwarf.mq.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 
 public abstract class ActorModule extends PrivateModule {
@@ -53,7 +53,7 @@ public abstract class ActorModule extends PrivateModule {
     protected void bindActorTo(Class<? extends Actor<?>> actor) {
         checkHasAnnotation(actor, actorScope);
 
-        bind(Actor.class).to(actor);
+        bind(genericActorInterfaceOf(actor)).to((Class) actor); // cast needed to satisfy the Scala compiler
 
         actors.add(exposeUniqueKey(ActorRegistration.class, actorRegistrationProvider()));
     }
@@ -81,6 +81,22 @@ public abstract class ActorModule extends PrivateModule {
         if (target.getAnnotation(annotation) == null) {
             throw new IllegalArgumentException(target.getName() + " must be annotated with " + annotation.getName());
         }
+    }
+
+    private static Key<?> genericActorInterfaceOf(Class<? extends Actor<?>> actor) {
+        return Key.get(getGenericInterfaceType(Actor.class, actor));
+    }
+
+    private static <T> ParameterizedType getGenericInterfaceType(Class<T> genericInterface, Class<? extends T> target) {
+        for (Type type : target.getGenericInterfaces()) {
+            if (type instanceof ParameterizedType) {
+                ParameterizedType ptype = (ParameterizedType) type;
+                if (ptype.getRawType().equals(genericInterface)) {
+                    return ptype;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Does not (directly) implement the Actor interface: " + target);
     }
 
     private <T> Key<T> exposeUniqueKey(Class<T> type, Provider<T> provider) {
