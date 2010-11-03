@@ -57,7 +57,7 @@ public class ClientConnectionTest {
         client.receivesMessage("hello");
     }
 
-    //@Test
+    @Test
     public void multiple_clients_can_be_connected_to_the_server() throws Exception {
         server.startApplication(EchoApp.class);
 
