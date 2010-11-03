@@ -53,7 +53,7 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
     }
 
     evaluating {
-      new ActorModule("Dummy") {
+      new ActorModule[Any]("Dummy") {
         def configure() {
           bindControllerTo(classOf[NotControllerScopedController])
         }
@@ -69,7 +69,7 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
     }
 
     evaluating {
-      new ActorModule("Dummy") {
+      new ActorModule[Any]("Dummy") {
         def configure() {
           bindActorTo(classOf[NotActorScopedActor])
         }
@@ -81,13 +81,13 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
     // Test against the bug mentioned in
     // http://groups.google.com/group/google-guice/browse_thread/thread/5f61266829554993
 
-    class DependantModule extends ActorModule("Dependant") {
+    class DependantModule extends ActorModule[Any]("Dependant") {
       def configure() {
         bindControllerTo(classOf[DependantController])
         bindMessageQueueOfType(classOf[Any])
       }
     }
-    class DependeeModule extends ActorModule("Dependee") {
+    class DependeeModule extends ActorModule[Any]("Dependee") {
       def configure() {
         bindControllerTo(classOf[DependeeController])
         bindMessageQueueOfType(classOf[Any])

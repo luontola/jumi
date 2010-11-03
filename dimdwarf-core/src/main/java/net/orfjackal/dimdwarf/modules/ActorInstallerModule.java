@@ -12,9 +12,9 @@ import net.orfjackal.dimdwarf.controller.*;
 
 public class ActorInstallerModule extends AbstractModule {
 
-    private final ActorModule[] actorModules;
+    private final ActorModule<?>[] actorModules;
 
-    public ActorInstallerModule(ActorModule... actorModules) {
+    public ActorInstallerModule(ActorModule<?>... actorModules) {
         this.actorModules = actorModules;
     }
 
@@ -27,7 +27,7 @@ public class ActorInstallerModule extends AbstractModule {
 
         Multibinder<ControllerRegistration> controllerBindings = Multibinder.newSetBinder(binder(), ControllerRegistration.class);
         Multibinder<ActorRegistration> actorBindings = Multibinder.newSetBinder(binder(), ActorRegistration.class);
-        for (ActorModule module : actorModules) {
+        for (ActorModule<?> module : actorModules) {
             install(module);
             for (Key<ControllerRegistration> key : module.getControllers()) {
                 controllerBindings.addBinding().to(key);

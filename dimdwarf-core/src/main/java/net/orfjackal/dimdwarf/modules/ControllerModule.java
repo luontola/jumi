@@ -12,7 +12,7 @@ import org.slf4j.*;
 
 import java.util.*;
 
-public class ControllerModule extends ActorModule {
+public class ControllerModule extends ActorModule<Object> {
 
     private static Logger logger = LoggerFactory.getLogger(ControllerModule.class);
 

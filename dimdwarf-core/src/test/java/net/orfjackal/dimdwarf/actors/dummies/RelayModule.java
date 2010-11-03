@@ -8,7 +8,7 @@ import com.google.inject.Provides;
 import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 
-public class RelayModule extends ActorModule {
+public class RelayModule extends ActorModule<Object> {
 
     public RelayModule() {
         super("Relay");

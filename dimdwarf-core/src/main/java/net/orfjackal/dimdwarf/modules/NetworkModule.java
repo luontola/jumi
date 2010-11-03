@@ -10,7 +10,7 @@ import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import net.orfjackal.dimdwarf.net.*;
 
-public class NetworkModule extends ActorModule {
+public class NetworkModule extends ActorModule<NetworkMessage> {
 
     private final int port;
 

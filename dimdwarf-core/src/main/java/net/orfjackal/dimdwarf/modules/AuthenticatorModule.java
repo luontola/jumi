@@ -9,7 +9,7 @@ import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.auth.*;
 import net.orfjackal.dimdwarf.mq.MessageReceiver;
 
-public class AuthenticatorModule extends ActorModule {
+public class AuthenticatorModule extends ActorModule<AuthenticatorMessage> {
 
     public AuthenticatorModule() {
         super("Authenticator");

@@ -15,7 +15,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
-public abstract class ActorModule extends PrivateModule {
+public abstract class ActorModule<M> extends PrivateModule {
 
     protected final String actorName;
 
@@ -50,10 +50,10 @@ public abstract class ActorModule extends PrivateModule {
         controllers.add(exposeUniqueKey(ControllerRegistration.class, controllerRegistrationProvider()));
     }
 
-    protected void bindActorTo(Class<? extends Actor<?>> actor) {
+    protected void bindActorTo(Class<? extends Actor<M>> actor) {
         checkHasAnnotation(actor, actorScope);
 
-        bind(genericActorInterfaceOf(actor)).to((Class) actor); // cast needed to satisfy the Scala compiler
+        bind(genericActorInterfaceOf(actor)).to(actor);
 
         actors.add(exposeUniqueKey(ActorRegistration.class, actorRegistrationProvider()));
     }
@@ -83,8 +83,9 @@ public abstract class ActorModule extends PrivateModule {
         }
     }
 
-    private static Key<?> genericActorInterfaceOf(Class<? extends Actor<?>> actor) {
-        return Key.get(getGenericInterfaceType(Actor.class, actor));
+    @SuppressWarnings({"unchecked"})
+    private Key<Actor<M>> genericActorInterfaceOf(Class<? extends Actor<M>> actor) {
+        return (Key<Actor<M>>) Key.get(getGenericInterfaceType(Actor.class, actor));
     }
 
     private static <T> ParameterizedType getGenericInterfaceType(Class<T> genericInterface, Class<? extends T> target) {
@@ -112,7 +113,8 @@ public abstract class ActorModule extends PrivateModule {
         return Names.named(actorName + "/" + UUID.randomUUID().toString());
     }
 
-    protected void bindMessageQueueOfType(Type messageType) {
+    // TODO: the message type could be retrieved from the type parameters of ActorModule 
+    protected void bindMessageQueueOfType(Class<M> messageType) {
         MessageQueue<?> mq = new MessageQueue<Object>(actorName);
         bind(messageSenderOf(messageType)).toInstance(mq);
         bind(messageReceiverOf(messageType)).toInstance(mq);
