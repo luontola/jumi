@@ -10,13 +10,13 @@ import net.orfjackal.dimdwarf.net.sgs._
 class NetworkController @Inject()(toNetwork: MessageSender[Any], authenticator: Authenticator) extends Controller {
   def process(message: Any) {
     message match {
-      case ReceivedFromClient(message) =>
-        processClientMessage(message)
+      case ReceivedFromClient(message, session) =>
+        processClientMessage(message, session)
       case _ =>
     }
   }
 
-  private def processClientMessage(message: ClientMessage) {
+  private def processClientMessage(message: ClientMessage, session: SessionHandle) {
     message match {
       case LoginRequest(username, password) =>
         authenticator.isUserAuthenticated(new PasswordCredentials(username, password),

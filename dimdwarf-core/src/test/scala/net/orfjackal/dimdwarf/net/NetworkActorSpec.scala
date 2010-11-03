@@ -32,7 +32,11 @@ class NetworkActorSpec extends Spec {
   "Receives messages from clients and forwards them to the hub" >> {
     clientSends(logoutRequest())
 
-    assertHubReceives(ReceivedFromClient(LogoutRequest()))
+    //assertHubReceives(ReceivedFromClient(null, LogoutRequest()))
+    val message = toHub.poll(TIMEOUT)
+    message match {
+      case ReceivedFromClient(LogoutRequest(), _) =>
+    }
   }
 
   "Sends messages to clients" >> {
@@ -44,9 +48,14 @@ class NetworkActorSpec extends Spec {
   }
 
 
-  private def givenClientHasConnected() {
+  private def givenClientHasConnected(): SessionHandle = {
     clientSends(loginRequest("username", "password"))
-    assertHubReceives(ReceivedFromClient(LoginRequest("username", "password")))
+    //assertHubReceives(ReceivedFromClient(null, LoginRequest("username", "password")))
+    val message = toHub.poll(TIMEOUT)
+    message match {
+      case ReceivedFromClient(LoginRequest("username", "password"), session) =>
+        session
+    }
   }
 
   private def clientSends(message: IoBuffer) {

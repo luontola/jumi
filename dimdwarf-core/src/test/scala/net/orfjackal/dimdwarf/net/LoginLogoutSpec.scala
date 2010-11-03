@@ -72,7 +72,7 @@ class LoginLogoutSpec extends Spec {
   }
 
   private def clientSends(message: ClientMessage) {
-    queues.toHub.send(ReceivedFromClient(message))
+    queues.toHub.send(ReceivedFromClient(message, DummySessionHandle()))
     queues.processMessagesUntilIdle()
   }
 
@@ -95,4 +95,6 @@ class LoginLogoutSpec extends Spec {
 
     def process(message: Any) {}
   }
+
+  case class DummySessionHandle() extends SessionHandle
 }

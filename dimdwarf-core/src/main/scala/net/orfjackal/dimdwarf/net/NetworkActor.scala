@@ -65,6 +65,11 @@ class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender
     logger.debug("RECEIVED: {}", message)
 
     lastSession = session
-    toHub.send(ReceivedFromClient(message.asInstanceOf[ClientMessage]))
+    toHub.send(
+      ReceivedFromClient(
+        message.asInstanceOf[ClientMessage],
+        IoSessionHandle(session)))
   }
+
+  private case class IoSessionHandle(session: IoSession) extends SessionHandle
 }
