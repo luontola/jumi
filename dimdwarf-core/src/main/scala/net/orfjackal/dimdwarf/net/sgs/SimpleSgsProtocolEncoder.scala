@@ -7,7 +7,7 @@ import org.apache.mina.core.buffer.IoBuffer
 import javax.annotation.concurrent.Immutable
 
 @Immutable
-class SimpleSgsProtocolEncoder extends ProtocolEncoder {
+class SimpleSgsProtocolEncoder extends ProtocolEncoderAdapter {
   def encode(session: IoSession, message: Any, out: ProtocolEncoderOutput) {
     val encoded = message match {
     // TODO: calculate the length of the messages dynamically?
@@ -33,8 +33,5 @@ class SimpleSgsProtocolEncoder extends ProtocolEncoder {
                 flip()
     }
     out.write(encoded)
-  }
-
-  def dispose(session: IoSession) {
   }
 }
