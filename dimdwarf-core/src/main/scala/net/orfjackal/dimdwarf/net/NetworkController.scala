@@ -4,6 +4,7 @@ import net.orfjackal.dimdwarf.mq.MessageSender
 import com.google.inject.Inject
 import net.orfjackal.dimdwarf.controller._
 import net.orfjackal.dimdwarf.auth._
+import net.orfjackal.dimdwarf.net.sgs._
 
 @ControllerScoped
 class NetworkController @Inject()(toNetwork: MessageSender[Any], authenticator: Authenticator) extends Controller {

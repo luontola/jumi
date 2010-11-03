@@ -1,4 +1,4 @@
-package net.orfjackal.dimdwarf.net
+package net.orfjackal.dimdwarf.net.sgs
 
 import org.apache.mina.core.session.IoSession
 import org.apache.mina.filter.codec._

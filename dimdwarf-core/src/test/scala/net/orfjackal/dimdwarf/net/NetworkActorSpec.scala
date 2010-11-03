@@ -7,12 +7,13 @@ import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.mq.MessageQueue
 import net.orfjackal.dimdwarf.util._
 import org.apache.mina.core.buffer.IoBuffer
-import SimpleSgsProtocolReferenceMessages._
 import net.orfjackal.dimdwarf.util.CustomMatchers._
 import org.apache.mina.transport.socket.nio.NioSocketConnector
 import org.apache.mina.core.service.IoHandlerAdapter
 import org.apache.mina.core.session.IoSession
 import java.net._
+import net.orfjackal.dimdwarf.net.sgs._
+import SimpleSgsProtocolReferenceMessages._
 
 @RunWith(classOf[Specsy])
 class NetworkActorSpec extends Spec {

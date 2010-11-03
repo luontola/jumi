@@ -12,6 +12,7 @@ import net.orfjackal.dimdwarf.mq.MessageSender
 import org.apache.mina.core.service.IoHandlerAdapter
 import org.apache.mina.core.session._
 import net.orfjackal.dimdwarf.controller.Hub
+import net.orfjackal.dimdwarf.net.sgs._
 
 @ActorScoped
 class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender[Any]) extends IoHandlerAdapter with Actor {

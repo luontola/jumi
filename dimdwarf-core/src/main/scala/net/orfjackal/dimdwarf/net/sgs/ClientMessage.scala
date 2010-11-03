@@ -1,5 +1,6 @@
-package net.orfjackal.dimdwarf.net
+package net.orfjackal.dimdwarf.net.sgs
 
+// TODO: move these out of the sgs package, decouple them from the SimpleSgsProtocol?
 abstract sealed class ClientMessage
 
 case class LoginRequest(username: String, password: String) extends ClientMessage

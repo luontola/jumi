@@ -1,4 +1,4 @@
-package net.orfjackal.dimdwarf.net
+package net.orfjackal.dimdwarf.net.sgs
 
 import com.sun.sgs.protocol.simple.SimpleSgsProtocol
 import org.apache.mina.filter.codec._

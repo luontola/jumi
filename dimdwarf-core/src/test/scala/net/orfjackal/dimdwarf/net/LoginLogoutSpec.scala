@@ -7,6 +7,7 @@ import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.mq.MessageQueue
 import net.orfjackal.dimdwarf.auth._
 import net.orfjackal.dimdwarf.actors._
+import net.orfjackal.dimdwarf.net.sgs._
 
 @RunWith(classOf[Specsy])
 class LoginLogoutSpec extends Spec {

@@ -1,4 +1,4 @@
-package net.orfjackal.dimdwarf.net
+package net.orfjackal.dimdwarf.net.sgs
 
 import org.hamcrest.Matchers._
 import org.hamcrest.MatcherAssert.assertThat
