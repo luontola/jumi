@@ -1,8 +1,6 @@
 package net.orfjackal.dimdwarf.net
 
 import org.junit.runner.RunWith
-import org.hamcrest.Matchers._
-import org.hamcrest.MatcherAssert.assertThat
 import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.mq.MessageQueue
 import net.orfjackal.dimdwarf.util._
@@ -25,60 +23,81 @@ class NetworkActorSpec extends Spec {
   networkActor.start()
   defer {networkActor.stop()}
 
-  val clientReceived = new ByteSink(TIMEOUT)
-  val clientSession = connectClient(port, clientReceived)
-  defer {clientSession.close(true)}
+  val client1 = new ClientRunner(port)
+  defer {client1.disconnect()}
+
+  val client2 = new ClientRunner(port)
+  defer {client2.disconnect()}
 
   "Receives messages from clients and forwards them to the hub" >> {
-    clientSends(logoutRequest())
+    client1.sends(logoutRequest())
 
-    //assertHubReceives(ReceivedFromClient(null, LogoutRequest()))
-    val message = toHub.poll(TIMEOUT)
-    message match {
-      case ReceivedFromClient(LogoutRequest(), _) =>
-    }
+    assertHubReceives(LogoutRequest()) // TODO: pass a partial function (?)
   }
 
   "Sends messages to clients" >> {
-    givenClientHasConnected()
+    val session1 = loginAndGetSessionHandleOf(client1)
 
-    networkActor.process(SendToClient(LogoutSuccess()))
+    networkActor.process(SendToClient(LogoutSuccess(), session1))
 
-    assertClientReceived(logoutSuccess())
+    client1.assertReceived(logoutSuccess())
+  }
+
+  "Each client receives only the messages which are addressed to itself" >> {
+    val session1 = loginAndGetSessionHandleOf(client1)
+    val session2 = loginAndGetSessionHandleOf(client2)
+
+    networkActor.process(SendToClient(LoginSuccess(), session1))
+    client1.assertReceived(loginSuccess(Array()))
+
+    networkActor.process(SendToClient(LoginFailure(), session2))
+    client2.assertReceived(loginFailure(""))
   }
 
 
-  private def givenClientHasConnected(): SessionHandle = {
-    clientSends(loginRequest("username", "password"))
-    //assertHubReceives(ReceivedFromClient(null, LoginRequest("username", "password")))
-    val message = toHub.poll(TIMEOUT)
-    message match {
-      case ReceivedFromClient(LoginRequest("username", "password"), session) =>
-        session
+  private def loginAndGetSessionHandleOf(client: ClientRunner): SessionHandle = {
+    client.sends(loginRequest("username", "password"))
+    sessionHandleOfNextConnectedClient()
+  }
+
+  private def sessionHandleOfNextConnectedClient(): SessionHandle = {
+    toHub.poll(TIMEOUT) match {
+      case ReceivedFromClient(_, session) => session
     }
   }
 
-  private def clientSends(message: IoBuffer) {
-    clientSession.write(message)
+  private def assertHubReceives(expected: ClientMessage) {
+    toHub.poll(TIMEOUT) match {
+      case ReceivedFromClient(expected, _) => // OK
+    }
   }
 
-  private def assertClientReceived(expected: IoBuffer) {
-    assertEventually(clientReceived, startsWithBytes(expected))
-  }
+  class ClientRunner(port: Int) {
+    private val received = new ByteSink(TIMEOUT)
+    private val session = connectToPort(port)
 
-  private def assertHubReceives(expected: Any) {
-    assertThat(toHub.poll(TIMEOUT), is(expected))
-  }
+    private def connectToPort(port: Int): IoSession = {
+      val connector = new NioSocketConnector()
+      connector.setHandler(new IoHandlerAdapter {
+        override def messageReceived(session: IoSession, message: AnyRef) {
+          received.append(message.asInstanceOf[IoBuffer])
+        }
+      })
+      val connecting = connector.connect(new InetSocketAddress("localhost", port))
+      connecting.awaitUninterruptibly(TIMEOUT);
+      connecting.getSession
+    }
 
-  private def connectClient(port: Int, receivedMessages: ByteSink): IoSession = {
-    val connector = new NioSocketConnector()
-    connector.setHandler(new IoHandlerAdapter {
-      override def messageReceived(session: IoSession, message: AnyRef) {
-        receivedMessages.append(message.asInstanceOf[IoBuffer])
-      }
-    })
-    val connecting = connector.connect(new InetSocketAddress("localhost", port))
-    connecting.awaitUninterruptibly(TIMEOUT);
-    connecting.getSession
+    def disconnect() {
+      session.close(true)
+    }
+
+    def sends(message: IoBuffer) {
+      session.write(message)
+    }
+
+    def assertReceived(expected: IoBuffer) {
+      assertEventually(received, startsWithBytes(expected))
+    }
   }
 }

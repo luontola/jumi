@@ -19,9 +19,6 @@ class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender
   private val logger = LoggerFactory.getLogger(classOf[NetworkActor])
   private val acceptor = createAcceptor()
 
-  // XXX: support multiple clients, give an ID for each session
-  private var lastSession: IoSession = null
-
   private def createAcceptor() = {
     val acceptor = new NioSocketAcceptor
     acceptor.getFilterChain.addLast("logger", createLoggingFilter())
@@ -54,21 +51,20 @@ class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender
 
   def process(message: Any) {
     message match {
-      case SendToClient(message) =>
-        if (lastSession != null) {
-          lastSession.write(message)
-        }
+      case SendToClient(message, IoSessionHandle(session)) =>
+        session.write(message)
     }
   }
 
   override def messageReceived(session: IoSession, message: Any) {
     logger.debug("RECEIVED: {}", message)
 
-    lastSession = session
+    forwardToController(message.asInstanceOf[ClientMessage], session)
+  }
+
+  private def forwardToController(message: ClientMessage, session: IoSession) {
     toHub.send(
-      ReceivedFromClient(
-        message.asInstanceOf[ClientMessage],
-        IoSessionHandle(session)))
+      ReceivedFromClient(message, IoSessionHandle(session)))
   }
 
   private case class IoSessionHandle(session: IoSession) extends SessionHandle

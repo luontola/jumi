@@ -22,6 +22,7 @@ class LoginLogoutSpec extends Spec {
 
   val USERNAME = "John Doe"
   val PASSWORD = "secret"
+  val SESSION = DummySessionHandle()
 
   "When a client sends a login request" >> {
     clientSends(LoginRequest(USERNAME, PASSWORD))
@@ -36,7 +37,7 @@ class LoginLogoutSpec extends Spec {
       queues.processMessagesUntilIdle()
 
       "NetworkController sends a success message to the client" >> {
-        assertMessageSent(toNetwork, SendToClient(LoginSuccess()))
+        assertMessageSent(toNetwork, SendToClient(LoginSuccess(), SESSION))
       }
     }
 
@@ -45,7 +46,7 @@ class LoginLogoutSpec extends Spec {
       queues.processMessagesUntilIdle()
 
       "NetworkController sends a failure message to the client" >> {
-        assertMessageSent(toNetwork, SendToClient(LoginFailure()))
+        assertMessageSent(toNetwork, SendToClient(LoginFailure(), SESSION))
       }
     }
   }
@@ -58,10 +59,11 @@ class LoginLogoutSpec extends Spec {
 
     clientSends(LogoutRequest())
 
-    "and NetworkController logs out the client" // TODO: keep track of which clients are connected (implement with support for multiple clients)
+    // TODO: keep track of which clients are connected (cam be test-driven with JMX monitoring or session messages)
+    "and NetworkController logs out the client"
 
     "after which NetworkController sends a logout success message to the client" >> {
-      assertMessageSent(toNetwork, SendToClient(LogoutSuccess()))
+      assertMessageSent(toNetwork, SendToClient(LogoutSuccess(), SESSION))
     }
   }
 
@@ -72,7 +74,7 @@ class LoginLogoutSpec extends Spec {
   }
 
   private def clientSends(message: ClientMessage) {
-    queues.toHub.send(ReceivedFromClient(message, DummySessionHandle()))
+    queues.toHub.send(ReceivedFromClient(message, SESSION))
     queues.processMessagesUntilIdle()
   }
 
