@@ -6,26 +6,35 @@ import net.orfjackal.dimdwarf.controller._
 
 @ControllerScoped
 class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) extends Controller with Authenticator {
-  // TODO: write a test for concurrent authentications from the same user
-  // TODO: remove old callbacks
-  private var pending = Map[Credentials, Callbacks]()
+  private var pending = Map[Credentials, List[Callback]]().withDefaultValue(Nil)
 
   def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit) {
     toAuthenticator.send(IsUserAuthenticated(credentials))
-    pending = pending.updated(credentials, new Callbacks(onYes _, onNo _))
+    addCallback(credentials, onYes, onNo)
   }
 
   def process(message: Any) {
     message match {
       case YesUserIsAuthenticated(credentials) =>
-        pending(credentials).fireSuccess()
+        callAndResetCallbacks(credentials, _.fireSuccess())
       case NoUserIsNotAuthenticated(credentials) =>
-        pending(credentials).fireFailure()
+        callAndResetCallbacks(credentials, _.fireFailure())
       case _ =>
     }
   }
 
-  private class Callbacks(onYes: Function0[Unit], onNo: Function0[Unit]) {
+  private def addCallback(credentials: Credentials, onYes: => Unit, onNo: => Unit): Unit = {
+    val oldCallbacks = pending(credentials)
+    val newCallbacks = new Callback(onYes _, onNo _) :: oldCallbacks
+    pending = pending.updated(credentials, newCallbacks)
+  }
+
+  private def callAndResetCallbacks(credentials: Credentials, call: (Callback) => Any) {
+    pending(credentials).foreach(call)
+    pending -= credentials
+  }
+
+  private class Callback(onYes: Function0[Unit], onNo: Function0[Unit]) {
     def fireSuccess() = onYes()
 
     def fireFailure() = onNo()

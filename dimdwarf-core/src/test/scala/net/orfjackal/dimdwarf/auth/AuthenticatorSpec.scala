@@ -47,4 +47,20 @@ class AuthenticatorSpec extends Spec {
     verify(credentialsChecker).isValid(invalidCredentials)
     assertThat(response, is("no"))
   }
+
+  "When the same user authenticates multiple times concurrently, each authentication attempt gets a response" >> {
+    var responses = Set[Int]()
+
+    authController.isUserAuthenticated(validCredentials,
+      onYes = {responses += 1}, onNo = {})
+    authController.isUserAuthenticated(validCredentials,
+      onYes = {responses += 2}, onNo = {})
+    authController.isUserAuthenticated(invalidCredentials,
+      onYes = {}, onNo = {responses += 3})
+    authController.isUserAuthenticated(invalidCredentials,
+      onYes = {}, onNo = {responses += 4})
+    queues.processMessagesUntilIdle()
+
+    assertThat(responses, is(Set(1, 2, 3, 4)))
+  }
 }
