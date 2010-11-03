@@ -7,7 +7,7 @@ import net.orfjackal.dimdwarf.auth._
 import net.orfjackal.dimdwarf.net.sgs._
 
 @ControllerScoped
-class NetworkController @Inject()(toNetwork: MessageSender[Any], authenticator: Authenticator) extends Controller {
+class NetworkController @Inject()(toNetwork: MessageSender[NetworkMessage], authenticator: Authenticator) extends Controller {
   def process(message: Any) {
     message match {
       case ReceivedFromClient(message, session) =>

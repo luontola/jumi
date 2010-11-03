@@ -24,11 +24,11 @@ public class NetworkModule extends ActorModule {
 
         bindControllerTo(NetworkController.class);
         bindActorTo(NetworkActor.class);
-        bindMessageQueueOfType(Object.class);
+        bindMessageQueueOfType(NetworkMessage.class);
     }
 
     @Provides
-    ActorRunnable actor(Actor actor, MessageReceiver<Object> toActor) {
+    ActorRunnable actor(Actor actor, MessageReceiver<NetworkMessage> toActor) {
         return new ActorMessageLoop(actor, toActor);
     }
 }

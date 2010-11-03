@@ -15,7 +15,7 @@ class LoginLogoutSpec extends Spec {
   val authenticator = new SpyAuthenticator
   val networkActor = new DummyNetworkActor()
 
-  val toNetwork = new MessageQueue[Any]("toNetwork")
+  val toNetwork = new MessageQueue[NetworkMessage]("toNetwork")
   queues.addActor(networkActor, toNetwork)
   val networkCtrl = new NetworkController(toNetwork, authenticator)
   queues.addController(networkCtrl)
@@ -69,7 +69,7 @@ class LoginLogoutSpec extends Spec {
 
   // TODO: when a client is not logged in, do not allow a logout request (or any other messages)
 
-  private def assertMessageSent(queue: MessageQueue[Any], expected: Any) {
+  private def assertMessageSent(queue: MessageQueue[NetworkMessage], expected: Any) {
     assertThat(queues.seenIn(queue).head, is(expected))
   }
 

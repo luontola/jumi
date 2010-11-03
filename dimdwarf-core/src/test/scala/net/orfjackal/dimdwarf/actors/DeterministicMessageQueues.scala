@@ -21,7 +21,7 @@ class DeterministicMessageQueues {
     hub.addController(controller)
   }
 
-  def seenIn(toActor: MessageQueue[Any]): Seq[Any] = {
+  def seenIn(toActor: MessageQueue[_]): Seq[Any] = {
     seenMessages(toActor).toSeq
   }
 
