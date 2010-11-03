@@ -7,6 +7,7 @@ import net.orfjackal.dimdwarf.actors._
 import org.mockito.Mockito._
 import org.hamcrest.Matchers._
 import org.hamcrest.MatcherAssert.assertThat
+import scala.collection.mutable.Buffer
 
 @RunWith(classOf[Specsy])
 class AuthenticatorSpec extends Spec {
@@ -48,19 +49,19 @@ class AuthenticatorSpec extends Spec {
     assertThat(response, is("no"))
   }
 
-  "When the same user authenticates multiple times concurrently, each authentication attempt gets a response" >> {
-    var responses = Set[Int]()
+  "When the same user authenticates multiple times concurrently, each authentication attempt gets a response, in FIFO order" >> {
+    val responses = Buffer[String]()
 
     authController.isUserAuthenticated(validCredentials,
-      onYes = {responses += 1}, onNo = {})
+      onYes = {responses.append("yes-1")}, onNo = {})
     authController.isUserAuthenticated(validCredentials,
-      onYes = {responses += 2}, onNo = {})
+      onYes = {responses.append("yes-2")}, onNo = {})
     authController.isUserAuthenticated(invalidCredentials,
-      onYes = {}, onNo = {responses += 3})
+      onYes = {}, onNo = {responses.append("no-3")})
     authController.isUserAuthenticated(invalidCredentials,
-      onYes = {}, onNo = {responses += 4})
+      onYes = {}, onNo = {responses.append("no-4")})
     queues.processMessagesUntilIdle()
 
-    assertThat(responses, is(Set(1, 2, 3, 4)))
+    assertThat(responses, is(Buffer("yes-1", "yes-2", "no-3", "no-4")))
   }
 }

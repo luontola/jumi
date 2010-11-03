@@ -6,7 +6,7 @@ import net.orfjackal.dimdwarf.controller._
 
 @ControllerScoped
 class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) extends Controller with Authenticator {
-  private var pending = Map[Credentials, List[Callback]]().withDefaultValue(Nil)
+  private var pending = Map[Credentials, Seq[Callback]]().withDefaultValue(Seq())
 
   def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit) {
     toAuthenticator.send(IsUserAuthenticated(credentials))
@@ -25,7 +25,7 @@ class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) ext
 
   private def addCallback(credentials: Credentials, onYes: => Unit, onNo: => Unit): Unit = {
     val oldCallbacks = pending(credentials)
-    val newCallbacks = new Callback(onYes _, onNo _) :: oldCallbacks
+    val newCallbacks = oldCallbacks :+ new Callback(onYes _, onNo _)
     pending = pending.updated(credentials, newCallbacks)
   }
 
