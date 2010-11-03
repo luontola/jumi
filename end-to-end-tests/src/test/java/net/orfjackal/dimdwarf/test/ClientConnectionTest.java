@@ -11,8 +11,8 @@ import org.junit.*;
 public class ClientConnectionTest {
 
     private final ServerRunner server = new ServerRunner();
-    private final ClientRunner client = new ClientRunner(server);
-    private final ClientRunner client2 = new ClientRunner(server);
+    private final ClientRunner client = new ClientRunner(server).withUsername("user1");
+    private final ClientRunner client2 = new ClientRunner(server).withUsername("user2");
 
     @After
     public void shutdownServer() {
@@ -41,6 +41,7 @@ public class ClientConnectionTest {
         client.isLoggedOut();
     }
 
+    // TODO: test session messages in a different class
     //@Test
     public void send_and_receive_messages() throws Exception {
         server.startApplication(EchoApp.class);
@@ -58,16 +59,13 @@ public class ClientConnectionTest {
 
         client.loginToServer();
         client2.loginToServer();
+
         client.isLoggedIn();
         client2.isLoggedIn();
 
-        client.sendMessage("hello 1");
-        client2.sendMessage("hello 2");
-        client.receivesMessage("hello 1");
-        client2.receivesMessage("hello 2");
-
         client.logout();
         client2.logout();
+
         client.isLoggedOut();
         client2.isLoggedOut();
     }

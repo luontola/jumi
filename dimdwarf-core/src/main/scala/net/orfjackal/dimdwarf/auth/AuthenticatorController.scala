@@ -6,15 +6,15 @@ import net.orfjackal.dimdwarf.controller._
 
 @ControllerScoped
 class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Any]) extends Controller with Authenticator {
-  private var yesCallbacks = List[Function0[Unit]]()
-  private var noCallbacks = List[Function0[Unit]]()
+  private var yesCallbacks: Option[Function0[Unit]] = None
+  private var noCallbacks: Option[Function0[Unit]] = None
 
   // TODO: support more than one client
   // TODO: remove old callbacks
   def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit) {
     toAuthenticator.send(IsUserAuthenticated(credentials))
-    yesCallbacks = onYes _ :: yesCallbacks
-    noCallbacks = onNo _ :: noCallbacks
+    yesCallbacks = Some(onYes _)
+    noCallbacks = Some(onNo _)
   }
 
   def process(message: Any) {

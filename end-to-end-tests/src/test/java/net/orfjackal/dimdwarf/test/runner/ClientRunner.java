@@ -36,6 +36,11 @@ public class ClientRunner {
         client = new SimpleClient(new MySimpleClientListener());
     }
 
+    public ClientRunner withUsername(String username) {
+        this.username = username;
+        return this;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
