@@ -20,7 +20,7 @@ class NetworkActorSpec extends Spec {
   val port = SocketUtil.anyFreePort
   val toHub = new MessageQueue[Any]("toHub")
 
-  val networkActor = new NetworkActor(port, new SimpleSgsProtocolIoHandler(toHub))
+  val networkActor = new NetworkActor(port, toHub)
   networkActor.start()
   defer {networkActor.stop()}
 
