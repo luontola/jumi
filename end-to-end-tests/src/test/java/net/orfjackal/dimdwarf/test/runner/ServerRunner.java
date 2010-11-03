@@ -96,10 +96,13 @@ public class ServerRunner {
         serverProcess.waitForOutput("Server started", TIMEOUT, TIMEOUT_UNIT);
     }
 
-    public void shutdown() {
+    public void assertIsRunning() {
         if (serverProcess != null) {
             assertTrue("Server had died unexpectedly", serverProcess.isAlive());
         }
+    }
+
+    public void shutdown() {
         try {
             if (serverProcess != null) {
                 serverProcess.kill();

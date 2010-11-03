@@ -16,9 +16,13 @@ public class ClientConnectionTest {
 
     @After
     public void shutdownServer() {
-        client2.disconnect();
-        client.disconnect();
-        server.shutdown();
+        try {
+            server.assertIsRunning();
+        } finally {
+            client2.disconnect();
+            client.disconnect();
+            server.shutdown();
+        }
     }
 
     @Test
