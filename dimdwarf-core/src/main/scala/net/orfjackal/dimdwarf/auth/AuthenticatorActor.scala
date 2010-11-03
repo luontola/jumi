@@ -14,9 +14,9 @@ class AuthenticatorActor @Inject()(@Hub toHub: MessageSender[Any], credentialsCh
     message match {
       case IsUserAuthenticated(credentials) =>
         if (credentialsChecker.isValid(credentials)) {
-          toHub.send(YesUserIsAuthenticated())
+          toHub.send(YesUserIsAuthenticated(credentials))
         } else {
-          toHub.send(NoUserIsNotAuthenticated())
+          toHub.send(NoUserIsNotAuthenticated(credentials))
         }
     }
   }
