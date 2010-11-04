@@ -7,7 +7,6 @@ package net.orfjackal.dimdwarf.modules;
 import com.google.inject.Provides;
 import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.controller.*;
-import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import org.slf4j.*;
 
 import java.util.*;
@@ -28,9 +27,10 @@ public class ControllerModule extends ActorModule<Object> {
     }
 
     @Provides
-    ActorRunnable actor(ControllerHub actor, MessageReceiver<Object> toActor, Set<ControllerRegistration> controllerRegs) {
-        registerControllers(actor, controllerRegs);
-        return new ActorMessageLoop(actor, toActor);
+    ControllerHub hub(Set<ControllerRegistration> controllerRegs) {
+        ControllerHub hub = new ControllerHub();
+        registerControllers(hub, controllerRegs);
+        return hub;
     }
 
     private static void registerControllers(ControllerHub hub, Set<ControllerRegistration> controllerRegs) {

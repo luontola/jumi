@@ -4,9 +4,7 @@
 
 package net.orfjackal.dimdwarf.actors.dummies;
 
-import com.google.inject.Provides;
-import net.orfjackal.dimdwarf.actors.*;
-import net.orfjackal.dimdwarf.mq.MessageReceiver;
+import net.orfjackal.dimdwarf.actors.ActorModule;
 
 public class RelayModule extends ActorModule<Object> {
 
@@ -17,10 +15,5 @@ public class RelayModule extends ActorModule<Object> {
     protected void configure() {
         bindControllerTo(RelayController.class);
         bindActorTo(RelayActor.class);
-    }
-
-    @Provides
-    ActorRunnable actor(Actor<Object> actor, MessageReceiver<Object> toActor) {
-        return new ActorMessageLoop<Object>(actor, toActor);
     }
 }

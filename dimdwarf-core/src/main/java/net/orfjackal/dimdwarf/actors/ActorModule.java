@@ -25,6 +25,7 @@ public abstract class ActorModule<M> extends PrivateModule {
     protected final Class<M> messageType;
     protected final TypeLiteral<MessageSender<M>> messageSenderType;
     protected final TypeLiteral<MessageReceiver<M>> messageReceiverType;
+    protected final TypeLiteral<ActorMessageLoop<M>> actorMessageLoopType;
     protected final TypeLiteral<Actor<M>> actorType;
 
     public ActorModule(String actorName) {
@@ -39,6 +40,7 @@ public abstract class ActorModule<M> extends PrivateModule {
         messageType = getMessageType();
         messageSenderType = (TypeLiteral<MessageSender<M>>) TypeLiteral.get(Types.newParameterizedType(MessageSender.class, messageType));
         messageReceiverType = (TypeLiteral<MessageReceiver<M>>) TypeLiteral.get(Types.newParameterizedType(MessageReceiver.class, messageType));
+        actorMessageLoopType = (TypeLiteral<ActorMessageLoop<M>>) TypeLiteral.get(Types.newParameterizedType(ActorMessageLoop.class, messageType));
         actorType = (TypeLiteral<Actor<M>>) TypeLiteral.get(Types.newParameterizedType(Actor.class, messageType));
     }
 
@@ -75,6 +77,8 @@ public abstract class ActorModule<M> extends PrivateModule {
         MessageQueue<M> mq = new MessageQueue<M>(actorName);
         bind(messageSenderType).toInstance(mq);
         bind(messageReceiverType).toInstance(mq);
+
+        bind(ActorRunnable.class).to(actorMessageLoopType);
 
         actors.add(exposeUniqueKey(ActorRegistration.class, actorRegistrationProvider()));
     }

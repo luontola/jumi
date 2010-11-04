@@ -12,6 +12,7 @@ import net.orfjackal.dimdwarf.modules._
 import net.orfjackal.dimdwarf.mq._
 import net.orfjackal.dimdwarf.context.ThreadContext
 
+// TODO: use JUnit/Hamcrest matchers instead of Specs' matchers (?)
 @RunWith(classOf[Specsy])
 class InstallingActorsSpec extends Spec with ShouldMatchers {
   val injector = Guice.createInjector(new ActorInstallerModule(new ControllerModule, new RelayModule))
@@ -28,8 +29,6 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
     val actorNames = actors.map(_.getName)
 
     actorNames should contain("Relay")
-    //assertThat(actorNames, hasItem("Relay")) // TODO: doesn't compile, create a Scala wrapper
-    //assertTrue(actorNames.toString, actorNames.contains("Relay"))
   }
 
   "Controllers can send messages to actors" >> {
@@ -83,18 +82,14 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
 
     class DependantModule extends ActorModule[Any]("Dependant") {
       def configure() {
-        bindActorTo(classOf[DummyActor])
-        bind(classOf[ActorRunnable]).to(classOf[DummyActorRunnable])
-
         bindControllerTo(classOf[DependantController])
+        bindActorTo(classOf[DummyActor])
       }
     }
     class DependeeModule extends ActorModule[Any]("Dependee") {
       def configure() {
-        bindActorTo(classOf[DummyActor])
-        bind(classOf[ActorRunnable]).to(classOf[DummyActorRunnable])
-
         bindControllerTo(classOf[DependeeController])
+        bindActorTo(classOf[DummyActor])
       }
     }
 

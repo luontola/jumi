@@ -5,9 +5,8 @@
 package net.orfjackal.dimdwarf.modules;
 
 import com.google.inject.Provides;
-import net.orfjackal.dimdwarf.actors.*;
+import net.orfjackal.dimdwarf.actors.ActorModule;
 import net.orfjackal.dimdwarf.auth.*;
-import net.orfjackal.dimdwarf.mq.MessageReceiver;
 
 public class AuthenticatorModule extends ActorModule<AuthenticatorMessage> {
 
@@ -31,10 +30,5 @@ public class AuthenticatorModule extends ActorModule<AuthenticatorMessage> {
         // To make it easier to write bindings in the application code (no TypeLiterals),
         // we create a binding from the raw type to the generic type.
         return checker;
-    }
-
-    @Provides
-    ActorRunnable actor(Actor<AuthenticatorMessage> actor, MessageReceiver<AuthenticatorMessage> toActor) {
-        return new ActorMessageLoop<AuthenticatorMessage>(actor, toActor);
     }
 }

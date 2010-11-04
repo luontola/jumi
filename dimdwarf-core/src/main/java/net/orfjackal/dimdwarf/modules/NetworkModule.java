@@ -4,10 +4,8 @@
 
 package net.orfjackal.dimdwarf.modules;
 
-import com.google.inject.Provides;
 import com.google.inject.name.Names;
-import net.orfjackal.dimdwarf.actors.*;
-import net.orfjackal.dimdwarf.mq.MessageReceiver;
+import net.orfjackal.dimdwarf.actors.ActorModule;
 import net.orfjackal.dimdwarf.net.*;
 
 public class NetworkModule extends ActorModule<NetworkMessage> {
@@ -20,14 +18,9 @@ public class NetworkModule extends ActorModule<NetworkMessage> {
     }
 
     protected void configure() {
-        bindConstant().annotatedWith(Names.named("port")).to(port);
-
         bindControllerTo(NetworkController.class);
         bindActorTo(NetworkActor.class);
-    }
 
-    @Provides
-    ActorRunnable actor(Actor<NetworkMessage> actor, MessageReceiver<NetworkMessage> toActor) {
-        return new ActorMessageLoop<NetworkMessage>(actor, toActor);
+        bindConstant().annotatedWith(Names.named("port")).to(port);
     }
 }
