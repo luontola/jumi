@@ -8,10 +8,6 @@ import net.orfjackal.dimdwarf.actors.ActorModule;
 
 public class RelayModule extends ActorModule<Object> {
 
-    public RelayModule() {
-        super("Relay");
-    }
-
     protected void configure() {
         bindControllerTo(RelayController.class);
         bindActorTo(RelayActor.class);

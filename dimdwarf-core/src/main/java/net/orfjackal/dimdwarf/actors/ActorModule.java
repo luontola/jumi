@@ -28,12 +28,23 @@ public abstract class ActorModule<M> extends PrivateModule {
     protected final TypeLiteral<ActorMessageLoop<M>> actorMessageLoopType;
     protected final TypeLiteral<Actor<M>> actorType;
 
+    public ActorModule() {
+        this("");
+    }
+
+    public ActorModule(Class<? extends Annotation> actorScope) {
+        this("", actorScope);
+    }
+
     public ActorModule(String actorName) {
         this(actorName, ActorScoped.class);
     }
 
     @SuppressWarnings({"unchecked"})
     public ActorModule(String actorName, Class<? extends Annotation> actorScope) {
+        if (actorName.equals("")) {
+            actorName = getDefaultActorName();
+        }
         this.actorName = actorName;
         this.actorScope = actorScope;
 
@@ -42,6 +53,11 @@ public abstract class ActorModule<M> extends PrivateModule {
         messageReceiverType = (TypeLiteral<MessageReceiver<M>>) TypeLiteral.get(Types.newParameterizedType(MessageReceiver.class, messageType));
         actorMessageLoopType = (TypeLiteral<ActorMessageLoop<M>>) TypeLiteral.get(Types.newParameterizedType(ActorMessageLoop.class, messageType));
         actorType = (TypeLiteral<Actor<M>>) TypeLiteral.get(Types.newParameterizedType(Actor.class, messageType));
+    }
+
+    private String getDefaultActorName() {
+        String className = getClass().getSimpleName();
+        return className.substring(0, className.indexOf("Module"));
     }
 
     @SuppressWarnings({"unchecked"})

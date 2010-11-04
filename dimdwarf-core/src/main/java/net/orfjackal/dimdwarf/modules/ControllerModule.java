@@ -16,7 +16,7 @@ public class ControllerModule extends ActorModule<Object> {
     private static Logger logger = LoggerFactory.getLogger(ControllerModule.class);
 
     public ControllerModule() {
-        super("Controller", ControllerScoped.class);
+        super(ControllerScoped.class);
     }
 
     protected void configure() {

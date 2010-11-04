@@ -56,8 +56,7 @@ class ActorStarterSpec extends Spec with ShouldMatchers {
           onStart
         }
 
-        def run() {
-        }
+        def run() {}
       }))
   }
 

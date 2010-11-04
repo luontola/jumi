@@ -13,7 +13,6 @@ public class NetworkModule extends ActorModule<NetworkMessage> {
     private final int port;
 
     public NetworkModule(int port) {
-        super("Network");
         this.port = port;
     }
 

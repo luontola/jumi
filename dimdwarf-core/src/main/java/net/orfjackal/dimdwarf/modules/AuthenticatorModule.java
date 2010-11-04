@@ -10,10 +10,6 @@ import net.orfjackal.dimdwarf.auth.*;
 
 public class AuthenticatorModule extends ActorModule<AuthenticatorMessage> {
 
-    public AuthenticatorModule() {
-        super("Authenticator");
-    }
-
     protected void configure() {
         bindControllerTo(AuthenticatorController.class);
         bindActorTo(AuthenticatorActor.class);
