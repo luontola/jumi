@@ -17,19 +17,36 @@ import java.util.*;
 
 public abstract class ActorModule<M> extends PrivateModule {
 
-    protected final String actorName;
-
     private final List<Key<ControllerRegistration>> controllers = new ArrayList<Key<ControllerRegistration>>();
     private final List<Key<ActorRegistration>> actors = new ArrayList<Key<ActorRegistration>>();
     private final Class<? extends Annotation> actorScope;
+
+    protected final String actorName;
+    protected final Class<M> messageType;
+    protected final TypeLiteral<MessageSender<M>> messageSenderType;
+    protected final TypeLiteral<MessageReceiver<M>> messageReceiverType;
+    protected final TypeLiteral<Actor<M>> actorType;
 
     public ActorModule(String actorName) {
         this(actorName, ActorScoped.class);
     }
 
+    @SuppressWarnings({"unchecked"})
     public ActorModule(String actorName, Class<? extends Annotation> actorScope) {
         this.actorName = actorName;
         this.actorScope = actorScope;
+
+        messageType = getMessageType();
+        messageSenderType = (TypeLiteral<MessageSender<M>>) TypeLiteral.get(Types.newParameterizedType(MessageSender.class, messageType));
+        messageReceiverType = (TypeLiteral<MessageReceiver<M>>) TypeLiteral.get(Types.newParameterizedType(MessageReceiver.class, messageType));
+        actorType = (TypeLiteral<Actor<M>>) TypeLiteral.get(Types.newParameterizedType(Actor.class, messageType));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private Class<M> getMessageType() {
+        ParameterizedType actorModuleType = (ParameterizedType) getClass().getGenericSuperclass();
+        Type messageType = actorModuleType.getActualTypeArguments()[0];
+        return (Class<M>) messageType;
     }
 
     public List<Key<ControllerRegistration>> getControllers() {
@@ -53,7 +70,11 @@ public abstract class ActorModule<M> extends PrivateModule {
     protected void bindActorTo(Class<? extends Actor<M>> actor) {
         checkHasAnnotation(actor, actorScope);
 
-        bind(genericActorInterfaceOf(actor)).to(actor);
+        bind(actorType).to(actor);
+
+        MessageQueue<M> mq = new MessageQueue<M>(actorName);
+        bind(messageSenderType).toInstance(mq);
+        bind(messageReceiverType).toInstance(mq);
 
         actors.add(exposeUniqueKey(ActorRegistration.class, actorRegistrationProvider()));
     }
@@ -83,23 +104,6 @@ public abstract class ActorModule<M> extends PrivateModule {
         }
     }
 
-    @SuppressWarnings({"unchecked"})
-    private Key<Actor<M>> genericActorInterfaceOf(Class<? extends Actor<M>> actor) {
-        return (Key<Actor<M>>) Key.get(getGenericInterfaceType(Actor.class, actor));
-    }
-
-    private static <T> ParameterizedType getGenericInterfaceType(Class<T> genericInterface, Class<? extends T> target) {
-        for (Type type : target.getGenericInterfaces()) {
-            if (type instanceof ParameterizedType) {
-                ParameterizedType ptype = (ParameterizedType) type;
-                if (ptype.getRawType().equals(genericInterface)) {
-                    return ptype;
-                }
-            }
-        }
-        throw new IllegalArgumentException("Does not (directly) implement the Actor interface: " + target);
-    }
-
     private <T> Key<T> exposeUniqueKey(Class<T> type, Provider<T> provider) {
         bind(type).toProvider(provider);
 
@@ -111,22 +115,5 @@ public abstract class ActorModule<M> extends PrivateModule {
 
     private Named uniqueId() {
         return Names.named(actorName + "/" + UUID.randomUUID().toString());
-    }
-
-    // TODO: the message type could be retrieved from the type parameters of ActorModule 
-    protected void bindMessageQueueOfType(Class<M> messageType) {
-        MessageQueue<?> mq = new MessageQueue<Object>(actorName);
-        bind(messageSenderOf(messageType)).toInstance(mq);
-        bind(messageReceiverOf(messageType)).toInstance(mq);
-    }
-
-    @SuppressWarnings({"unchecked"})
-    protected TypeLiteral<MessageSender<?>> messageSenderOf(Type messageType) {
-        return (TypeLiteral<MessageSender<?>>) TypeLiteral.get(Types.newParameterizedType(MessageSender.class, messageType));
-    }
-
-    @SuppressWarnings({"unchecked"})
-    protected TypeLiteral<MessageReceiver<?>> messageReceiverOf(Type messageType) {
-        return (TypeLiteral<MessageReceiver<?>>) TypeLiteral.get(Types.newParameterizedType(MessageReceiver.class, messageType));
     }
 }

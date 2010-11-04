@@ -83,14 +83,18 @@ class InstallingActorsSpec extends Spec with ShouldMatchers {
 
     class DependantModule extends ActorModule[Any]("Dependant") {
       def configure() {
+        bindActorTo(classOf[DummyActor])
+        bind(classOf[ActorRunnable]).to(classOf[DummyActorRunnable])
+
         bindControllerTo(classOf[DependantController])
-        bindMessageQueueOfType(classOf[Any])
       }
     }
     class DependeeModule extends ActorModule[Any]("Dependee") {
       def configure() {
+        bindActorTo(classOf[DummyActor])
+        bind(classOf[ActorRunnable]).to(classOf[DummyActorRunnable])
+
         bindControllerTo(classOf[DependeeController])
-        bindMessageQueueOfType(classOf[Any])
       }
     }
 
@@ -140,4 +144,15 @@ class DependantController @Inject()(val dependee: DependeeController, val queue:
 @ControllerScoped
 class DependeeController @Inject()(val queue: MessageSender[Any]) extends Controller {
   def process(message: Any) {}
+}
+@ActorScoped
+class DummyActor extends Actor[Any] {
+  def start() {}
+
+  def process(message: Any) {}
+}
+class DummyActorRunnable extends ActorRunnable {
+  def run() {}
+
+  def start() {}
 }

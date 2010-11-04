@@ -24,7 +24,6 @@ public class NetworkModule extends ActorModule<NetworkMessage> {
 
         bindControllerTo(NetworkController.class);
         bindActorTo(NetworkActor.class);
-        bindMessageQueueOfType(NetworkMessage.class);
     }
 
     @Provides

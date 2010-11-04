@@ -18,7 +18,6 @@ public class AuthenticatorModule extends ActorModule<AuthenticatorMessage> {
     protected void configure() {
         bindControllerTo(AuthenticatorController.class);
         bindActorTo(AuthenticatorActor.class);
-        bindMessageQueueOfType(AuthenticatorMessage.class);
 
         bind(Authenticator.class).to(AuthenticatorController.class);
         expose(Authenticator.class);

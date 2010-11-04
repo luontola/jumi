@@ -17,7 +17,6 @@ public class RelayModule extends ActorModule<Object> {
     protected void configure() {
         bindControllerTo(RelayController.class);
         bindActorTo(RelayActor.class);
-        bindMessageQueueOfType(Object.class);
     }
 
     @Provides

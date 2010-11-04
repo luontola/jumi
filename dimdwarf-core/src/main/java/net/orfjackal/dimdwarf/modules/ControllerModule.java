@@ -7,7 +7,7 @@ package net.orfjackal.dimdwarf.modules;
 import com.google.inject.Provides;
 import net.orfjackal.dimdwarf.actors.*;
 import net.orfjackal.dimdwarf.controller.*;
-import net.orfjackal.dimdwarf.mq.*;
+import net.orfjackal.dimdwarf.mq.MessageReceiver;
 import org.slf4j.*;
 
 import java.util.*;
@@ -23,20 +23,22 @@ public class ControllerModule extends ActorModule<Object> {
     protected void configure() {
         bindActorTo(ControllerHub.class);
 
-        MessageQueue<Object> toHub = new MessageQueue<Object>(actorName);
-        bind(messageSenderOf(Object.class)).annotatedWith(Hub.class).toInstance(toHub);
-        bind(messageReceiverOf(Object.class)).annotatedWith(Hub.class).toInstance(toHub);
-        expose(messageSenderOf(Object.class)).annotatedWith(Hub.class);
+        bind(messageSenderType).annotatedWith(Hub.class).to(messageSenderType);
+        expose(messageSenderType).annotatedWith(Hub.class);
     }
 
     @Provides
-    ActorRunnable actor(ControllerHub hub, @Hub MessageReceiver<Object> toHub, Set<ControllerRegistration> controllerRegs) {
+    ActorRunnable actor(ControllerHub actor, MessageReceiver<Object> toActor, Set<ControllerRegistration> controllerRegs) {
+        registerControllers(actor, controllerRegs);
+        return new ActorMessageLoop(actor, toActor);
+    }
+
+    private static void registerControllers(ControllerHub hub, Set<ControllerRegistration> controllerRegs) {
         for (ControllerRegistration reg : preventTemporalCoupling(controllerRegs)) {
             Controller controller = reg.getController().get();
             logger.info("Registering controller \"{}\" of type {}", reg.getName(), controller.getClass().getName());
             hub.addController(controller);
         }
-        return new ActorMessageLoop(hub, toHub);
     }
 
     private static List<ControllerRegistration> preventTemporalCoupling(Set<ControllerRegistration> deterministicOrder) {
