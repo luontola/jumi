@@ -146,8 +146,3 @@ class DummyActor extends Actor[Any] {
 
   def process(message: Any) {}
 }
-class DummyActorRunnable extends ActorRunnable {
-  def run() {}
-
-  def start() {}
-}
