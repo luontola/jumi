@@ -5,6 +5,10 @@
         <option name="PATTERN" value="net.orfjackal.dimdwarf.*" />
         <option name="ENABLED" value="true" />
       </pattern>
+      <pattern>
+        <option name="PATTERN" value="end2endtests.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
     </extension>
     <extension name="snapshooter" />
     <module name="end-to-end-tests" />

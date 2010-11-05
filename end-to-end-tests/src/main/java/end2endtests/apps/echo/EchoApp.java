@@ -2,11 +2,11 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.test.apps.echo;
+package end2endtests.apps.echo;
 
 import com.google.inject.AbstractModule;
+import end2endtests.apps.FakeCredentialsChecker;
 import net.orfjackal.dimdwarf.auth.CredentialsChecker;
-import net.orfjackal.dimdwarf.test.apps.FakeCredentialsChecker;
 
 public class EchoApp extends AbstractModule {
 

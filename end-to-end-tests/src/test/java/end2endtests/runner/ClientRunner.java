@@ -2,11 +2,11 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.test.runner;
+package end2endtests.runner;
 
 import com.sun.sgs.client.*;
 import com.sun.sgs.client.simple.*;
-import net.orfjackal.dimdwarf.test.apps.FakeCredentialsChecker;
+import end2endtests.apps.FakeCredentialsChecker;
 
 import java.io.IOException;
 import java.net.PasswordAuthentication;
@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 import java.util.Properties;
 import java.util.concurrent.*;
 
-import static net.orfjackal.dimdwarf.test.runner.ClientRunner.EventType.*;
+import static end2endtests.runner.ClientRunner.EventType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 

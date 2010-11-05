@@ -2,10 +2,10 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.test;
+package end2endtests;
 
-import net.orfjackal.dimdwarf.test.apps.echo.EchoApp;
-import net.orfjackal.dimdwarf.test.runner.*;
+import end2endtests.apps.echo.EchoApp;
+import end2endtests.runner.*;
 import org.junit.*;
 
 public class ClientConnectionTest {
