@@ -2,7 +2,7 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.test.util;
+package net.orfjackal.dimdwarf.testutils;
 
 import java.io.Reader;
 import java.util.Scanner;

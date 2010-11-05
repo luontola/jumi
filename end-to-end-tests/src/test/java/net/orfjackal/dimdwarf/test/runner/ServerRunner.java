@@ -5,7 +5,8 @@
 package net.orfjackal.dimdwarf.test.runner;
 
 import com.google.inject.Module;
-import net.orfjackal.dimdwarf.test.util.*;
+import net.orfjackal.dimdwarf.test.util.TestEnvironment;
+import net.orfjackal.dimdwarf.testutils.SocketUtil;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;

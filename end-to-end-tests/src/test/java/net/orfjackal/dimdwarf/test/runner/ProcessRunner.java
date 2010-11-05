@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.test.runner;
 
-import net.orfjackal.dimdwarf.test.util.*;
+import net.orfjackal.dimdwarf.testutils.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.io.output.CloseShieldOutputStream;

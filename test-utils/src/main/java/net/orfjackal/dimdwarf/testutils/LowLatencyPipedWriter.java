@@ -2,31 +2,31 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://dimdwarf.sourceforge.net/LICENSE
 
-package net.orfjackal.dimdwarf.test.util;
+package net.orfjackal.dimdwarf.testutils;
 
 import java.io.*;
 
 /**
- * {@link java.io.PipedOutputStream} should be flushed after every write, or otherwise
+ * {@link java.io.PipedWriter} should be flushed after every write, or otherwise
  * there will be a one-second latency for the reader. This class does that automatically.
  * <a href="http://stackoverflow.com/questions/2843555/better-alternative-for-pipedreader-pipedwriter/2844689#2844689">More information</a>.
  */
-public class LowLatencyPipedOutputStream extends PipedOutputStream {
+public class LowLatencyPipedWriter extends PipedWriter {
 
-    public LowLatencyPipedOutputStream(PipedInputStream snk) throws IOException {
+    public LowLatencyPipedWriter(PipedReader snk) throws IOException {
         super(snk);
     }
 
-    public LowLatencyPipedOutputStream() {
+    public LowLatencyPipedWriter() {
     }
 
-    public void write(int b) throws IOException {
-        super.write(b);
+    public void write(int c) throws IOException {
+        super.write(c);
         flush();
     }
 
-    public void write(byte[] b, int off, int len) throws IOException {
-        super.write(b, off, len);
+    public void write(char[] cbuf, int off, int len) throws IOException {
+        super.write(cbuf, off, len);
         flush();
     }
 }

@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.io.*;
 
-import static net.orfjackal.dimdwarf.test.util.Matchers.*;
+import static net.orfjackal.dimdwarf.testutils.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 
