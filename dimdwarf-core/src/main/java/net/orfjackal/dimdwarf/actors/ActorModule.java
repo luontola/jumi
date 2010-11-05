@@ -40,7 +40,6 @@ public abstract class ActorModule<M> extends PrivateModule {
         this(actorName, ActorScoped.class);
     }
 
-    @SuppressWarnings({"unchecked"})
     public ActorModule(String actorName, Class<? extends Annotation> actorScope) {
         if (actorName.equals("")) {
             actorName = getDefaultActorName();
@@ -49,10 +48,10 @@ public abstract class ActorModule<M> extends PrivateModule {
         this.actorScope = actorScope;
 
         messageType = getMessageType();
-        messageSenderType = (TypeLiteral<MessageSender<M>>) TypeLiteral.get(Types.newParameterizedType(MessageSender.class, messageType));
-        messageReceiverType = (TypeLiteral<MessageReceiver<M>>) TypeLiteral.get(Types.newParameterizedType(MessageReceiver.class, messageType));
-        actorMessageLoopType = (TypeLiteral<ActorMessageLoop<M>>) TypeLiteral.get(Types.newParameterizedType(ActorMessageLoop.class, messageType));
-        actorType = (TypeLiteral<Actor<M>>) TypeLiteral.get(Types.newParameterizedType(Actor.class, messageType));
+        messageSenderType = parameterizedType(MessageSender.class, messageType);
+        messageReceiverType = parameterizedType(MessageReceiver.class, messageType);
+        actorMessageLoopType = parameterizedType(ActorMessageLoop.class, messageType);
+        actorType = parameterizedType(Actor.class, messageType);
     }
 
     private String getDefaultActorName() {
@@ -65,6 +64,11 @@ public abstract class ActorModule<M> extends PrivateModule {
         ParameterizedType actorModuleType = (ParameterizedType) getClass().getGenericSuperclass();
         Type messageType = actorModuleType.getActualTypeArguments()[0];
         return (Class<M>) messageType;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private static <T> TypeLiteral<T> parameterizedType(Class<?> type, Class<?> typeParameter) {
+        return (TypeLiteral<T>) TypeLiteral.get(Types.newParameterizedType(type, typeParameter));
     }
 
     public List<Key<ControllerRegistration>> getControllers() {
