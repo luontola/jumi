@@ -30,7 +30,7 @@ public class Main {
         int port = Integer.parseInt(args[1]);
         String applicationDir = args[3];
 
-        List<Module> modules = configureServerModules(port, applicationDir);
+        List<Module> modules = configureServerModules(port, loadApplicationModule(applicationDir));
         logger.info("Modules configured");
 
         // TODO: speed up startup by loading classes in parallel
@@ -54,16 +54,14 @@ public class Main {
         return version != null ? version : "<unknown version>";
     }
 
-    // TODO: unit test for module configuration (no Guice exceptions)
-
-    private static List<Module> configureServerModules(int port, String applicationDir) throws Exception {
+    public static List<Module> configureServerModules(int port, Module appModule) {
         List<Module> modules = new ArrayList<Module>();
         modules.add(new ActorInstallerModule(
                 new ControllerModule(),
                 new AuthenticatorModule(),
                 new NetworkModule(port)
         ));
-        modules.add(loadApplicationModule(applicationDir));
+        modules.add(appModule);
         return modules;
     }
 
