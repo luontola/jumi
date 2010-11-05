@@ -54,6 +54,8 @@ public class Main {
         return version != null ? version : "<unknown version>";
     }
 
+    // TODO: unit test for module configuration (no Guice exceptions)
+
     private static List<Module> configureServerModules(int port, String applicationDir) throws Exception {
         List<Module> modules = new ArrayList<Module>();
         modules.add(new ActorInstallerModule(

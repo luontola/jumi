@@ -14,6 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CustomMatchers {
 
+    // TODO: matching messages in sequence
+    // - add a consume/dropFirst method to AsynchronousSink, use it when assert passes
+    // - create ConsumingMatcher which tells how many items it will consume
+
     @SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter"})
     public static void assertEventually(AsynchronousSink<?> sink, Matcher<?> matcher) {
         synchronized (sink) {
