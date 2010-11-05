@@ -43,6 +43,7 @@
         <module>dist</module>
         <module>end-to-end-tests</module>
         <module>parent</module>
+        <module>test-utils</module>
     </modules>
 
     <build>

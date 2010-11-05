@@ -71,8 +71,8 @@
         <!-- Utilities -->
 
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
+            <groupId>net.orfjackal.dimdwarf</groupId>
+            <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
 

@@ -96,7 +96,6 @@
             <!-- Must be declared before JUnit to use hamcrest-core 1.2 instead of the 1.1 which junit-dep depends on -->
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>
-            <version>1.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -198,6 +197,12 @@
             <dependency>
                 <groupId>net.orfjackal.dimdwarf</groupId>
                 <artifactId>dimdwarf-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.orfjackal.dimdwarf</groupId>
+                <artifactId>test-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -334,6 +339,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>1.2</version>
             </dependency>
 
         </dependencies>
