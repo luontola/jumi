@@ -36,14 +36,24 @@ public class Matchers {
         };
     }
 
-    public static Matcher<File> containsFile(final File file) {
+    public static Matcher<File> containsFile(final File expectedFile) {
         return new TypeSafeMatcher<File>() {
             public boolean matchesSafely(File dir) {
-                return hasItemInArray(file).matches(dir.listFiles());
+                return hasItemInArray(expectedFile).matches(dir.listFiles());
             }
 
             public void describeTo(Description description) {
-                description.appendText("directory containing ").appendValue(file);
+                description
+                        .appendText("directory containing ")
+                        .appendValue(expectedFile);
+            }
+
+            protected void describeMismatchSafely(File dir, Description mismatchDescription) {
+                mismatchDescription
+                        .appendText("directory ")
+                        .appendValue(dir)
+                        .appendText(" contained ")
+                        .appendValueList("", ", ", "", dir.listFiles());
             }
         };
     }
