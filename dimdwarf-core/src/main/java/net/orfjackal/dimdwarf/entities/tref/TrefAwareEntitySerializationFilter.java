@@ -31,6 +31,8 @@ public class TrefAwareEntitySerializationFilter implements EntitySerializationFi
     public Object resolveDeserialized(Object obj) {
         obj = trefSupport.initDeserializedTransparentReference(obj);
         // TODO: Would before tref handling be better? May this accidentally inject transparent reference proxies?
+        // TODO: Would using com.google.inject.MembersInjector make sense?
+        // TODO: Inject only objects with a marker interface? Need to profile the current performance first.
         injector.injectMembers(obj);
         return obj;
     }
