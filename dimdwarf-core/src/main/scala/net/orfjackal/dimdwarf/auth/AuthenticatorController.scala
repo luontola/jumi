@@ -26,7 +26,7 @@ class AuthenticatorController @Inject()(toAuthenticator: MessageSender[Authentic
   private def addCallback(credentials: Credentials, onYes: => Unit, onNo: => Unit): Unit = {
     val oldCallbacks = pending(credentials)
     val newCallbacks = oldCallbacks :+ new Callback(onYes _, onNo _)
-    pending = pending.updated(credentials, newCallbacks)
+    pending += (credentials -> newCallbacks)
   }
 
   private def callAndResetCallbacks(credentials: Credentials, call: (Callback) => Any) {
