@@ -6,6 +6,7 @@ import net.orfjackal.dimdwarf.controller._
 
 @ControllerScoped
 class AuthenticatorController @Inject()(toAuthenticator: MessageSender[AuthenticatorMessage]) extends Controller with Authenticator {
+  // TODO: pass callbacks with the message (as a private class), to avoid local state and to simplify the message contracts
   private var pending = Map[Credentials, Seq[Callback]]().withDefaultValue(Seq())
 
   def isUserAuthenticated(credentials: Credentials, onYes: => Unit, onNo: => Unit) {
