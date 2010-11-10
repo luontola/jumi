@@ -16,6 +16,7 @@
           <module name="dimdwarf-core" />
           <module name="parent" />
           <module name="dimdwarf-dist" />
+          <module name="test-utils" />
         </modules>
       </facet-type>
     </autodetection-disabled>
