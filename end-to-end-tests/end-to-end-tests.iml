@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="scala" name="Scala">
+      <configuration>
+        <option name="compilerLibraryLevel" value="Project" />
+        <option name="compilerLibraryName" value="Maven: org.scala-lang:scala-compiler-bundle:2.8.1" />
+        <option name="vmOptions" value="" />
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -18,7 +27,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="dimdwarf-dist" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: org.reddwarfserver.client:sgs-client:0.10.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.reddwarfserver.server:sgs-shared:1.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.mina:mina-core:1.1.7" level="project" />
