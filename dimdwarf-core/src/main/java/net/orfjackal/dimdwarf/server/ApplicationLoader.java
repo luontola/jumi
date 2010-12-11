@@ -12,9 +12,11 @@ import java.net.*;
 import java.util.*;
 
 public class ApplicationLoader {
-    public static final String APP_CLASSES = "classes";
-    public static final String APP_LIBRARIES = "lib";
-    public static final String APP_PROPERTIES = "META-INF/app.properties";
+    public static final String CLASSES_DIR = "classes";
+    public static final String LIBRARIES_DIR = "lib";
+    public static final String CONFIG_FILE = "META-INF/app.properties";
+    public static final String APP_NAME = "dimdwarf.app.name";
+    public static final String APP_MODULE = "dimdwarf.app.module";
 
     private final URLClassLoader classLoader;
     private final String applicationName;
@@ -26,12 +28,12 @@ public class ApplicationLoader {
 
     public ApplicationLoader(File applicationDir, ClassLoader parent) throws ConfigurationException {
         List<File> classpath = new ArrayList<File>();
-        classpath.add(new File(applicationDir, APP_CLASSES));
-        classpath.addAll(Arrays.asList(listJarsInDirectory(new File(applicationDir, APP_LIBRARIES))));
+        classpath.add(new File(applicationDir, CLASSES_DIR));
+        classpath.addAll(Arrays.asList(listJarsInDirectory(new File(applicationDir, LIBRARIES_DIR))));
         classLoader = new URLClassLoader(asUrls(classpath), parent);
 
-        applicationName = getRequiredProperty("dimdwarf.app.name", APP_PROPERTIES);
-        applicationModule = getRequiredProperty("dimdwarf.app.module", APP_PROPERTIES);
+        applicationName = getRequiredProperty(APP_NAME, CONFIG_FILE);
+        applicationModule = getRequiredProperty(APP_MODULE, CONFIG_FILE);
     }
 
     public String getApplicationName() {
