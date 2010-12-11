@@ -29,7 +29,7 @@ public class Sandbox {
         } while (!dir.mkdir() && counter < SAFETY_LIMIT);
 
         if (!dir.isDirectory()) {
-            throw new IllegalStateException("Unable to create directory: " + dir);
+            throw new IllegalStateException("Unable to create directory: " + dir.getAbsolutePath());
         }
         return dir;
     }

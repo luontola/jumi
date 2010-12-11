@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 
 public class SandboxTest {
 
-    private final File sandboxDir = new File(getClass().getSimpleName() + "_" + UUID.randomUUID().toString() + ".tmp");
+    private final File sandboxDir = new File("target", getClass().getSimpleName() + "_" + UUID.randomUUID().toString() + ".tmp");
     private final Sandbox sandbox = new Sandbox(sandboxDir);
 
     @Before
