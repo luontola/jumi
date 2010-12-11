@@ -5,12 +5,12 @@
 package net.orfjackal.dimdwarf.actors;
 
 import com.google.inject.*;
-import net.orfjackal.dimdwarf.context.AbstractThreadContext;
+import net.orfjackal.dimdwarf.context.BaseContext;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
-public class ActorContext extends AbstractThreadContext {
+public class ActorContext extends BaseContext {
 
     @Inject
     public ActorContext(Injector injector) {

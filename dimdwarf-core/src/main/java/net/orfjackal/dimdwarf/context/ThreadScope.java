@@ -11,9 +11,9 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class ThreadScope implements Scope {
 
-    private final Class<? extends AbstractThreadContext> contextType;
+    private final Class<? extends BaseContext> contextType;
 
-    public ThreadScope(Class<? extends AbstractThreadContext> contextType) {
+    public ThreadScope(Class<? extends BaseContext> contextType) {
         this.contextType = contextType;
     }
 

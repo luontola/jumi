@@ -9,13 +9,17 @@ import com.google.inject.*;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
+/**
+ * Context implementations should extend this class without adding any methods
+ * (only the constructor is needed), in order to ensure separation of DI scopes.
+ */
 @NotThreadSafe
-public abstract class AbstractThreadContext implements Context {
+public abstract class BaseContext implements Context {
 
     private final Map<Key<?>, Object> cache = new HashMap<Key<?>, Object>();
     private final Injector injector;
 
-    public AbstractThreadContext(Injector injector) {
+    public BaseContext(Injector injector) {
         this.injector = injector;
     }
 
