@@ -40,6 +40,11 @@ class ApplicationLoadingSpec extends Spec {
       val loader = new ApplicationLoader(applicationDir)
 
       // FIXME: reading a file from a JAR appears to lock the JAR, and then this test can't remove the test data directory
+      // Related issues and some workarounds. URLClassLoader.close() has been added in JDK 7.
+      // http://bugs.sun.com/view_bug.do?bug_id=4950148
+      // http://bugs.sun.com/view_bug.do?bug_id=4167874
+      // http://download.oracle.com/javase/7/docs/technotes/guides/net/ClassLoader.html
+
       //val content = readContent("file-in-jar.txt", loader.getClassLoader)
       //assertThat(content, is("file content"))
     }
