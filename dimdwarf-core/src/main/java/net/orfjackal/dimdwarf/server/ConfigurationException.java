@@ -4,13 +4,9 @@
 
 package net.orfjackal.dimdwarf.server;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+public class ConfigurationException extends Exception {
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ApplicationLoadingSpec.class,
-        ModuleConfigurationSpec.class
-})
-public class ScalaSpecs {
+    public ConfigurationException(String message) {
+        super(message);
+    }
 }
