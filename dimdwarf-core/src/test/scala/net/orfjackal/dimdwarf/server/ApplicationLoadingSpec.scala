@@ -11,6 +11,7 @@ import com.google.inject._
 import org.junit.Assert
 import java.io._
 import java.util.zip._
+import java.net._
 
 @RunWith(classOf[Specsy])
 class ApplicationLoadingSpec extends Spec {
@@ -31,22 +32,20 @@ class ApplicationLoadingSpec extends Spec {
       val content = readContent("file.txt", loader.getClassLoader)
       assertThat(content, is("file content"))
     }
-    "Adds to classpath all JARs in the /lib directory" >> {
-      val out = new ZipOutputStream(new FileOutputStream(new File(libDir, "sample.jar")))
+
+    if (JRE.isJava7) "Adds to classpath all JARs in the /lib directory" >> {
+      val jarFile = new File(libDir, "sample.jar")
+
+      val out = new ZipOutputStream(new FileOutputStream(jarFile))
       out.putNextEntry(new ZipEntry("file-in-jar.txt"))
       IOUtils.write("file content", out)
       out.close()
 
       val loader = new ApplicationLoader(applicationDir)
+      defer {closeClassLoader(loader.getClassLoader, jarFile)}
 
-      // FIXME: reading a file from a JAR appears to lock the JAR, and then this test can't remove the test data directory
-      // Related issues and some workarounds. URLClassLoader.close() has been added in JDK 7.
-      // http://bugs.sun.com/view_bug.do?bug_id=4950148
-      // http://bugs.sun.com/view_bug.do?bug_id=4167874
-      // http://download.oracle.com/javase/7/docs/technotes/guides/net/ClassLoader.html
-
-      //val content = readContent("file-in-jar.txt", loader.getClassLoader)
-      //assertThat(content, is("file content"))
+      val content = readContent("file-in-jar.txt", loader.getClassLoader)
+      assertThat(content, is("file content"))
     }
     // TODO: write a test case that the /classes dir is first in classpath? (write a file with same name to /classes and a JAR)
 
@@ -76,6 +75,28 @@ class ApplicationLoadingSpec extends Spec {
       ApplicationLoader.APP_NAME -> "MyApp"))
 
     assertGivesAnErrorMentioning("Property", "was not set", ApplicationLoader.APP_MODULE, ApplicationLoader.CONFIG_FILE)
+  }
+
+  private def closeClassLoader(cl: URLClassLoader, jarFiles: File*) {
+    assert(JRE.isJava7)
+    // URLClassLoader locks the JAR when it reads a file from it,
+    // which would here prevent the removing of the temporary directory.
+    // Related issues and some workarounds.
+    // http://bugs.sun.com/view_bug.do?bug_id=4950148
+    // http://bugs.sun.com/view_bug.do?bug_id=4167874
+    // http://download.oracle.com/javase/7/docs/technotes/guides/net/ClassLoader.html
+
+    // XXX: URLClassLoader.close() has been added in JDK 7, but it does not appear to work without explicitly closing the JAR
+    for (jarFile <- jarFiles) {
+      closeJarConnection(jarFile)
+    }
+    JRE.closeClassLoader(cl)
+  }
+
+  private def closeJarConnection(jarFile: File) {
+    val url = new URL("jar:" + jarFile.toURI.toURL + "!/")
+    val connection = url.openConnection.asInstanceOf[JarURLConnection]
+    connection.getJarFile.close()
   }
 
   private def assertGivesAnErrorMentioning(messages: String*) {

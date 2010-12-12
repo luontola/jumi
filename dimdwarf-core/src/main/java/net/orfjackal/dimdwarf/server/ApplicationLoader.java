@@ -53,7 +53,7 @@ public class ApplicationLoader {
         }
     }
 
-    public ClassLoader getClassLoader() {
+    public URLClassLoader getClassLoader() {
         return classLoader;
     }
 
