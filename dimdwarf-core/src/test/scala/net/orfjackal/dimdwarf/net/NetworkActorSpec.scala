@@ -1,6 +1,8 @@
 package net.orfjackal.dimdwarf.net
 
 import org.junit.runner.RunWith
+import org.hamcrest.Matchers._
+import org.hamcrest.MatcherAssert.assertThat
 import net.orfjackal.specsy._
 import net.orfjackal.dimdwarf.mq.MessageQueue
 import net.orfjackal.dimdwarf.util._
@@ -32,7 +34,7 @@ class NetworkActorSpec extends Spec {
   "Receives messages from clients and forwards them to the hub" >> {
     client1.sends(logoutRequest())
 
-    assertHubReceives(LogoutRequest()) // TODO: pass a partial function (?)
+    assertHubReceives(LogoutRequest())
   }
 
   "Sends messages to clients" >> {
@@ -68,7 +70,8 @@ class NetworkActorSpec extends Spec {
 
   private def assertHubReceives(expected: ClientMessage) {
     toHub.poll(TIMEOUT) match {
-      case ReceivedFromClient(expected, _) => // OK
+      case ReceivedFromClient(actual, _) =>
+        assertThat("hub received from client", expected, is(actual))
     }
   }
 
