@@ -20,10 +20,9 @@ class ApplicationLoadingSpec extends Spec {
   val libDir = createDir(applicationDir, ApplicationLoader.LIBRARIES_DIR)
 
   "When configured correctly" >> {
-    writePropertiesFile(classesDir, ApplicationLoader.CONFIG_FILE, Map(
+    writeConfiguration(Map(
       ApplicationLoader.APP_NAME -> "MyApp",
       ApplicationLoader.APP_MODULE -> classOf[MyApp].getName))
-    copyClassToDir(classOf[MyApp], classesDir)
 
     "Adds to classpath the /classes directory" >> {
       FileUtils.write(new File(classesDir, "file.txt"), "file content")
@@ -35,11 +34,8 @@ class ApplicationLoadingSpec extends Spec {
 
     if (JRE.isJava7) "Adds to classpath all JARs in the /lib directory" >> {
       val jarFile = new File(libDir, "sample.jar")
-
-      val out = new ZipOutputStream(new FileOutputStream(jarFile))
-      out.putNextEntry(new ZipEntry("file-in-jar.txt"))
-      IOUtils.write("file content", out)
-      out.close()
+      writeJarFile(jarFile, Map(
+        "file-in-jar.txt" -> "file content"))
 
       val loader = new ApplicationLoader(applicationDir)
       defer {closeClassLoader(loader.getClassLoader, jarFile)}
@@ -65,13 +61,13 @@ class ApplicationLoadingSpec extends Spec {
     assertGivesAnErrorMentioning("File not found", ApplicationLoader.CONFIG_FILE)
   }
   "Error: no application name declared" >> {
-    writePropertiesFile(classesDir, ApplicationLoader.CONFIG_FILE, Map(
+    writeConfiguration(Map(
       ApplicationLoader.APP_MODULE -> classOf[MyApp].getName))
 
     assertGivesAnErrorMentioning("Property", "was not set", ApplicationLoader.APP_NAME, ApplicationLoader.CONFIG_FILE)
   }
   "Error: no application module declared" >> {
-    writePropertiesFile(classesDir, ApplicationLoader.CONFIG_FILE, Map(
+    writeConfiguration(Map(
       ApplicationLoader.APP_NAME -> "MyApp"))
 
     assertGivesAnErrorMentioning("Property", "was not set", ApplicationLoader.APP_MODULE, ApplicationLoader.CONFIG_FILE)
@@ -124,6 +120,10 @@ class ApplicationLoadingSpec extends Spec {
     dir
   }
 
+  private def writeConfiguration(properties: Map[String, String]) {
+    writePropertiesFile(classesDir, ApplicationLoader.CONFIG_FILE, properties)
+  }
+
   private def writePropertiesFile(dir: File, name: String, properties: Map[String, String]) {
     import scala.collection.JavaConversions._
     val file = new File(dir, name)
@@ -131,9 +131,16 @@ class ApplicationLoadingSpec extends Spec {
     FileUtils.writeLines(file, rows)
   }
 
-  private def copyClassToDir(clazz: Class[_], dir: File) {
-    val path = clazz.getName.replace('.', '/') + ".class"
-    FileUtils.copyInputStreamToFile(clazz.getResourceAsStream("/" + path), new File(dir, path))
+  def writeJarFile(jarFile: File, entries: Map[String, String]) {
+    val out = new ZipOutputStream(new FileOutputStream(jarFile))
+    try {
+      for ((entry, content) <- entries) {
+        out.putNextEntry(new ZipEntry(entry))
+        IOUtils.write(content, out)
+      }
+    } finally {
+      out.close()
+    }
   }
 
   private def readContent(path: String, classLoader: ClassLoader): String = {
