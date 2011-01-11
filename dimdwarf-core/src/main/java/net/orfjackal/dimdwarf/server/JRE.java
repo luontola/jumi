@@ -22,7 +22,7 @@ public class JRE {
      */
     public static void closeClassLoader(URLClassLoader cl) {
         try {
-            cl.getClass().getMethod("close").invoke(cl);
+            URLClassLoader.class.getMethod("close").invoke(cl);
         } catch (Exception e) {
             throw new RuntimeException("Cannot invoke URLClassLoader.close()", e);
         }
