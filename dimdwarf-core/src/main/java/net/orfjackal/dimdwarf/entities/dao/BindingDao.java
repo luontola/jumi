@@ -4,9 +4,10 @@
 
 package net.orfjackal.dimdwarf.entities.dao;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.db.*;
+
+import javax.inject.Inject;
 
 public class BindingDao
         extends DatabaseTableAdapter<String, EntityId, Blob, Blob>

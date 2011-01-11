@@ -4,11 +4,11 @@
 
 package net.orfjackal.dimdwarf.server;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.events.SystemLifecycleListener;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.*;
 
 @Singleton
 @NotThreadSafe

@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.util;
 
-import com.google.inject.Provider;
+import javax.inject.Provider;
 
 public class StubProvider<T> implements Provider<T> {
 

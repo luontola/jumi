@@ -4,8 +4,9 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.EntityApi;
+
+import javax.inject.Inject;
 
 public class SerializationAllowedPolicy {
 

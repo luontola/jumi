@@ -4,12 +4,12 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.tasks.Task;
 import org.jetbrains.annotations.TestOnly;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;

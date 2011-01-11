@@ -1,9 +1,9 @@
 package net.orfjackal.dimdwarf.actors.dummies
 
-import com.google.inject.Inject
 import net.orfjackal.dimdwarf.controller.Hub
 import net.orfjackal.dimdwarf.mq.MessageSender
 import net.orfjackal.dimdwarf.actors._
+import javax.inject.Inject
 
 @ActorScoped
 class RelayActor @Inject()(@Hub toHub: MessageSender[Any], spy: Spy) extends Actor[Any] {

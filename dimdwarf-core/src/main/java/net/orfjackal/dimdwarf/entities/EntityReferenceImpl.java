@@ -4,12 +4,12 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityReference;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.Inject;
 import java.io.Serializable;
 
 @NotThreadSafe

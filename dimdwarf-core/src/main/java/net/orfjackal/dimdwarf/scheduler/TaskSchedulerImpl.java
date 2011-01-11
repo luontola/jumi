@@ -4,7 +4,6 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.TaskScheduler;
 import net.orfjackal.dimdwarf.tasks.Task;
 import net.orfjackal.dimdwarf.tx.*;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.*;
+import javax.inject.*;
 import java.util.concurrent.*;
 
 @Singleton

@@ -4,11 +4,11 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.EntityObjectId;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton

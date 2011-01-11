@@ -4,10 +4,10 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.events.SystemLifecycleListener;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Inject;
 
 @Immutable
 public class TaskSchedulingLifecycleManager implements SystemLifecycleListener {

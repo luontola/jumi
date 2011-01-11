@@ -1,8 +1,8 @@
 package net.orfjackal.dimdwarf.auth
 
 import net.orfjackal.dimdwarf.mq.MessageSender
-import com.google.inject.Inject
 import net.orfjackal.dimdwarf.controller._
+import javax.inject.Inject
 
 @ControllerScoped
 class AuthenticatorController @Inject()(toAuthenticator: MessageSender[AuthenticatorMessage]) extends Controller with Authenticator {

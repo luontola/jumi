@@ -4,10 +4,11 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.*;
+import com.google.inject.Injector;
 import net.orfjackal.dimdwarf.context.BaseContext;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.Inject;
 
 @NotThreadSafe
 public class TaskContext extends BaseContext {

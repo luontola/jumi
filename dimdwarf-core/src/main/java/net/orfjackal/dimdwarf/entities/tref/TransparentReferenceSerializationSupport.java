@@ -4,10 +4,10 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.internal.*;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Inject;
 
 @Immutable
 public class TransparentReferenceSerializationSupport {

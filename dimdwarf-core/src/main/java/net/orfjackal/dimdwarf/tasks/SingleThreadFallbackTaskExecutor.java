@@ -4,12 +4,12 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.tx.Retryable;
 import net.orfjackal.dimdwarf.util.Exceptions;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.*;
 

@@ -4,11 +4,11 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.db.DatabaseTable;
 import net.orfjackal.dimdwarf.entities.dao.BindingDao;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Inject;
 
 @Immutable
 public class BindingRepository implements DatabaseTable<String, Object> {

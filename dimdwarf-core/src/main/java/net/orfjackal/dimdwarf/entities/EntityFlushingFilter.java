@@ -4,10 +4,10 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.tasks.Filter;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Inject;
 
 @Immutable
 public class EntityFlushingFilter implements Filter {

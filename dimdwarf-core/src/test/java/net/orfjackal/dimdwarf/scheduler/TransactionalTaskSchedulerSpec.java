@@ -16,6 +16,7 @@ import net.orfjackal.dimdwarf.util.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
+import javax.inject.Provider;
 import java.util.concurrent.*;
 import java.util.logging.*;
 

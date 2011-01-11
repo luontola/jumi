@@ -4,9 +4,9 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.util.Clock;
 
+import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 

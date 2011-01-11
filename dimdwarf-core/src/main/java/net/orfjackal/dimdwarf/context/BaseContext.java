@@ -7,6 +7,7 @@ package net.orfjackal.dimdwarf.context;
 import com.google.inject.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.Provider;
 import java.util.*;
 
 /**

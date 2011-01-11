@@ -1,7 +1,7 @@
 package net.orfjackal.dimdwarf.actors.dummies
 
-import com.google.inject.Singleton
 import java.util.concurrent._
+import javax.inject.Singleton
 
 @Singleton
 class Spy {

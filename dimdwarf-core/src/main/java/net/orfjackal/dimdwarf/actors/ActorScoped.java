@@ -4,13 +4,12 @@
 
 package net.orfjackal.dimdwarf.actors;
 
-import com.google.inject.*;
-
+import javax.inject.*;
 import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation
-@BindingAnnotation
+@Scope
+@Qualifier
 public @interface ActorScoped {
 }

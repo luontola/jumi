@@ -13,6 +13,7 @@ import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.tasks.TaskExecutor;
 import org.junit.runner.RunWith;
 
+import javax.inject.Provider;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 

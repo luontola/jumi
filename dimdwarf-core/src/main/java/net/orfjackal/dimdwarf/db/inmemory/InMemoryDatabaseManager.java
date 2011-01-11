@@ -4,12 +4,12 @@
 
 package net.orfjackal.dimdwarf.db.inmemory;
 
-import com.google.inject.Singleton;
 import net.orfjackal.dimdwarf.db.*;
 import net.orfjackal.dimdwarf.tx.*;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.concurrent.*;
+import javax.inject.Singleton;
 import java.util.concurrent.*;
 
 @Singleton

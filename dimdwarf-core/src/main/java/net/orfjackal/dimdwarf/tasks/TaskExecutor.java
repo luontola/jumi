@@ -4,10 +4,10 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.context.*;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.*;
 import java.util.concurrent.Executor;
 
 @Immutable

@@ -4,8 +4,9 @@
 
 package net.orfjackal.dimdwarf.actors;
 
-import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.controller.Controller;
+
+import javax.inject.Provider;
 
 public class ControllerRegistration {
 

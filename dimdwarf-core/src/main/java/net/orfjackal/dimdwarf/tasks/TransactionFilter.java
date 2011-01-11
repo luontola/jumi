@@ -4,12 +4,12 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.tx.TransactionCoordinator;
 import net.orfjackal.dimdwarf.util.Exceptions;
 import org.slf4j.*;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Inject;
 
 @Immutable
 public class TransactionFilter implements Filter {

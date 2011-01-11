@@ -4,7 +4,6 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import com.google.inject.Provider;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
@@ -12,6 +11,8 @@ import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.*;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import javax.inject.Provider;
 
 import static net.orfjackal.dimdwarf.util.StubProvider.providerOf;
 

@@ -4,11 +4,10 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.BindingAnnotation;
-
+import javax.inject.Qualifier;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@BindingAnnotation
+@Qualifier
 public @interface RetryingTaskContext {
 }

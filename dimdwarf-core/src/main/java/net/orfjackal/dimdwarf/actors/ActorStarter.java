@@ -4,9 +4,8 @@
 
 package net.orfjackal.dimdwarf.actors;
 
-import com.google.inject.Inject;
-
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.Inject;
 import java.util.*;
 
 @NotThreadSafe

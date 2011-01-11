@@ -11,6 +11,7 @@ import net.orfjackal.dimdwarf.controller._
 import net.orfjackal.dimdwarf.modules._
 import net.orfjackal.dimdwarf.mq._
 import net.orfjackal.dimdwarf.context.ThreadContext
+import javax.inject.Inject
 
 // TODO: use JUnit/Hamcrest matchers instead of Specs' matchers (?)
 @RunWith(classOf[Specsy])

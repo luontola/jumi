@@ -11,6 +11,7 @@ import net.orfjackal.dimdwarf.modules.*;
 import net.orfjackal.dimdwarf.tasks.*;
 import org.junit.runner.RunWith;
 
+import javax.inject.Provider;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 

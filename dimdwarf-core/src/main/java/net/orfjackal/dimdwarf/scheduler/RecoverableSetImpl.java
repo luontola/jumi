@@ -4,13 +4,13 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.entities.*;
 import net.orfjackal.dimdwarf.util.Objects;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Provider;
 import java.util.*;
 
 @ThreadSafe

@@ -4,7 +4,6 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.*;
 import net.orfjackal.dimdwarf.api.internal.*;
 import net.orfjackal.dimdwarf.entities.EntityReferenceFactory;
@@ -13,6 +12,7 @@ import net.sf.cglib.proxy.*;
 import org.objenesis.*;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.*;
 import java.lang.reflect.Method;
 import java.util.*;
 

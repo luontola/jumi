@@ -4,8 +4,10 @@
 
 package net.orfjackal.dimdwarf.entities.tref;
 
-import com.google.inject.*;
+import com.google.inject.Injector;
 import net.orfjackal.dimdwarf.entities.*;
+
+import javax.inject.Inject;
 
 public class TrefAwareEntitySerializationFilter implements EntitySerializationFilter {
 

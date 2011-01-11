@@ -4,8 +4,7 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.ScopeAnnotation;
-
+import javax.inject.Scope;
 import java.lang.annotation.*;
 
 /**
@@ -16,6 +15,6 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation
+@Scope
 public @interface TaskScoped {
 }

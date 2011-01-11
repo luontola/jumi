@@ -4,7 +4,6 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.*;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.db.Blob;
 import net.orfjackal.dimdwarf.entities.dao.EntityDao;
@@ -12,6 +11,7 @@ import net.orfjackal.dimdwarf.serial.ObjectSerializer;
 import net.orfjackal.dimdwarf.tasks.TaskScoped;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.*;
 
 @TaskScoped
 @NotThreadSafe

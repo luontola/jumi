@@ -16,6 +16,7 @@ import net.orfjackal.dimdwarf.tx.Transaction;
 import net.orfjackal.dimdwarf.util.*;
 import org.junit.runner.RunWith;
 
+import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;

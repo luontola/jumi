@@ -4,8 +4,9 @@
 
 package net.orfjackal.dimdwarf.actors;
 
-import com.google.inject.Provider;
 import net.orfjackal.dimdwarf.context.Context;
+
+import javax.inject.Provider;
 
 public class ActorRegistration {
 
@@ -14,8 +15,8 @@ public class ActorRegistration {
     private final Provider<? extends ActorRunnable> actor;
 
     public ActorRegistration(String name,
-                               Provider<? extends Context> context,
-                               Provider<? extends ActorRunnable> actor) {
+                             Provider<? extends Context> context,
+                             Provider<? extends ActorRunnable> actor) {
         this.name = name;
         this.context = context;
         this.actor = actor;

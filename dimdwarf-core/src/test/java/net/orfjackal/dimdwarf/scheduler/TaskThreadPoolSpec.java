@@ -4,7 +4,6 @@
 
 package net.orfjackal.dimdwarf.scheduler;
 
-import com.google.inject.Provider;
 import jdave.Group;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.context.*;
@@ -14,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 
+import javax.inject.Provider;
 import java.util.concurrent.*;
 
 import static org.mockito.Mockito.verify;

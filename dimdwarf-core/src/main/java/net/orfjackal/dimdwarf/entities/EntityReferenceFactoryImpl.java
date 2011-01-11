@@ -4,11 +4,11 @@
 
 package net.orfjackal.dimdwarf.entities;
 
-import com.google.inject.Inject;
 import net.orfjackal.dimdwarf.api.EntityId;
 import net.orfjackal.dimdwarf.api.internal.*;
 
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Inject;
 
 @Immutable
 public class EntityReferenceFactoryImpl implements EntityReferenceFactory {

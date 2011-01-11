@@ -4,7 +4,7 @@
 
 package net.orfjackal.dimdwarf.tasks;
 
-import com.google.inject.*;
+import com.google.inject.Injector;
 import jdave.*;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.dimdwarf.api.EntityId;
@@ -15,6 +15,7 @@ import net.orfjackal.dimdwarf.modules.CommonModules;
 import net.orfjackal.dimdwarf.server.TestServer;
 import org.junit.runner.RunWith;
 
+import javax.inject.Provider;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;

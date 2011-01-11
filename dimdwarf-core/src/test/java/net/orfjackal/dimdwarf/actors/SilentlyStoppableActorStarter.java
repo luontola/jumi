@@ -4,8 +4,7 @@
 
 package net.orfjackal.dimdwarf.actors;
 
-import com.google.inject.Inject;
-
+import javax.inject.Inject;
 import java.util.Set;
 
 public class SilentlyStoppableActorStarter extends ActorStarter {

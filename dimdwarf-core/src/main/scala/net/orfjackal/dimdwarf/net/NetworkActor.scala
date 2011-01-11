@@ -1,18 +1,17 @@
 package net.orfjackal.dimdwarf.net
 
-import com.google.inject.Inject
 import java.net.InetSocketAddress
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor
 import org.apache.mina.filter.codec.ProtocolCodecFilter
 import org.slf4j.LoggerFactory
 import net.orfjackal.dimdwarf.actors._
-import com.google.inject.name.Named
 import org.apache.mina.filter.logging._
 import net.orfjackal.dimdwarf.mq.MessageSender
 import org.apache.mina.core.service.IoHandlerAdapter
 import org.apache.mina.core.session._
 import net.orfjackal.dimdwarf.controller.Hub
 import net.orfjackal.dimdwarf.net.sgs._
+import javax.inject._
 
 @ActorScoped
 class NetworkActor @Inject()(@Named("port") port: Int, @Hub toHub: MessageSender[Any]) extends IoHandlerAdapter with Actor[NetworkMessage] {
