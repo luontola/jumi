@@ -31,8 +31,7 @@ class ApplicationLoadingSpec extends Spec {
       val content = readContent("file.txt", loader.getClassLoader)
       assertThat(content, is("file content"))
     }
-
-    if (JRE.isJava7) "Adds to classpath all JARs in the /lib directory" >> {
+    "Adds to classpath all JARs in the /lib directory" >> worksOnlyOnJava7 {
       val jarFile = new File(libDir, "sample.jar")
       writeJarFile(jarFile, Map(
         "file-in-jar.txt" -> "file content"))
@@ -71,6 +70,12 @@ class ApplicationLoadingSpec extends Spec {
       ApplicationLoader.APP_NAME -> "MyApp"))
 
     assertGivesAnErrorMentioning("Property", "was not set", ApplicationLoader.APP_MODULE, ApplicationLoader.CONFIG_FILE)
+  }
+
+  private def worksOnlyOnJava7(closure: => Unit) {
+    if (JRE.isJava7) {
+      closure
+    }
   }
 
   private def closeClassLoader(cl: URLClassLoader, jarFiles: File*) {
