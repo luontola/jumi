@@ -24,6 +24,11 @@ public class ThreadScope implements Scope {
                 checkInsideScope(context);
                 return contextType.cast(context).scopedGet(key, unscoped);
             }
+
+            @Override
+            public String toString() {
+                return unscoped.toString();
+            }
         };
     }
 
@@ -31,5 +36,10 @@ public class ThreadScope implements Scope {
         if (!contextType.isInstance(context)) {
             throw new IllegalStateException("Expected context " + contextType.getName() + " but was: " + context);
         }
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + contextType.getSimpleName() + ")";
     }
 }
