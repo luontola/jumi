@@ -43,9 +43,33 @@ public class Sandbox {
             throw new IllegalArgumentException("I did not create that file, deleting it would be dangerous: " + dir);
         }
         try {
-            FileUtils.forceDelete(dir);
+            retryingForceDelete(dir);
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete directory: " + dir, e);
+        }
+    }
+
+    private static void retryingForceDelete(File dir) throws IOException {
+        long limit = System.currentTimeMillis() + 1000;
+        IOException unableToDelete;
+        do {
+            try {
+                FileUtils.forceDelete(dir);
+                return;
+            } catch (IOException e) {
+                System.err.println("WARNING: " + e.getMessage() + " Retrying...");
+                unableToDelete = e;
+            }
+            sleep(10);
+        } while (System.currentTimeMillis() < limit);
+        throw unableToDelete;
+    }
+
+    private static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e1) {
+            throw new RuntimeException(e1);
         }
     }
 }
