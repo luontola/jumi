@@ -26,6 +26,9 @@ class SimpleSgsProtocolEncoder extends ProtocolEncoder {
                 flip()
 
       case LogoutSuccess() =>
+        IoBuffer.allocate(1).
+                put(SimpleSgsProtocol.LOGIN_SUCCESS).
+                flip()
     }
     out.write(encoded)
   }
