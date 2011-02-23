@@ -24,6 +24,8 @@ class SimpleSgsProtocolEncoder extends ProtocolEncoder {
                 put(SimpleSgsProtocol.LOGIN_FAILURE).
                 putShort(0.asInstanceOf[Short]).
                 flip()
+
+      case LogoutSuccess() =>
     }
     out.write(encoded)
   }
