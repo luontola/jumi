@@ -13,6 +13,10 @@ class NetworkController @Inject()(toNetwork: MessageSender[Any], authenticator: 
         authenticator.isUserAuthenticated(new PasswordCredentials(username, password),
           onYes = {toNetwork.send(LoginSuccess())},
           onNo = {toNetwork.send(LoginFailure())})
+
+      case LogoutRequest() =>
+        toNetwork.send(LogoutSuccess())
+
       case _ =>
     }
   }
