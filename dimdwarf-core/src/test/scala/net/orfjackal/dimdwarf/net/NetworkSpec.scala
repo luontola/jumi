@@ -95,6 +95,7 @@ class NetworkSpec extends Spec {
       assertThat(queues.seenIn(toNetwork).head, is(LogoutSuccess(): Any))
     }
     "Actor sends the logout message to Client" >> {
+      assertThat(nextMessage(in), is(logoutSuccess()))
     }
   }
 
