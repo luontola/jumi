@@ -32,6 +32,6 @@ More details on the project's motivation can be read from its original announcem
 License
 -------
 
-Copyright © 2011 Esko Luontola <[www.orfjackal.net](http://www.orfjackal.net/)>  
+Copyright © 2011-{{ site.time | date: "%Y" }} Esko Luontola <[www.orfjackal.net](http://www.orfjackal.net/)>  
 This software is released under the Apache License 2.0.  
 The license text is at <http://www.apache.org/licenses/LICENSE-2.0>
