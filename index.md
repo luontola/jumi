@@ -5,7 +5,7 @@ layout: page
 
 Common test runner for the JVM. Natively supports running tests in parallel, class loader caching, test order priorization and other measures to run tests faster. Contains the full stack for running tests (the responsibilities which used to be spread over build tools, IDEs and test runners) in order to overcome limitations of previously existing tools. Will overcome JUnit's test runner's limitations to better support all testing frameworks on the JVM.
 
-Jumi is not only open source, but also its development is open. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code>
+Jumi is not only open source, but also open development. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code> The long-term roadmap is in [ROADMAP.txt](https://github.com/orfjackal/jumi/blob/master/ROADMAP.txt) and the short-term task list is in [TODO.txt](https://github.com/orfjackal/jumi/blob/master/TODO.txt).
 
 - Mailing list: <http://groups.google.com/group/ctr4j>
 - Source code: <https://github.com/orfjackal/jumi>
