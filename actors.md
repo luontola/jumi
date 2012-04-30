@@ -19,7 +19,7 @@ Features
 
 - **Decoupled** - The actors themselves are not infected by the actors library. No implementation inheritance, global state or other invasive anti-patterns. Unit testing without the container is easy.
 
-- **Small** - The runtime JAR is only 26 KB (measured 2012-04-28), which is miniscule compared to for example [Akka 2.0.1](http://akka.io/)'s minimum of 1.75 MB (akka-actor.jar) + 8.43 MB (scala-library.jar). Naturally this means that it has less features, so if you are building distributed high-availablity systems then maybe Akka suits you better.
+- **Small** - As of 2012-04-30, the runtime JAR is only 26 KB <small>(and could be made up to 50% smaller by removing optional classes)</small>, which is minuscule compared to for example [Akka 2.0.1](http://akka.io/)'s minimum of 1.75 MB <small>(akka-actor.jar)</small> + 8.43 MB <small>(scala-library.jar)</small>. Naturally this means that it has less features, so if you are building distributed high-availablity systems then maybe Akka suits you better.
 
 - **Many Actors per Thread** - Creating lots of actors is cheap, because individual actors don't require their own threads.
 
