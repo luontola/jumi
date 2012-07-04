@@ -23,7 +23,7 @@ Features
 
 - **Many Actors per Thread** - Creating lots of actors is cheap, because individual actors don't require their own threads.
 
-- **One Thread per Actor** - Each actor will stay in the same thread all its life. You have explicit control over which actors are run in which thread.
+- **One Thread per Actor** - Each actor will stay in the same thread all its life. You have explicit control over which actors are run in which thread. This makes it even safe to share some mutable state between closely related actors (such as anonymous inner classes).
 
 - **Garbage Collected Actors** - After nobody can send messages to an actor, it will be garbage collected the same way as normal Java objects. Note however that the lifecycle of actor *threads* must be managed manually.
 
