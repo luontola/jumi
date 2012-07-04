@@ -27,6 +27,6 @@ Features
 
 - **Garbage Collected Actors** - After nobody can send messages to an actor, it will be garbage collected the same way as normal Java objects. Note however that the lifecycle of actor *threads* must be managed manually.
 
-- **Deterministic Testing** - Jumi Actors has [a single-threaded implementation](https://github.com/orfjackal/jumi/blob/master/jumi-actors/src/main/java/fi/jumi/actors/SingleThreadedActors.java) which is useful for integration testing actors.
+- **Deterministic Testing** - Jumi Actors has [a single-threaded implementation](https://github.com/orfjackal/jumi/blob/master/jumi-actors/src/main/java/fi/jumi/actors/SingleThreadedActors.java) which is useful for integration testing actors with the container (unit tests should be written without any containers).
 
 - **No Reflection** (optional) - It's possible to avoid reflection by using [jumi-actors-maven-plugin](https://github.com/orfjackal/jumi/tree/master/jumi-actors-maven-plugin) to generate the necessary event stubs at build time. Though using reflection requires less setup and thus might be preferable at least in tests.
