@@ -23,10 +23,10 @@ Features
 
 - **Many Actors per Thread** - Creating lots of actors is cheap, because individual actors don't require their own threads.
 
-- **One Thread per Actor** - Each actor will stay in the same thread all its life. You have explicit control over which actors are run in which thread. (Stopping actor threads is not yet officially supported, but will probably be sooner or later.)
+- **One Thread per Actor** - Each actor will stay in the same thread all its life. You have explicit control over which actors are run in which thread.
 
 - **Garbage Collected Actors** - After nobody can send messages to an actor, it will be garbage collected the same way as normal Java objects. Note however that the lifecycle of actor *threads* must be managed manually.
 
-- **Deterministic Testing** - Jumi Actors has [a single-threaded implementation](https://github.com/orfjackal/jumi/blob/master/jumi-actors/src/main/java/fi/jumi/actors/SingleThreadedActors.java) which is useful for testing actors.
+- **Deterministic Testing** - Jumi Actors has [a single-threaded implementation](https://github.com/orfjackal/jumi/blob/master/jumi-actors/src/main/java/fi/jumi/actors/SingleThreadedActors.java) which is useful for integration testing actors.
 
-- **No Reflection** (optional) - It's possible to avoid reflection by using [jumi-actors-maven-plugin](https://github.com/orfjackal/jumi/tree/master/jumi-actors-maven-plugin) to generate the necessary event stubs at build time. Though using reflection might be easier, at least in tests.
+- **No Reflection** (optional) - It's possible to avoid reflection by using [jumi-actors-maven-plugin](https://github.com/orfjackal/jumi/tree/master/jumi-actors-maven-plugin) to generate the necessary event stubs at build time. Though using reflection requires less setup and thus might be preferable at least in tests.
