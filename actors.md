@@ -15,12 +15,15 @@ Example
 
 Given the interface:
 
+<pre class="brush: java">
     public interface Greeter {
         void sayGreeting(String name);
     }
+</pre>
 
 When we run the code:
 
+<pre class="brush: java">
     ExecutorService actorsThreadPool = Executors.newCachedThreadPool();
     Actors actors = new MultiThreadedActors(
             actorsThreadPool,
@@ -30,7 +33,7 @@ When we run the code:
     );
     ActorThread actorThread = actors.startActorThread();
 
-    ActorRef<Greeter> helloSayer = actorThread.bindActor(Greeter.class, new Greeter() {
+    ActorRef&lt;Greeter> helloSayer = actorThread.bindActor(Greeter.class, new Greeter() {
         public void sayGreeting(String name) {
             System.out.println("Hello " + name + " from " + Thread.currentThread().getName());
         }
@@ -40,11 +43,14 @@ When we run the code:
 
     actorThread.stop();
     actorsThreadPool.shutdown();
+</pre>
 
 Then it will print:
 
+<pre class="brush: plain">
     Wazzup from main
     Hello World from pool-1-thread-1
+</pre>
 
 For some explanations and more information, see [the examples package](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples).
 

@@ -38,6 +38,31 @@
         })();
     </script>
 
+    <!-- Using SyntaxHighlighter from http://alexgorbatchev.com/SyntaxHighlighter/ -->
+    <link href="{{ BASE_PATH }}/syntaxhighlighter/shCore.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="{{ BASE_PATH }}/syntaxhighlighter/shThemeDefault.css" media="all" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        .syntaxhighlighter {
+            /* override SyntaxHighlighter's default to avoid horizontal scroll bar */
+            padding: 0.5em !important;
+
+            /* borders with rounded corners */
+            border: 1px solid #ddd;
+            -webkit-box-shadow: rgba(0, 0, 0, 0.07) 0 1px 2px inset;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+        }
+    </style>
+    <script type="text/javascript" src="{{ BASE_PATH }}/syntaxhighlighter/shCore.js"></script>
+    <script type="text/javascript" src="{{ BASE_PATH }}/syntaxhighlighter/shBrushJava.js"></script>
+    <script type="text/javascript" src="{{ BASE_PATH }}/syntaxhighlighter/shBrushPlain.js"></script>
+    <script type="text/javascript">
+        SyntaxHighlighter.defaults['gutter'] = false;
+        SyntaxHighlighter.defaults['toolbar'] = false;
+        SyntaxHighlighter.all();
+    </script>
+
   </head>
 
   <body>
