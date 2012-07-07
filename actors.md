@@ -7,7 +7,46 @@ group: navigation
 
 Jumi has its own little [actors](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actors library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
-The codebase is still evolving quite rapidly and Jumi doesn't yet have a public release, but you can check out the [jumi-actors](https://github.com/orfjackal/jumi/tree/master/jumi-actors) module and see how it's being used in the rest of the project for some examples on how to use it. Better documentation will be written some other day.
+The first release will be in Maven Central very soon. Until then you can build the [jumi-actors](https://github.com/orfjackal/jumi/tree/master/jumi-actors) module yourself.
+
+
+Example
+-------
+
+Given the interface:
+
+    public interface Greeter {
+        void sayGreeting(String name);
+    }
+
+When we run the code:
+
+    ExecutorService actorsThreadPool = Executors.newCachedThreadPool();
+    Actors actors = new MultiThreadedActors(
+            actorsThreadPool,
+            new DynamicEventizerProvider(),
+            new CrashEarlyFailureHandler(),
+            new NullMessageListener()
+    );
+    ActorThread actorThread = actors.startActorThread();
+
+    ActorRef<Greeter> helloSayer = actorThread.bindActor(Greeter.class, new Greeter() {
+        public void sayGreeting(String name) {
+            System.out.println("Hello " + name + " from " + Thread.currentThread().getName());
+        }
+    });
+    helloSayer.tell().sayGreeting("World");
+    System.out.println("Wazzup from " + Thread.currentThread().getName());
+
+    actorThread.stop();
+    actorsThreadPool.shutdown();
+
+Then it will print:
+
+    Wazzup from main
+    Hello World from pool-1-thread-1
+
+For some explanations and more information, see [the examples package](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples).
 
 
 Features
