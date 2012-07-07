@@ -16,40 +16,40 @@ Example
 Given the interface:
 
 <pre class="brush: java">
-    public interface Greeter {
-        void sayGreeting(String name);
-    }
+public interface Greeter {
+    void sayGreeting(String name);
+}
 </pre>
 
 When we run the code:
 
 <pre class="brush: java">
-    ExecutorService actorsThreadPool = Executors.newCachedThreadPool();
-    Actors actors = new MultiThreadedActors(
-            actorsThreadPool,
-            new DynamicEventizerProvider(),
-            new CrashEarlyFailureHandler(),
-            new NullMessageListener()
-    );
-    ActorThread actorThread = actors.startActorThread();
+ExecutorService actorsThreadPool = Executors.newCachedThreadPool();
+Actors actors = new MultiThreadedActors(
+        actorsThreadPool,
+        new DynamicEventizerProvider(),
+        new CrashEarlyFailureHandler(),
+        new NullMessageListener()
+);
+ActorThread actorThread = actors.startActorThread();
 
-    ActorRef&lt;Greeter> helloSayer = actorThread.bindActor(Greeter.class, new Greeter() {
-        public void sayGreeting(String name) {
-            System.out.println("Hello " + name + " from " + Thread.currentThread().getName());
-        }
-    });
-    helloSayer.tell().sayGreeting("World");
-    System.out.println("Wazzup from " + Thread.currentThread().getName());
+ActorRef&lt;Greeter> helloGreeter = actorThread.bindActor(Greeter.class, new Greeter() {
+    public void sayGreeting(String name) {
+        System.out.println("Hello " + name + " from " + Thread.currentThread().getName());
+    }
+});
+helloGreeter.tell().sayGreeting("World");
+System.out.println("Wazzup from " + Thread.currentThread().getName());
 
-    actorThread.stop();
-    actorsThreadPool.shutdown();
+actorThread.stop();
+actorsThreadPool.shutdown();
 </pre>
 
 Then it will print:
 
 <pre class="brush: plain">
-    Wazzup from main
-    Hello World from pool-1-thread-1
+Wazzup from main
+Hello World from pool-1-thread-1
 </pre>
 
 For some explanations and more information, see [the examples package](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples).
