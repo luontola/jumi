@@ -52,7 +52,7 @@ Wazzup from main
 Hello World from pool-1-thread-1
 </pre>
 
-For some explanations and more information, see [the examples package](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples).
+For some explanations and more information, see [the examples package](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
 
 
 Features
