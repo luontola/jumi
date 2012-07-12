@@ -68,7 +68,7 @@ Features
 
 - **Many Actors per Thread** - Creating lots of actors is cheap, because individual actors don't require their own threads.
 
-- **One Thread per Actor** - Each actor will stay in the same thread all its life. You have explicit control over which actors are run in which thread. This makes it even safe to share some mutable state between closely related actors (such as anonymous inner classes).
+- **One Thread per Actor** - Each actor will stay in the same thread all its life. You have explicit control over which actors are run in which thread. This makes it even safe to share some mutable state between closely related actors (such as anonymous inner classes). It also makes it possible to use Jumi's *thread-safety-agent* to check at runtime that each [@NotThreadSafe](http://code.google.com/p/jsr-305/source/browse/trunk/ri/src/main/java/javax/annotation/concurrent/NotThreadSafe.java) object is used only by one thread.
 
 - **Garbage Collected Actors** - After nobody can send messages to an actor, it will be garbage collected the same way as normal Java objects. Note however that the lifecycle of actor *threads* must be managed manually.
 
