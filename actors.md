@@ -7,7 +7,7 @@ group: navigation
 
 Jumi has its own little [actors](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actors library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
-The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the changelog](https://github.com/orfjackal/jumi/blob/master/CHANGELOG.md).
+The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md).
 
 
 Example
