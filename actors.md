@@ -7,7 +7,7 @@ group: navigation
 
 Jumi has its own little [actors](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actors library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
-The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md).
+To get started, read [the user guide](https://github.com/orfjackal/jumi/wiki/Actors-User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md).
 
 
 Example
@@ -52,7 +52,7 @@ Wazzup from main
 Hello World from pool-1-thread-1
 </pre>
 
-For some explanations and more information, see [the examples package](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
+For some explanations and more information, see [the user guide](https://github.com/orfjackal/jumi/wiki/Actors-User-Guide) and [examples](https://github.com/orfjackal/jumi/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
 
 
 Features
