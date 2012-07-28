@@ -24,7 +24,7 @@ public interface Greeter {
 When we run the code:
 
 <pre class="brush: java">
-/* configuration */
+// configuration
 ExecutorService actorsThreadPool = Executors.newCachedThreadPool();
 Actors actors = new MultiThreadedActors(
         actorsThreadPool,
@@ -34,7 +34,7 @@ Actors actors = new MultiThreadedActors(
 );
 ActorThread actorThread = actors.startActorThread();
 
-/* usage */
+// usage
 ActorRef&lt;Greeter> helloGreeter = actorThread.bindActor(Greeter.class, new Greeter() {
     public void sayGreeting(String name) {
         System.out.println("Hello " + name + " from " + Thread.currentThread().getName());
@@ -43,7 +43,7 @@ ActorRef&lt;Greeter> helloGreeter = actorThread.bindActor(Greeter.class, new Gre
 helloGreeter.tell().sayGreeting("World");
 System.out.println("Wazzup from " + Thread.currentThread().getName());
 
-/* cleanup */
+// cleanup
 actorThread.stop();
 actorsThreadPool.shutdown();
 </pre>
