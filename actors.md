@@ -5,7 +5,7 @@ group: navigation
 ---
 {% include JB/setup %}
 
-Jumi has its own little [actors](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actors library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
+Jumi has its own little [actor](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actor library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
 To get started, read [the user guide](https://github.com/orfjackal/jumi/wiki/Actors-User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md).
 
@@ -65,7 +65,7 @@ Features
 
 - **Statically Typed** - Due to using Java interfaces, all messages are type checked and the actors are guaranteed to handle all messages (i.e. method calls) which can be sent to them.
 
-- **Decoupled** - The actors themselves are not infected by the actors library. No implementation inheritance, global state or other invasive anti-patterns. Not even annotations. Unit testing without the container is easy.
+- **Decoupled** - The actors themselves are not infected by the actor library. No implementation inheritance, global state or other invasive anti-patterns. Not even annotations. Unit testing without the container is easy.
 
 - **Small** - Jumi Actors 0.1.64's runtime JAR is only 33 KB <small>(and could be made up to 50% smaller by removing optional classes)</small>, which is minuscule compared to for example [Akka 2.0.2](http://akka.io/)'s minimum of 1.76 MB <small>(akka-actor.jar)</small> + 8.44 MB <small>(scala-library.jar)</small>. Naturally this means that it has less features, so if you are building distributed high-availablity systems then maybe Akka suits you better.
 
