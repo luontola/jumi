@@ -21,7 +21,6 @@ Who is using Jumi?
 
 Jumi has just recently been released and it's missing some important features, but it's already at a stage where testing framework developers can start implementing support for it. Here is a list of frameworks and tools that already have Jumi support:
 
-- [SimpleUnit](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22%20a%3A%22simpleunit%22), a minimal testing framework that serves as an example of using Jumi
 - [Specsy](http://specsy.org/), a testing framework for Scala, Groovy, Java and easily any other JVM-based language
 
 
