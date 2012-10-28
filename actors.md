@@ -7,10 +7,13 @@ group: navigation
 
 Jumi has its own little [actor](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actor library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
-To get started, read [the user guide](https://github.com/orfjackal/jumi/wiki/Actors-User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md).
+To get started, read [the user guide](https://github.com/orfjackal/jumi-actors/wiki/User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md).
 
+- Documentation: <https://github.com/orfjackal/jumi-actors/wiki>
+- Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md))
 - Source code: <https://github.com/orfjackal/jumi-actors>
 - License: [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- Developer: [Esko Luontola](https://github.com/orfjackal) ([@orfjackal](http://twitter.com/orfjackal))
 
 
 Example
@@ -58,7 +61,7 @@ Wazzup from main
 Hello World from pool-1-thread-1
 </pre>
 
-For some explanations and more information, see [the user guide](https://github.com/orfjackal/jumi/wiki/Actors-User-Guide) and [examples](https://github.com/orfjackal/jumi-actors/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
+For some explanations and more information, see [the user guide](https://github.com/orfjackal/jumi-actors/wiki/User-Guide) and [examples](https://github.com/orfjackal/jumi-actors/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
 
 
 Features
