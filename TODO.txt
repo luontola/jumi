@@ -4,11 +4,8 @@
 	OK - remove unrelated modules
 	OK - cleanup BuildTest
 	OK - remove unused dependencies from parent
-	!! - the same for jumi-actors project
-		- remove unrelated modules
-		- cleanup BuildTest
-		- update readme etc.
-	- extract build scripts to their own project?
+	OK - the same for jumi-actors project
+	!! - extract build scripts to their own project
 
 - extract test doubles from Specsy to testbench
 	- SilentOutputCapturer or overloaded OutputCapturer constructor (UTF_16BE should be the simplest conversion, same as what Strings use)
@@ -67,27 +64,6 @@ java.lang.NullPointerException
 
 - given an error message if starting the daemon fails (for example out of memory)
 
-- make jumi-actors its own project
-	would speed up the build by 50%, send a message about its stability (1.0+ version), and allow dependencies in examples and benchmarks (e.g. Akka)
-	- refactor build scripts to be project-independent
-	- move build scripts to their own project (jumi-scripts)
-	- update deployment pipeline to fetch scripts separately (might not need to store as artifacts)
-	- copy jumi to jumi-actors repository, disconnect their histories
-	- remove unnecessary stuff from parent POM
-	- move user guide to the new project's wiki
-	- update all links on the web site, add links to all repositories
-
-- actors examples & benchmarks:
-	OK - create benchmarks: ring round trip, warm startup
-	- create jumi-actors-examples, put there the examples and benchmarks
-	- create a benchmark to compare against Akka Actors
-		- ring round trip
-		- warm startup
-		- cold startup (can't use Caliper, need a main method in a fresh JVM, or could it be done with custom class loaders?)
-	- create a benchmark to compare reflection vs code generation based eventizers
-		- also use it as an example of using the code generator plugin
-	- add the benchmark results to the web site
-
 - misc refactoring
 	- replace SuiteRunnerIntegrationHelper with TestBench?
 	- when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?
@@ -127,7 +103,6 @@ java.lang.NullPointerException
 	- combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
 	- there might be unnecessary eventizers in fi.jumi.daemon.Main and /jumi-core/pom.xml
 		- create EventizerUsageStatistics (extends EventizerProvider), print usage statistics when program exits
-	- logging actor messages could benefit from seeing that from which actor a messages was sent; a trace of intermediate actors
 	- packages by functionality
 		core
 			discovery
@@ -153,7 +128,6 @@ java.lang.NullPointerException
 		2. run proguard to minimize the JAR at method level and preverify (in and out files must be different?)
 		3. replace the main artifact
 			http://mojo.codehaus.org/build-helper-maven-plugin/attach-artifact-mojo.html
-	- seems that Eventizer.newBackend is not used; keep it for symmetry or remove it?
 	- consider logging with MinLog http://code.google.com/p/minlog/
 		or create our own clone, since it's just one file (and )
 		- actors: extract AbstractMessageLogger from PrintStreamMessageLogger
@@ -225,62 +199,6 @@ java.lang.NullPointerException
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
-
-- refactor jumi-actors-maven-plugin
-	- find a way to read the compiler language level from maven-compiler-plugin, instead of configuring it separately for this plugin
-		http://maven.apache.org/ref/3.0.4/maven-core/apidocs/org/apache/maven/project/MavenProject.html
-			getPlugin
-		http://maven.apache.org/ref/3.0.4/maven-core/apidocs/org/apache/maven/plugin/BuildPluginManager.html
-		http://maven.apache.org/ref/3.0.4/maven-core/apidocs/org/apache/maven/plugin/MavenPluginManager.html
-			getConfiguredMojo
-		http://maven.apache.org/ref/2.2.1/maven-core/apidocs/org/apache/maven/plugin/PluginManager.html (deprecated)
-			getPluginDefinitionForPrefix
-			getPluginComponent
-		http://stackoverflow.com/questions/526733/maven-plugin-executing-another-plugin
-		http://timmoore.github.com/mojo-executor/
-		http://stackoverflow.com/questions/4243686/how-to-programatically-invoke-a-maven-dependency-plugin/5761554#5761554
-	- DummyListenerToEvent: rename sender to target
-	- EventToDummyListener: rename listener to target
-	- switch to using Eclipse JDT DOM for code generation, create an internal DSL as necessary (factory methods to avoid setter hell)
-		http://blog.cedarsoft.com/2010/08/code-generation-done-right/
-		http://www.eclipse.org/jdt/core/index.php
-		http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/package-summary.html
-		- walking skeleton
-			1. take the old generator's output
-			2. parse it to AST
-				example: http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/AST.html
-				http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/ASTParser.html
-			3. convert AST to string
-				example: http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/AST.html
-				http://help.eclipse.org/indigo/topic/org.eclipse.platform.doc.isv/reference/api/org/eclipse/jface/text/Document.html
-				http://help.eclipse.org/indigo/topic/org.eclipse.platform.doc.isv/reference/api/org/eclipse/jface/text/IDocument.html#get()
-			4. format using Eclipse Formatter
-				http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/ToolFactory.html#createCodeFormatter
-				http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/formatter/package-summary.html
-				http://www.eclipse.org/jdt/core/codecoverage/B01/org.eclipse.jdt.core/org.eclipse.jdt.core.formatter/CodeFormatterApplication.java.html#L204
-			5. use the Organize Imports operation, unless formatter already adds imports
-				? http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/ui/actions/OrganizeImportsAction.html
-				? http://plugins.intellij.net/plugin/?idea&id=6546
-				http://stackoverflow.com/questions/2644440/simplifying-fully-qualified-names-in-eclipse
-				- might need to transform the AST ourselves?
-		- migrate to generating code with JDT AST
-			- generate code with fully qualified names, rely on the formatter for imports
-			- migrate to AST one method at a time, if possible
-				- try using AST.newMethodDeclaration or AST.newBlock instead of AST.newCompilationUnit
-			- delete the old code generator
-	- @Generated annotation, example: @Generated(value = "fi.jumi.codegenerator.EventStubGenerator", comments = "Generated based on fi.jumi.codegenerator.DummyListener", date = "2000-01-01")
-	- @Override annotation to all methods
-	- annotation to suppress unchecked warnings due to type erasure?
-	- toString?
-	- hand-written serialization using bare DataOutput/DataInput? should give overall best performance without additional dependencies: https://github.com/eishay/jvm-serializers/wiki/
-	- plugin pom: add-source with http://mojo.codehaus.org/build-helper-maven-plugin/
-	- install plugin to local repository to avoid false alarms in jumi-core pom
-	- evaluate triggering the code generator using JSR 269 (might be hard to generate code for 3rd party classes such as Runnable?)
-		! http://deors.wordpress.com/2011/10/08/annotation-processors/
-		! http://deors.wordpress.com/2011/10/31/annotation-generators/
-		http://weblogs.java.net/blog/tball/archive/2006/09/hacking_javac.html
-		http://code.google.com/p/genftw/
-		http://code.google.com/p/objectify-gwtkey/
 
 - deployment pipeline
 	jumi:
