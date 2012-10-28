@@ -47,6 +47,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <minimumMavenVersion>3.0.3</minimumMavenVersion>
+        <jumi-actors.version>0.1.196</jumi-actors.version>
     </properties>
 
     <prerequisites>
@@ -98,11 +99,6 @@
 
             <dependency>
                 <groupId>fi.jumi</groupId>
-                <artifactId>jumi-actors</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>fi.jumi</groupId>
                 <artifactId>jumi-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -126,6 +122,14 @@
                 <groupId>fi.jumi</groupId>
                 <artifactId>simpleunit</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <!-- Jumi Actors -->
+
+            <dependency>
+                <groupId>fi.jumi</groupId>
+                <artifactId>jumi-actors</artifactId>
+                <version>${jumi-actors.version}</version>
             </dependency>
 
             <!-- Networking -->
@@ -367,7 +371,7 @@
                 <plugin>
                     <groupId>fi.jumi</groupId>
                     <artifactId>jumi-actors-maven-plugin</artifactId>
-                    <version>${project.version}</version>
+                    <version>${jumi-actors.version}</version>
                     <configuration>
                         <source>1.7</source>
                         <target>1.7</target>

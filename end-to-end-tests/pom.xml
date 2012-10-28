@@ -114,7 +114,7 @@
                             <value>true</value>
                         </property>
                     </systemProperties>
-                    <argLine>"-javaagent:${test.projectArtifactsDir}/thread-safety-agent-${project.version}.jar"
+                    <argLine>"-javaagent:${test.projectArtifactsDir}/thread-safety-agent-${jumi-actors.version}.jar"
                     </argLine>
                 </configuration>
                 <executions>
@@ -157,12 +157,12 @@
                                 <artifactItem>
                                     <groupId>fi.jumi</groupId>
                                     <artifactId>jumi-actors</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${jumi-actors.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>fi.jumi</groupId>
                                     <artifactId>jumi-actors</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${jumi-actors.version}</version>
                                     <type>pom</type>
                                 </artifactItem>
 
@@ -223,12 +223,12 @@
                                 <artifactItem>
                                     <groupId>fi.jumi</groupId>
                                     <artifactId>thread-safety-agent</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${jumi-actors.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>fi.jumi</groupId>
                                     <artifactId>thread-safety-agent</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${jumi-actors.version}</version>
                                     <type>pom</type>
                                 </artifactItem>
 
