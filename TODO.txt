@@ -1,11 +1,12 @@
 
 !! - separate project for jumi-actors
 	OK - fix the version numbers
-	!! - remove unrelated modules
-	- cleanup BuildTest
-	- remove unused dependencies from parent
-	- the same for jumi-actors project
+	OK - remove unrelated modules
+	OK - cleanup BuildTest
+	OK - remove unused dependencies from parent
+	!! - the same for jumi-actors project
 		- remove unrelated modules
+		- cleanup BuildTest
 		- update readme etc.
 	- extract build scripts to their own project?
 

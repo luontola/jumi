@@ -73,15 +73,6 @@ public class BuildTest {
     public static Collection<Object[]> data() {
         // TODO: upgrade shaded dependencies to Java 6/7 to benefit from their faster class loading
         return asList(new Object[][]{
-                {"jumi-actors",
-                        asList(Opcodes.V1_6),
-                        asList(),
-                        asList(
-                                MANIFEST,
-                                POM_FILES,
-                                BASE_PACKAGE + "actors/")
-                },
-
                 {"jumi-api",
                         asList(Opcodes.V1_7),
                         asList(),
@@ -122,15 +113,6 @@ public class BuildTest {
                                 MANIFEST,
                                 POM_FILES,
                                 BASE_PACKAGE + "launcher/")
-                },
-
-                {"thread-safety-agent",
-                        asList(Opcodes.V1_5, Opcodes.V1_6),
-                        asList(),
-                        asList(
-                                MANIFEST,
-                                POM_FILES,
-                                BASE_PACKAGE + "threadsafetyagent/")
                 },
         });
     }

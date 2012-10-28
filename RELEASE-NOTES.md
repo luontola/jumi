@@ -5,6 +5,7 @@ Release Notes
 ### Upcoming Changes
 
 - Removed from jumi-api's Javadocs mentions of planned features which do not yet exist
+- Jumi Actors is from this release onwards its own project with its own release cycle
 
 ### Jumi 0.1.196 (2012-09-19)
 
