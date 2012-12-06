@@ -2,6 +2,20 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/end-to-end-tests/target/generated-test-sources/test-annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-launcher/target/generated-test-sources/test-annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-core/target/generated-test-sources/test-annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/simpleunit/target/generated-test-sources/test-annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-api/target/generated-test-sources/test-annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-daemon/target/generated-test-sources/test-annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/end-to-end-tests/target/generated-sources/annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-daemon/target/generated-sources/annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-core/target/generated-sources/annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-api/target/generated-sources/annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/simpleunit/target/generated-sources/annotations" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/jumi-launcher/target/generated-sources/annotations" includeSubdirectories="true" />
+    </excludeFromCompile>
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
@@ -35,8 +49,6 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="end-to-end-tests" target="1.7" />
-      <module name="jumi-actors" target="1.6" />
-      <module name="jumi-actors-maven-plugin" target="1.6" />
       <module name="jumi-api" target="1.7" />
       <module name="jumi-core" target="1.7" />
       <module name="jumi-daemon" target="1.7" />
@@ -44,7 +56,6 @@
       <module name="parent" target="1.7" />
       <module name="project" target="1.7" />
       <module name="simpleunit" target="1.7" />
-      <module name="thread-safety-agent" target="1.6" />
     </bytecodeTargetLevel>
   </component>
   <component name="EclipseCompilerSettings">
