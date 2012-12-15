@@ -33,8 +33,8 @@ java.lang.NullPointerException
 
 - TextUI: optionally hide passing tests
 
-- release 0.2.x
-	- promote Specsy 2, now that Jumi is nearly usable
+- release 0.2
+	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
 	- contact selected testing framework developers directly
 
 - end-to-end tests: discovering test classes based on file patterns
@@ -56,14 +56,18 @@ java.lang.NullPointerException
 
 - end-to-end tests: setting the working directory for a test run
 
-- end-to-end tests: failures outside tests (in drivers and core)
-	OK - actor tests print dummy exceptions; solve by having a custom pluggable exception handler which doesn't print stack traces of a DummyException class
-	OK - consider a command for stopping actors (Thread.interrupt(), DeathPill)
-	- consider a supervisor pattern for actors (like in Akka)
+- release 0.3
+
+- JUnit backward compatibility
+	- end-to-end test: run tests written in JUnit 4, JUnit 3, custom JUnit runner
+
+- end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
+	- given an error message if starting the daemon fails (for example out of memory)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 
-- given an error message if starting the daemon fails (for example out of memory)
+- release 0.4
+	- promote widely
 
 - misc refactoring
 	- replace SuiteRunnerIntegrationHelper with TestBench?
