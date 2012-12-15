@@ -9,7 +9,7 @@ Motivation and benefits of the Jumi test runner are explained in its announcemen
 
 Jumi is not only open source, but also open development. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code> The long-term roadmap is in [ROADMAP.txt](https://github.com/orfjackal/jumi/blob/master/ROADMAP.txt) and the short-term task list is in [TODO.txt](https://github.com/orfjackal/jumi/blob/master/TODO.txt).
 
-- Mailing list: <http://groups.google.com/group/jumi-runner>
+- Mailing list: <https://groups.google.com/d/forum/jumi-test-runner>
 - Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md))
 - Source code: <https://github.com/orfjackal/jumi>
 - License: [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
