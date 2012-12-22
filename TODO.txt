@@ -9,18 +9,20 @@
 		OK - separate history
 		OK - setup CI
 		OK - run pipeline without assertions
-		!! - tests for the scripts
-			!! - end-to-end tests for the final result
-				- maven artifacts
-				- tag name
-				- tag message
-				- commit messages
-				- release notes
-				- produced reports
-			- unit test check-release-notes.sh
-			- unit test upload-maven-repository.rb
-		- fix the scripts to work with the current directory structure
-			- build-summary.html needs to be copied to build/
+		OK - tests for the scripts
+			OK - end-to-end tests for the final result
+				OK - maven artifacts
+				OK - tag name
+				OK - tag message
+				OK - commit messages
+				OK - release notes
+				OK - produced reports
+				OK - pushed branch and tag
+			SKIP - unit test check-release-notes.sh
+			SKIP - unit test upload-maven-repository.rb
+		OK - fix the scripts to work with the current directory structure
+			OK - build-summary.html needs to be copied to build/
+		OK - parameterize project name
 		- change CI to use the new scripts
 		- remove the old scripts
 	- consider migrating to nexus-staging-maven-plugin, https://github.com/sonatype/nexus-maven-plugins/tree/master/nexus-staging-maven-plugin
