@@ -5,7 +5,7 @@
 	OK - cleanup BuildTest
 	OK - remove unused dependencies from parent
 	OK - the same for jumi-actors project
-	!! - extract build scripts to their own project
+	OK - extract build scripts to their own project
 		OK - separate history
 		OK - setup CI
 		OK - run pipeline without assertions
@@ -23,9 +23,10 @@
 		OK - fix the scripts to work with the current directory structure
 			OK - build-summary.html needs to be copied to build/
 		OK - parameterize project name
-		- change CI to use the new scripts
-		- remove the old scripts
-	- consider migrating to nexus-staging-maven-plugin, https://github.com/sonatype/nexus-maven-plugins/tree/master/nexus-staging-maven-plugin
+		OK - change CI to use the new scripts
+		OK - extract build pipeline templates
+		OK - remove the old scripts
+	!! - consider migrating to nexus-staging-maven-plugin, https://github.com/sonatype/nexus-maven-plugins/tree/master/nexus-staging-maven-plugin
 
 - extract test doubles from Specsy to testbench
 	- SilentOutputCapturer or overloaded OutputCapturer constructor (UTF_16BE should be the simplest conversion, same as what Strings use)
