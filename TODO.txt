@@ -1,33 +1,4 @@
 
-!! - separate project for jumi-actors
-	OK - fix the version numbers
-	OK - remove unrelated modules
-	OK - cleanup BuildTest
-	OK - remove unused dependencies from parent
-	OK - the same for jumi-actors project
-	OK - extract build scripts to their own project
-		OK - separate history
-		OK - setup CI
-		OK - run pipeline without assertions
-		OK - tests for the scripts
-			OK - end-to-end tests for the final result
-				OK - maven artifacts
-				OK - tag name
-				OK - tag message
-				OK - commit messages
-				OK - release notes
-				OK - produced reports
-				OK - pushed branch and tag
-			SKIP - unit test check-release-notes.sh
-			SKIP - unit test upload-maven-repository.rb
-		OK - fix the scripts to work with the current directory structure
-			OK - build-summary.html needs to be copied to build/
-		OK - parameterize project name
-		OK - change CI to use the new scripts
-		OK - extract build pipeline templates
-		OK - remove the old scripts
-	!! - consider migrating to nexus-staging-maven-plugin, https://github.com/sonatype/nexus-maven-plugins/tree/master/nexus-staging-maven-plugin
-
 - extract test doubles from Specsy to testbench
 	- SilentOutputCapturer or overloaded OutputCapturer constructor (UTF_16BE should be the simplest conversion, same as what Strings use)
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UTF_8.java
@@ -98,13 +69,7 @@ java.lang.NullPointerException
 	- after upgrading to (presumably) JUnit 4.11, refactor BuildTest's parameterized descriptions
 		https://github.com/KentBeck/junit/pull/145
 		https://github.com/KentBeck/junit/pull/393
-	- aftermath of upgrading to Java 7
-		SKIP - extract actors to their own project; IDEA can't handle well mixing language levels in the same project
-			-> works in IDEA 12
-		OK - BuildTest: enable all_classes_must_use_the_specified_bytecode_version also when building in IDEA
-		OK - IDEA should warn about the use of APIs newer than the module language level
-			-> works when changed the module to use JDK 6
-		- we have many ASM versions we have on classpath (caliper depends on ASM 3), block "asm:*" artifacts with maven-enforcer-plugin?
+	- check whether we still have many ASM versions we have on classpath (caliper depends on ASM 3), block "asm:*" artifacts with maven-enforcer-plugin?
 	- use ~/.jumi directory for the daemon jar
 	- make the number of test threads by default the number of CPUs + 1 or similar
 	- make JUnit print a thread dump when a test times out due to @Test(timeout)
@@ -243,8 +208,6 @@ java.lang.NullPointerException
 		announce [M]
 			update-www
 			send-emails
-	OK - upgrade to Go 12.3
-	OK - enable deployment for all except end-to-end tests and the aggregate pom: jumi-api, jumi-core, jumi-daemon, jumi-launcher
 	- create jumi-integration and add it to the pipeline
 		- integration tests for Specsy
 		- platform for running the tests
@@ -253,10 +216,12 @@ java.lang.NullPointerException
 	- push-button releasing the staging repository
 		- run smoke tests before promoting
 		- if smoke tests pass, promote automatically from OSSRH to Central
+			- consider migrating to nexus-staging-maven-plugin, https://github.com/sonatype/nexus-maven-plugins/tree/master/nexus-staging-maven-plugin
 			http://www.sonatype.com/books/nexus-book/reference/staging-sect-managing-plugin.html
 			https://repository.sonatype.org/content/sites/maven-sites/nexus-maven-plugin/
-	- update the version number of latest release to the web site
-	- update javadocs to the web site
+	- automate updating the web site
+		- update the version number of latest release to the web site
+		- update javadocs to the web site
 
 - web site improvements
 	- site for jumi-actors-maven-plugin
