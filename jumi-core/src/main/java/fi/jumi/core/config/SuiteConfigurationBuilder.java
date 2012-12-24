@@ -14,7 +14,7 @@ public class SuiteConfigurationBuilder {
 
     private final List<URI> classPath;
     private final List<String> jvmOptions;
-    private String testClass;
+    private final List<String> testClasses;
 
     public SuiteConfigurationBuilder() {
         this(SuiteConfiguration.DEFAULTS);
@@ -23,7 +23,7 @@ public class SuiteConfigurationBuilder {
     SuiteConfigurationBuilder(SuiteConfiguration src) {
         classPath = new ArrayList<>(src.classPath());
         jvmOptions = new ArrayList<>(src.jvmOptions());
-        testClass = src.testClass();
+        testClasses = new ArrayList<>(src.testClasses());
     }
 
     public SuiteConfiguration freeze() {
@@ -46,12 +46,17 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public String testClass() {
-        return testClass;
+    public List<String> testClasses() {
+        return testClasses;
     }
 
-    public SuiteConfigurationBuilder testClass(String testClass) {
-        this.testClass = testClass;
+    public SuiteConfigurationBuilder testClasses(String... testClasses) {
+        return testClasses(Arrays.asList(testClasses));
+    }
+
+    public SuiteConfigurationBuilder testClasses(List<String> testClasses) {
+        this.testClasses.clear();
+        this.testClasses.addAll(testClasses);
         return this;
     }
 

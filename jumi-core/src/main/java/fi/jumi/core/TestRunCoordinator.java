@@ -44,7 +44,7 @@ public class TestRunCoordinator implements CommandListener {
     public void runTests(SuiteConfiguration suiteConfiguration) {
         TestClassFinder testClassFinder = new FileSystemTestClassFinder(
                 suiteConfiguration.classPath(),
-                suiteConfiguration.testClass()
+                suiteConfiguration.testClasses().get(0) // TODO
         );
         DriverFinder driverFinder = new RunViaAnnotationDriverFinder();
 

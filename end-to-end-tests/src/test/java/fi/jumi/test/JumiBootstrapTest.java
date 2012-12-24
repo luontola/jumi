@@ -22,7 +22,7 @@ public class JumiBootstrapTest {
     public void runs_tests_with_current_classpath() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
 
-        bootstrap.runTestClass(OnePassingTest.class);
+        bootstrap.runTestClasses(OnePassingTest.class);
 
         assertThat(out.toString(), containsString("testPassing"));
     }
@@ -32,7 +32,7 @@ public class JumiBootstrapTest {
         ByteArrayOutputStream daemonOutput = new ByteArrayOutputStream();
         JumiBootstrap bootstrap = new JumiBootstrap().setOut(out).enableDebugMode(daemonOutput);
 
-        bootstrap.runTestClass(OnePassingTest.class);
+        bootstrap.runTestClasses(OnePassingTest.class);
 
         assertThat(daemonOutput.toString(), containsString("[jumi-actors-1]"));
     }

@@ -52,18 +52,18 @@ public class SuiteConfigurationTest {
     }
 
 
-    // testClass
+    // testClasses
 
     @Test
-    public void test_class_can_be_changed() {
-        builder.testClass("TheClass");
+    public void test_classes_can_be_changed() {
+        builder.testClasses("TheClass", "AnotherClass");
 
-        assertThat(configuration().testClass(), is("TheClass"));
+        assertThat(configuration().testClasses(), contains("TheClass", "AnotherClass"));
     }
 
     @Test
-    public void test_class_has_a_default_value() {
-        assertThat(configuration().testClass(), is(SuiteConfiguration.DEFAULTS.testClass()));
+    public void test_classes_defaults_to_empty() {
+        assertThat(configuration().testClasses(), is(empty()));
     }
 
 

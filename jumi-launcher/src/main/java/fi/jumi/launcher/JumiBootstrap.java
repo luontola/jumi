@@ -17,8 +17,7 @@ import java.util.regex.Pattern;
 public class JumiBootstrap {
 
     public static void main(String[] args) throws Exception {
-        String testClass = args[0];
-        new JumiBootstrap().runTestClass(testClass);
+        new JumiBootstrap().runTestClasses(args);
     }
 
     private Appendable out = System.out;
@@ -38,14 +37,22 @@ public class JumiBootstrap {
         return this;
     }
 
-    public void runTestClass(Class<?> testClass) throws IOException, InterruptedException {
-        runTestClass(testClass.getName());
+    public void runTestClasses(Class<?>... testClasses) throws IOException, InterruptedException {
+        runTestClasses(toClassNames(testClasses));
     }
 
-    public void runTestClass(String testClass) throws IOException, InterruptedException {
+    private static String[] toClassNames(Class<?>[] classes) {
+        String[] names = new String[classes.length];
+        for (int i = 0; i < classes.length; i++) {
+            names[i] = classes[i].getName();
+        }
+        return names;
+    }
+
+    public void runTestClasses(String... testClasses) throws IOException, InterruptedException {
         SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
                 .addJvmOptions("-ea")
-                .testClass(testClass);
+                .testClasses(testClasses);
 
         for (Path path : currentClasspath()) {
             suite.addToClassPath(path);

@@ -39,6 +39,17 @@ public class RunningTestsTest {
         app.checkContainsRun("OneFailingTest", "testFailing", "/", "/");
     }
 
+    @Ignore("not implemented")
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void suite_with_many_test_classes() throws Exception {
+        app.runTests(OnePassingTest.class, OneFailingTest.class);
+
+        app.checkPassingAndFailingTests(2, 1);
+        app.checkTotalTestRuns(2);
+        app.checkContainsRun("OnePassingTest", "testPassing", "/", "/");
+        app.checkContainsRun("OneFailingTest", "testFailing", "/", "/");
+    }
+
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_failure_stack_traces() throws Exception {
         app.runTests(OneFailingTest.class);

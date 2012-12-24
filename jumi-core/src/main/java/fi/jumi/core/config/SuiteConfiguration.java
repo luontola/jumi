@@ -19,18 +19,18 @@ public class SuiteConfiguration implements Serializable {
     // TODO: support for main and test class paths
     private final List<URI> classPath;
     private final List<String> jvmOptions;
-    private final String testClass;
+    private final List<String> testClasses;
 
     public SuiteConfiguration() {
         classPath = Collections.emptyList();
         jvmOptions = Collections.emptyList();
-        testClass = ""; // TODO
+        testClasses = Collections.emptyList();
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
         classPath = Immutables.list(src.classPath());
         jvmOptions = Immutables.list(src.jvmOptions());
-        testClass = src.testClass();
+        testClasses = Immutables.list(src.testClasses());
     }
 
     public SuiteConfigurationBuilder melt() {
@@ -48,7 +48,7 @@ public class SuiteConfiguration implements Serializable {
         return jvmOptions;
     }
 
-    public String testClass() {
-        return testClass;
+    public List<String> testClasses() {
+        return testClasses;
     }
 }

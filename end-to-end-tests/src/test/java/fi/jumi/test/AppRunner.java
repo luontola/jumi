@@ -104,12 +104,20 @@ public class AppRunner implements TestRule {
         return daemonOutput.toString();
     }
 
-    public void runTests(Class<?> clazz) throws Exception {
-        runTests(clazz.getName());
+    public void runTests(Class<?>... testClasses) throws Exception {
+        runTests(toClassNames(testClasses));
     }
 
-    public void runTests(String testClass) throws Exception {
-        startTests(testClass);
+    private static String[] toClassNames(Class<?>[] classes) {
+        String[] names = new String[classes.length];
+        for (int i = 0; i < classes.length; i++) {
+            names[i] = classes[i].getName();
+        }
+        return names;
+    }
+
+    public void runTests(String... testClasses) throws Exception {
+        startTests(testClasses);
 
         StringBuilder outputBuffer = new StringBuilder();
         TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(outputBuffer));
@@ -120,17 +128,17 @@ public class AppRunner implements TestRule {
         this.ui = new TextUIParser(output);
     }
 
-    public void startTests(String testClass) throws IOException {
-        getLauncher().start(configure(suite.freeze(), testClass), configure(daemon.freeze()));
+    public void startTests(String... testClasses) throws IOException {
+        getLauncher().start(configure(suite.freeze(), testClasses), configure(daemon.freeze()));
     }
 
-    private SuiteConfiguration configure(SuiteConfiguration suite, String testClass) throws IOException {
+    private SuiteConfiguration configure(SuiteConfiguration suite, String[] testClasses) throws IOException {
         SuiteConfigurationBuilder builder = suite.melt();
 
         builder.addJvmOptions("-Dfile.encoding=" + daemonDefaultCharset.name());
         builder.addToClassPath(TestEnvironment.getProjectJar("simpleunit"));
         builder.addToClassPath(TestEnvironment.getSampleClassesDir());
-        builder.testClass(testClass);
+        builder.testClasses(testClasses);
         if (TestSystemProperties.useThreadSafetyAgent()) {
             builder.addJvmOptions("-javaagent:" + TestEnvironment.getProjectJar("thread-safety-agent"));
         }
