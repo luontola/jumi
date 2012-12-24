@@ -2,7 +2,7 @@
 Release Notes
 =============
 
-### Upcoming Changes
+### Jumi 0.2.235 (2012-12-24)
 
 This release is ready for early adopters to start using Jumi. It adds support for running multiple test classes (though they must be listed manually; automatic test discovery will be added in the following release).
 
