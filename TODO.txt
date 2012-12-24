@@ -9,7 +9,7 @@ OK - extract test doubles from Specsy to testbench
 	SKIP - FakeSuiteNotifier
 	OK - boostrapper: run tests with the current classpath
 
-- NPE if annotation is missing:
+OK - NPE if annotation is missing:
 java.lang.NullPointerException
 	at fi.jumi.core.drivers.RunViaAnnotationDriverFinder.findTestClassDriver(RunViaAnnotationDriverFinder.java:18)
 	at fi.jumi.core.runners.SuiteRunner.onTestClassFound(SuiteRunner.java:63)
