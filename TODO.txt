@@ -21,9 +21,10 @@ OK - make @RunVia inherited
 !! - end-to-end tests: running multiple test classes
 	OK - pass a list of class names as a suite parameter
 		OK - fix the daemon jar in .jumi not being updated for snapshots
-	!! - update FileSystemTestClassFinder, maybe create a new class
+	OK - update FileSystemTestClassFinder, maybe create a new class
 	- update end-to-end test for zero tests
-	- it's not sure whether SuiteRunner works correctly when there are many test classes
+	- add new case to SuiteMother
+	- make sure that SuiteRunner works correctly when there are many test classes
 
 - TextUI: optionally hide passing tests
 
@@ -41,6 +42,7 @@ OK - make @RunVia inherited
 		- consider using Java 7's glob/regex patterns
 			http://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob
 			http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)
+	- create FileNamePatternTestClassFinder
 	- set a good default value for fi.jumi.core.config.SuiteConfiguration#includedTestsPattern
 
 - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader

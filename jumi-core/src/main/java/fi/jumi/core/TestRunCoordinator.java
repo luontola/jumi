@@ -12,6 +12,8 @@ import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runners.SuiteRunner;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.net.*;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
@@ -42,15 +44,31 @@ public class TestRunCoordinator implements CommandListener {
 
     @Override
     public void runTests(SuiteConfiguration suiteConfiguration) {
-        TestClassFinder testClassFinder = new FileSystemTestClassFinder(
-                suiteConfiguration.classPath(),
-                suiteConfiguration.testClasses().get(0) // TODO
+        TestClassFinder testClassFinder = new EnumeratedTestClassFinder(
+                createClassLoader(suiteConfiguration.classPath()),
+                suiteConfiguration.testClasses()
         );
         DriverFinder driverFinder = new RunViaAnnotationDriverFinder();
 
         ActorRef<Startable> suiteRunner = actorThread.bindActor(Startable.class,
                 new SuiteRunner(listener, testClassFinder, driverFinder, actorThread, testExecutor, outputCapturer));
         suiteRunner.tell().start();
+    }
+
+    private static ClassLoader createClassLoader(List<URI> classpath) {
+        try {
+            return new URLClassLoader(asUrls(classpath));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Failed to create class loader for classpath " + classpath, e);
+        }
+    }
+
+    private static URL[] asUrls(List<URI> uris) throws MalformedURLException {
+        URL[] urls = new URL[uris.size()];
+        for (int i = 0, filesLength = uris.size(); i < filesLength; i++) {
+            urls[i] = uris.get(i).toURL();
+        }
+        return urls;
     }
 
     @Override
