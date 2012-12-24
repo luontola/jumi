@@ -11,6 +11,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @NotThreadSafe
 public class JumiBootstrap {
@@ -57,7 +58,8 @@ public class JumiBootstrap {
         Path javaHome = Paths.get(System.getProperty("java.home"));
 
         List<Path> classpath = new ArrayList<>();
-        for (String library : System.getProperty("java.class.path").split(";")) {
+        String pathSeparator = System.getProperty("path.separator");
+        for (String library : System.getProperty("java.class.path").split(Pattern.quote(pathSeparator))) {
             Path libraryPath = Paths.get(library);
             if (!libraryPath.startsWith(javaHome)) {
                 classpath.add(libraryPath);
