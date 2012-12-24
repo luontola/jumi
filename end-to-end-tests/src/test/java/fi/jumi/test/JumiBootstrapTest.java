@@ -9,9 +9,10 @@ import org.junit.Test;
 import sample.OnePassingTest;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.*;
 
 public class JumiBootstrapTest {
 
@@ -33,5 +34,36 @@ public class JumiBootstrapTest {
                 .runTestClass(OnePassingTest.class);
 
         assertThat(daemonOutput.toString(), containsString("[jumi-actors-1]"));
+    }
+
+    @Test
+    public void output_defaults_to_stdout() {
+        JumiBootstrap bootstrap = new JumiBootstrap();
+
+        assertThat(getFieldValue(bootstrap, "out"), is((Object) System.out));
+    }
+
+    @Test
+    public void debug_output_is_disabled_by_default() {
+        JumiBootstrap bootstrap = new JumiBootstrap();
+
+        assertThat(getFieldValue(bootstrap, "debugOutput"), is((Object) null));
+    }
+
+    @Test
+    public void debug_output_defaults_to_stderr_when_enabled() {
+        JumiBootstrap bootstrap = new JumiBootstrap().enableDebugMode();
+
+        assertThat(getFieldValue(bootstrap, "debugOutput"), is((Object) System.err));
+    }
+
+    private static Object getFieldValue(Object object, String fieldName) {
+        try {
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
