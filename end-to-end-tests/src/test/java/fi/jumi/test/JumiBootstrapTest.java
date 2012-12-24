@@ -6,7 +6,7 @@ package fi.jumi.test;
 
 import fi.jumi.launcher.JumiBootstrap;
 import org.junit.Test;
-import sample.OnePassingTest;
+import sample.*;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -22,9 +22,12 @@ public class JumiBootstrapTest {
     public void runs_tests_with_current_classpath() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
 
-        bootstrap.runTestClasses(OnePassingTest.class);
+        bootstrap.runTestClasses(OnePassingTest.class, OneFailingTest.class);
 
-        assertThat(out.toString(), containsString("testPassing"));
+        String out = this.out.toString();
+        assertThat("should show test results", out, containsString("Pass: 3, Fail: 1, Total: 4"));
+        assertThat("should hide passing tests", out, not(containsString("OnePassingTest")));
+        assertThat("should show failing tests", out, containsString("OneFailingTest"));
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
@@ -35,6 +38,23 @@ public class JumiBootstrapTest {
         bootstrap.runTestClasses(OnePassingTest.class);
 
         assertThat(daemonOutput.toString(), containsString("[jumi-actors-1]"));
+    }
+
+
+    // configuration
+
+    @Test
+    public void passing_tests_are_hidden_by_default() {
+        JumiBootstrap bootstrap = new JumiBootstrap();
+
+        assertThat(getFieldValue(bootstrap, "passingTestsVisible"), is((Object) false));
+    }
+
+    @Test
+    public void passing_tests_can_be_made_visible() {
+        JumiBootstrap bootstrap = new JumiBootstrap().setPassingTestsVisible(true);
+
+        assertThat(getFieldValue(bootstrap, "passingTestsVisible"), is((Object) true));
     }
 
     @Test

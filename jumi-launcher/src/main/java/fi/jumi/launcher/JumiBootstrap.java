@@ -20,8 +20,14 @@ public class JumiBootstrap {
         new JumiBootstrap().runTestClasses(args);
     }
 
+    private boolean passingTestsVisible = false;
     private Appendable out = System.out;
     private OutputStream debugOutput = null;
+
+    public JumiBootstrap setPassingTestsVisible(boolean passingTestsVisible) {
+        this.passingTestsVisible = passingTestsVisible;
+        return this;
+    }
 
     public JumiBootstrap setOut(Appendable out) {
         this.out = out;
@@ -84,6 +90,7 @@ public class JumiBootstrap {
             launcher.start(suite, daemon);
 
             TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(out));
+            ui.setPassingTestsVisible(passingTestsVisible);
             ui.updateUntilFinished();
 
             launcher.close();

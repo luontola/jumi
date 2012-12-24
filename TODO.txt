@@ -25,16 +25,18 @@ OK - end-to-end tests: running multiple test classes
 	OK - update end-to-end test for zero tests
 	SKIP - add new case to SuiteMother, make sure that SuiteRunner works correctly when there are many test classes
 
-!! - TextUI: optionally hide passing tests
+OK - TextUI: optionally hide passing tests
 	OK - add option to TextUI
-	!! - add option to JumiBootstrap
+	OK - add option to JumiBootstrap
 
 - release 0.2
 	- sort the release notes by importance
-	- update Specsy 2
+	- update Specsy 2 (first with a snapshot)
 		- remove SilentOutputCapturer
 		- remove dependency on commons-io
 		- inherit @RunVia
+	- make the release
+	- send announcement emails
 	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
 	- contact selected testing framework developers directly
 
