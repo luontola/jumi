@@ -16,7 +16,7 @@ java.lang.NullPointerException
 	- give a better error message, or just a warning
 	- after adding JUnit support, this can be expected to fail, after which the next strategy in chain should be tried
 
-- make @RunVia inherited
+OK - make @RunVia inherited
 
 - end-to-end tests: running multiple test classes
 	- it's not sure whether SuiteRunner works correctly when there are many test classes
@@ -25,9 +25,11 @@ java.lang.NullPointerException
 - TextUI: optionally hide passing tests
 
 - release 0.2
+	- sort the release notes by importance
 	- update Specsy 2
 		- remove SilentOutputCapturer
 		- remove dependency on commons-io
+		- inherit @RunVia
 	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
 	- contact selected testing framework developers directly
 

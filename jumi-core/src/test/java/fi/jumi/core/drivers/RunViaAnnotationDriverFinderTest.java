@@ -29,6 +29,13 @@ public class RunViaAnnotationDriverFinderTest {
     }
 
     @Test
+    public void the_RunVia_annotation_is_inherited_from_super_class() {
+        Driver driver = driverFinder.findTestClassDriver(InheritsAnnotationFromSuperClass.class);
+
+        assertThat(driver, is(instanceOf(DummyDriver.class)));
+    }
+
+    @Test
     public void raises_an_error_if_the_class_is_not_annotated_with_RunVia() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("NotAnnotatedClass was not annotated with fi.jumi.api.RunVia");
@@ -39,6 +46,9 @@ public class RunViaAnnotationDriverFinderTest {
 
     @RunVia(DummyDriver.class)
     private static class DummyTestClass {
+    }
+
+    private static class InheritsAnnotationFromSuperClass extends DummyTestClass {
     }
 
     private static class NotAnnotatedClass {

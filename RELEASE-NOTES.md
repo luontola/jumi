@@ -9,6 +9,7 @@ Release Notes
 - Added a default constructor to `fi.jumi.core.output.OutputCapturer` in order to avoid the need of a `NullOutputStream` in tests
 - Added `fi.jumi.launcher.JumiBootstrap` for running tests without support from IDEs and build tools
 - Better error message if `@RunVia` is missing
+- `@RunVia` can now be inherited from a test's super class
 
 ### Jumi 0.1.196 (2012-09-19)
 
