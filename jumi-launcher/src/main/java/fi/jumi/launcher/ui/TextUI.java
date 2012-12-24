@@ -23,10 +23,15 @@ public class TextUI {
 
     private final SuiteEventDemuxer demuxer = new SuiteEventDemuxer();
     private final SuitePrinter suitePrinter = new SuitePrinter();
+    private boolean passingTestsVisible = true;
 
     public TextUI(MessageReceiver<Event<SuiteListener>> eventStream, Printer printer) {
         this.eventStream = eventStream;
         this.printer = printer;
+    }
+
+    public void setPassingTestsVisible(boolean passingTestsVisible) {
+        this.passingTestsVisible = passingTestsVisible;
     }
 
     public void update() {
@@ -59,8 +64,15 @@ public class TextUI {
 
         @Override
         public void onRunFinished(RunId runId) {
-            // TODO: option for printing only failing or all runs
-            demuxer.visitRun(runId, new RunPrinter());
+            if (passingTestsVisible || hasFailures(runId)) {
+                demuxer.visitRun(runId, new RunPrinter());
+            }
+        }
+
+        private boolean hasFailures(RunId runId) {
+            SuiteResultsSummary tmp = new SuiteResultsSummary();
+            demuxer.visitRun(runId, tmp);
+            return tmp.getFailingTests() > 0;
         }
 
         @Override

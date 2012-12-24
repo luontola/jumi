@@ -11,6 +11,7 @@ Release Notes
 - Better error message if `@RunVia` is missing
 - `@RunVia` can now be inherited from a test's super class
 - Runs multiple test classes (no test discovery yet; requires enumerating the class names)
+- TextUI can optionally hide passing tests
 
 ### Jumi 0.1.196 (2012-09-19)
 

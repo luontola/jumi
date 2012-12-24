@@ -25,7 +25,9 @@ OK - end-to-end tests: running multiple test classes
 	OK - update end-to-end test for zero tests
 	SKIP - add new case to SuiteMother, make sure that SuiteRunner works correctly when there are many test classes
 
-- TextUI: optionally hide passing tests
+!! - TextUI: optionally hide passing tests
+	OK - add option to TextUI
+	!! - add option to JumiBootstrap
 
 - release 0.2
 	- sort the release notes by importance

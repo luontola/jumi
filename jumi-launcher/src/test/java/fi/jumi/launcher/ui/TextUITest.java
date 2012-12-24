@@ -353,4 +353,27 @@ public class TextUITest {
         String theNextMetaLine = " > -";
         assertInOutput(printedToStdout + "\n" + theNextMetaLine);
     }
+
+
+    // configuration
+
+    @Test
+    public void can_choose_to_show_passing_tests() {
+        ui.setPassingTestsVisible(true);
+
+        SuiteMother.onePassingTest(listener);
+
+        assertInOutput("Run #1");
+        assertInOutput("Pass: 1");
+    }
+
+    @Test
+    public void can_choose_to_hide_passing_tests() {
+        ui.setPassingTestsVisible(false);
+
+        SuiteMother.onePassingTest(listener);
+
+        assertNotInOutput("Run #1");
+        assertInOutput("Pass: 1");
+    }
 }
