@@ -4,14 +4,17 @@ Release Notes
 
 ### Upcoming Changes
 
-- Removed from jumi-api's Javadocs mentions of planned features which do not yet exist
-- Jumi Actors is from this release onwards its own project with its own release cycle
-- Added a default constructor to `fi.jumi.core.output.OutputCapturer` in order to avoid the need of a `NullOutputStream` in tests
+This release is ready for early adopters to start using Jumi. It adds support for running multiple test classes (though they must be listed manually; automatic test discovery will be added in the following release).
+
+- Runs multiple test classes in a suite
 - Added `fi.jumi.launcher.JumiBootstrap` for running tests without support from IDEs and build tools
-- Better error message if `@RunVia` is missing
-- `@RunVia` can now be inherited from a test's super class
-- Runs multiple test classes (no test discovery yet; requires enumerating the class names)
 - TextUI can optionally hide passing tests
+- `@RunVia` can now be inherited from a test's super class
+- Better error message if `@RunVia` is missing
+- Added a default constructor to `fi.jumi.core.output.OutputCapturer` in order to avoid the need of a `NullOutputStream` in tests
+- Removed from jumi-api's Javadocs mentions of planned features which do not yet exist
+
+Jumi Actors is from this release onwards its own project with its own release cycle
 
 ### Jumi 0.1.196 (2012-09-19)
 
