@@ -12,10 +12,8 @@ import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.results.SuiteEventDemuxer;
 import fi.jumi.core.runners.SuiteRunner;
-import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 
 public class TestBench {
 
@@ -35,7 +33,7 @@ public class TestBench {
     private FailureHandler actorsFailureHandler = new CrashEarlyFailureHandler();
 
     public TestBench() {
-        outputCapturer = new OutputCapturer(new NullOutputStream(), new NullOutputStream(), StandardCharsets.UTF_8);
+        outputCapturer = new OutputCapturer();
         out = outputCapturer.out();
         err = outputCapturer.err();
     }

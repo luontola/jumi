@@ -1,12 +1,13 @@
 
-- extract test doubles from Specsy to testbench
-	- SilentOutputCapturer or overloaded OutputCapturer constructor (UTF_16BE should be the simplest conversion, same as what Strings use)
+!! - extract test doubles from Specsy to testbench
+	OK - SilentOutputCapturer or overloaded OutputCapturer constructor (UTF_16BE should be the simplest conversion, same as what Strings use)
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UTF_8.java
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UTF_16BE.java
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UnicodeEncoder.java
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UnicodeDecoder.java
 		- try to avoid commons-io dependency on testers; create our own NullOutputStream, or is that constructor enough?
 	- FakeSuiteNotifier
+	- boostrapper: run tests with the current classpath
 	- others?
 
 - NPE if annotation is missing:
@@ -25,6 +26,9 @@ java.lang.NullPointerException
 - TextUI: optionally hide passing tests
 
 - release 0.2
+	- update Specsy 2
+		- remove SilentOutputCapturer
+		- remove dependency on commons-io
 	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
 	- contact selected testing framework developers directly
 

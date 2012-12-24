@@ -14,10 +14,8 @@ import fi.jumi.core.files.TestClassFinder;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.testbench.*;
 import fi.jumi.core.util.SpyListener;
-import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.concurrent.Executor;
 
 public abstract class SuiteRunnerIntegrationHelper {
@@ -32,7 +30,7 @@ public abstract class SuiteRunnerIntegrationHelper {
     private final SingleThreadedActors actors = new SingleThreadedActors(new DynamicEventizerProvider(), failureHandler, messageListener);
     private final Executor executor = actors.getExecutor();
 
-    private final OutputCapturer outputCapturer = new OutputCapturer(new NullOutputStream(), new NullOutputStream(), Charset.defaultCharset());
+    private final OutputCapturer outputCapturer = new OutputCapturer();
     protected final PrintStream stdout = outputCapturer.out();
     protected final PrintStream stderr = outputCapturer.err();
 

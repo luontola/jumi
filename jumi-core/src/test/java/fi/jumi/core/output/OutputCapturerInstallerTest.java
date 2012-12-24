@@ -4,17 +4,14 @@
 
 package fi.jumi.core.output;
 
-import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Test;
-
-import java.nio.charset.Charset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class OutputCapturerInstallerTest {
 
-    private final OutputCapturer capturer = new OutputCapturer(new NullOutputStream(), new NullOutputStream(), Charset.defaultCharset());
+    private final OutputCapturer capturer = new OutputCapturer();
     private final FakeOutErr outErr = new FakeOutErr();
     private final OutputCapturerInstaller installer = new OutputCapturerInstaller(outErr);
 

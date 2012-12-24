@@ -9,12 +9,10 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runners.TestClassListener;
-import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 
 import static org.mockito.Mockito.*;
 
@@ -23,7 +21,7 @@ public class DefaultSuiteNotifierTest {
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
 
     private final TestClassListener listener = mock(TestClassListener.class);
-    private final OutputCapturer outputCapturer = new OutputCapturer(new NullOutputStream(), new NullOutputStream(), Charset.defaultCharset());
+    private final OutputCapturer outputCapturer = new OutputCapturer();
     private final PrintStream stdout = outputCapturer.out();
 
     private final SuiteNotifier notifier = new DefaultSuiteNotifier(ActorRef.wrap(listener), new RunIdSequence(), outputCapturer);

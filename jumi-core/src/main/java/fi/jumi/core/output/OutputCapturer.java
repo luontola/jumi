@@ -4,11 +4,11 @@
 
 package fi.jumi.core.output;
 
-import org.apache.commons.io.output.WriterOutputStream;
+import org.apache.commons.io.output.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 @ThreadSafe
@@ -20,6 +20,10 @@ public class OutputCapturer {
     private final ErrCapturer errCapturer = new ErrCapturer();
     private final PrintStream out;
     private final PrintStream err;
+
+    public OutputCapturer() {
+        this(new NullOutputStream(), new NullOutputStream(), StandardCharsets.UTF_16BE);
+    }
 
     public OutputCapturer(OutputStream realOut, OutputStream realErr, Charset charset) {
         OutputStream capturedOut = new WriterOutputStream(outCapturer, charset);
