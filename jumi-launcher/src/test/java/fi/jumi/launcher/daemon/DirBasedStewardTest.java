@@ -9,11 +9,11 @@ import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.attribute.FileTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
 
 public class DirBasedStewardTest {
 
@@ -35,14 +35,27 @@ public class DirBasedStewardTest {
     }
 
     @Test
-    public void does_not_copy_the_daemon_JAR_if_it_has_already_been_copied() {
-        StubDaemonJar spyDaemonJar = spy(stubDaemonJar);
-        DirBasedSteward steward = new DirBasedSteward(spyDaemonJar, tempDir.getRoot().toPath());
+    public void does_not_copy_the_daemon_JAR_if_it_has_already_been_copied() throws IOException {
+        DirBasedSteward steward = new DirBasedSteward(stubDaemonJar, tempDir.getRoot().toPath());
 
-        steward.getDaemonJar();
-        steward.getDaemonJar();
+        FileTime lastModified1 = Files.getLastModifiedTime(steward.getDaemonJar());
+        FileTime lastModified2 = Files.getLastModifiedTime(steward.getDaemonJar());
 
-        verify(spyDaemonJar, atMost(1)).getDaemonJarAsStream();
+        assertThat(lastModified2, is(lastModified1));
+    }
+
+    @Test
+    public void overwrites_an_existing_daemon_JAR_that_has_difference_file_size() throws IOException {
+        DirBasedSteward steward = new DirBasedSteward(stubDaemonJar, tempDir.getRoot().toPath());
+        overwriteWithFileOfSize(expectedContent.length + 1, steward.getDaemonJar());
+
+        Path daemonJar = steward.getDaemonJar();
+
+        assertThat(FileUtils.readFileToByteArray(daemonJar.toFile()), is(expectedContent));
+    }
+
+    private static void overwriteWithFileOfSize(int fileSize, Path path) throws IOException {
+        Files.write(path, new byte[fileSize]);
     }
 
 

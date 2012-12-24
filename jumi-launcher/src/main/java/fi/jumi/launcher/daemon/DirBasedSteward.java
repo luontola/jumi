@@ -34,14 +34,18 @@ public class DirBasedSteward implements Steward {
     }
 
     private void createIfDoesNotExist(Path extractedJar) {
-        if (Files.exists(extractedJar)) {
-            return;
-        }
         try (InputStream embeddedJar = daemonJar.getDaemonJarAsStream()) {
+            if (sameSize(extractedJar, embeddedJar)) {
+                return;
+            }
             copyToFile(embeddedJar, extractedJar);
         } catch (IOException e) {
             throw new RuntimeException("failed to copy the embedded daemon JAR to " + extractedJar, e);
         }
+    }
+
+    private static boolean sameSize(Path path, InputStream in) throws IOException {
+        return Files.exists(path) && Files.size(path) == in.available();
     }
 
     private static void copyToFile(InputStream source, Path destination) throws IOException {
