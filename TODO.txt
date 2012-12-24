@@ -1,6 +1,7 @@
 
 !! - release 0.2
 	OK - sort the release notes by importance
+	OK - bump version number
 	!! - update Specsy 2 (first with a snapshot)
 		- remove SilentOutputCapturer
 		- remove dependency on commons-io
