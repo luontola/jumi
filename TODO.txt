@@ -8,11 +8,16 @@
 		OK - inherit @RunVia
 		OK - use JumiBootstrap
 	OK - make the release
-	!! - release Specsy 2.1
-		- update code examples on web site
-	- send announcement emails
+	OK - release Specsy 2.1
+		OK - update code examples on web site
+	!! - send announcement emails
 	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
 	- contact selected testing framework developers directly
+
+- JumiBootstrap: fail if there were errors
+	- refactor: remove the unnecessary call to launcher.close(), also check for similar issues elsewhere
+	- System.exit(1) when called as application
+	- throw exception when called from JUnit etc.
 
 - end-to-end tests: discovering test classes based on file patterns
 	- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
