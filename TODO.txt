@@ -18,13 +18,12 @@ java.lang.NullPointerException
 
 OK - make @RunVia inherited
 
-!! - end-to-end tests: running multiple test classes
+OK - end-to-end tests: running multiple test classes
 	OK - pass a list of class names as a suite parameter
 		OK - fix the daemon jar in .jumi not being updated for snapshots
 	OK - update FileSystemTestClassFinder, maybe create a new class
-	- update end-to-end test for zero tests
-	- add new case to SuiteMother
-	- make sure that SuiteRunner works correctly when there are many test classes
+	OK - update end-to-end test for zero tests
+	SKIP - add new case to SuiteMother, make sure that SuiteRunner works correctly when there are many test classes
 
 - TextUI: optionally hide passing tests
 

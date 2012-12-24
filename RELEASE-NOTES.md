@@ -10,6 +10,7 @@ Release Notes
 - Added `fi.jumi.launcher.JumiBootstrap` for running tests without support from IDEs and build tools
 - Better error message if `@RunVia` is missing
 - `@RunVia` can now be inherited from a test's super class
+- Runs multiple test classes (no test discovery yet; requires enumerating the class names)
 
 ### Jumi 0.1.196 (2012-09-19)
 
