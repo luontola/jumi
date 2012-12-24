@@ -6,7 +6,8 @@ Release Notes
 
 - Removed from jumi-api's Javadocs mentions of planned features which do not yet exist
 - Jumi Actors is from this release onwards its own project with its own release cycle
-- Added a default constructor to `OutputCapturer` in order to avoid the need of a `NullOutputStream` in tests
+- Added a default constructor to `fi.jumi.core.output.OutputCapturer` in order to avoid the need of a `NullOutputStream` in tests
+- Added `fi.jumi.launcher.JumiBootstrap` for running tests without support from IDEs and build tools
 
 ### Jumi 0.1.196 (2012-09-19)
 

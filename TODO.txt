@@ -1,14 +1,13 @@
 
-!! - extract test doubles from Specsy to testbench
+OK - extract test doubles from Specsy to testbench
 	OK - SilentOutputCapturer or overloaded OutputCapturer constructor (UTF_16BE should be the simplest conversion, same as what Strings use)
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UTF_8.java
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UTF_16BE.java
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UnicodeEncoder.java
 		http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/nio/cs/UnicodeDecoder.java
 		- try to avoid commons-io dependency on testers; create our own NullOutputStream, or is that constructor enough?
-	- FakeSuiteNotifier
-	- boostrapper: run tests with the current classpath
-	- others?
+	SKIP - FakeSuiteNotifier
+	OK - boostrapper: run tests with the current classpath
 
 - NPE if annotation is missing:
 java.lang.NullPointerException
