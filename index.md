@@ -19,7 +19,7 @@ Jumi is not only open source, but also open development. The process of how Jumi
 Who is using Jumi?
 ------------------
 
-Jumi has just recently been released and it's missing some important features, but it's already at a stage where testing framework developers can start implementing support for it. Here is a list of frameworks and tools that already have Jumi support:
+Jumi has just recently been released and it's missing some important features, but it's already at a stage where early adopters can start using it and testing framework developers can implement support for it. Here is a list of frameworks and tools that already have Jumi support:
 
 - [Specsy](http://specsy.org/), a testing framework for Scala, Groovy, Java and easily any other JVM-based language
 
