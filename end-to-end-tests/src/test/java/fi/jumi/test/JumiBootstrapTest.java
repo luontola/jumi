@@ -17,21 +17,22 @@ import static org.hamcrest.Matchers.*;
 public class JumiBootstrapTest {
 
     private final StringBuilder out = new StringBuilder();
-    private final JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
 
-    @Test
+    @Test(timeout = Timeouts.END_TO_END_TEST)
     public void runs_tests_with_current_classpath() throws Exception {
+        JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
+
         bootstrap.runTestClass(OnePassingTest.class);
 
         assertThat(out.toString(), containsString("testPassing"));
     }
 
-    @Test
+    @Test(timeout = Timeouts.END_TO_END_TEST)
     public void can_debug_the_daemons_actor_messages() throws Exception {
         ByteArrayOutputStream daemonOutput = new ByteArrayOutputStream();
+        JumiBootstrap bootstrap = new JumiBootstrap().setOut(out).enableDebugMode(daemonOutput);
 
-        bootstrap.enableDebugMode(daemonOutput)
-                .runTestClass(OnePassingTest.class);
+        bootstrap.runTestClass(OnePassingTest.class);
 
         assertThat(daemonOutput.toString(), containsString("[jumi-actors-1]"));
     }
