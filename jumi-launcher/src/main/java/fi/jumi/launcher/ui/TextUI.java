@@ -24,6 +24,7 @@ public class TextUI {
     private final SuiteEventDemuxer demuxer = new SuiteEventDemuxer();
     private final SuitePrinter suitePrinter = new SuitePrinter();
     private boolean passingTestsVisible = true;
+    private boolean hasFailures = false;
 
     public TextUI(MessageReceiver<Event<SuiteListener>> eventStream, Printer printer) {
         this.eventStream = eventStream;
@@ -32,6 +33,10 @@ public class TextUI {
 
     public void setPassingTestsVisible(boolean passingTestsVisible) {
         this.passingTestsVisible = passingTestsVisible;
+    }
+
+    public boolean hasFailures() {
+        return hasFailures;
     }
 
     public void update() {
@@ -80,6 +85,7 @@ public class TextUI {
             SuiteResultsSummary summary = new SuiteResultsSummary();
             demuxer.visitAllRuns(summary);
             printSuiteFooter(summary);
+            hasFailures = summary.getFailingTests() > 0;
         }
 
         // visual style

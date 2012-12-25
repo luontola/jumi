@@ -13,6 +13,8 @@ import fi.jumi.core.runs.RunId;
 import org.junit.Test;
 
 import static fi.jumi.core.util.Asserts.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class TextUITest {
 
@@ -375,5 +377,24 @@ public class TextUITest {
 
         assertNotInOutput("Run #1");
         assertInOutput("Pass: 1");
+    }
+
+
+    // suite results
+
+    @Test
+    public void tells_when_the_suite_had_no_failures() {
+        SuiteMother.onePassingTest(listener);
+        runAndGetOutput();
+
+        assertThat("has failures", ui.hasFailures(), is(false));
+    }
+
+    @Test
+    public void tells_when_the_suite_had_some_failures() {
+        SuiteMother.oneFailingTest(listener);
+        runAndGetOutput();
+
+        assertThat("has failures", ui.hasFailures(), is(true));
     }
 }
