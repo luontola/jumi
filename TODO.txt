@@ -1,27 +1,17 @@
 
-OK - use Jumi & Specsy 2 in Dimdwarf
-
-OK - JumiBootstrap: fail if there were errors
-	OK - refactor: remove the unnecessary call to launcher.close(), also check for similar issues elsewhere
-	OK - expose failure state from TextUI
-	OK - throw exception when called from JUnit etc.
-	OK - System.exit(1) when called as application
-
-OK - release 0.2 patch
-	OK - check release notes
-	OK - make the release
-	OK - update javadocs on web site
-	OK - send announcement emails (jumi list sent, also send public lists)
-	OK - promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
-	OK - contact selected testing framework developers directly
-
-- end-to-end tests: discovering test classes based on file patterns
-	- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
-		- consider using Java 7's glob/regex patterns
+!! - end-to-end tests: discovering test classes based on file patterns
+	!! - write an e2e test that executes multiple tests using a pattern
+	- pass the parameters as SuiteConfiguration.testFilesPattern
+		- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
+			- consider using Java 7's glob/regex patterns: "glob:com/example/**Test.class"
 			http://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob
 			http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)
+		- set a good default value e.g. "*Test"
 	- create FileNamePatternTestClassFinder
-	- set a good default value for fi.jumi.core.config.SuiteConfiguration#includedTestsPattern
+		- at least at first find only tests from directories, nor JARs; Java 7's ZipFileSystem is broken:
+			http://stackoverflow.com/questions/9873845/java-7-zip-file-system-provider-doesnt-seem-to-accept-spaces-in-uri
+			http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7156873
+			- fixed in 7u12: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8001178
 
 - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
 	- introduce ExceptionSafetyGloves?
@@ -54,9 +44,10 @@ OK - release 0.2 patch
 	- tidy up release notes
 	- bump version
 	- release
+	- create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
 
-- misc refactoring
+- misc refactoring (choose some, defer others)
 	- replace SuiteRunnerIntegrationHelper with TestBench?
 	- when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?
 		(1) We could have an internal PrintStream which uses UTF-8/16 and capture losslessly from it, after which it's routed to a PrintStream which uses the actual encoding (might interfere with writing binary data to stdout).
@@ -119,40 +110,19 @@ OK - release 0.2 patch
 		- create logger specific implementation of AbstractMessageLogger
 		- customize MinLog's output to use microsecond accuracy, similar to PrintStreamMessageLogger
 
-- improving TextUI
-	- option for showing all test runs or only failing
-	(- if multiple readers are needed: Streamer class for receiving events from UI thread)
-	- different colors for out (default), err (red), metadata e.g. test names (blue), binary output (yellow BG)?
-		- JCons (uses JNI on Windows, so maybe support only Unix)
-			http://jcons.sourceforge.net/
-			http://sourceforge.net/projects/jcons/
-		- could also JLine do it? (uses a native binary)
-			http://jline.sourceforge.net/
-			https://github.com/jline
-		- misc links
-			http://www.codeguru.com/forum/showthread.php?t=504096
-			http://blogs.atlassian.com/2009/10/colour_your_console_ansicolor/
-			http://en.wikipedia.org/wiki/ANSI_escape_code
-			http://www.velocityreviews.com/forums/t143949-text-color-in-windows-console.html
-			http://academic.evergreen.edu/projects/biophysics/technotes/program/ansi_esc.htm
-			http://www.tldp.org/LDP/abs/html/colorizing.html
-			http://stackoverflow.com/questions/7445658/how-to-detect-if-the-console-does-support-ansi-escape-codes-in-python
-		- ANSI escape codes work in IDEA?
-			http://youtrack.jetbrains.net/issue/IDEA-68679
-
 - write daemon output to log file
-	- use Process.getInputStream to write the log file in JumiLauncher's process
+	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
 		- write log to JUMI_HOME/run/*/console.log
 		- default JUMI_HOME to ~/.jumi
 	- update e2e tests to read the output from the log file
-	- upgrade to Java 7
-	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
 	- get rid of fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#copyInBackground
 		- don't create background threads in the launcher automatically (the tests should create them explicitly, if any)
 		- also remove the hack in fi.jumi.test.ReleasingResourcesTest#launcher_stops_the_threads_it_started
 
+- release 0.4 update?
+
 - end-to-end tests: persistent daemon process
-	- spike communicating over memory-mapped files
+	- spike communicating over memory-mapped files (see below)
 	- should drive better design on launcher side
 	- connect to existing process
 		- cancel idleTimeout if somebody connects again (unit test only?)
@@ -184,6 +154,13 @@ OK - release 0.2 patch
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
+
+- release 0.5
+	- tidy up release notes
+	- bump version
+	- release
+	- create a performance comparison (e.g. with Dimdwarf's tests)
+	- promote widely
 
 - deployment pipeline
 	jumi:
@@ -225,6 +202,26 @@ OK - release 0.2 patch
 		http://maven.apache.org/guides/mini/guide-site.html
 	- aggregated javadoc of all modules?
 		http://maven.apache.org/plugins/maven-javadoc-plugin/aggregate-mojo.html
+
+- improving TextUI
+	(- if multiple readers are needed: Streamer class for receiving events from UI thread)
+	- different colors for out (default), err (red), metadata e.g. test names (blue), binary output (yellow BG)?
+		- JCons (uses JNI on Windows, so maybe support only Unix)
+			http://jcons.sourceforge.net/
+			http://sourceforge.net/projects/jcons/
+		- could also JLine do it? (uses a native binary)
+			http://jline.sourceforge.net/
+			https://github.com/jline
+		- misc links
+			http://www.codeguru.com/forum/showthread.php?t=504096
+			http://blogs.atlassian.com/2009/10/colour_your_console_ansicolor/
+			http://en.wikipedia.org/wiki/ANSI_escape_code
+			http://www.velocityreviews.com/forums/t143949-text-color-in-windows-console.html
+			http://academic.evergreen.edu/projects/biophysics/technotes/program/ansi_esc.htm
+			http://www.tldp.org/LDP/abs/html/colorizing.html
+			http://stackoverflow.com/questions/7445658/how-to-detect-if-the-console-does-support-ansi-escape-codes-in-python
+		- ANSI escape codes work in IDEA?
+			http://youtrack.jetbrains.net/issue/IDEA-68679
 
 - write performance tests
 	- test: suite with a hundred test classes, each with a hundred tests, some of which also do printing; measure total time of running the suite
