@@ -7,13 +7,13 @@ OK - JumiBootstrap: fail if there were errors
 	OK - throw exception when called from JUnit etc.
 	OK - System.exit(1) when called as application
 
-!! - release 0.2 patch
+OK - release 0.2 patch
 	OK - check release notes
-	!! - make the release
-	- update javadocs on web site
-	- send announcement emails
-	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
-	- contact selected testing framework developers directly
+	OK - make the release
+	OK - update javadocs on web site
+	OK - send announcement emails (jumi list sent, also send public lists)
+	OK - promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
+	OK - contact selected testing framework developers directly
 
 - end-to-end tests: discovering test classes based on file patterns
 	- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
