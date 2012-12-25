@@ -5,7 +5,8 @@
 package fi.jumi.test;
 
 import fi.jumi.launcher.JumiBootstrap;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 import sample.*;
 
 import java.io.ByteArrayOutputStream;
@@ -16,18 +17,29 @@ import static org.hamcrest.Matchers.*;
 
 public class JumiBootstrapTest {
 
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
     private final StringBuilder out = new StringBuilder();
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void runs_tests_with_current_classpath() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
 
-        bootstrap.runTestClasses(OnePassingTest.class, OneFailingTest.class);
+        bootstrap.runTestClasses(OnePassingTest.class);
 
         String out = this.out.toString();
-        assertThat("should show test results", out, containsString("Pass: 3, Fail: 1, Total: 4"));
-        assertThat("should hide passing tests", out, not(containsString("OnePassingTest")));
-        assertThat("should show failing tests", out, containsString("OneFailingTest"));
+        assertThat("should show test results", out, containsString("Pass: 2"));
+        assertThat("should hide passing tests by default", out, not(containsString("OnePassingTest")));
+    }
+
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void reports_failures_by_throwing_AssertionError() throws Exception {
+        JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
+
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("There were test failures");
+        bootstrap.runTestClasses(OneFailingTest.class);
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)

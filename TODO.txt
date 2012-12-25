@@ -1,15 +1,15 @@
 
 OK - use Jumi & Specsy 2 in Dimdwarf
 
-!! - JumiBootstrap: fail if there were errors
+OK - JumiBootstrap: fail if there were errors
 	OK - refactor: remove the unnecessary call to launcher.close(), also check for similar issues elsewhere
 	OK - expose failure state from TextUI
-	!! - throw exception when called from JUnit etc.
-	- System.exit(1) when called as application
+	OK - throw exception when called from JUnit etc.
+	OK - System.exit(1) when called as application
 
-- release 0.2 patch
-	- check release notes
-	- make the release
+!! - release 0.2 patch
+	OK - check release notes
+	!! - make the release
 	- update javadocs on web site
 	- send announcement emails
 	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable

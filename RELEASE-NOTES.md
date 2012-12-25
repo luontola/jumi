@@ -4,7 +4,7 @@ Release Notes
 
 ### Upcoming Changes
 
-- TBD
+- `JumiBootstrap` now throws an `AssertionError` or calls `System.exit(1)` if the suite contained test failures
 
 ### Jumi 0.2.235 (2012-12-24)
 
@@ -18,7 +18,7 @@ This release is ready for early adopters to start using Jumi. It adds support fo
 - Added a default constructor to `fi.jumi.core.output.OutputCapturer` in order to avoid the need of a `NullOutputStream` in tests
 - Removed from jumi-api's Javadocs mentions of planned features which do not yet exist
 
-Jumi Actors is from this release onwards its own project with its own release cycle
+Jumi Actors is from this release onwards its own project with its own release cycle.
 
 ### Jumi 0.1.196 (2012-09-19)
 

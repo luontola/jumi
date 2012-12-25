@@ -17,7 +17,11 @@ import java.util.regex.Pattern;
 public class JumiBootstrap {
 
     public static void main(String[] args) throws Exception {
-        new JumiBootstrap().runTestClasses(args);
+        try {
+            new JumiBootstrap().runTestClasses(args);
+        } catch (AssertionError e) {
+            System.exit(1);
+        }
     }
 
     private boolean passingTestsVisible = false;
@@ -92,6 +96,10 @@ public class JumiBootstrap {
             TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(out));
             ui.setPassingTestsVisible(passingTestsVisible);
             ui.updateUntilFinished();
+
+            if (ui.hasFailures()) {
+                throw new AssertionError("There were test failures");
+            }
         }
     }
 
