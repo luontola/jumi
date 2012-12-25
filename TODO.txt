@@ -2,7 +2,7 @@
 OK - use Jumi & Specsy 2 in Dimdwarf
 
 !! - JumiBootstrap: fail if there were errors
-	- refactor: remove the unnecessary call to launcher.close(), also check for similar issues elsewhere
+	OK - refactor: remove the unnecessary call to launcher.close(), also check for similar issues elsewhere
 	- System.exit(1) when called as application
 	- throw exception when called from JUnit etc.
 

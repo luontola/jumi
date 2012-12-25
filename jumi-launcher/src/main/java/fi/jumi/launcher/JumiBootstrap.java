@@ -92,8 +92,6 @@ public class JumiBootstrap {
             TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(out));
             ui.setPassingTestsVisible(passingTestsVisible);
             ui.updateUntilFinished();
-
-            launcher.close();
         }
     }
 
