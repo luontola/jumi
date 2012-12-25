@@ -2,6 +2,10 @@
 Release Notes
 =============
 
+### Upcoming Changes
+
+- TBD
+
 ### Jumi 0.2.241 (2012-12-25)
 
 - `JumiBootstrap` now throws an `AssertionError` or calls `System.exit(1)` if the suite contained test failures
