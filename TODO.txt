@@ -1,5 +1,5 @@
 
-!! - release 0.2
+OK - release 0.2
 	OK - sort the release notes by importance
 	OK - bump version number
 	OK - update Specsy 2 (first with a snapshot)
@@ -10,14 +10,21 @@
 	OK - make the release
 	OK - release Specsy 2.1
 		OK - update code examples on web site
-	!! - send announcement emails
-	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
-	- contact selected testing framework developers directly
+	OK - send announcement emails
+
+!! - use Jumi & Specsy 2 in Dimdwarf
 
 - JumiBootstrap: fail if there were errors
 	- refactor: remove the unnecessary call to launcher.close(), also check for similar issues elsewhere
 	- System.exit(1) when called as application
 	- throw exception when called from JUnit etc.
+
+- release 0.2 patch
+	- check release notes
+	- make the release
+	- send announcement emails
+	- promote Specsy 2 (including on its own mailing list), now that Jumi is nearly usable
+	- contact selected testing framework developers directly
 
 - end-to-end tests: discovering test classes based on file patterns
 	- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
