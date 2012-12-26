@@ -48,8 +48,7 @@ public class EnumeratedTestClassFinderTest {
 
 
     private void findTests(String... testClassNames) {
-        EnumeratedTestClassFinder finder = new EnumeratedTestClassFinder(
-                getClass().getClassLoader(), Arrays.asList(testClassNames)) {
+        EnumeratedTestClassFinder finder = new EnumeratedTestClassFinder(Arrays.asList(testClassNames), getClass().getClassLoader()) {
             @Override
             protected void logTestClassNotFound(String testClassName, ClassNotFoundException e) {
                 failures.add(testClassName);

@@ -44,10 +44,8 @@ public class TestRunCoordinator implements CommandListener {
 
     @Override
     public void runTests(SuiteConfiguration suiteConfiguration) {
-        TestClassFinder testClassFinder = new EnumeratedTestClassFinder(
-                createClassLoader(suiteConfiguration.classPath()),
-                suiteConfiguration.testClasses()
-        );
+        ClassLoader classLoader = createClassLoader(suiteConfiguration.classPath());
+        TestClassFinder testClassFinder = TestClassFinderFactory.create(suiteConfiguration, classLoader);
         DriverFinder driverFinder = new RunViaAnnotationDriverFinder();
 
         ActorRef<Startable> suiteRunner = actorThread.bindActor(Startable.class,

@@ -12,12 +12,12 @@ import java.util.List;
 @NotThreadSafe
 public class EnumeratedTestClassFinder implements TestClassFinder {
 
-    private final ClassLoader classLoader;
     private final List<String> testClassNames;
+    private final ClassLoader classLoader;
 
-    public EnumeratedTestClassFinder(ClassLoader classLoader, List<String> testClassNames) {
-        this.classLoader = classLoader;
+    public EnumeratedTestClassFinder(List<String> testClassNames, ClassLoader classLoader) {
         this.testClassNames = testClassNames;
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -38,5 +38,19 @@ public class EnumeratedTestClassFinder implements TestClassFinder {
         // TODO: better logging
         System.err.println("Could not find class \"" + testClassName + "\"");
         e.printStackTrace();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof EnumeratedTestClassFinder)) {
+            return false;
+        }
+        EnumeratedTestClassFinder that = (EnumeratedTestClassFinder) obj;
+        return this.testClassNames.equals(that.testClassNames);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + testClassNames + ")";
     }
 }
