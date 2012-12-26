@@ -10,8 +10,8 @@ import org.junit.rules.ExpectedException;
 import sample.*;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
 
+import static fi.jumi.core.util.ReflectionUtil.getFieldValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -88,15 +88,5 @@ public class JumiBootstrapTest {
         JumiBootstrap bootstrap = new JumiBootstrap().enableDebugMode();
 
         assertThat(getFieldValue(bootstrap, "debugOutput"), is((Object) System.err));
-    }
-
-    private static Object getFieldValue(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

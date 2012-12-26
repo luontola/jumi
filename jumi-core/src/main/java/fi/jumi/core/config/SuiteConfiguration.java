@@ -26,7 +26,7 @@ public class SuiteConfiguration implements Serializable {
         classPath = Collections.emptyList();
         jvmOptions = Collections.emptyList();
         testClasses = Collections.emptyList();
-        testFileMatcher = "**Test.class";
+        testFileMatcher = "glob:**Test.class";
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
