@@ -67,6 +67,21 @@ public class SuiteConfigurationTest {
     }
 
 
+    // testFileMatcher
+
+    @Test
+    public void test_files_matcher_can_be_changed() {
+        builder.testFileMatcher("*Foo.class");
+
+        assertThat(configuration().testFileMatcher(), is("*Foo.class"));
+    }
+
+    @Test
+    public void test_files_matcher_has_a_commonly_used_default_value() {
+        assertThat(configuration().testFileMatcher(), is("**Test.class"));
+    }
+
+
     // helpers
 
     private SuiteConfiguration configuration() {

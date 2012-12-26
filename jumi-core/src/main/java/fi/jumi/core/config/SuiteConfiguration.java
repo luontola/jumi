@@ -20,17 +20,20 @@ public class SuiteConfiguration implements Serializable {
     private final List<URI> classPath;
     private final List<String> jvmOptions;
     private final List<String> testClasses;
+    private final String testFileMatcher;
 
     public SuiteConfiguration() {
         classPath = Collections.emptyList();
         jvmOptions = Collections.emptyList();
         testClasses = Collections.emptyList();
+        testFileMatcher = "**Test.class";
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
         classPath = Immutables.list(src.classPath());
         jvmOptions = Immutables.list(src.jvmOptions());
         testClasses = Immutables.list(src.testClasses());
+        testFileMatcher = src.testFileMatcher();
     }
 
     public SuiteConfigurationBuilder melt() {
@@ -50,5 +53,9 @@ public class SuiteConfiguration implements Serializable {
 
     public List<String> testClasses() {
         return testClasses;
+    }
+
+    public String testFileMatcher() {
+        return testFileMatcher;
     }
 }

@@ -1,17 +1,18 @@
 
 !! - end-to-end tests: discovering test classes based on file patterns
 	OK - write an e2e test that executes multiple tests using a pattern
-	!! - pass the parameters as SuiteConfiguration.testFilesPattern
-		- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
+	OK - pass the parameters as SuiteConfiguration.testFilesPattern
+		OK - test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
 			- consider using Java 7's glob/regex patterns: "glob:com/example/**Test.class"
 			http://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob
 			http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)
-		- set a good default value e.g. "*Test"
-	- create FileNamePatternTestClassFinder
+		OK - set a good default value e.g. "*Test"
+	!! - create FileNamePatternTestClassFinder
 		- at least at first find only tests from directories, nor JARs; Java 7's ZipFileSystem is broken:
 			http://stackoverflow.com/questions/9873845/java-7-zip-file-system-provider-doesnt-seem-to-accept-spaces-in-uri
 			http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7156873
 			- fixed in 7u12: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8001178
+	- try in practise whether the default pattern works
 
 - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
 	- introduce ExceptionSafetyGloves?

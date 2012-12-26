@@ -15,6 +15,7 @@ public class SuiteConfigurationBuilder {
     private final List<URI> classPath;
     private final List<String> jvmOptions;
     private final List<String> testClasses;
+    private String testFileMatcher;
 
     public SuiteConfigurationBuilder() {
         this(SuiteConfiguration.DEFAULTS);
@@ -24,6 +25,7 @@ public class SuiteConfigurationBuilder {
         classPath = new ArrayList<>(src.classPath());
         jvmOptions = new ArrayList<>(src.jvmOptions());
         testClasses = new ArrayList<>(src.testClasses());
+        testFileMatcher = src.testFileMatcher();
     }
 
     public SuiteConfiguration freeze() {
@@ -46,7 +48,12 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public SuiteConfigurationBuilder testFileMatcher(String syntaxAndPattern) { // TODO
+    public List<String> jvmOptions() {
+        return jvmOptions;
+    }
+
+    public SuiteConfigurationBuilder addJvmOptions(String... jvmOptions) {
+        this.jvmOptions.addAll(Arrays.asList(jvmOptions));
         return this;
     }
 
@@ -64,12 +71,15 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public List<String> jvmOptions() {
-        return jvmOptions;
+    public String testFileMatcher() {
+        return testFileMatcher;
     }
 
-    public SuiteConfigurationBuilder addJvmOptions(String... jvmOptions) {
-        this.jvmOptions.addAll(Arrays.asList(jvmOptions));
+    /**
+     * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
+     */
+    public SuiteConfigurationBuilder testFileMatcher(String syntaxAndPattern) {
+        this.testFileMatcher = syntaxAndPattern;
         return this;
     }
 }
