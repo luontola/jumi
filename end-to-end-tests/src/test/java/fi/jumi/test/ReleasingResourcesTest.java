@@ -116,7 +116,7 @@ public class ReleasingResourcesTest {
     }
 
     private void startAndStopLauncher() throws Exception {
-        app.runTests("unimportant");
+        app.runTests();
         JumiLauncher launcher = app.getLauncher();
         launcher.close();
     }

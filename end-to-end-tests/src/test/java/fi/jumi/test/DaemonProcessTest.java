@@ -4,6 +4,7 @@
 
 package fi.jumi.test;
 
+import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.network.*;
 import fi.jumi.launcher.JumiLauncher;
 import org.junit.*;
@@ -70,12 +71,12 @@ public class DaemonProcessTest {
     // helpers
 
     private void startDaemonProcess() throws Exception {
-        app.runTests("unimportant");
+        app.runTests();
         initTestHelpers();
     }
 
     private void startDaemonProcessAsynchronously() throws Exception {
-        app.startTests("unimportant");
+        app.startSuite(new SuiteConfiguration());
         initTestHelpers();
     }
 

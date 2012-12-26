@@ -40,7 +40,6 @@ public class AppRunner implements TestRule {
     private JumiLauncher launcher;
     private TextUIParser ui;
 
-    public final SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder();
     public final DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
     public void setMockNetworkServer(NetworkServer mockNetworkServer) {
@@ -105,7 +104,10 @@ public class AppRunner implements TestRule {
     }
 
     public void runTests(Class<?>... testClasses) throws Exception {
-        runTests(toClassNames(testClasses));
+        startSuite(new SuiteConfigurationBuilder()
+                .testClasses(toClassNames(testClasses))
+                .freeze());
+        receiveTestOutput();
     }
 
     private static String[] toClassNames(Class<?>[] classes) {
@@ -116,29 +118,23 @@ public class AppRunner implements TestRule {
         return names;
     }
 
-    public void runTests(String... testClasses) throws Exception {
-        startTests(testClasses);
-
-        StringBuilder outputBuffer = new StringBuilder();
-        TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(outputBuffer));
-        ui.updateUntilFinished();
-
-        String output = outputBuffer.toString();
-        printTextUIOutput(output);
-        this.ui = new TextUIParser(output);
+    public void runTestsMatching(String syntaxAndPattern) throws Exception {
+        startSuite(new SuiteConfigurationBuilder()
+                .testFileMatcher(syntaxAndPattern)
+                .freeze());
+        receiveTestOutput();
     }
 
-    public void startTests(String... testClasses) throws IOException {
-        getLauncher().start(configure(suite.freeze(), testClasses), configure(daemon.freeze()));
+    public void startSuite(SuiteConfiguration suite) throws IOException {
+        getLauncher().start(configure(suite), configure(daemon.freeze()));
     }
 
-    private SuiteConfiguration configure(SuiteConfiguration suite, String[] testClasses) throws IOException {
+    private SuiteConfiguration configure(SuiteConfiguration suite) throws IOException {
         SuiteConfigurationBuilder builder = suite.melt();
 
         builder.addJvmOptions("-Dfile.encoding=" + daemonDefaultCharset.name());
         builder.addToClassPath(TestEnvironment.getProjectJar("simpleunit"));
         builder.addToClassPath(TestEnvironment.getSampleClassesDir());
-        builder.testClasses(testClasses);
         if (TestSystemProperties.useThreadSafetyAgent()) {
             builder.addJvmOptions("-javaagent:" + TestEnvironment.getProjectJar("thread-safety-agent"));
         }
@@ -149,6 +145,16 @@ public class AppRunner implements TestRule {
         return daemon.melt()
                 .logActorMessages(true)
                 .freeze();
+    }
+
+    private void receiveTestOutput() throws InterruptedException {
+        StringBuilder outputBuffer = new StringBuilder();
+        TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(outputBuffer));
+        ui.updateUntilFinished();
+
+        String output = outputBuffer.toString();
+        printTextUIOutput(output);
+        this.ui = new TextUIParser(output);
     }
 
     private static void printTextUIOutput(String output) {

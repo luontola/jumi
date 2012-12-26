@@ -1,7 +1,7 @@
 
 !! - end-to-end tests: discovering test classes based on file patterns
-	!! - write an e2e test that executes multiple tests using a pattern
-	- pass the parameters as SuiteConfiguration.testFilesPattern
+	OK - write an e2e test that executes multiple tests using a pattern
+	!! - pass the parameters as SuiteConfiguration.testFilesPattern
 		- test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
 			- consider using Java 7's glob/regex patterns: "glob:com/example/**Test.class"
 			http://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob

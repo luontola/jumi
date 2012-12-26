@@ -46,6 +46,10 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
+    public SuiteConfigurationBuilder testFileMatcher(String syntaxAndPattern) { // TODO
+        return this;
+    }
+
     public List<String> testClasses() {
         return testClasses;
     }
