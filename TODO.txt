@@ -1,5 +1,5 @@
 
-!! - end-to-end tests: discovering test classes based on file patterns
+OK - end-to-end tests: discovering test classes based on file patterns
 	OK - write an e2e test that executes multiple tests using a pattern
 	OK - pass the parameters as SuiteConfiguration.testFilesPattern
 		OK - test class inclusion patterns (*Test, Test*, some.package.*, some.package.** etc.)
@@ -15,7 +15,7 @@
 			- fixed in 7u12: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8001178
 		OK - connect to TestClassFinderFactory, get test classes dir from suite configuration
 		OK - support for multiple directories
-	!! - update JumiBootstrap
+	OK - update JumiBootstrap
 
 - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
 	- introduce ExceptionSafetyGloves?

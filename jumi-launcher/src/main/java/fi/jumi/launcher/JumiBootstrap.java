@@ -47,6 +47,20 @@ public class JumiBootstrap {
         return this;
     }
 
+    public void runTestsMatchingDefaultPattern() throws IOException, InterruptedException {
+        runSuite(commonConfiguration()
+                .freeze());
+    }
+
+    /**
+     * @param syntaxAndPattern Same format as in {@link java.nio.file.FileSystem#getPathMatcher(String)}
+     */
+    public void runTestsMatching(String syntaxAndPattern) throws IOException, InterruptedException {
+        runSuite(commonConfiguration()
+                .testFileMatcher(syntaxAndPattern)
+                .freeze());
+    }
+
     public void runTestClasses(Class<?>... testClasses) throws IOException, InterruptedException {
         runTestClasses(toClassNames(testClasses));
     }
@@ -60,15 +74,18 @@ public class JumiBootstrap {
     }
 
     public void runTestClasses(String... testClasses) throws IOException, InterruptedException {
-        SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
-                .addJvmOptions("-ea")
-                .testClasses(testClasses);
+        runSuite(commonConfiguration()
+                .testClasses(testClasses)
+                .freeze());
+    }
 
+    private static SuiteConfigurationBuilder commonConfiguration() {
+        SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder();
+        suite.addJvmOptions("-ea");
         for (Path path : currentClasspath()) {
             suite.addToClassPath(path);
         }
-
-        runSuite(suite.freeze());
+        return suite;
     }
 
     public static List<Path> currentClasspath() {

@@ -26,7 +26,7 @@ public class JumiBootstrapTest {
     public void runs_tests_with_current_classpath() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
 
-        bootstrap.runTestClasses(OnePassingTest.class);
+        bootstrap.runTestsMatching("glob:**/OnePassingTest.class");
 
         String out = this.out.toString();
         assertThat("should show test results", out, containsString("Pass: 2"));
