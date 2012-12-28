@@ -27,7 +27,7 @@ public class TestClassFinderFactoryTest {
     @Test
     public void when_testFileMatcher_is_set_creates_an_enumerated_finder() {
         assertCreates(new SuiteConfigurationBuilder().testFileMatcher("the pattern"),
-                new FileNamePatternTestClassFinder("the pattern", null));
+                new FileNamePatternTestClassFinder("the pattern", null, null));
     }
 
     @Test

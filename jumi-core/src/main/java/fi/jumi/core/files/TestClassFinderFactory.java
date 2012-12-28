@@ -18,7 +18,7 @@ public class TestClassFinderFactory {
         if (!testClasses.isEmpty()) {
             return new EnumeratedTestClassFinder(testClasses, classLoader);
         } else if (!testFileMatcher.isEmpty()) {
-            return new FileNamePatternTestClassFinder(testFileMatcher, classLoader);
+            return new FileNamePatternTestClassFinder(testFileMatcher, null, classLoader); // TODO
         } else {
             throw new IllegalArgumentException("testClasses and testFileMatcher were both empty");
         }

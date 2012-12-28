@@ -9,10 +9,12 @@
 		OK - set a good default value e.g. "*Test"
 	OK - try in practise whether the default pattern works
 	!! - create FileNamePatternTestClassFinder
-		- at least at first find only tests from directories, nor JARs; Java 7's ZipFileSystem is broken:
+		!! - at least at first find only tests from directories, nor JARs; Java 7's ZipFileSystem is broken:
 			http://stackoverflow.com/questions/9873845/java-7-zip-file-system-provider-doesnt-seem-to-accept-spaces-in-uri
 			http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7156873
 			- fixed in 7u12: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8001178
+		- connect to TestClassFinderFactory, get test classes dir from suite configuration
+		- support for multiple directories
 
 - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
 	- introduce ExceptionSafetyGloves?
@@ -49,6 +51,7 @@
 	- promote widely
 
 - misc refactoring (choose some, defer others)
+	- thread-safety-checker: when an inner class is missing the annotation, use the annotation of the enclosing class
 	- replace SuiteRunnerIntegrationHelper with TestBench?
 	- when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?
 		(1) We could have an internal PrintStream which uses UTF-8/16 and capture losslessly from it, after which it's routed to a PrintStream which uses the actual encoding (might interfere with writing binary data to stdout).
