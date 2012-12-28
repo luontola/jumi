@@ -46,11 +46,12 @@ public class EnumeratedTestClassFinder implements TestClassFinder {
             return false;
         }
         EnumeratedTestClassFinder that = (EnumeratedTestClassFinder) obj;
-        return this.testClassNames.equals(that.testClassNames);
+        return this.testClassNames.equals(that.testClassNames) &&
+                this.classLoader.equals(that.classLoader);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + testClassNames + ")";
+        return getClass().getSimpleName() + "(" + testClassNames + ", " + classLoader + ")";
     }
 }

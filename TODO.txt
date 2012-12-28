@@ -9,12 +9,12 @@
 		OK - set a good default value e.g. "*Test"
 	OK - try in practise whether the default pattern works
 	!! - create FileNamePatternTestClassFinder
-		!! - at least at first find only tests from directories, nor JARs; Java 7's ZipFileSystem is broken:
+		OK - at least at first find only tests from directories, nor JARs; Java 7's ZipFileSystem is broken:
 			http://stackoverflow.com/questions/9873845/java-7-zip-file-system-provider-doesnt-seem-to-accept-spaces-in-uri
 			http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7156873
 			- fixed in 7u12: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8001178
-		- connect to TestClassFinderFactory, get test classes dir from suite configuration
-		- support for multiple directories
+		OK - connect to TestClassFinderFactory, get test classes dir from suite configuration
+		!! - support for multiple directories
 
 - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
 	- introduce ExceptionSafetyGloves?

@@ -52,12 +52,14 @@ public class FileNamePatternTestClassFinder implements TestClassFinder {
             return false;
         }
         FileNamePatternTestClassFinder that = (FileNamePatternTestClassFinder) obj;
-        return this.syntaxAndPattern.equals(that.syntaxAndPattern);
+        return this.syntaxAndPattern.equals(that.syntaxAndPattern) &&
+                this.classesDirectory.equals(that.classesDirectory) &&
+                this.classLoader.equals(that.classLoader);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + syntaxAndPattern + ")";
+        return getClass().getSimpleName() + "(" + syntaxAndPattern + ", " + classesDirectory + ", " + classLoader + ")";
     }
 
     @NotThreadSafe

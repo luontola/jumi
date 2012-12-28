@@ -7,7 +7,9 @@ package fi.jumi.core.files;
 import fi.jumi.core.config.SuiteConfiguration;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.List;
+import java.net.URI;
+import java.nio.file.*;
+import java.util.*;
 
 @ThreadSafe
 public class TestClassFinderFactory {
@@ -18,9 +20,23 @@ public class TestClassFinderFactory {
         if (!testClasses.isEmpty()) {
             return new EnumeratedTestClassFinder(testClasses, classLoader);
         } else if (!testFileMatcher.isEmpty()) {
-            return new FileNamePatternTestClassFinder(testFileMatcher, null, classLoader); // TODO
+            for (Path dir : getClassesDirectories(suite)) {
+                return new FileNamePatternTestClassFinder(testFileMatcher, dir, classLoader);
+            }
+            throw new AssertionError("TODO"); // TODO
         } else {
             throw new IllegalArgumentException("testClasses and testFileMatcher were both empty");
         }
+    }
+
+    static List<Path> getClassesDirectories(SuiteConfiguration suite) {
+        ArrayList<Path> dirs = new ArrayList<>();
+        for (URI uri : suite.classPath()) {
+            Path path = Paths.get(uri);
+            if (Files.isDirectory(path)) {
+                dirs.add(path);
+            }
+        }
+        return dirs;
     }
 }
