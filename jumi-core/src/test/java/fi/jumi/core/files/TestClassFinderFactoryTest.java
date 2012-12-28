@@ -4,16 +4,16 @@
 
 package fi.jumi.core.files;
 
-import fi.jumi.core.config.*;
+import fi.jumi.core.config.SuiteConfigurationBuilder;
 import org.junit.*;
 import org.junit.rules.*;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 public class TestClassFinderFactoryTest {
 
@@ -34,7 +34,7 @@ public class TestClassFinderFactoryTest {
     @Test
     public void when_testFileMatcher_is_set_creates_an_enumerated_finder() {
         assertCreates(new SuiteConfigurationBuilder().testFileMatcher("the pattern").addToClassPath(Paths.get(".")),
-                new FileNamePatternTestClassFinder("the pattern", Paths.get(".").toAbsolutePath(), cl));
+                compositeOf(new FileNamePatternTestClassFinder("the pattern", Paths.get(".").toAbsolutePath(), cl)));
     }
 
     @Test
@@ -55,19 +55,25 @@ public class TestClassFinderFactoryTest {
         Path libraryJar = tempDir.newFile("library.jar").toPath();
         Path folder1 = tempDir.newFolder("folder1").toPath();
         Path folder2 = tempDir.newFolder("folder2").toPath();
-        SuiteConfiguration suite = new SuiteConfigurationBuilder()
+
+        SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
+                .testFileMatcher("the pattern")
                 .addToClassPath(libraryJar)
                 .addToClassPath(folder1)
-                .addToClassPath(folder2)
-                .freeze();
+                .addToClassPath(folder2);
 
-        List<Path> paths = TestClassFinderFactory.getClassesDirectories(suite);
-
-        assertThat(paths, contains(folder1, folder2));
+        assertCreates(suite, compositeOf(
+                new FileNamePatternTestClassFinder("the pattern", folder1, cl),
+                new FileNamePatternTestClassFinder("the pattern", folder2, cl)
+        ));
     }
 
 
     private void assertCreates(SuiteConfigurationBuilder suite, TestClassFinder expected) {
         assertThat(TestClassFinderFactory.create(suite.freeze(), cl), is(expected));
+    }
+
+    private static CompositeTestClassFinder compositeOf(TestClassFinder... finders) {
+        return new CompositeTestClassFinder(Arrays.asList(finders));
     }
 }

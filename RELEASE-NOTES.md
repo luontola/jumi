@@ -4,7 +4,7 @@ Release Notes
 
 ### Upcoming Changes
 
-- TBD
+- Automatic discovery of test classes based on file name patterns
 
 ### Jumi 0.2.241 (2012-12-25)
 
