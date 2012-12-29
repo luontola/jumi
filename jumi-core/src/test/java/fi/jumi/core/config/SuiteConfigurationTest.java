@@ -4,13 +4,11 @@
 
 package fi.jumi.core.config;
 
-import org.hamcrest.*;
 import org.junit.*;
-import org.junit.internal.matchers.TypeSafeMatcher;
 
 import java.nio.file.*;
 
-import static fi.jumi.core.util.ReflectionUtil.getFieldValue;
+import static fi.jumi.core.util.PathMatchers.matches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -104,29 +102,5 @@ public class SuiteConfigurationTest {
 
     private SuiteConfiguration configuration() {
         return builder.freeze();
-    }
-
-    private static Matcher<? super PathMatcher> matches(final Path path) {
-        return new TypeSafeMatcher<PathMatcher>() {
-
-            @Override
-            public boolean matchesSafely(PathMatcher matcher) {
-                return matcher.matches(path);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("matches ")
-                        .appendValue(path);
-            }
-
-            @Override
-            public void describeMismatch(Object matcher, Description description) {
-                description.appendText("was ")
-                        .appendValue(matcher)
-                        .appendText(" with pattern ")
-                        .appendValue(getFieldValue(matcher, "val$pattern"));
-            }
-        };
     }
 }

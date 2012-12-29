@@ -34,7 +34,8 @@ OK - SuiteListener#onFailure cannot rely on the exception class from existing in
 		http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludes
 		http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html
 		OK - add the parameters to SuiteConfiguration
-		!! - create a IncludeExcludePathMatcher that composes two PathMatchers
+		OK - create a IncludeExcludePathMatcher that composes two PathMatchers
+		!! - use it in SuiteConfiguration
 		- move creating the PathMatcher into SuiteConfiguration, check the parameters when they are configured
 	- remove the option for enumerating the test class names to run
 		- create a convenience method in SuiteConfigurationBuilder that converts class names to patterns
