@@ -6,6 +6,10 @@ package fi.jumi.core;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+/**
+ * Masquerades as another exception instance. Enables transferring exception stack traces between JVMs, without
+ * requiring the remote JVM to have every custom exception class on its classpath.
+ */
 @ThreadSafe
 public class StackTrace extends Throwable {
 
