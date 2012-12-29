@@ -5,6 +5,7 @@
 package fi.jumi.core.config;
 
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.nio.file.*;
 
@@ -13,6 +14,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class SuiteConfigurationTest {
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     private SuiteConfigurationBuilder builder = new SuiteConfigurationBuilder();
 
@@ -72,16 +76,36 @@ public class SuiteConfigurationTest {
 
     @Test
     public void included_tests_pattern_can_be_changed() {
-        builder.includedTestsPattern("*Foo.class");
+        builder.includedTestsPattern("glob:*Foo.class");
 
-        assertThat(configuration().includedTestsPattern(), is("*Foo.class"));
+        assertThat(configuration().includedTestsPattern(), is("glob:*Foo.class"));
+    }
+
+    @Test
+    public void disallows_invalid_included_tests_pattern() {
+        thrown.expect(IllegalArgumentException.class);
+        builder.includedTestsPattern("garbage");
     }
 
     @Test
     public void excluded_tests_pattern_can_be_changed() {
-        builder.excludedTestsPattern("*Bar.class");
+        builder.excludedTestsPattern("glob:*Bar.class");
 
-        assertThat(configuration().excludedTestsPattern(), is("*Bar.class"));
+        assertThat(configuration().excludedTestsPattern(), is("glob:*Bar.class"));
+    }
+
+    @Test
+    public void disallows_invalid_excluded_tests_pattern() {
+        thrown.expect(IllegalArgumentException.class);
+        builder.excludedTestsPattern("garbage");
+    }
+
+    @Test
+    public void excluded_tests_pattern_can_be_disabled_by_setting_it_empty() {
+        builder.excludedTestsPattern("");
+
+        PathMatcher matcher = configuration().createTestFileMatcher(FileSystems.getDefault());
+        assertThat("shouldn't anymore exclude inner classes", matcher, matches(Paths.get("Test$Test.class")));
     }
 
     @Test
@@ -93,8 +117,8 @@ public class SuiteConfigurationTest {
         assertThat("should not match Test prefix", matcher, not(matches(Paths.get("TestX.class"))));
         assertThat("should not match non-class files", matcher, not(matches(Paths.get("SomeTest.java"))));
         assertThat("should match in all packages", matcher, matches(Paths.get("com/example/SomeTest.class")));
-//        assertThat("should not match inner classes", matcher, not(matches(Paths.get("Test$Test.class")))); // TODO
-//        assertThat("should not match inner classes in any package", matcher, not(matches(Paths.get("com/example/Test$Test.class"))));
+        assertThat("should not match inner classes", matcher, not(matches(Paths.get("Test$Test.class"))));
+        assertThat("should not match inner classes in any package", matcher, not(matches(Paths.get("com/example/Test$Test.class"))));
     }
 
 

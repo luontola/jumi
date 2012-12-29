@@ -6,7 +6,7 @@ package fi.jumi.core.config;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.URI;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 
 @NotThreadSafe
@@ -81,6 +81,7 @@ public class SuiteConfigurationBuilder {
      * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
      */
     public SuiteConfigurationBuilder includedTestsPattern(String syntaxAndPattern) {
+        checkPathMatcherSyntaxAndPattern(syntaxAndPattern);
         this.includedTestsPattern = syntaxAndPattern;
         return this;
     }
@@ -93,7 +94,14 @@ public class SuiteConfigurationBuilder {
      * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
      */
     public SuiteConfigurationBuilder excludedTestsPattern(String syntaxAndPattern) {
+        if (!syntaxAndPattern.isEmpty()) {
+            checkPathMatcherSyntaxAndPattern(syntaxAndPattern);
+        }
         this.excludedTestsPattern = syntaxAndPattern;
         return this;
+    }
+
+    private static void checkPathMatcherSyntaxAndPattern(String syntaxAndPattern) {
+        FileSystems.getDefault().getPathMatcher(syntaxAndPattern);
     }
 }

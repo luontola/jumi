@@ -4,7 +4,7 @@
 
 package fi.jumi.core.config;
 
-import fi.jumi.core.util.Immutables;
+import fi.jumi.core.util.*;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
@@ -29,7 +29,7 @@ public class SuiteConfiguration implements Serializable {
         jvmOptions = Collections.emptyList();
         testClasses = Collections.emptyList();
         includedTestsPattern = "glob:**Test.class";
-        excludedTestsPattern = "";
+        excludedTestsPattern = "glob:**$*.class";
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
@@ -48,7 +48,7 @@ public class SuiteConfiguration implements Serializable {
     // factory methods
 
     public PathMatcher createTestFileMatcher(FileSystem fileSystem) {
-        return fileSystem.getPathMatcher(includedTestsPattern());
+        return new IncludeExcludePathMatcher(fileSystem, includedTestsPattern(), excludedTestsPattern());
     }
 
 
