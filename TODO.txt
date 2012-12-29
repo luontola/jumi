@@ -17,15 +17,30 @@ OK - end-to-end tests: discovering test classes based on file patterns
 		OK - support for multiple directories
 	OK - update JumiBootstrap
 
-- SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
+!! - SuiteListener#onFailure cannot rely on the exception class from existing in the caller's class loader
+	!! - generate an exception class in sample.CustomExceptionTest, or just store the .class in version control /end-to-end-tests/src/main/testdata
 	- introduce ExceptionSafetyGloves?
 		- implementable as an exception with custom toString and that copies the StackTraceElements
 		- provide getExceptionClassName: String
+	- wrap the SuiteListener in fi.jumi.daemon.DaemonNetworkEndpoint#onConnected to a SerializableSuiteListener
 	- test: same toString as the original exception
 	- test: same StackTraceElements
 	- test: same toString & StackTraceElements also for cause
 	- test: same toString & StackTraceElements also for suppressed (Java 7+)
 	- test: same output of printStackTrace (should pass, given the above tests)
+
+- default test file pattern: should not match inner classes (i.e. "$" in file name)
+	- easiest to configure by providing includedTestsPattern & excludedTestsPattern?
+		http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludes
+		http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html
+		- add the parameters to SuiteConfiguration
+		- create a IncludeExcludePathMatcher that composes two PathMatchers
+		- move creating the PathMatcher into SuiteConfiguration, check the parameters when they are configured
+	- remove the option for enumerating the test class names to run
+		- create a convenience method in SuiteConfigurationBuilder that converts class names to patterns
+		- simplify TestClassFinderFactory, remove EnumeratedTestClassFinder
+
+- refactor: move class loading out of TestClassFinder, for example into SuiteRunner
 
 - end-to-end tests: setting the working directory for a test run
 
@@ -33,8 +48,9 @@ OK - end-to-end tests: discovering test classes based on file patterns
 
 - release 0.3
 	- tidy up release notes
-	- bump version
+	OK - bump version
 	- release
+	- update wiki for JumiBootstrap
 
 - JUnit backward compatibility
 	- end-to-end test: run tests written in JUnit 4, JUnit 3, custom JUnit runner
