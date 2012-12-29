@@ -30,7 +30,15 @@ public class FileNamePatternTestClassFinderTest {
         verifyNoMoreInteractions(listener);
     }
 
-    // TODO: no matches
+    @Test
+    public void does_nothing_when_finds_no_matches() {
+        PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:NoMatches");
+        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory, getClass().getClassLoader());
+
+        finder.findTestClasses(ActorRef.wrap(listener));
+
+        verifyNoMoreInteractions(listener);
+    }
 
 
     private static Path getClassesDirectory(Class<?> clazz) {

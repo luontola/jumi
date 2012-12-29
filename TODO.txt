@@ -38,9 +38,9 @@ OK - SuiteListener#onFailure cannot rely on the exception class from existing in
 		OK - use it in SuiteConfiguration
 		OK - check the parameters when they are configured
 		OK - use SuiteConfiguration.createTestFileMatcher
-	!! - FileNamePatternTestClassFinderTest: test for no matches
-	- remove the option for enumerating the test class names to run
-		- create a convenience method in SuiteConfigurationBuilder that converts class names to patterns
+	OK - FileNamePatternTestClassFinderTest: test for no matches
+	!! - remove the option for enumerating the test class names to run
+		!! - create a convenience method in SuiteConfigurationBuilder that converts class names to patterns
 		- simplify TestClassFinderFactory, remove EnumeratedTestClassFinder
 
 - refactor: move class loading out of TestClassFinder, for example into SuiteRunner
