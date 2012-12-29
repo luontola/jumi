@@ -33,21 +33,21 @@ public class TestClassFinderFactoryTest {
 
     @Test
     public void when_testFileMatcher_is_set_creates_an_enumerated_finder() {
-        assertCreates(new SuiteConfigurationBuilder().testFileMatcher("the pattern").addToClassPath(Paths.get(".")),
+        assertCreates(new SuiteConfigurationBuilder().includedTestsPattern("the pattern").addToClassPath(Paths.get(".")),
                 compositeOf(new FileNamePatternTestClassFinder("the pattern", Paths.get(".").toAbsolutePath(), cl)));
     }
 
     @Test
     public void testClasses_takes_precedence_over_testFileMatcher() {
-        assertCreates(new SuiteConfigurationBuilder().testClasses("Foo", "Bar").testFileMatcher("the pattern"),
+        assertCreates(new SuiteConfigurationBuilder().testClasses("Foo", "Bar").includedTestsPattern("the pattern"),
                 new EnumeratedTestClassFinder(Arrays.asList("Foo", "Bar"), cl));
     }
 
     @Test
     public void testClasses_or_testFileMatcher_is_required() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("testClasses and testFileMatcher were both empty");
-        TestClassFinderFactory.create(new SuiteConfigurationBuilder().testFileMatcher("").freeze(), cl);
+        thrown.expectMessage("testClasses and includedTestsPattern were both empty");
+        TestClassFinderFactory.create(new SuiteConfigurationBuilder().includedTestsPattern("").freeze(), cl);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TestClassFinderFactoryTest {
         Path folder2 = tempDir.newFolder("folder2").toPath();
 
         SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
-                .testFileMatcher("the pattern")
+                .includedTestsPattern("the pattern")
                 .addToClassPath(libraryJar)
                 .addToClassPath(folder1)
                 .addToClassPath(folder2);

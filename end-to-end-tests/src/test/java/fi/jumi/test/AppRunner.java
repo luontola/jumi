@@ -120,7 +120,7 @@ public class AppRunner implements TestRule {
 
     public void runTestsMatching(String syntaxAndPattern) throws Exception {
         startSuite(new SuiteConfigurationBuilder()
-                .testFileMatcher(syntaxAndPattern)
+                .includedTestsPattern(syntaxAndPattern)
                 .freeze());
         receiveTestOutput();
     }

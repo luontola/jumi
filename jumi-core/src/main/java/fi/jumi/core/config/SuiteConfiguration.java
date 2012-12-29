@@ -9,6 +9,7 @@ import fi.jumi.core.util.Immutables;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.file.*;
 import java.util.*;
 
 @Immutable
@@ -20,24 +21,34 @@ public class SuiteConfiguration implements Serializable {
     private final List<URI> classPath;
     private final List<String> jvmOptions;
     private final List<String> testClasses;
-    private final String testFileMatcher;
+    private final String includedTestsPattern;
+    private final String excludedTestsPattern;
 
     public SuiteConfiguration() {
         classPath = Collections.emptyList();
         jvmOptions = Collections.emptyList();
         testClasses = Collections.emptyList();
-        testFileMatcher = "glob:**Test.class";
+        includedTestsPattern = "glob:**Test.class";
+        excludedTestsPattern = "";
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
         classPath = Immutables.list(src.classPath());
         jvmOptions = Immutables.list(src.jvmOptions());
         testClasses = Immutables.list(src.testClasses());
-        testFileMatcher = src.testFileMatcher();
+        includedTestsPattern = src.includedTestsPattern();
+        excludedTestsPattern = src.excludedTestsPattern();
     }
 
     public SuiteConfigurationBuilder melt() {
         return new SuiteConfigurationBuilder(this);
+    }
+
+
+    // factory methods
+
+    public PathMatcher createTestFileMatcher(FileSystem fileSystem) {
+        return fileSystem.getPathMatcher(includedTestsPattern());
     }
 
 
@@ -55,7 +66,11 @@ public class SuiteConfiguration implements Serializable {
         return testClasses;
     }
 
-    public String testFileMatcher() {
-        return testFileMatcher;
+    public String includedTestsPattern() {
+        return includedTestsPattern;
+    }
+
+    public String excludedTestsPattern() {
+        return excludedTestsPattern;
     }
 }

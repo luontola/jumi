@@ -16,7 +16,7 @@ public class TestClassFinderFactory {
 
     public static TestClassFinder create(SuiteConfiguration suite, ClassLoader classLoader) {
         List<String> testClasses = suite.testClasses();
-        String testFileMatcher = suite.testFileMatcher();
+        String testFileMatcher = suite.includedTestsPattern();
 
         if (!testClasses.isEmpty()) {
             // TODO: remove enumeration and only use file name patterns?
@@ -30,7 +30,7 @@ public class TestClassFinderFactory {
             return new CompositeTestClassFinder(finders);
 
         } else {
-            throw new IllegalArgumentException("testClasses and testFileMatcher were both empty");
+            throw new IllegalArgumentException("testClasses and includedTestsPattern were both empty");
         }
     }
 

@@ -15,7 +15,8 @@ public class SuiteConfigurationBuilder {
     private final List<URI> classPath;
     private final List<String> jvmOptions;
     private final List<String> testClasses;
-    private String testFileMatcher;
+    private String includedTestsPattern;
+    private String excludedTestsPattern;
 
     public SuiteConfigurationBuilder() {
         this(SuiteConfiguration.DEFAULTS);
@@ -25,7 +26,8 @@ public class SuiteConfigurationBuilder {
         classPath = new ArrayList<>(src.classPath());
         jvmOptions = new ArrayList<>(src.jvmOptions());
         testClasses = new ArrayList<>(src.testClasses());
-        testFileMatcher = src.testFileMatcher();
+        includedTestsPattern = src.includedTestsPattern();
+        excludedTestsPattern = src.excludedTestsPattern();
     }
 
     public SuiteConfiguration freeze() {
@@ -71,15 +73,27 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public String testFileMatcher() {
-        return testFileMatcher;
+    public String includedTestsPattern() {
+        return includedTestsPattern;
     }
 
     /**
      * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
      */
-    public SuiteConfigurationBuilder testFileMatcher(String syntaxAndPattern) {
-        this.testFileMatcher = syntaxAndPattern;
+    public SuiteConfigurationBuilder includedTestsPattern(String syntaxAndPattern) {
+        this.includedTestsPattern = syntaxAndPattern;
+        return this;
+    }
+
+    public String excludedTestsPattern() {
+        return excludedTestsPattern;
+    }
+
+    /**
+     * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
+     */
+    public SuiteConfigurationBuilder excludedTestsPattern(String syntaxAndPattern) {
+        this.excludedTestsPattern = syntaxAndPattern;
         return this;
     }
 }

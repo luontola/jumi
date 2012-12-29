@@ -70,24 +70,33 @@ public class SuiteConfigurationTest {
     }
 
 
-    // testFileMatcher
+    // includedTestsPattern & excludedTestsPattern
 
     @Test
-    public void test_files_matcher_can_be_changed() {
-        builder.testFileMatcher("*Foo.class");
+    public void included_tests_pattern_can_be_changed() {
+        builder.includedTestsPattern("*Foo.class");
 
-        assertThat(configuration().testFileMatcher(), is("*Foo.class"));
+        assertThat(configuration().includedTestsPattern(), is("*Foo.class"));
     }
 
     @Test
-    public void test_files_matcher_default_matches_classes_ending_with_Test_in_all_packages() {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher(configuration().testFileMatcher());
+    public void excluded_tests_pattern_can_be_changed() {
+        builder.excludedTestsPattern("*Bar.class");
+
+        assertThat(configuration().excludedTestsPattern(), is("*Bar.class"));
+    }
+
+    @Test
+    public void test_file_matcher_by_default_matches_classes_ending_with_Test_in_all_packages() {
+        PathMatcher matcher = configuration().createTestFileMatcher(FileSystems.getDefault());
 
         assertThat("should match just Test", matcher, matches(Paths.get("Test.class")));
         assertThat("should match Test suffix", matcher, matches(Paths.get("XTest.class")));
         assertThat("should not match Test prefix", matcher, not(matches(Paths.get("TestX.class"))));
         assertThat("should not match non-class files", matcher, not(matches(Paths.get("SomeTest.java"))));
         assertThat("should match in all packages", matcher, matches(Paths.get("com/example/SomeTest.class")));
+//        assertThat("should not match inner classes", matcher, not(matches(Paths.get("Test$Test.class")))); // TODO
+//        assertThat("should not match inner classes in any package", matcher, not(matches(Paths.get("com/example/Test$Test.class"))));
     }
 
 
