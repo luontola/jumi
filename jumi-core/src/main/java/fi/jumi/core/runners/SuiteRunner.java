@@ -12,14 +12,17 @@ import fi.jumi.core.drivers.DriverFinder;
 import fi.jumi.core.files.*;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.*;
+import fi.jumi.core.util.ClassFiles;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.nio.file.Path;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
 public class SuiteRunner implements Startable, TestClassFinderListener {
 
     private final SuiteListener suiteListener;
+    private final ClassLoader testClassLoader;
     private final TestClassFinder testClassFinder;
     private final DriverFinder driverFinder;
     private final ActorThread actorThread;
@@ -31,12 +34,14 @@ public class SuiteRunner implements Startable, TestClassFinderListener {
 
     // XXX: too many constructor parameters, could we group some of them together?
     public SuiteRunner(SuiteListener suiteListener,
+                       ClassLoader testClassLoader,
                        TestClassFinder testClassFinder,
                        DriverFinder driverFinder,
                        ActorThread actorThread,
                        Executor testExecutor,
                        OutputCapturer outputCapturer) {
         this.suiteListener = suiteListener;
+        this.testClassLoader = testClassLoader;
         this.testClassFinder = testClassFinder;
         this.driverFinder = driverFinder;
         this.actorThread = actorThread;
@@ -59,7 +64,8 @@ public class SuiteRunner implements Startable, TestClassFinderListener {
     }
 
     @Override
-    public void onTestClassFound(Class<?> testClass) {
+    public void onTestClassFound(Path testFile) {
+        Class<?> testClass = loadTestClass(testFile);
         Driver driver = driverFinder.findTestClassDriver(testClass);
 
         SuiteNotifier suiteNotifier = new DefaultSuiteNotifier(
@@ -73,6 +79,14 @@ public class SuiteRunner implements Startable, TestClassFinderListener {
         WorkerCounter executor = new WorkerCounter(testExecutor);
         executor.execute(new DriverRunner(driver, testClass, suiteNotifier, executor));
         executor.afterPreviousWorkersFinished(childRunnerListener());
+    }
+
+    private Class<?> loadTestClass(Path testFile) {
+        try {
+            return testClassLoader.loadClass(ClassFiles.pathToClassName(testFile));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Cannot load class from " + testFile, e);
+        }
     }
 
     private ActorRef<WorkerListener> childRunnerListener() {

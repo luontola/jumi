@@ -5,7 +5,6 @@
 package fi.jumi.core.files;
 
 import fi.jumi.actors.ActorRef;
-import fi.jumi.core.util.ClassFiles;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
@@ -16,18 +15,28 @@ public class FileNamePatternTestClassFinder implements TestClassFinder {
 
     private final PathMatcher matcher;
     private final Path baseDir;
-    private final ClassLoader classLoader;
 
-    public FileNamePatternTestClassFinder(PathMatcher matcher, Path baseDir, ClassLoader classLoader) {
+    public FileNamePatternTestClassFinder(PathMatcher matcher, Path baseDir) {
         this.matcher = matcher;
         this.baseDir = baseDir;
-        this.classLoader = classLoader;
     }
 
     @Override
-    public void findTestClasses(ActorRef<TestClassFinderListener> listener) {
+    public void findTestClasses(final ActorRef<TestClassFinderListener> listener) {
+        @NotThreadSafe
+        class ClassFindingFileVisitor extends RelativePathMatchingFileVisitor {
+            public ClassFindingFileVisitor(PathMatcher matcher, Path baseDir) {
+                super(matcher, baseDir);
+            }
+
+            @Override
+            protected void fileFound(Path relativePath) {
+                listener.tell().onTestClassFound(relativePath);
+            }
+        }
+
         try {
-            Files.walkFileTree(baseDir, new ClassFindingFileVisitor(matcher, baseDir, listener));
+            Files.walkFileTree(baseDir, new ClassFindingFileVisitor(matcher, baseDir));
         } catch (IOException e) {
             throw new RuntimeException("Failed to traverse " + baseDir, e);
         }
@@ -35,28 +44,6 @@ public class FileNamePatternTestClassFinder implements TestClassFinder {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + matcher + ", " + baseDir + ", " + classLoader + ")";
-    }
-
-    @NotThreadSafe
-    private class ClassFindingFileVisitor extends RelativePathMatchingFileVisitor {
-        private final ActorRef<TestClassFinderListener> listener;
-
-        public ClassFindingFileVisitor(PathMatcher matcher, Path baseDir, ActorRef<TestClassFinderListener> listener) {
-            super(matcher, baseDir);
-            this.listener = listener;
-        }
-
-        @Override
-        protected void fileFound(Path relativePath) {
-            // TODO: move the class loading out of this class?
-            String className = ClassFiles.pathToClassName(relativePath);
-            try {
-                Class<?> testClass = classLoader.loadClass(className);
-                listener.tell().onTestClassFound(testClass);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        return getClass().getSimpleName() + "(" + matcher + ", " + baseDir + ")";
     }
 }

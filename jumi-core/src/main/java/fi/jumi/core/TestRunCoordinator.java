@@ -46,20 +46,20 @@ public class TestRunCoordinator implements CommandListener {
     @Override
     public void runTests(SuiteConfiguration suite) {
         ClassLoader classLoader = createClassLoader(suite.classPath());
-        TestClassFinder testClassFinder = createTestClassFinder(suite, classLoader);
+        TestClassFinder testClassFinder = createTestClassFinder(suite);
         DriverFinder driverFinder = new RunViaAnnotationDriverFinder();
 
         ActorRef<Startable> suiteRunner = actorThread.bindActor(Startable.class,
-                new SuiteRunner(listener, testClassFinder, driverFinder, actorThread, testExecutor, outputCapturer));
+                new SuiteRunner(listener, classLoader, testClassFinder, driverFinder, actorThread, testExecutor, outputCapturer));
         suiteRunner.tell().start();
     }
 
-    private static TestClassFinder createTestClassFinder(SuiteConfiguration suite, ClassLoader classLoader) {
+    private static TestClassFinder createTestClassFinder(SuiteConfiguration suite) {
         List<Path> classDirectories = getClassDirectories(suite);
         List<TestClassFinder> finders = new ArrayList<>();
         for (Path dir : classDirectories) {
             PathMatcher matcher = suite.createTestFileMatcher(dir.getFileSystem());
-            finders.add(new FileNamePatternTestClassFinder(matcher, dir, classLoader));
+            finders.add(new FileNamePatternTestClassFinder(matcher, dir));
         }
         return new CompositeTestClassFinder(finders);
     }

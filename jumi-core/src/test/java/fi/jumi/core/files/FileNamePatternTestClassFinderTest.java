@@ -5,7 +5,7 @@
 package fi.jumi.core.files;
 
 import fi.jumi.actors.ActorRef;
-import fi.jumi.core.files.dummies.*;
+import fi.jumi.core.files.dummies.DummyTest;
 import org.junit.Test;
 
 import java.net.*;
@@ -21,19 +21,19 @@ public class FileNamePatternTestClassFinderTest {
     @Test
     public void finds_all_classes_from_a_directory_matching_a_pattern() {
         PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:fi/jumi/core/files/dummies/*Test.class");
-        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory, getClass().getClassLoader());
+        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory);
 
         finder.findTestClasses(ActorRef.wrap(listener));
 
-        verify(listener).onTestClassFound(DummyTest.class);
-        verify(listener).onTestClassFound(AnotherDummyTest.class);
+        verify(listener).onTestClassFound(Paths.get("fi/jumi/core/files/dummies/DummyTest.class"));
+        verify(listener).onTestClassFound(Paths.get("fi/jumi/core/files/dummies/AnotherDummyTest.class"));
         verifyNoMoreInteractions(listener);
     }
 
     @Test
     public void does_nothing_when_finds_no_matches() {
         PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:NoMatches");
-        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory, getClass().getClassLoader());
+        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory);
 
         finder.findTestClasses(ActorRef.wrap(listener));
 

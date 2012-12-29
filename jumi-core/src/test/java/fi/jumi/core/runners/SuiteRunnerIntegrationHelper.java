@@ -56,7 +56,7 @@ public abstract class SuiteRunnerIntegrationHelper {
         TestClassFinder testClassFinder = new StubTestClassFinder(testClasses);
         ActorThread actorThread = actors.startActorThread();
         ActorRef<Startable> runner = actorThread.bindActor(Startable.class,
-                new SuiteRunner(listener, testClassFinder, driverFinder, actorThread, executor, outputCapturer));
+                new SuiteRunner(listener, getClass().getClassLoader(), testClassFinder, driverFinder, actorThread, executor, outputCapturer));
         runner.tell().start();
         actors.processEventsUntilIdle();
     }
