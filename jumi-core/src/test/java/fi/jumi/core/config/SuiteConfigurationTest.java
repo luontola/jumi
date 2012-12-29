@@ -30,10 +30,11 @@ public class SuiteConfigurationTest {
     // classPath
 
     @Test
-    public void class_path_can_be_changed() {
-        builder.addToClassPath(Paths.get("foo.jar"));
+    public void class_path_can_be_appended_to() {
+        builder.addToClassPath(Paths.get("foo.jar"))
+                .addToClassPath(Paths.get("bar.jar"));
 
-        assertThat(configuration().classPath(), contains(Paths.get("foo.jar").toUri()));
+        assertThat(configuration().classPath(), contains(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri()));
     }
 
     @Test
@@ -45,10 +46,11 @@ public class SuiteConfigurationTest {
     // jvmOptions
 
     @Test
-    public void jvm_options_can_be_changed() {
-        builder.addJvmOptions("-option");
+    public void jvm_options_can_be_appended_to() {
+        builder.addJvmOptions("-option")
+                .addJvmOptions("-more", "options");
 
-        assertThat(configuration().jvmOptions(), contains("-option"));
+        assertThat(configuration().jvmOptions(), contains("-option", "-more", "options"));
     }
 
     @Test
