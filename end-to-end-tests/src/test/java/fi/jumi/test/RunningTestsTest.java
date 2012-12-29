@@ -7,6 +7,8 @@ package fi.jumi.test;
 import org.junit.*;
 import sample.*;
 
+import static org.junit.Assert.fail;
+
 public class RunningTestsTest {
 
     @Rule
@@ -66,6 +68,27 @@ public class RunningTestsTest {
         app.checkHasStackTrace(
                 "java.lang.AssertionError: dummy failure",
                 "at sample.OneFailingTest.testFailing");
+    }
+
+    @Ignore
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void reports_exceptions_that_are_not_on_the_classpath_of_the_launcher() throws Exception {
+        assertNotOnClasspath("sample.extra.CustomException");
+
+        app.runTests(CustomExceptionTest.class);
+
+        app.checkHasStackTrace(
+                "sample.extra.CustomException: dummy failure",
+                "at sample.CustomExceptionTest.testThrowCustomException");
+    }
+
+    private static void assertNotOnClasspath(String className) {
+        try {
+            Class.forName(className);
+            fail("Expected the class to not be on classpath, but it was: " + className);
+        } catch (ClassNotFoundException e) {
+            // OK
+        }
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)

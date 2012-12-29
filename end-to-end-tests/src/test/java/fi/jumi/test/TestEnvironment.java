@@ -15,6 +15,7 @@ public class TestEnvironment {
     private static final Path PROJECT_ARTIFACTS_DIR;
     private static final Path SANDBOX_DIR;
     private static final Path SAMPLE_CLASSES_DIR;
+    private static final Path EXTRA_CLASSPATH;
 
     static {
         try (InputStream in = BuildTest.class.getResourceAsStream("/testing.properties")) {
@@ -24,6 +25,7 @@ public class TestEnvironment {
             PROJECT_ARTIFACTS_DIR = getDirectory(testing, "test.projectArtifactsDir");
             SANDBOX_DIR = getDirectory(testing, "test.sandbox");
             SAMPLE_CLASSES_DIR = getDirectory(testing, "test.sampleClasses");
+            EXTRA_CLASSPATH = getDirectory(testing, "test.extraClasspath");
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -68,5 +70,9 @@ public class TestEnvironment {
 
     public static Path getSampleClassesDir() {
         return SAMPLE_CLASSES_DIR;
+    }
+
+    public static Path getExtraClasspath() {
+        return EXTRA_CLASSPATH;
     }
 }

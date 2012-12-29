@@ -17,6 +17,7 @@
         <test.projectArtifactsDir>${project.build.directory}/project-artifacts</test.projectArtifactsDir>
         <test.sandbox>${project.build.directory}/sandbox</test.sandbox>
         <test.sampleClasses>${project.build.directory}/classes</test.sampleClasses>
+        <test.extraClasspath>${basedir}/src/main/only-on-daemon</test.extraClasspath>
     </properties>
 
     <dependencies>

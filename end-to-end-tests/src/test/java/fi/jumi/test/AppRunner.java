@@ -135,6 +135,7 @@ public class AppRunner implements TestRule {
         builder.addJvmOptions("-Dfile.encoding=" + daemonDefaultCharset.name());
         builder.addToClassPath(TestEnvironment.getProjectJar("simpleunit"));
         builder.addToClassPath(TestEnvironment.getSampleClassesDir());
+        builder.addToClassPath(TestEnvironment.getExtraClasspath());
         if (TestSystemProperties.useThreadSafetyAgent()) {
             builder.addJvmOptions("-javaagent:" + TestEnvironment.getProjectJar("thread-safety-agent"));
         }
