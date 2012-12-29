@@ -30,14 +30,15 @@ OK - SuiteListener#onFailure cannot rely on the exception class from existing in
 	OK - wrap the SuiteListener in fi.jumi.daemon.DaemonNetworkEndpoint#onConnected to a SerializableSuiteListener
 
 !! - default test file pattern: should not match inner classes (i.e. "$" in file name)
-	!! - easiest to configure by providing includedTestsPattern & excludedTestsPattern?
+	OK - easiest to configure by providing includedTestsPattern & excludedTestsPattern?
 		http://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#excludes
 		http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html
 		OK - add the parameters to SuiteConfiguration
 		OK - create a IncludeExcludePathMatcher that composes two PathMatchers
 		OK - use it in SuiteConfiguration
 		OK - check the parameters when they are configured
-		!! - use SuiteConfiguration.createTestFileMatcher
+		OK - use SuiteConfiguration.createTestFileMatcher
+	!! - FileNamePatternTestClassFinderTest: test for no matches
 	- remove the option for enumerating the test class names to run
 		- create a convenience method in SuiteConfigurationBuilder that converts class names to patterns
 		- simplify TestClassFinderFactory, remove EnumeratedTestClassFinder

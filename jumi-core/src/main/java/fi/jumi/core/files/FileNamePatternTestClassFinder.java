@@ -13,24 +13,22 @@ import java.nio.file.*;
 @NotThreadSafe
 public class FileNamePatternTestClassFinder implements TestClassFinder {
 
-    private final String syntaxAndPattern;
-    private final Path classesDirectory;
+    private final PathMatcher matcher;
+    private final Path baseDir;
     private final ClassLoader classLoader;
 
-    public FileNamePatternTestClassFinder(String syntaxAndPattern, Path classesDirectory, ClassLoader classLoader) {
-        this.syntaxAndPattern = syntaxAndPattern;
-        this.classesDirectory = classesDirectory;
+    public FileNamePatternTestClassFinder(PathMatcher matcher, Path baseDir, ClassLoader classLoader) {
+        this.matcher = matcher;
+        this.baseDir = baseDir;
         this.classLoader = classLoader;
     }
 
     @Override
-    public void findTestClasses(final ActorRef<TestClassFinderListener> listener) {
-        final PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher(syntaxAndPattern);
-
+    public void findTestClasses(ActorRef<TestClassFinderListener> listener) {
         try {
-            Files.walkFileTree(classesDirectory, new ClassFindingFileVisitor(matcher, classesDirectory, listener));
+            Files.walkFileTree(baseDir, new ClassFindingFileVisitor(matcher, baseDir, listener));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to traverse " + classesDirectory, e);
+            throw new RuntimeException("Failed to traverse " + baseDir, e);
         }
     }
 
@@ -52,22 +50,22 @@ public class FileNamePatternTestClassFinder implements TestClassFinder {
             return false;
         }
         FileNamePatternTestClassFinder that = (FileNamePatternTestClassFinder) obj;
-        return this.syntaxAndPattern.equals(that.syntaxAndPattern) &&
-                this.classesDirectory.equals(that.classesDirectory) &&
+        return this.matcher.equals(that.matcher) &&
+                this.baseDir.equals(that.baseDir) &&
                 this.classLoader.equals(that.classLoader);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + syntaxAndPattern + ", " + classesDirectory + ", " + classLoader + ")";
+        return getClass().getSimpleName() + "(" + matcher + ", " + baseDir + ", " + classLoader + ")";
     }
 
     @NotThreadSafe
     private class ClassFindingFileVisitor extends RelativePathMatchingFileVisitor {
         private final ActorRef<TestClassFinderListener> listener;
 
-        public ClassFindingFileVisitor(PathMatcher matcher, Path classesDirectory, ActorRef<TestClassFinderListener> listener) {
-            super(matcher, classesDirectory);
+        public ClassFindingFileVisitor(PathMatcher matcher, Path baseDir, ActorRef<TestClassFinderListener> listener) {
+            super(matcher, baseDir);
             this.listener = listener;
         }
 

@@ -20,8 +20,8 @@ public class FileNamePatternTestClassFinderTest {
 
     @Test
     public void finds_all_classes_from_a_directory_matching_a_pattern() {
-        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(
-                "glob:fi/jumi/core/files/dummies/*Test.class", classesDirectory, getClass().getClassLoader());
+        PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:fi/jumi/core/files/dummies/*Test.class");
+        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory, getClass().getClassLoader());
 
         finder.findTestClasses(ActorRef.wrap(listener));
 

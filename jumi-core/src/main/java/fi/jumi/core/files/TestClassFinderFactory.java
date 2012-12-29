@@ -25,7 +25,8 @@ public class TestClassFinderFactory {
         } else if (!testFileMatcher.isEmpty()) {
             List<TestClassFinder> finders = new ArrayList<>();
             for (Path dir : getClassesDirectories(suite)) {
-                finders.add(new FileNamePatternTestClassFinder(testFileMatcher, dir, classLoader));
+                PathMatcher matcher = suite.createTestFileMatcher(dir.getFileSystem());
+                finders.add(new FileNamePatternTestClassFinder(matcher, dir, classLoader));
             }
             return new CompositeTestClassFinder(finders);
 
@@ -34,7 +35,7 @@ public class TestClassFinderFactory {
         }
     }
 
-    private static List<Path> getClassesDirectories(SuiteConfiguration suite) {
+    public static List<Path> getClassesDirectories(SuiteConfiguration suite) {
         ArrayList<Path> dirs = new ArrayList<>();
         for (URI uri : suite.classPath()) {
             Path path = Paths.get(uri);
