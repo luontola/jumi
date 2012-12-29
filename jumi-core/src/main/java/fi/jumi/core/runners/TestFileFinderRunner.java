@@ -10,18 +10,18 @@ import fi.jumi.core.files.*;
 import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
-public class TestClassFinderRunner implements Runnable {
+public class TestFileFinderRunner implements Runnable {
 
-    private final TestClassFinder testClassFinder;
-    private final ActorRef<TestClassFinderListener> finderListener;
+    private final TestFileFinder testFileFinder;
+    private final ActorRef<TestFileFinderListener> finderListener;
 
-    public TestClassFinderRunner(TestClassFinder testClassFinder, ActorRef<TestClassFinderListener> finderListener) {
-        this.testClassFinder = testClassFinder;
+    public TestFileFinderRunner(TestFileFinder testFileFinder, ActorRef<TestFileFinderListener> finderListener) {
+        this.testFileFinder = testFileFinder;
         this.finderListener = finderListener;
     }
 
     @Override
     public void run() {
-        testClassFinder.findTestClasses(finderListener);
+        testFileFinder.findTestFiles(finderListener);
     }
 }

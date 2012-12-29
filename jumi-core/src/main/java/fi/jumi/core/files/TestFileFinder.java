@@ -6,7 +6,7 @@ package fi.jumi.core.files;
 
 import fi.jumi.actors.ActorRef;
 
-public interface TestClassFinder {
+public interface TestFileFinder {
 
-    void findTestClasses(ActorRef<TestClassFinderListener> listener);
+    void findTestFiles(ActorRef<TestFileFinderListener> listener);
 }

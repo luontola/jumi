@@ -11,32 +11,32 @@ import java.io.IOException;
 import java.nio.file.*;
 
 @NotThreadSafe
-public class FileNamePatternTestClassFinder implements TestClassFinder {
+public class PathMatcherTestFileFinder implements TestFileFinder {
 
     private final PathMatcher matcher;
     private final Path baseDir;
 
-    public FileNamePatternTestClassFinder(PathMatcher matcher, Path baseDir) {
+    public PathMatcherTestFileFinder(PathMatcher matcher, Path baseDir) {
         this.matcher = matcher;
         this.baseDir = baseDir;
     }
 
     @Override
-    public void findTestClasses(final ActorRef<TestClassFinderListener> listener) {
+    public void findTestFiles(final ActorRef<TestFileFinderListener> listener) {
         @NotThreadSafe
-        class ClassFindingFileVisitor extends RelativePathMatchingFileVisitor {
-            public ClassFindingFileVisitor(PathMatcher matcher, Path baseDir) {
+        class ListenerNotifyingFileVisitor extends RelativePathMatchingFileVisitor {
+            public ListenerNotifyingFileVisitor(PathMatcher matcher, Path baseDir) {
                 super(matcher, baseDir);
             }
 
             @Override
             protected void fileFound(Path relativePath) {
-                listener.tell().onTestClassFound(relativePath);
+                listener.tell().onTestFileFound(relativePath);
             }
         }
 
         try {
-            Files.walkFileTree(baseDir, new ClassFindingFileVisitor(matcher, baseDir));
+            Files.walkFileTree(baseDir, new ListenerNotifyingFileVisitor(matcher, baseDir));
         } catch (IOException e) {
             throw new RuntimeException("Failed to traverse " + baseDir, e);
         }

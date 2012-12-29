@@ -70,7 +70,7 @@ public class Main {
                         new StartableEventizer(),
                         new RunnableEventizer(),
                         new WorkerListenerEventizer(),
-                        new TestClassFinderListenerEventizer(),
+                        new TestFileFinderListenerEventizer(),
                         new SuiteListenerEventizer(),
                         new CommandListenerEventizer(),
                         new TestClassListenerEventizer()

@@ -49,7 +49,7 @@ public class TestBench {
         SuiteRunner runner = new SuiteRunner(
                 new SuiteListenerEventizer().newFrontend(results),
                 getClass().getClassLoader(),
-                new StubTestClassFinder(testClasses),
+                new StubTestFileFinder(testClasses),
                 driverFinder,
                 actors.startActorThread(),
                 actors.getExecutor(),

@@ -19,11 +19,11 @@ import java.nio.file.Path;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
-public class SuiteRunner implements Startable, TestClassFinderListener {
+public class SuiteRunner implements Startable, TestFileFinderListener {
 
     private final SuiteListener suiteListener;
     private final ClassLoader testClassLoader;
-    private final TestClassFinder testClassFinder;
+    private final TestFileFinder testFileFinder;
     private final DriverFinder driverFinder;
     private final ActorThread actorThread;
     private final Executor testExecutor;
@@ -35,14 +35,14 @@ public class SuiteRunner implements Startable, TestClassFinderListener {
     // XXX: too many constructor parameters, could we group some of them together?
     public SuiteRunner(SuiteListener suiteListener,
                        ClassLoader testClassLoader,
-                       TestClassFinder testClassFinder,
+                       TestFileFinder testFileFinder,
                        DriverFinder driverFinder,
                        ActorThread actorThread,
                        Executor testExecutor,
                        OutputCapturer outputCapturer) {
         this.suiteListener = suiteListener;
         this.testClassLoader = testClassLoader;
-        this.testClassFinder = testClassFinder;
+        this.testFileFinder = testFileFinder;
         this.driverFinder = driverFinder;
         this.actorThread = actorThread;
         this.testExecutor = testExecutor;
@@ -53,9 +53,9 @@ public class SuiteRunner implements Startable, TestClassFinderListener {
     public void start() {
         suiteListener.onSuiteStarted();
 
-        TestClassFinderRunner runner = new TestClassFinderRunner(
-                testClassFinder,
-                actorThread.bindActor(TestClassFinderListener.class, this)
+        TestFileFinderRunner runner = new TestFileFinderRunner(
+                testFileFinder,
+                actorThread.bindActor(TestFileFinderListener.class, this)
         );
 
         WorkerCounter executor = new WorkerCounter(testExecutor);
@@ -64,7 +64,7 @@ public class SuiteRunner implements Startable, TestClassFinderListener {
     }
 
     @Override
-    public void onTestClassFound(Path testFile) {
+    public void onTestFileFound(Path testFile) {
         Class<?> testClass = loadTestClass(testFile);
         Driver driver = driverFinder.findTestClassDriver(testClass);
 

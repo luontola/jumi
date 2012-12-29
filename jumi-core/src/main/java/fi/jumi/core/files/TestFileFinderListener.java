@@ -6,7 +6,7 @@ package fi.jumi.core.files;
 
 import java.nio.file.Path;
 
-public interface TestClassFinderListener {
+public interface TestFileFinderListener {
 
-    void onTestClassFound(Path testFile);
+    void onTestFileFound(Path testFile);
 }

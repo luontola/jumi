@@ -13,29 +13,29 @@ import java.nio.file.*;
 
 import static org.mockito.Mockito.*;
 
-public class FileNamePatternTestClassFinderTest {
+public class PathMatcherTestFileFinderTest {
 
     private final Path classesDirectory = getClassesDirectory(DummyTest.class);
-    private final TestClassFinderListener listener = mock(TestClassFinderListener.class);
+    private final TestFileFinderListener listener = mock(TestFileFinderListener.class);
 
     @Test
     public void finds_all_classes_from_a_directory_matching_a_pattern() {
         PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:fi/jumi/core/files/dummies/*Test.class");
-        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory);
+        PathMatcherTestFileFinder finder = new PathMatcherTestFileFinder(matcher, classesDirectory);
 
-        finder.findTestClasses(ActorRef.wrap(listener));
+        finder.findTestFiles(ActorRef.wrap(listener));
 
-        verify(listener).onTestClassFound(Paths.get("fi/jumi/core/files/dummies/DummyTest.class"));
-        verify(listener).onTestClassFound(Paths.get("fi/jumi/core/files/dummies/AnotherDummyTest.class"));
+        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/files/dummies/DummyTest.class"));
+        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/files/dummies/AnotherDummyTest.class"));
         verifyNoMoreInteractions(listener);
     }
 
     @Test
     public void does_nothing_when_finds_no_matches() {
         PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:NoMatches");
-        FileNamePatternTestClassFinder finder = new FileNamePatternTestClassFinder(matcher, classesDirectory);
+        PathMatcherTestFileFinder finder = new PathMatcherTestFileFinder(matcher, classesDirectory);
 
-        finder.findTestClasses(ActorRef.wrap(listener));
+        finder.findTestFiles(ActorRef.wrap(listener));
 
         verifyNoMoreInteractions(listener);
     }

@@ -10,7 +10,7 @@ import fi.jumi.actors.listeners.*;
 import fi.jumi.api.drivers.Driver;
 import fi.jumi.core.*;
 import fi.jumi.core.drivers.DriverFinder;
-import fi.jumi.core.files.TestClassFinder;
+import fi.jumi.core.files.TestFileFinder;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.testbench.*;
 import fi.jumi.core.util.SpyListener;
@@ -53,10 +53,10 @@ public abstract class SuiteRunnerIntegrationHelper {
     }
 
     protected void run(SuiteListener listener, DriverFinder driverFinder, Class<?>... testClasses) {
-        TestClassFinder testClassFinder = new StubTestClassFinder(testClasses);
+        TestFileFinder testFileFinder = new StubTestFileFinder(testClasses);
         ActorThread actorThread = actors.startActorThread();
         ActorRef<Startable> runner = actorThread.bindActor(Startable.class,
-                new SuiteRunner(listener, getClass().getClassLoader(), testClassFinder, driverFinder, actorThread, executor, outputCapturer));
+                new SuiteRunner(listener, getClass().getClassLoader(), testFileFinder, driverFinder, actorThread, executor, outputCapturer));
         runner.tell().start();
         actors.processEventsUntilIdle();
     }

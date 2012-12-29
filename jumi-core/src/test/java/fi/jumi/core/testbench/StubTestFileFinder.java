@@ -10,18 +10,18 @@ import fi.jumi.core.util.ClassFiles;
 
 import java.nio.file.Paths;
 
-public class StubTestClassFinder implements TestClassFinder {
+public class StubTestFileFinder implements TestFileFinder {
 
     private final Class<?>[] testClasses;
 
-    public StubTestClassFinder(Class<?>... testClasses) {
+    public StubTestFileFinder(Class<?>... testClasses) {
         this.testClasses = testClasses;
     }
 
     @Override
-    public void findTestClasses(ActorRef<TestClassFinderListener> listener) {
+    public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
         for (Class<?> testClass : testClasses) {
-            listener.tell().onTestClassFound(Paths.get(ClassFiles.classNameToPath(testClass.getName())));
+            listener.tell().onTestFileFound(Paths.get(ClassFiles.classNameToPath(testClass.getName())));
         }
     }
 }

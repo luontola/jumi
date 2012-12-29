@@ -10,18 +10,18 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.util.List;
 
 @NotThreadSafe
-public class CompositeTestClassFinder implements TestClassFinder {
+public class CompositeTestFileFinder implements TestFileFinder {
 
-    private final List<TestClassFinder> finders;
+    private final List<TestFileFinder> finders;
 
-    public CompositeTestClassFinder(List<TestClassFinder> finders) {
+    public CompositeTestFileFinder(List<TestFileFinder> finders) {
         this.finders = finders;
     }
 
     @Override
-    public void findTestClasses(ActorRef<TestClassFinderListener> listener) {
-        for (TestClassFinder finder : finders) {
-            finder.findTestClasses(listener);
+    public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
+        for (TestFileFinder finder : finders) {
+            finder.findTestFiles(listener);
         }
     }
 
