@@ -13,7 +13,8 @@ import fi.jumi.core.runners.SuiteRunner;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.*;
-import java.util.List;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
@@ -43,14 +44,24 @@ public class TestRunCoordinator implements CommandListener {
     }
 
     @Override
-    public void runTests(SuiteConfiguration suiteConfiguration) {
-        ClassLoader classLoader = createClassLoader(suiteConfiguration.classPath());
-        TestClassFinder testClassFinder = TestClassFinderFactory.create(suiteConfiguration, classLoader);
+    public void runTests(SuiteConfiguration suite) {
+        ClassLoader classLoader = createClassLoader(suite.classPath());
+        TestClassFinder testClassFinder = createTestClassFinder(suite, classLoader);
         DriverFinder driverFinder = new RunViaAnnotationDriverFinder();
 
         ActorRef<Startable> suiteRunner = actorThread.bindActor(Startable.class,
                 new SuiteRunner(listener, testClassFinder, driverFinder, actorThread, testExecutor, outputCapturer));
         suiteRunner.tell().start();
+    }
+
+    private static TestClassFinder createTestClassFinder(SuiteConfiguration suite, ClassLoader classLoader) {
+        List<Path> classDirectories = getClassDirectories(suite);
+        List<TestClassFinder> finders = new ArrayList<>();
+        for (Path dir : classDirectories) {
+            PathMatcher matcher = suite.createTestFileMatcher(dir.getFileSystem());
+            finders.add(new FileNamePatternTestClassFinder(matcher, dir, classLoader));
+        }
+        return new CompositeTestClassFinder(finders);
     }
 
     private static ClassLoader createClassLoader(List<URI> classpath) {
@@ -59,6 +70,17 @@ public class TestRunCoordinator implements CommandListener {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Failed to create class loader for classpath " + classpath, e);
         }
+    }
+
+    static List<Path> getClassDirectories(SuiteConfiguration suite) {
+        ArrayList<Path> dirs = new ArrayList<>();
+        for (URI uri : suite.classPath()) {
+            Path path = Paths.get(uri);
+            if (Files.isDirectory(path)) {
+                dirs.add(path);
+            }
+        }
+        return dirs;
     }
 
     private static URL[] asUrls(List<URI> uris) throws MalformedURLException {

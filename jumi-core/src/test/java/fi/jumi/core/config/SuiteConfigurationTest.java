@@ -57,21 +57,6 @@ public class SuiteConfigurationTest {
     }
 
 
-    // testClasses
-
-    @Test
-    public void test_classes_can_be_changed() {
-        builder.testClasses("TheClass", "AnotherClass");
-
-        assertThat(configuration().testClasses(), contains("TheClass", "AnotherClass"));
-    }
-
-    @Test
-    public void test_classes_defaults_to_empty() {
-        assertThat(configuration().testClasses(), is(empty()));
-    }
-
-
     // includedTestsPattern & excludedTestsPattern
 
     @Test
@@ -119,6 +104,15 @@ public class SuiteConfigurationTest {
         assertThat("should match in all packages", matcher, matches(Paths.get("com/example/SomeTest.class")));
         assertThat("should not match inner classes", matcher, not(matches(Paths.get("Test$Test.class"))));
         assertThat("should not match inner classes in any package", matcher, not(matches(Paths.get("com/example/Test$Test.class"))));
+    }
+
+    @Test
+    public void convenience_method_for_running_specific_test_classes() {
+        builder.testClasses("TheClass", "com.example.AnotherClass");
+
+        SuiteConfiguration suite = configuration();
+        assertThat(suite.includedTestsPattern(), is("glob:{TheClass.class,com/example/AnotherClass.class}"));
+        assertThat(suite.excludedTestsPattern(), is(""));
     }
 
 

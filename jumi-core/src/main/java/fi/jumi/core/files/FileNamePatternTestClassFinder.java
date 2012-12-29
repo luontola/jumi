@@ -5,6 +5,7 @@
 package fi.jumi.core.files;
 
 import fi.jumi.actors.ActorRef;
+import fi.jumi.core.util.ClassFiles;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
@@ -32,29 +33,6 @@ public class FileNamePatternTestClassFinder implements TestClassFinder {
         }
     }
 
-    private static String pathToClassName(Path path) {
-        if (!path.toString().endsWith(".class")) {
-            throw new IllegalArgumentException("Not a class file: " + path);
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Path p : path) {
-            sb.append(p.getFileName());
-            sb.append(".");
-        }
-        return sb.substring(0, sb.lastIndexOf(".class."));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof FileNamePatternTestClassFinder)) {
-            return false;
-        }
-        FileNamePatternTestClassFinder that = (FileNamePatternTestClassFinder) obj;
-        return this.matcher.equals(that.matcher) &&
-                this.baseDir.equals(that.baseDir) &&
-                this.classLoader.equals(that.classLoader);
-    }
-
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" + matcher + ", " + baseDir + ", " + classLoader + ")";
@@ -72,7 +50,7 @@ public class FileNamePatternTestClassFinder implements TestClassFinder {
         @Override
         protected void fileFound(Path relativePath) {
             // TODO: move the class loading out of this class?
-            String className = pathToClassName(relativePath);
+            String className = ClassFiles.pathToClassName(relativePath);
             try {
                 Class<?> testClass = classLoader.loadClass(className);
                 listener.tell().onTestClassFound(testClass);

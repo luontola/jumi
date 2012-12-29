@@ -26,15 +26,6 @@ public class CompositeTestClassFinder implements TestClassFinder {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CompositeTestClassFinder)) {
-            return super.equals(obj);
-        }
-        CompositeTestClassFinder that = (CompositeTestClassFinder) obj;
-        return this.finders.equals(that.finders);
-    }
-
-    @Override
     public String toString() {
         return getClass().getSimpleName() + "(" + finders + ")";
     }

@@ -4,6 +4,8 @@
 
 package fi.jumi.core.config;
 
+import fi.jumi.core.util.ClassFiles;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.URI;
 import java.nio.file.*;
@@ -14,7 +16,6 @@ public class SuiteConfigurationBuilder {
 
     private final List<URI> classPath;
     private final List<String> jvmOptions;
-    private final List<String> testClasses;
     private String includedTestsPattern;
     private String excludedTestsPattern;
 
@@ -25,7 +26,6 @@ public class SuiteConfigurationBuilder {
     SuiteConfigurationBuilder(SuiteConfiguration src) {
         classPath = new ArrayList<>(src.classPath());
         jvmOptions = new ArrayList<>(src.jvmOptions());
-        testClasses = new ArrayList<>(src.testClasses());
         includedTestsPattern = src.includedTestsPattern();
         excludedTestsPattern = src.excludedTestsPattern();
     }
@@ -59,17 +59,24 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public List<String> testClasses() {
-        return testClasses;
-    }
-
     public SuiteConfigurationBuilder testClasses(String... testClasses) {
         return testClasses(Arrays.asList(testClasses));
     }
 
     public SuiteConfigurationBuilder testClasses(List<String> testClasses) {
-        this.testClasses.clear();
-        this.testClasses.addAll(testClasses);
+        List<String> paths = new ArrayList<>();
+        for (String testClass : testClasses) {
+            paths.add(ClassFiles.classNameToPath(testClass));
+        }
+        StringBuilder pattern = new StringBuilder();
+        for (String path : paths) {
+            if (pattern.length() > 0) {
+                pattern.append(',');
+            }
+            pattern.append(path);
+        }
+        includedTestsPattern("glob:{" + pattern + "}");
+        excludedTestsPattern("");
         return this;
     }
 
