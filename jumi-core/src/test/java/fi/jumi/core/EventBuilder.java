@@ -67,7 +67,7 @@ public class EventBuilder {
         test(runId, testId, name, new Runnable() {
             @Override
             public void run() {
-                listener.onFailure(runId, failure);
+                listener.onFailure(runId, StackTrace.copyOf(failure));
             }
         });
     }

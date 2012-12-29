@@ -294,7 +294,7 @@ public class TextUITest {
                 listener.onTestFound(SuiteMother.TEST_CLASS, TestId.ROOT, SuiteMother.TEST_CLASS_NAME);
                 listener.onRunStarted(run1, SuiteMother.TEST_CLASS);
                 listener.onTestStarted(run1, TestId.ROOT);
-                listener.onFailure(run1, new Throwable("dummy exception"));
+                listener.onFailure(run1, StackTrace.copyOf(new Throwable("dummy exception")));
 
                 assertNotInOutput("java.lang.Throwable: dummy exception");
 

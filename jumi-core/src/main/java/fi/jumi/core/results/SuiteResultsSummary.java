@@ -5,6 +5,7 @@
 package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.StackTrace;
 import fi.jumi.core.runs.RunId;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -34,7 +35,7 @@ public class SuiteResultsSummary extends NullRunVisitor {
     }
 
     @Override
-    public void onFailure(RunId runId, String testClass, TestId testId, Throwable cause) {
+    public void onFailure(RunId runId, String testClass, TestId testId, StackTrace cause) {
         failedTests.add(new GlobalTestId(testClass, testId));
     }
 }

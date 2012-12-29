@@ -21,7 +21,7 @@ public interface SuiteListener {
 
     void onPrintedErr(RunId runId, String text);
 
-    void onFailure(RunId runId, Throwable cause);
+    void onFailure(RunId runId, StackTrace cause);
 
     void onTestFinished(RunId runId);
 

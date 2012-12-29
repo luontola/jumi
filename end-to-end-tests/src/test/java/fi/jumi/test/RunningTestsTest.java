@@ -70,7 +70,6 @@ public class RunningTestsTest {
                 "at sample.OneFailingTest.testFailing");
     }
 
-    @Ignore
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_exceptions_that_are_not_on_the_classpath_of_the_launcher() throws Exception {
         assertNotOnClasspath("sample.extra.CustomException");

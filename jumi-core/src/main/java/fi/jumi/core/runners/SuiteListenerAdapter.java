@@ -5,7 +5,7 @@
 package fi.jumi.core.runners;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.SuiteListener;
+import fi.jumi.core.*;
 import fi.jumi.core.runs.RunId;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -48,7 +48,7 @@ class SuiteListenerAdapter implements TestClassListener {
 
     @Override
     public void onFailure(RunId runId, TestId testId, Throwable cause) {
-        suiteListener.onFailure(runId, cause);
+        suiteListener.onFailure(runId, StackTrace.copyOf(cause));
     }
 
     @Override

@@ -7,7 +7,7 @@ package fi.jumi.core.results;
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.SuiteListener;
+import fi.jumi.core.*;
 import fi.jumi.core.runs.RunId;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -117,7 +117,7 @@ public class SuiteEventDemuxer implements MessageSender<Event<SuiteListener>> {
         }
 
         @Override
-        public void onFailure(RunId runId, Throwable cause) {
+        public void onFailure(RunId runId, StackTrace cause) {
             saveCurrentMessageToRun(runId);
         }
 

@@ -6,6 +6,7 @@ package fi.jumi.simpleunit;
 
 import fi.jumi.api.RunVia;
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.StackTrace;
 import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;
@@ -69,7 +70,7 @@ public class SimpleUnitTest {
         listener.onRunStarted(RUN_1, testClass.getName());
         listener.onTestStarted(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onTestStarted(RUN_1, testClass.getName(), TestId.of(0));
-        listener.onFailure(RUN_1, testClass.getName(), TestId.of(0), new AssertionError("dummy failure"));
+        listener.onFailure(RUN_1, testClass.getName(), TestId.of(0), StackTrace.copyOf(new AssertionError("dummy failure")));
         listener.onTestFinished(RUN_1, testClass.getName(), TestId.of(0));
         listener.onTestFinished(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onRunFinished(RUN_1, testClass.getName());
@@ -88,7 +89,7 @@ public class SimpleUnitTest {
         Class<FailureInConstructorTest> testClass = FailureInConstructorTest.class;
         listener.onRunStarted(RUN_1, testClass.getName());
         listener.onTestStarted(RUN_1, testClass.getName(), TestId.ROOT);
-        listener.onFailure(RUN_1, testClass.getName(), TestId.ROOT, new RuntimeException("dummy exception"));
+        listener.onFailure(RUN_1, testClass.getName(), TestId.ROOT, StackTrace.copyOf(new RuntimeException("dummy exception")));
         listener.onTestFinished(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onRunFinished(RUN_1, testClass.getName());
 
@@ -110,7 +111,7 @@ public class SimpleUnitTest {
         listener.onRunStarted(RUN_1, testClass.getName());
         listener.onTestStarted(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onTestStarted(RUN_1, testClass.getName(), TestId.of(0));
-        listener.onFailure(RUN_1, testClass.getName(), TestId.of(0), new IllegalArgumentException("wrong number of arguments"));
+        listener.onFailure(RUN_1, testClass.getName(), TestId.of(0), StackTrace.copyOf(new IllegalArgumentException("wrong number of arguments")));
         listener.onTestFinished(RUN_1, testClass.getName(), TestId.of(0));
         listener.onTestFinished(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onRunFinished(RUN_1, testClass.getName());
@@ -133,7 +134,7 @@ public class SimpleUnitTest {
         listener.onRunStarted(RUN_1, testClass.getName());
         listener.onTestStarted(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onFailure(RUN_1, testClass.getName(), TestId.ROOT,
-                new IllegalArgumentException("No test methods in class fi.jumi.simpleunit.SimpleUnitTest$NoTestMethodsTest"));
+                StackTrace.copyOf(new IllegalArgumentException("No test methods in class fi.jumi.simpleunit.SimpleUnitTest$NoTestMethodsTest")));
         listener.onTestFinished(RUN_1, testClass.getName(), TestId.ROOT);
         listener.onRunFinished(RUN_1, testClass.getName());
 

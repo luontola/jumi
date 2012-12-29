@@ -37,7 +37,7 @@ public class NullSuiteListener implements SuiteListener {
     }
 
     @Override
-    public void onFailure(RunId runId, Throwable cause) {
+    public void onFailure(RunId runId, StackTrace cause) {
     }
 
     @Override

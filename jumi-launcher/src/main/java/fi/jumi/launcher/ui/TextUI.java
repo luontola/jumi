@@ -125,8 +125,8 @@ public class TextUI {
         }
 
         @Override
-        public void onFailure(RunId runId, String testClass, TestId testId, Throwable cause) {
-            printer.printErr(getStackTrace(cause));
+        public void onFailure(RunId runId, String testClass, TestId testId, StackTrace cause) {
+            printer.printErr(getStackTraceAsString(cause));
         }
 
         @Override
@@ -163,11 +163,9 @@ public class TextUI {
         }
     }
 
-    private static String getStackTrace(Throwable cause) {
+    private static String getStackTraceAsString(Throwable cause) {
         StringWriter buffer = new StringWriter();
-        PrintWriter writer = new PrintWriter(buffer);
-        cause.printStackTrace(writer);
-        writer.close(); // XXX: line not tested
+        cause.printStackTrace(new PrintWriter(buffer));
         return buffer.toString();
     }
 }

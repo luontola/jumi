@@ -5,6 +5,7 @@ Release Notes
 ### Upcoming Changes
 
 - Automatic discovery of test classes based on file name patterns
+- Doesn't anymore require all thrown exception classes to be in the launcher's classpath
 
 ### Jumi 0.2.241 (2012-12-25)
 

@@ -5,6 +5,7 @@
 package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.StackTrace;
 import fi.jumi.core.runs.RunId;
 
 public interface RunVisitor {
@@ -17,7 +18,7 @@ public interface RunVisitor {
 
     void onPrintedErr(RunId runId, String testClass, TestId testId, String text);
 
-    void onFailure(RunId runId, String testClass, TestId testId, Throwable cause);
+    void onFailure(RunId runId, String testClass, TestId testId, StackTrace cause);
 
     void onTestFinished(RunId runId, String testClass, TestId testId);
 
