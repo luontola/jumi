@@ -47,14 +47,29 @@ OK - default test file pattern: should not match inner classes (i.e. "$" in file
 OK - refactor: move class loading out of TestClassFinder, for example into SuiteRunner
 
 !! - end-to-end tests: setting the working directory for a test run
+	!! - e2e test: print working directory
+	- add workingDirectory to SuiteConfiguration
+	- update fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#connectToDaemon
 
 - use ~/.jumi directory for the daemon jar
+	- add DaemonConfiguration property
+	- set the default
+
+- misc refactoring:
+	- extract all construction from TestRunCoordinator and SuiteRunner into SuiteFactory
+	- inline TestRunCoordinator into DaemonNetworkEndpoint, remove CommandListener#addSuiteListener
+	- reorder packages, see below "packages by functionality"
+		- suite, drivers, runs, output, api, results, config, discovery, network
+		- move DriverRunner into drivers
+		- move TestClassListener into runs (rename to RunListener)
+	- create TestFile value object
 
 - release 0.3
 	- tidy up release notes
 	OK - bump version
 	- release
 	- update wiki for JumiBootstrap
+	- search & remove stale .jumi directories from all projects after upgrading them, remove from .gitignore
 
 - JUnit backward compatibility
 	- end-to-end test: run tests written in JUnit 4, JUnit 3, custom JUnit runner
@@ -63,6 +78,12 @@ OK - refactor: move class loading out of TestClassFinder, for example into Suite
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
 	- given an error message if starting the daemon fails (for example out of memory)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
+
+- ignoring tests
+	- ignoring without running a test
+	- ignoring after test has started
+	- JUnit @Ignore
+	- JUnit assumptions
 
 - release 0.4
 	- tidy up release notes
