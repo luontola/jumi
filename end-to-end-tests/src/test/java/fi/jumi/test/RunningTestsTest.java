@@ -107,12 +107,11 @@ public class RunningTestsTest {
         app.checkContainsRun("ParallelismTest", "testTwo", "/", "/");
     }
 
-    @Ignore("not implemented")
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void tests_are_run_in_the_specified_working_directory() throws Exception {
         File workingDir = tempDir.newFolder();
 
-        // TODO: set working dir
+        app.workingDirectory = workingDir.toPath();
         app.runTests(WorkingDirectoryTest.class);
 
         app.checkPassingAndFailingTests(2, 0);

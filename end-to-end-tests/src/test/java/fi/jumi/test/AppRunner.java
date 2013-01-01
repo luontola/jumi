@@ -40,6 +40,7 @@ public class AppRunner implements TestRule {
     private JumiLauncher launcher;
     private TextUIParser ui;
 
+    public Path workingDirectory = Paths.get(SuiteConfiguration.DEFAULTS.workingDirectory());
     public final DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
     public void setMockNetworkServer(NetworkServer mockNetworkServer) {
@@ -132,6 +133,7 @@ public class AppRunner implements TestRule {
     private SuiteConfiguration configure(SuiteConfiguration suite) throws IOException {
         SuiteConfigurationBuilder builder = suite.melt();
 
+        builder.workingDirectory(workingDirectory);
         builder.addJvmOptions("-Dfile.encoding=" + daemonDefaultCharset.name());
         builder.addToClassPath(TestEnvironment.getProjectJar("simpleunit"));
         builder.addToClassPath(TestEnvironment.getSampleClassesDir());

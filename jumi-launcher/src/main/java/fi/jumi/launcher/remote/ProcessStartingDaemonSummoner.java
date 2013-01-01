@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -38,22 +38,22 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
     }
 
     @Override
-    public void connectToDaemon(SuiteConfiguration suiteConfiguration,
-                                DaemonConfiguration daemonConfiguration,
+    public void connectToDaemon(SuiteConfiguration suite,
+                                DaemonConfiguration daemon,
                                 ActorRef<DaemonListener> listener) {
         // XXX: should we handle multiple connections properly, even though we are expecting only one?
         int port = daemonConnector.listenOnAnyPort(new OneTimeDaemonListenerFactory(listener));
-        daemonConfiguration = daemonConfiguration.melt()
+        daemon = daemon.melt()
                 .launcherPort(port)
                 .freeze();
 
         try {
             JvmArgs jvmArgs = new JvmArgsBuilder()
                     .executableJar(steward.getDaemonJar())
-                    .workingDir(Paths.get(".")) // TODO: get the working directory from suite options
-                    .jvmOptions(suiteConfiguration.jvmOptions())
-                    .systemProperties(daemonConfiguration.toSystemProperties())
-                    .programArgs(daemonConfiguration.toProgramArgs())
+                    .workingDir(Paths.get(suite.workingDirectory()))
+                    .jvmOptions(suite.jvmOptions())
+                    .systemProperties(daemon.toSystemProperties())
+                    .programArgs(daemon.toProgramArgs())
                     .toJvmArgs();
             Process process = processStarter.startJavaProcess(jvmArgs);
             copyInBackground(process.getInputStream(), outputListener); // TODO: write the output to a log file using OS pipes, read it from there with AppRunner
