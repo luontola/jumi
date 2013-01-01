@@ -47,8 +47,8 @@ OK - default test file pattern: should not match inner classes (i.e. "$" in file
 OK - refactor: move class loading out of TestClassFinder, for example into SuiteRunner
 
 !! - end-to-end tests: setting the working directory for a test run
-	!! - e2e test: print working directory
-	- add workingDirectory to SuiteConfiguration
+	OK - e2e test: print working directory
+	!! - add workingDirectory to SuiteConfiguration
 	- update fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#connectToDaemon
 
 - use ~/.jumi directory for the daemon jar

@@ -1,10 +1,9 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.test;
 
-import fi.jumi.core.runs.RunId;
 import org.junit.*;
 import sample.PrintingTest;
 
@@ -57,7 +56,6 @@ public class StandardOutputTest {
 
     private String outputOf(Class<?> testClass, String testName) throws Exception {
         app.runTests(testClass);
-        RunId runId = app.findRun(testClass.getSimpleName(), testName, "/", "/");
-        return app.getRunOutput(runId);
+        return app.getRunOutput(testClass, testName);
     }
 }

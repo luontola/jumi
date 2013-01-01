@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -180,6 +180,12 @@ public class AppRunner implements TestRule {
 
     public void checkContainsRun(String... startAndEndEvents) {
         assertNotNull("did not contain a run with the expected events", findRun(startAndEndEvents));
+    }
+
+    public String getRunOutput(Class<?> testClass, String testName) {
+        RunId runId = findRun(testClass.getSimpleName(), testName, "/", "/");
+        assertNotNull("run not found", runId);
+        return getRunOutput(runId);
     }
 
     public RunId findRun(String... startAndEndEvents) {

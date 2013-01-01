@@ -1,15 +1,22 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.test;
 
 import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 import sample.*;
 
-import static org.junit.Assert.fail;
+import java.io.File;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.*;
 
 public class RunningTestsTest {
+
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
 
     @Rule
     public final AppRunner app = new AppRunner();
@@ -98,5 +105,19 @@ public class RunningTestsTest {
         app.checkTotalTestRuns(2);
         app.checkContainsRun("ParallelismTest", "testOne", "/", "/");
         app.checkContainsRun("ParallelismTest", "testTwo", "/", "/");
+    }
+
+    @Ignore("not implemented")
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void tests_are_run_in_the_specified_working_directory() throws Exception {
+        File workingDir = tempDir.newFolder();
+
+        // TODO: set working dir
+        app.runTests(WorkingDirectoryTest.class);
+
+        app.checkPassingAndFailingTests(2, 0);
+        app.checkTotalTestRuns(1);
+        assertThat(app.getRunOutput(WorkingDirectoryTest.class, "testWorkingDirectory"),
+                containsString("working directory: " + workingDir.getCanonicalPath()));
     }
 }
