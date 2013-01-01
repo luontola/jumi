@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,7 +8,6 @@ package fi.jumi.core.runs;
 import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
-import fi.jumi.core.runners.TestClassListener;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -20,7 +19,7 @@ public class DefaultSuiteNotifierTest {
 
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
 
-    private final TestClassListener listener = mock(TestClassListener.class);
+    private final RunListener listener = mock(RunListener.class);
     private final OutputCapturer outputCapturer = new OutputCapturer();
     private final PrintStream stdout = outputCapturer.out();
 

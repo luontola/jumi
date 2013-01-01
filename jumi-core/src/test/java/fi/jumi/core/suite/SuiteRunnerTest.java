@@ -1,11 +1,11 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.runners;
+package fi.jumi.core.suite;
 
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.SuiteListener;
+import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.drivers.DriverFinder;
 import fi.jumi.core.util.MethodCallSpy;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
     }
 
     /**
-     * Responsibility delegated to {@link fi.jumi.core.runners.DuplicateOnTestFoundEventFilter}
+     * Responsibility delegated to {@link fi.jumi.core.suite.DuplicateOnTestFoundEventFilter}
      */
     @Test
     public void filters_duplicate_onTestFound_events() {

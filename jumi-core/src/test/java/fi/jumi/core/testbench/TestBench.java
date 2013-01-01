@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -11,7 +11,7 @@ import fi.jumi.core.drivers.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.results.SuiteEventDemuxer;
-import fi.jumi.core.runners.SuiteRunner;
+import fi.jumi.core.suite.SuiteRunner;
 
 import java.io.PrintStream;
 

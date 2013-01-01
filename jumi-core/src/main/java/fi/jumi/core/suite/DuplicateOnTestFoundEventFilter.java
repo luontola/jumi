@@ -1,22 +1,22 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.runners;
+package fi.jumi.core.suite;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.runs.RunId;
+import fi.jumi.core.runs.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
 @NotThreadSafe
-class DuplicateOnTestFoundEventFilter implements TestClassListener {
+class DuplicateOnTestFoundEventFilter implements RunListener {
 
-    private final TestClassListener target;
+    private final RunListener target;
     private final Map<TestId, String> tests = new HashMap<>();
 
-    public DuplicateOnTestFoundEventFilter(TestClassListener target) {
+    public DuplicateOnTestFoundEventFilter(RunListener target) {
         this.target = target;
     }
 

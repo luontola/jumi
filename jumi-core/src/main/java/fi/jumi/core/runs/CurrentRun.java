@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -7,7 +7,6 @@ package fi.jumi.core.runs;
 import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.output.*;
-import fi.jumi.core.runners.TestClassListener;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,13 +14,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ThreadSafe
 class CurrentRun {
 
-    private final ActorRef<TestClassListener> listener;
+    private final ActorRef<RunListener> listener;
     private final RunIdSequence runIdSequence;
     private final OutputCapturer outputCapturer;
 
     private final InheritableThreadLocal<RunContext> currentRun = new InheritableThreadLocal<>();
 
-    public CurrentRun(ActorRef<TestClassListener> listener, RunIdSequence runIdSequence, OutputCapturer outputCapturer) {
+    public CurrentRun(ActorRef<RunListener> listener, RunIdSequence runIdSequence, OutputCapturer outputCapturer) {
         this.listener = listener;
         this.runIdSequence = runIdSequence;
         this.outputCapturer = outputCapturer;
@@ -101,10 +100,10 @@ class CurrentRun {
 
     @ThreadSafe
     private static class OutputListenerAdapter implements OutputListener {
-        private final ActorRef<TestClassListener> listener;
+        private final ActorRef<RunListener> listener;
         private final RunId runId;
 
-        public OutputListenerAdapter(ActorRef<TestClassListener> listener, RunId runId) {
+        public OutputListenerAdapter(ActorRef<RunListener> listener, RunId runId) {
             this.listener = listener;
             this.runId = runId;
         }

@@ -1,11 +1,11 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.files;
+package fi.jumi.core.discovery;
 
 import fi.jumi.actors.ActorRef;
-import fi.jumi.core.files.dummies.DummyTest;
+import fi.jumi.core.discovery.dummies.DummyTest;
 import org.junit.Test;
 
 import java.net.*;
@@ -20,13 +20,13 @@ public class PathMatcherTestFileFinderTest {
 
     @Test
     public void finds_all_classes_from_a_directory_matching_a_pattern() {
-        PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:fi/jumi/core/files/dummies/*Test.class");
+        PathMatcher matcher = classesDirectory.getFileSystem().getPathMatcher("glob:fi/jumi/core/discovery/dummies/*Test.class");
         PathMatcherTestFileFinder finder = new PathMatcherTestFileFinder(matcher, classesDirectory);
 
         finder.findTestFiles(ActorRef.wrap(listener));
 
-        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/files/dummies/DummyTest.class"));
-        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/files/dummies/AnotherDummyTest.class"));
+        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/discovery/dummies/DummyTest.class"));
+        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/discovery/dummies/AnotherDummyTest.class"));
         verifyNoMoreInteractions(listener);
     }
 

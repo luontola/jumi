@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -6,7 +6,7 @@ package fi.jumi.simpleunit;
 
 import fi.jumi.api.RunVia;
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.StackTrace;
+import fi.jumi.core.api.StackTrace;
 import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;

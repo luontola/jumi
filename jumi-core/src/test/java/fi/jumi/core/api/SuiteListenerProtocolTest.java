@@ -1,12 +1,12 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core;
+package fi.jumi.core.api;
 
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.runners.SuiteRunnerIntegrationHelper;
 import fi.jumi.core.runs.RunId;
+import fi.jumi.core.suite.SuiteRunnerIntegrationHelper;
 import org.junit.Test;
 
 import java.util.concurrent.Executor;

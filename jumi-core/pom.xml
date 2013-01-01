@@ -97,10 +97,10 @@
                                 <interface>java.util.concurrent.Executor</interface>
                                 <interface>fi.jumi.actors.workers.WorkerListener</interface>
                                 <interface>fi.jumi.core.CommandListener</interface>
-                                <interface>fi.jumi.core.Startable</interface>
-                                <interface>fi.jumi.core.SuiteListener</interface>
-                                <interface>fi.jumi.core.files.TestFileFinderListener</interface>
-                                <interface>fi.jumi.core.runners.TestClassListener</interface>
+                                <interface>fi.jumi.core.util.Startable</interface>
+                                <interface>fi.jumi.core.api.SuiteListener</interface>
+                                <interface>fi.jumi.core.discovery.TestFileFinderListener</interface>
+                                <interface>fi.jumi.core.runs.RunListener</interface>
                             </eventInterfaces>
                         </configuration>
                     </execution>

@@ -1,8 +1,8 @@
-// Copyright © 2011, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core;
+package fi.jumi.core.api;
 
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 public class SuiteListenerTest {
 
     /**
-     * The {@link SuiteListener} interface is used for events sent over the network
+     * The {@link fi.jumi.core.api.SuiteListener} interface is used for events sent over the network
      * from daemon to launcher. It must not contain any Class instances as parameters,
      * because the receiver might not have those classes on its classpath.
      */

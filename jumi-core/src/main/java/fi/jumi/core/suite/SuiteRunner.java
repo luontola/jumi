@@ -1,18 +1,18 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.runners;
+package fi.jumi.core.suite;
 
 import fi.jumi.actors.*;
 import fi.jumi.actors.workers.*;
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.*;
-import fi.jumi.core.drivers.DriverFinder;
-import fi.jumi.core.files.*;
+import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.discovery.*;
+import fi.jumi.core.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.*;
-import fi.jumi.core.util.ClassFiles;
+import fi.jumi.core.util.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.file.Path;
@@ -69,7 +69,7 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
         Driver driver = driverFinder.findTestClassDriver(testClass);
 
         SuiteNotifier suiteNotifier = new DefaultSuiteNotifier(
-                actorThread.bindActor(TestClassListener.class,
+                actorThread.bindActor(RunListener.class,
                         new DuplicateOnTestFoundEventFilter(
                                 new SuiteListenerAdapter(suiteListener, testClass))),
                 runIdSequence,

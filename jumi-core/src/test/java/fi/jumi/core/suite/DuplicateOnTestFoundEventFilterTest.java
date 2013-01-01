@@ -1,11 +1,11 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.runners;
+package fi.jumi.core.suite;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.runs.RunId;
+import fi.jumi.core.runs.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 
 public class DuplicateOnTestFoundEventFilterTest {
 
-    private final TestClassListener target = mock(TestClassListener.class);
+    private final RunListener target = mock(RunListener.class);
     private final DuplicateOnTestFoundEventFilter filter = new DuplicateOnTestFoundEventFilter(target);
 
     @Rule
