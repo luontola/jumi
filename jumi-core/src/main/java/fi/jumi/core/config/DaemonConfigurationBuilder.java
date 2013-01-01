@@ -1,15 +1,17 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.config;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.nio.file.*;
 import java.util.*;
 
 @NotThreadSafe
 public class DaemonConfigurationBuilder {
 
+    private Path jumiHome;
     private int launcherPort;
     private boolean logActorMessages;
     private long startupTimeout;
@@ -20,6 +22,7 @@ public class DaemonConfigurationBuilder {
     }
 
     DaemonConfigurationBuilder(DaemonConfiguration src) {
+        jumiHome = src.jumiHome();
         launcherPort = src.launcherPort();
         logActorMessages = src.logActorMessages();
         startupTimeout = src.startupTimeout();
@@ -34,14 +37,18 @@ public class DaemonConfigurationBuilder {
     // conversions
 
     public DaemonConfigurationBuilder parseProgramArgs(String... args) {
-        // TODO: extract generic code, once we have two or more command line arguments
         Iterator<String> it = Arrays.asList(args).iterator();
         while (it.hasNext()) {
             String parameter = it.next();
-            if (parameter.equals(DaemonConfiguration.LAUNCHER_PORT)) {
-                launcherPort(Integer.parseInt(it.next()));
-            } else {
-                throw new IllegalArgumentException("unsupported parameter: " + parameter);
+            switch (parameter) {
+                case DaemonConfiguration.JUMI_HOME:
+                    jumiHome(Paths.get(it.next()));
+                    break;
+                case DaemonConfiguration.LAUNCHER_PORT:
+                    launcherPort(Integer.parseInt(it.next()));
+                    break;
+                default:
+                    throw new IllegalArgumentException("unsupported parameter: " + parameter);
             }
         }
         checkRequiredParameters();
@@ -63,6 +70,15 @@ public class DaemonConfigurationBuilder {
 
 
     // getters and setters
+
+    public Path jumiHome() {
+        return jumiHome;
+    }
+
+    public DaemonConfigurationBuilder jumiHome(Path jumiHome) {
+        this.jumiHome = jumiHome;
+        return this;
+    }
 
     public int launcherPort() {
         return launcherPort;

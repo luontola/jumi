@@ -52,9 +52,9 @@ OK - end-to-end tests: setting the working directory for a test run
 	OK - update fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#connectToDaemon
 
 !! - use ~/.jumi directory for the daemon jar
-	!! - add DaemonConfiguration property
-	- set the default
-	- update fi.jumi.launcher.JumiLauncherBuilder#getSettingsDirectory
+	OK - add DaemonConfiguration property
+	OK - set the default
+	!! - update fi.jumi.launcher.JumiLauncherBuilder#getSettingsDirectory
 		- need to parameterize DirBasedSteward#getDaemonJar in ProcessStartingDaemonSummoner#connectToDaemon with the directory?
 
 - misc refactoring:
@@ -95,6 +95,10 @@ OK - end-to-end tests: setting the working directory for a test run
 	- promote widely
 
 - misc refactoring (choose some, defer others)
+	- DaemonConfiguration: refactor the code for parsing command line parameters
+		fi.jumi.core.config.DaemonConfigurationBuilder#parseProgramArgs
+		fi.jumi.core.config.DaemonConfiguration#toProgramArgs
+		fi.jumi.core.config.DaemonConfiguration#JUMI_HOME and other constants
 	- thread-safety-checker: when an inner class is missing the annotation, use the annotation of the enclosing class or default to @NotThreadSafe when the enclosing class has any concurrency annotation
 	- replace SuiteRunnerIntegrationHelper with TestBench?
 	- when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?

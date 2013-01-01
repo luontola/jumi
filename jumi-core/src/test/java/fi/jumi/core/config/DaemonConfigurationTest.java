@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -7,11 +7,13 @@ package fi.jumi.core.config;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNotNull;
 
 public class DaemonConfigurationTest {
 
@@ -39,6 +41,24 @@ public class DaemonConfigurationTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("unsupported parameter: --foo");
         builder.parseProgramArgs("--foo");
+    }
+
+
+    // jumiHome
+
+    @Test
+    public void jumi_home_is_configurable() {
+        builder.jumiHome(Paths.get("foo"));
+
+        assertThat(configuration().jumiHome(), is(Paths.get("foo")));
+    }
+
+    @Test
+    public void jumi_home_is_by_default_inside_the_user_home_directory() {
+        String userHome = System.getProperty("user.home");
+        assertNotNull(userHome);
+
+        assertThat(configuration().jumiHome().getParent(), is(Paths.get(userHome)));
     }
 
     // launcherPort
