@@ -7,6 +7,7 @@ Release Notes
 - Automatic discovery of test classes based on file name patterns
 - Doesn't anymore require all thrown exception classes to be in the launcher's classpath
 - The working directory is now configurable
+- Jumi writes its temporary files now to `~/.jumi` instead of under the current working directory
 
 ### Jumi 0.2.241 (2012-12-25)
 

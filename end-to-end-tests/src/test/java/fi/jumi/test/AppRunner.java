@@ -62,11 +62,6 @@ public class AppRunner implements TestRule {
         class CustomJumiLauncherBuilder extends JumiLauncherBuilder {
 
             @Override
-            protected Path getSettingsDirectory() {
-                return sandboxDir.resolve("jumi-home");
-            }
-
-            @Override
             protected ProcessStarter createProcessStarter() {
                 return processStarter;
             }
@@ -146,6 +141,7 @@ public class AppRunner implements TestRule {
 
     private DaemonConfiguration configure(DaemonConfiguration daemon) {
         return daemon.melt()
+                .jumiHome(sandboxDir.resolve("jumi-home"))
                 .logActorMessages(true)
                 .freeze();
     }

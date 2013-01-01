@@ -8,5 +8,5 @@ import java.nio.file.Path;
 
 public interface Steward {
 
-    Path getDaemonJar();
+    Path getDaemonJar(Path jumiHome);
 }

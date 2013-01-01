@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -16,7 +16,6 @@ import org.apache.commons.io.output.NullOutputStream;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
-import java.nio.file.*;
 import java.util.concurrent.*;
 
 @NotThreadSafe
@@ -39,7 +38,7 @@ public class JumiLauncherBuilder {
         final ActorThread actorThread = startActorThread(actors);
 
         ActorRef<DaemonSummoner> daemonSummoner = actorThread.bindActor(DaemonSummoner.class, new ProcessStartingDaemonSummoner(
-                new DirBasedSteward(new EmbeddedDaemonJar(), getSettingsDirectory()),
+                new DirBasedSteward(new EmbeddedDaemonJar()),
                 processStarter,
                 networkServer,
                 daemonOutputListener
@@ -68,10 +67,6 @@ public class JumiLauncherBuilder {
     public JumiLauncherBuilder enableDebugLogging() {
         debugLogging = true;
         return this;
-    }
-
-    protected Path getSettingsDirectory() {
-        return Paths.get(".jumi"); // TODO: put into user home; also update fi.jumi.launcher.daemon.DirBasedSteward.settingsDir
     }
 
 

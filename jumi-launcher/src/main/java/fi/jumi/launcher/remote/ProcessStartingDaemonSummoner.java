@@ -49,7 +49,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
 
         try {
             JvmArgs jvmArgs = new JvmArgsBuilder()
-                    .executableJar(steward.getDaemonJar())
+                    .executableJar(steward.getDaemonJar(daemon.jumiHome()))
                     .workingDir(Paths.get(suite.workingDirectory()))
                     .jvmOptions(suite.jvmOptions())
                     .systemProperties(daemon.toSystemProperties())

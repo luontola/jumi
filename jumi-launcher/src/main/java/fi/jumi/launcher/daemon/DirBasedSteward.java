@@ -14,16 +14,14 @@ import java.nio.file.*;
 public class DirBasedSteward implements Steward {
 
     private final DaemonJar daemonJar;
-    private final Path settingsDir; // TODO: default to "~/.jumi" (create default constructor?)
 
-    public DirBasedSteward(DaemonJar daemonJar, Path settingsDir) {
+    public DirBasedSteward(DaemonJar daemonJar) {
         this.daemonJar = daemonJar;
-        this.settingsDir = settingsDir;
     }
 
     @Override
-    public Path getDaemonJar() {
-        Path extractedJar = settingsDir.resolve("lib/" + daemonJar.getDaemonJarName());
+    public Path getDaemonJar(Path jumiHome) {
+        Path extractedJar = jumiHome.resolve("lib/" + daemonJar.getDaemonJarName());
         createIfDoesNotExist(extractedJar);
         return extractedJar;
     }

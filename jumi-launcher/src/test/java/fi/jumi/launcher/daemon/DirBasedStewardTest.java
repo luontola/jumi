@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -24,11 +24,18 @@ public class DirBasedStewardTest {
     private final byte[] expectedContent = new byte[]{1, 2, 3};
     private final StubDaemonJar stubDaemonJar = new StubDaemonJar(expectedName, expectedContent);
 
+    private Path jumiHome;
+    private DirBasedSteward steward;
+
+    @Before
+    public void setup() {
+        jumiHome = tempDir.newFolder("jumiHome").toPath();
+        steward = new DirBasedSteward(stubDaemonJar);
+    }
+
     @Test
     public void copies_the_embedded_daemon_JAR_to_the_settings_dir() throws IOException {
-        DirBasedSteward steward = new DirBasedSteward(stubDaemonJar, tempDir.getRoot().toPath());
-
-        Path daemonJar = steward.getDaemonJar();
+        Path daemonJar = steward.getDaemonJar(jumiHome);
 
         assertThat(daemonJar.getFileName().toString(), is(expectedName));
         assertThat(FileUtils.readFileToByteArray(daemonJar.toFile()), is(expectedContent));
@@ -36,20 +43,17 @@ public class DirBasedStewardTest {
 
     @Test
     public void does_not_copy_the_daemon_JAR_if_it_has_already_been_copied() throws IOException {
-        DirBasedSteward steward = new DirBasedSteward(stubDaemonJar, tempDir.getRoot().toPath());
-
-        FileTime lastModified1 = Files.getLastModifiedTime(steward.getDaemonJar());
-        FileTime lastModified2 = Files.getLastModifiedTime(steward.getDaemonJar());
+        FileTime lastModified1 = Files.getLastModifiedTime(steward.getDaemonJar(jumiHome));
+        FileTime lastModified2 = Files.getLastModifiedTime(steward.getDaemonJar(jumiHome));
 
         assertThat(lastModified2, is(lastModified1));
     }
 
     @Test
     public void overwrites_an_existing_daemon_JAR_that_has_difference_file_size() throws IOException {
-        DirBasedSteward steward = new DirBasedSteward(stubDaemonJar, tempDir.getRoot().toPath());
-        overwriteWithFileOfSize(expectedContent.length + 1, steward.getDaemonJar());
+        overwriteWithFileOfSize(expectedContent.length + 1, steward.getDaemonJar(jumiHome));
 
-        Path daemonJar = steward.getDaemonJar();
+        Path daemonJar = steward.getDaemonJar(jumiHome);
 
         assertThat(FileUtils.readFileToByteArray(daemonJar.toFile()), is(expectedContent));
     }
