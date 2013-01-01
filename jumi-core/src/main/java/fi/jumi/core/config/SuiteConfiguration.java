@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -20,12 +20,14 @@ public class SuiteConfiguration implements Serializable {
     // TODO: support for main and test class paths
     private final List<URI> classPath;
     private final List<String> jvmOptions;
+    private final URI workingDirectory;
     private final String includedTestsPattern;
     private final String excludedTestsPattern;
 
     public SuiteConfiguration() {
         classPath = Collections.emptyList();
         jvmOptions = Collections.emptyList();
+        workingDirectory = Paths.get(".").normalize().toUri();
         includedTestsPattern = "glob:**Test.class";
         excludedTestsPattern = "glob:**$*.class";
     }
@@ -33,6 +35,7 @@ public class SuiteConfiguration implements Serializable {
     SuiteConfiguration(SuiteConfigurationBuilder src) {
         classPath = Immutables.list(src.classPath());
         jvmOptions = Immutables.list(src.jvmOptions());
+        workingDirectory = src.workingDirectory();
         includedTestsPattern = src.includedTestsPattern();
         excludedTestsPattern = src.excludedTestsPattern();
     }
@@ -57,6 +60,10 @@ public class SuiteConfiguration implements Serializable {
 
     public List<String> jvmOptions() {
         return jvmOptions;
+    }
+
+    public URI workingDirectory() {
+        return workingDirectory;
     }
 
     public String includedTestsPattern() {

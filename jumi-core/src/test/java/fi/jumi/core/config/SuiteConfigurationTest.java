@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -7,6 +7,7 @@ package fi.jumi.core.config;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.io.IOException;
 import java.nio.file.*;
 
 import static fi.jumi.core.util.PathMatchers.matches;
@@ -56,6 +57,21 @@ public class SuiteConfigurationTest {
     @Test
     public void jvm_options_defaults_to_empty() {
         assertThat(configuration().jvmOptions(), is(empty()));
+    }
+
+
+    // workingDirectory
+
+    @Test
+    public void working_directory_can_be_changed() {
+        builder.workingDirectory(Paths.get("foo"));
+
+        assertThat(configuration().workingDirectory(), is(Paths.get("foo").toAbsolutePath().toUri()));
+    }
+
+    @Test
+    public void working_directory_defaults_to_current_working_directory() throws IOException {
+        assertThat(configuration().workingDirectory(), is(Paths.get(".").toRealPath().toUri()));
     }
 
 
