@@ -48,7 +48,7 @@ public class StandardOutputTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void displays_all_unicode_characters_correctly() throws Exception {
-        assertThat(outputOf(PrintingTest.class, "testPrintNonAscii"), containsString("\u4f60\u597d")); // 你好
+        assertThat(outputOf(PrintingTest.class, "testPrintNonAscii"), containsString("\u4f60\u597d")); // 你好 nihao - hello in Chinese
     }
 
     // TODO: writing binary data to System.out: detect when using System.out as OutputStream and show it as binary data in the UI
