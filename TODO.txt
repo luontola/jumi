@@ -65,6 +65,8 @@ OK - use ~/.jumi directory for the daemon jar
 	!! - extract all construction from TestRunCoordinator and SuiteRunner into SuiteFactory
 	- inline TestRunCoordinator into DaemonNetworkEndpoint, remove CommandListener#addSuiteListener
 	- create TestFile value object
+		- support any files but pretty-print class files
+		- replace relevant occurrences of "testClass" with "testFile"
 
 - release 0.3
 	- tidy up release notes
@@ -94,6 +96,15 @@ OK - use ~/.jumi directory for the daemon jar
 	- create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
 
+- configurable thread count
+	- add configuration parameter (DaemonConfiguration) for the number of test threads
+	- make the number of test threads by default the number of CPUs + 1 or similar
+
+- make option 2 explicit by adding a test for it; check for "nihao: ??" and "umlauts: ???" on US-ASCII
+	> - when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?
+	>	(1) We could have an internal PrintStream which uses UTF-8/16 and capture losslessly from it, after which it's routed to a PrintStream which uses the actual encoding (might interfere with writing binary data to stdout).
+	>	(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
+
 - misc refactoring (choose some, defer others)
 	- DaemonConfiguration: refactor the code for parsing command line parameters
 		fi.jumi.core.config.DaemonConfigurationBuilder#parseProgramArgs
@@ -101,24 +112,15 @@ OK - use ~/.jumi directory for the daemon jar
 		fi.jumi.core.config.DaemonConfiguration#JUMI_HOME and other constants
 	- thread-safety-checker: when an inner class is missing the annotation, use the annotation of the enclosing class or default to @NotThreadSafe when the enclosing class has any concurrency annotation
 	- replace SuiteRunnerIntegrationHelper with TestBench?
-	- when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?
-		(1) We could have an internal PrintStream which uses UTF-8/16 and capture losslessly from it, after which it's routed to a PrintStream which uses the actual encoding (might interfere with writing binary data to stdout).
-		(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
 	- consider implementing SynchronizedPrintStream using something else than CGLIB (ASM? Tapestry's Plastic?) to make the JAR smaller
 	- after upgrading to (presumably) JUnit 4.11, refactor BuildTest's parameterized descriptions
 		https://github.com/KentBeck/junit/pull/145
 		https://github.com/KentBeck/junit/pull/393
 	- check whether we still have many ASM versions we have on classpath (caliper depends on ASM 3), block "asm:*" artifacts with maven-enforcer-plugin?
-	- make the number of test threads by default the number of CPUs + 1 or similar
 	- make JUnit print a thread dump when a test times out due to @Test(timeout)
 		- improve JUnit's test timeouts to show a stack trace of the timed out test, to help debugging sporadic timeouts in RunningTestsTest
 	- evaluate whether some of the concurrent tests could be made simpler by using MultithreadedTC
 		http://code.google.com/p/multithreadedtc/
-	- rename TestClass to TestCase (or a better term?), wrap it in a value object, allow any files and not just .class (maybe just pretty-print classes)
-		- in Java, "testclass" appears preferable over "fixture":
-		- suggestions: pack, (group), (bundle), file
-		http://xunitpatterns.com/Testcase%20Class.html
-		http://xunitpatterns.com/XUnit%20Terminology%20Crossreference.html
 	- BuildTest: make sure that jumi-daemon.jar contains everything from jumi-api.jar no matter what
 		- test the test by adding an unused class to jumi-api
 		- add includes if necessary: http://maven.apache.org/plugins/maven-shade-plugin/examples/includes-excludes.html
@@ -131,13 +133,6 @@ OK - use ~/.jumi directory for the daemon jar
 	- combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
 	- there might be unnecessary eventizers in fi.jumi.daemon.Main and /jumi-core/pom.xml
 		- create EventizerUsageStatistics (extends EventizerProvider), print usage statistics when program exits
-	- packages by functionality
-		core
-			discovery
-			drivers
-			suite
-			classes
-			runs
 	- organize the project so that it's possible to run unit tests separate from end-to-end tests
 		- put end-to-end tests in their own package, test.fi.jumi?
 		- or use JUnit categories, maybe with a custom runner?
