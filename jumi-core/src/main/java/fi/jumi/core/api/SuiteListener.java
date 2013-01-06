@@ -11,9 +11,9 @@ public interface SuiteListener {
 
     void onSuiteStarted();
 
-    void onTestFound(String testClass, TestId testId, String name);
+    void onTestFound(TestFile testFile, TestId testId, String name);
 
-    void onRunStarted(RunId runId, String testClass);
+    void onRunStarted(RunId runId, TestFile testFile);
 
     void onTestStarted(RunId runId, TestId testId);
 

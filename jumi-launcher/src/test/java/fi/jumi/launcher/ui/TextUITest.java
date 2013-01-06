@@ -117,7 +117,7 @@ public class TextUITest {
         suite.begin();
 
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, SuiteMother.TEST_CLASS);
+        suite.runStarted(run1, SuiteMother.TEST_FILE);
         suite.test(run1, TestId.ROOT, SuiteMother.TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -128,7 +128,7 @@ public class TextUITest {
 
         // same root test is executed twice, but should be counted only once in the total
         final RunId run2 = suite.nextRunId();
-        suite.runStarted(run2, SuiteMother.TEST_CLASS);
+        suite.runStarted(run2, SuiteMother.TEST_FILE);
         suite.test(run2, TestId.ROOT, SuiteMother.TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -139,7 +139,7 @@ public class TextUITest {
 
         // a different test class, same TestId, should be counted separately
         final RunId run3 = suite.nextRunId();
-        suite.runStarted(run3, "com.example.AnotherDummyTest");
+        suite.runStarted(run3, TestFile.fromClassName("com.example.AnotherDummyTest"));
         suite.test(run3, TestId.ROOT, "AnotherDummyTest");
         suite.runFinished(run3);
         suite.end();
@@ -154,7 +154,7 @@ public class TextUITest {
     public void prints_test_run_header() {
         suite.begin();
         RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, "com.example.DummyTest");
+        suite.runStarted(run1, TestFile.fromClassName("com.example.DummyTest"));
         suite.test(run1, TestId.ROOT, "Human-readable name");
         suite.runFinished(run1);
         suite.end();
@@ -185,7 +185,7 @@ public class TextUITest {
         final RunId run1 = suite.nextRunId();
 
         // First test of the test run - should print the class name
-        suite.runStarted(run1, SuiteMother.TEST_CLASS);
+        suite.runStarted(run1, SuiteMother.TEST_FILE);
         suite.test(run1, TestId.ROOT, "Human readable name of test class", new Runnable() {
             @Override
             public void run() {
@@ -233,7 +233,7 @@ public class TextUITest {
     public void prints_that_when_a_test_starts_and_ends() {
         suite.begin();
         RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, SuiteMother.TEST_CLASS);
+        suite.runStarted(run1, SuiteMother.TEST_FILE);
         suite.test(run1, TestId.ROOT, "Dummy test");
         suite.runFinished(run1);
         suite.end();
@@ -248,7 +248,7 @@ public class TextUITest {
     public void prints_with_indentation_that_when_a_nested_test_starts_and_ends() {
         suite.begin();
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, SuiteMother.TEST_CLASS);
+        suite.runStarted(run1, SuiteMother.TEST_FILE);
         suite.test(run1, TestId.ROOT, "Dummy test", new Runnable() {
             @Override
             public void run() {
@@ -292,8 +292,8 @@ public class TextUITest {
         {
             {
                 RunId run1 = suite.nextRunId();
-                listener.onTestFound(SuiteMother.TEST_CLASS, TestId.ROOT, SuiteMother.TEST_CLASS_NAME);
-                listener.onRunStarted(run1, SuiteMother.TEST_CLASS);
+                listener.onTestFound(SuiteMother.TEST_FILE, TestId.ROOT, SuiteMother.TEST_CLASS_NAME);
+                listener.onRunStarted(run1, SuiteMother.TEST_FILE);
                 listener.onTestStarted(run1, TestId.ROOT);
                 listener.onFailure(run1, StackTrace.copyOf(new Throwable("dummy exception")));
 
@@ -314,8 +314,8 @@ public class TextUITest {
         {
             {
                 RunId run1 = suite.nextRunId();
-                suite.runStarted(run1, SuiteMother.TEST_CLASS);
-                listener.onTestFound(SuiteMother.TEST_CLASS, TestId.ROOT, SuiteMother.TEST_CLASS_NAME);
+                suite.runStarted(run1, SuiteMother.TEST_FILE);
+                listener.onTestFound(SuiteMother.TEST_FILE, TestId.ROOT, SuiteMother.TEST_CLASS_NAME);
                 listener.onTestStarted(run1, TestId.ROOT);
                 suite.failingTest(run1, TestId.of(0), "testOne",
                         new Throwable("dummy exception")

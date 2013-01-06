@@ -14,21 +14,21 @@ import javax.annotation.concurrent.NotThreadSafe;
 class SuiteListenerAdapter implements RunListener {
 
     private final SuiteListener suiteListener;
-    private final Class<?> testClass;
+    private final TestFile testFile;
 
-    public SuiteListenerAdapter(SuiteListener suiteListener, Class<?> testClass) {
+    public SuiteListenerAdapter(SuiteListener suiteListener, TestFile testFile) {
         this.suiteListener = suiteListener;
-        this.testClass = testClass;
+        this.testFile = testFile;
     }
 
     @Override
     public void onTestFound(TestId testId, String name) {
-        suiteListener.onTestFound(testClass.getName(), testId, name);
+        suiteListener.onTestFound(testFile, testId, name);
     }
 
     @Override
     public void onRunStarted(RunId runId) {
-        suiteListener.onRunStarted(runId, testClass.getName());
+        suiteListener.onRunStarted(runId, testFile);
     }
 
     @Override

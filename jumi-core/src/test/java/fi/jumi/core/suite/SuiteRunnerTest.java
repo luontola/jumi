@@ -5,7 +5,7 @@
 package fi.jumi.core.suite;
 
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.drivers.DriverFinder;
 import fi.jumi.core.util.MethodCallSpy;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void filters_duplicate_onTestFound_events() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "fireTestFound called twice");
+        expect.onTestFound(TestFile.fromClass(CLASS_1), TestId.ROOT, "fireTestFound called twice");
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new DuplicateFireTestFoundDriver(), CLASS_1);

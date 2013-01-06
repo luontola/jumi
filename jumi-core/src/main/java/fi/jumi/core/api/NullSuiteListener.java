@@ -17,11 +17,11 @@ public class NullSuiteListener implements SuiteListener {
     }
 
     @Override
-    public void onTestFound(String testClass, TestId testId, String name) {
+    public void onTestFound(TestFile testFile, TestId testId, String name) {
     }
 
     @Override
-    public void onRunStarted(RunId runId, String testClass) {
+    public void onRunStarted(RunId runId, TestFile testFile) {
     }
 
     @Override

@@ -66,14 +66,14 @@ public class SuiteEventDemuxer implements MessageSender<Event<SuiteListener>> {
         }
     }
 
-    private void addTestName(String testClass, TestId testId, String name) {
-        testNames.put(new GlobalTestId(testClass, testId), name);
+    private void addTestName(TestFile testFile, TestId testId, String name) {
+        testNames.put(new GlobalTestId(testFile, testId), name);
     }
 
-    public String getTestName(String testClass, TestId testId) {
-        String name = testNames.get(new GlobalTestId(testClass, testId));
+    public String getTestName(TestFile testFile, TestId testId) {
+        String name = testNames.get(new GlobalTestId(testFile, testId));
         if (name == null) {
-            throw new IllegalArgumentException("name not found for " + testClass + " and " + testId);
+            throw new IllegalArgumentException("name not found for " + testFile + " and " + testId);
         }
         return name;
     }
@@ -92,12 +92,12 @@ public class SuiteEventDemuxer implements MessageSender<Event<SuiteListener>> {
         }
 
         @Override
-        public void onTestFound(String testClass, TestId testId, String name) {
-            addTestName(testClass, testId, name);
+        public void onTestFound(TestFile testFile, TestId testId, String name) {
+            addTestName(testFile, testId, name);
         }
 
         @Override
-        public void onRunStarted(RunId runId, String testClass) {
+        public void onRunStarted(RunId runId, TestFile testFile) {
             saveCurrentMessageToRun(runId);
         }
 

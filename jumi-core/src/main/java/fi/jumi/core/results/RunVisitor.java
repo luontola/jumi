@@ -5,22 +5,22 @@
 package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.api.StackTrace;
+import fi.jumi.core.api.*;
 import fi.jumi.core.runs.RunId;
 
 public interface RunVisitor {
 
-    void onRunStarted(RunId runId, String testClass);
+    void onRunStarted(RunId runId, TestFile testFile);
 
-    void onTestStarted(RunId runId, String testClass, TestId testId);
+    void onTestStarted(RunId runId, TestFile testFile, TestId testId);
 
-    void onPrintedOut(RunId runId, String testClass, TestId testId, String text);
+    void onPrintedOut(RunId runId, TestFile testFile, TestId testId, String text);
 
-    void onPrintedErr(RunId runId, String testClass, TestId testId, String text);
+    void onPrintedErr(RunId runId, TestFile testFile, TestId testId, String text);
 
-    void onFailure(RunId runId, String testClass, TestId testId, StackTrace cause);
+    void onFailure(RunId runId, TestFile testFile, TestId testId, StackTrace cause);
 
-    void onTestFinished(RunId runId, String testClass, TestId testId);
+    void onTestFinished(RunId runId, TestFile testFile, TestId testId);
 
-    void onRunFinished(RunId runId, String testClass);
+    void onRunFinished(RunId runId, TestFile testFile);
 }

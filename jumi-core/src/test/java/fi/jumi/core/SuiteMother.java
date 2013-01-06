@@ -5,12 +5,13 @@
 package fi.jumi.core;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.runs.RunId;
 
 public class SuiteMother {
 
-    public static final String TEST_CLASS = "com.example.DummyTest";
+    public static final TestFile TEST_FILE = TestFile.fromClassName("com.example.DummyTest");
+    public static final String TEST_CLASS = TEST_FILE.getClassName();
     public static final String TEST_CLASS_NAME = "DummyTest";
 
     public static void emptySuite(SuiteListener listener) {
@@ -27,7 +28,7 @@ public class SuiteMother {
         suite.begin();
 
         RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.test(run1, TestId.ROOT, TEST_CLASS_NAME);
         suite.runFinished(run1);
 
@@ -39,7 +40,7 @@ public class SuiteMother {
         suite.begin();
 
         RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.failingTest(run1, TestId.ROOT, TEST_CLASS_NAME,
                 new Throwable("dummy exception")
         );
@@ -53,7 +54,7 @@ public class SuiteMother {
         suite.begin();
 
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -76,7 +77,7 @@ public class SuiteMother {
         suite.begin();
 
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -86,7 +87,7 @@ public class SuiteMother {
         suite.runFinished(run1);
 
         final RunId run2 = suite.nextRunId();
-        suite.runStarted(run2, TEST_CLASS);
+        suite.runStarted(run2, TEST_FILE);
         suite.test(run2, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -104,10 +105,10 @@ public class SuiteMother {
 
         final RunId run1 = suite.nextRunId();
         final RunId run2 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
-        suite.runStarted(run2, TEST_CLASS);
-        listener.onTestFound(TEST_CLASS, TestId.of(0), "testOne");
-        listener.onTestFound(TEST_CLASS, TestId.of(1), "testTwo");
+        suite.runStarted(run1, TEST_FILE);
+        suite.runStarted(run2, TEST_FILE);
+        listener.onTestFound(TEST_FILE, TestId.of(0), "testOne");
+        listener.onTestFound(TEST_FILE, TestId.of(1), "testTwo");
         listener.onTestStarted(run1, TestId.of(0));
         listener.onTestStarted(run2, TestId.of(1));
         listener.onTestFinished(run1);
@@ -126,7 +127,7 @@ public class SuiteMother {
         suite.begin();
 
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -143,7 +144,7 @@ public class SuiteMother {
         suite.begin();
 
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {
@@ -160,7 +161,7 @@ public class SuiteMother {
         suite.begin();
 
         final RunId run1 = suite.nextRunId();
-        suite.runStarted(run1, TEST_CLASS);
+        suite.runStarted(run1, TEST_FILE);
         suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
             @Override
             public void run() {

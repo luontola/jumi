@@ -1,10 +1,11 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.testbench;
 
 import fi.jumi.api.drivers.*;
+import fi.jumi.core.api.TestFile;
 import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 import org.junit.Test;
@@ -38,8 +39,8 @@ public class TestBenchTest {
         SuiteEventDemuxer results = testBench.run(testClass);
         results.visitRun(run1, visitor);
 
-        verify(visitor).onPrintedOut(run1, testClass.getName(), TestId.ROOT, "printed to out");
-        verify(visitor).onPrintedErr(run1, testClass.getName(), TestId.ROOT, "printed to err");
+        verify(visitor).onPrintedOut(run1, TestFile.fromClass(testClass), TestId.ROOT, "printed to out");
+        verify(visitor).onPrintedErr(run1, TestFile.fromClass(testClass), TestId.ROOT, "printed to err");
     }
 
     private static class DummyTest {

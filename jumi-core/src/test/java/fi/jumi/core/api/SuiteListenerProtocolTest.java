@@ -15,8 +15,10 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
 
     private static final RunId RUN_1 = new RunId(1);
     private static final RunId RUN_2 = new RunId(2);
-    private static final Class<?> CLASS_1 = DummyTest.class;
-    private static final Class<?> CLASS_2 = SecondDummyTest.class;
+    private static final Class<?> TEST_CLASS_1 = DummyTest.class;
+    private static final TestFile TEST_FILE_1 = TestFile.fromClass(TEST_CLASS_1);
+    private static final Class<?> TEST_CLASS_2 = SecondDummyTest.class;
+    private static final TestFile TEST_FILE_2 = TestFile.fromClass(TEST_CLASS_2);
 
     @Test
     public void suite_with_zero_test_classes() {
@@ -29,30 +31,30 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_one_test_class_with_zero_tests() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new ZeroTestsDriver(), CLASS_1);
+        runAndCheckExpectations(new ZeroTestsDriver(), TEST_CLASS_1);
     }
 
     @Test
     public void suite_with_one_test_class_with_tests() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
-        expect.onRunStarted(RUN_1, CLASS_1.getName());
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
+        expect.onRunStarted(RUN_1, TEST_FILE_1);
         expect.onTestStarted(RUN_1, TestId.ROOT);
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new OneTestDriver(), CLASS_1);
+        runAndCheckExpectations(new OneTestDriver(), TEST_CLASS_1);
     }
 
     @Test
     public void suite_with_printing_tests() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
-        expect.onRunStarted(RUN_1, CLASS_1.getName());
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
+        expect.onRunStarted(RUN_1, TEST_FILE_1);
         expect.onTestStarted(RUN_1, TestId.ROOT);
         expect.onPrintedOut(RUN_1, "printed to stdout");
         expect.onPrintedErr(RUN_1, "printed to stderr");
@@ -60,33 +62,33 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onRunFinished(RUN_1);
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new OnePrintingTestDriver(), CLASS_1);
+        runAndCheckExpectations(new OnePrintingTestDriver(), TEST_CLASS_1);
     }
 
     @Test
     public void suite_with_failing_tests() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
-        expect.onRunStarted(RUN_1, CLASS_1.getName());
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
+        expect.onRunStarted(RUN_1, TEST_FILE_1);
         expect.onTestStarted(RUN_1, TestId.ROOT);
         expect.onFailure(RUN_1, StackTrace.copyOf(new Exception("dummy failure")));
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new OneFailingTestDriver(), CLASS_1);
+        runAndCheckExpectations(new OneFailingTestDriver(), TEST_CLASS_1);
     }
 
     @Test
     public void suite_with_nested_tests() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
 
-        expect.onTestFound(CLASS_1.getName(), TestId.of(0), "parent test");
-        expect.onRunStarted(RUN_1, CLASS_1.getName());
+        expect.onTestFound(TEST_FILE_1, TestId.of(0), "parent test");
+        expect.onRunStarted(RUN_1, TEST_FILE_1);
         expect.onTestStarted(RUN_1, TestId.of(0));
         {
-            expect.onTestFound(CLASS_1.getName(), TestId.of(0, 0), "child test");
+            expect.onTestFound(TEST_FILE_1, TestId.of(0, 0), "child test");
             expect.onTestStarted(RUN_1, TestId.of(0, 0));
             expect.onTestFinished(RUN_1);
         }
@@ -95,51 +97,51 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
 
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new NestedTestsDriver(), CLASS_1);
+        runAndCheckExpectations(new NestedTestsDriver(), TEST_CLASS_1);
     }
 
     @Test
     public void suite_with_many_runs() {
         expect.onSuiteStarted();
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
 
-        expect.onTestFound(CLASS_1.getName(), TestId.of(0), "test one");
-        expect.onRunStarted(RUN_1, CLASS_1.getName());
+        expect.onTestFound(TEST_FILE_1, TestId.of(0), "test one");
+        expect.onRunStarted(RUN_1, TEST_FILE_1);
         expect.onTestStarted(RUN_1, TestId.of(0));
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
 
-        expect.onTestFound(CLASS_1.getName(), TestId.of(1), "test two");
-        expect.onRunStarted(RUN_2, CLASS_1.getName());
+        expect.onTestFound(TEST_FILE_1, TestId.of(1), "test two");
+        expect.onRunStarted(RUN_2, TEST_FILE_1);
         expect.onTestStarted(RUN_2, TestId.of(1));
         expect.onTestFinished(RUN_2);
         expect.onRunFinished(RUN_2);
 
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new ManyTestRunsDriver(), CLASS_1);
+        runAndCheckExpectations(new ManyTestRunsDriver(), TEST_CLASS_1);
     }
 
     @Test
     public void suite_with_many_test_classes() {
         expect.onSuiteStarted();
 
-        expect.onTestFound(CLASS_1.getName(), TestId.ROOT, "DummyTest");
-        expect.onTestFound(CLASS_2.getName(), TestId.ROOT, "SecondDummyTest");
+        expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
+        expect.onTestFound(TEST_FILE_2, TestId.ROOT, "SecondDummyTest");
 
-        expect.onRunStarted(new RunId(1), CLASS_1.getName());
+        expect.onRunStarted(new RunId(1), TEST_FILE_1);
         expect.onTestStarted(new RunId(1), TestId.ROOT);
         expect.onTestFinished(new RunId(1));
         expect.onRunFinished(new RunId(1));
 
-        expect.onRunStarted(new RunId(2), CLASS_2.getName());
+        expect.onRunStarted(new RunId(2), TEST_FILE_2);
         expect.onTestStarted(new RunId(2), TestId.ROOT);
         expect.onTestFinished(new RunId(2));
         expect.onRunFinished(new RunId(2));
 
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(new OneTestDriver(), CLASS_1, CLASS_2);
+        runAndCheckExpectations(new OneTestDriver(), TEST_CLASS_1, TEST_CLASS_2);
     }
 
 

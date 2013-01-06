@@ -5,7 +5,7 @@
 package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.api.StackTrace;
+import fi.jumi.core.api.*;
 import fi.jumi.core.runs.RunId;
 
 import javax.annotation.concurrent.Immutable;
@@ -14,30 +14,30 @@ import javax.annotation.concurrent.Immutable;
 public class NullRunVisitor implements RunVisitor {
 
     @Override
-    public void onRunStarted(RunId runId, String testClass) {
+    public void onRunStarted(RunId runId, TestFile testFile) {
     }
 
     @Override
-    public void onTestStarted(RunId runId, String testClass, TestId testId) {
+    public void onTestStarted(RunId runId, TestFile testFile, TestId testId) {
     }
 
     @Override
-    public void onPrintedOut(RunId runId, String testClass, TestId testId, String text) {
+    public void onPrintedOut(RunId runId, TestFile testFile, TestId testId, String text) {
     }
 
     @Override
-    public void onPrintedErr(RunId runId, String testClass, TestId testId, String text) {
+    public void onPrintedErr(RunId runId, TestFile testFile, TestId testId, String text) {
     }
 
     @Override
-    public void onFailure(RunId runId, String testClass, TestId testId, StackTrace cause) {
+    public void onFailure(RunId runId, TestFile testFile, TestId testId, StackTrace cause) {
     }
 
     @Override
-    public void onTestFinished(RunId runId, String testClass, TestId testId) {
+    public void onTestFinished(RunId runId, TestFile testFile, TestId testId) {
     }
 
     @Override
-    public void onRunFinished(RunId runId, String testClass) {
+    public void onRunFinished(RunId runId, TestFile testFile) {
     }
 }

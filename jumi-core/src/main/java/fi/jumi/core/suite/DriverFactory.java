@@ -6,7 +6,7 @@ package fi.jumi.core.suite;
 
 import fi.jumi.actors.ActorThread;
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.*;
@@ -38,11 +38,12 @@ public class DriverFactory {
     public DriverRunner createDriverRunner(Path testFile, Executor testExecutor) {
         Class<?> testClass = loadTestClass(testClassLoader, testFile);
         Driver driver = driverFinder.findTestClassDriver(testClass);
+        TestFile testFile1 = TestFile.fromClass(testClass); // TODO
 
         SuiteNotifier suiteNotifier = new DefaultSuiteNotifier(
                 actorThread.bindActor(RunListener.class,
                         new DuplicateOnTestFoundEventFilter(
-                                new SuiteListenerAdapter(suiteListener, testClass))),
+                                new SuiteListenerAdapter(suiteListener, testFile1))),
                 runIdSequence,
                 outputCapturer
         );

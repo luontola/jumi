@@ -65,8 +65,8 @@ OK - use ~/.jumi directory for the daemon jar
 	OK - extract all construction from TestRunCoordinator and SuiteRunner into SuiteFactory
 	OK - inline TestRunCoordinator into DaemonNetworkEndpoint, remove CommandListener#addSuiteListener
 	!! - create TestFile value object
-		- support any files but pretty-print class files
-		- replace relevant occurrences of "testClass" with "testFile"
+		OK - replace relevant occurrences of "testClass" with "testFile"
+		!! - support any files but pretty-print class files
 
 - release 0.3
 	- tidy up release notes

@@ -14,7 +14,7 @@ public class EventBuilder {
 
     private final SuiteListener listener;
 
-    private final Map<RunId, String> testClassesByRunId = new HashMap<>();
+    private final Map<RunId, TestFile> testFilesByRunId = new HashMap<>();
     private int nextRunId = RunId.FIRST_ID;
 
     public EventBuilder(SuiteListener listener) {
@@ -37,9 +37,9 @@ public class EventBuilder {
         listener.onSuiteFinished();
     }
 
-    public void runStarted(RunId runId, String testClass) {
-        testClassesByRunId.put(runId, testClass);
-        listener.onRunStarted(runId, testClass);
+    public void runStarted(RunId runId, TestFile testFile) {
+        testFilesByRunId.put(runId, testFile);
+        listener.onRunStarted(runId, testFile);
     }
 
     public void runFinished(RunId runId) {
@@ -47,9 +47,9 @@ public class EventBuilder {
     }
 
     public void test(RunId runId, TestId testId, String name, Runnable testBody) {
-        String testClass = testClassesByRunId.get(runId);
-        assert testClass != null;
-        listener.onTestFound(testClass, testId, name);
+        TestFile testFile = testFilesByRunId.get(runId);
+        assert testFile != null;
+        listener.onTestFound(testFile, testId, name);
 
         listener.onTestStarted(runId, testId);
         testBody.run();

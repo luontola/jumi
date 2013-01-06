@@ -104,50 +104,50 @@ public class TextUI {
         private int testNestingLevel = 0;
 
         @Override
-        public void onRunStarted(RunId runId, String testClass) {
-            printRunHeader(testClass, runId);
+        public void onRunStarted(RunId runId, TestFile testFile) {
+            printRunHeader(testFile, runId);
         }
 
         @Override
-        public void onTestStarted(RunId runId, String testClass, TestId testId) {
+        public void onTestStarted(RunId runId, TestFile testFile, TestId testId) {
             testNestingLevel++;
-            printTestName("+", testClass, testId);
+            printTestName("+", testFile, testId);
         }
 
         @Override
-        public void onPrintedOut(RunId runId, String testClass, TestId testId, String text) {
+        public void onPrintedOut(RunId runId, TestFile testFile, TestId testId, String text) {
             printer.printOut(text);
         }
 
         @Override
-        public void onPrintedErr(RunId runId, String testClass, TestId testId, String text) {
+        public void onPrintedErr(RunId runId, TestFile testFile, TestId testId, String text) {
             printer.printErr(text);
         }
 
         @Override
-        public void onFailure(RunId runId, String testClass, TestId testId, StackTrace cause) {
+        public void onFailure(RunId runId, TestFile testFile, TestId testId, StackTrace cause) {
             printer.printErr(getStackTraceAsString(cause));
         }
 
         @Override
-        public void onTestFinished(RunId runId, String testClass, TestId testId) {
-            printTestName("-", testClass, testId);
+        public void onTestFinished(RunId runId, TestFile testFile, TestId testId) {
+            printTestName("-", testFile, testId);
             testNestingLevel--;
         }
 
         @Override
-        public void onRunFinished(RunId runId, String testClass) {
+        public void onRunFinished(RunId runId, TestFile testFile) {
             printRunFooter();
         }
 
         // visual style
 
-        private void printRunHeader(String testClass, RunId runId) {
-            printer.printlnMeta(" > Run #" + runId.toInt() + " in " + testClass);
+        private void printRunHeader(TestFile testFile, RunId runId) {
+            printer.printlnMeta(" > Run #" + runId.toInt() + " in " + testFile);
         }
 
-        private void printTestName(String bullet, String testClass, TestId testId) {
-            printer.printlnMeta(" > " + testNameIndent() + bullet + " " + demuxer.getTestName(testClass, testId));
+        private void printTestName(String bullet, TestFile testFile, TestId testId) {
+            printer.printlnMeta(" > " + testNameIndent() + bullet + " " + demuxer.getTestName(testFile, testId));
         }
 
         private void printRunFooter() {

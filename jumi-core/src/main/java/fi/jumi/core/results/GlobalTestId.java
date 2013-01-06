@@ -1,36 +1,37 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.api.TestFile;
 
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
 class GlobalTestId {
 
-    private final String testClass;
+    private final TestFile testFile;
     private final TestId testId;
 
-    public GlobalTestId(String testClass, TestId testId) {
-        assert testClass != null;
+    public GlobalTestId(TestFile testFile, TestId testId) {
+        assert testFile != null;
         assert testId != null;
-        this.testClass = testClass;
+        this.testFile = testFile;
         this.testId = testId;
     }
 
     @Override
     public boolean equals(Object other) {
         GlobalTestId that = (GlobalTestId) other;
-        return this.testClass.equals(that.testClass) &&
+        return this.testFile.equals(that.testFile) &&
                 this.testId.equals(that.testId);
     }
 
     @Override
     public int hashCode() {
-        int result = testClass.hashCode();
+        int result = testFile.hashCode();
         result = 31 * result + testId.hashCode();
         return result;
     }

@@ -16,7 +16,7 @@ public class RunEventDenormalizer implements SuiteListener {
 
     private final RunVisitor visitor;
     private final Deque<TestId> runningTests = new ArrayDeque<>();
-    private String testClass;
+    private TestFile testFile;
 
     public RunEventDenormalizer(RunVisitor visitor) {
         this.visitor = visitor;
@@ -32,47 +32,47 @@ public class RunEventDenormalizer implements SuiteListener {
     }
 
     @Override
-    public final void onTestFound(String testClass, TestId testId, String name) {
+    public final void onTestFound(TestFile testFile, TestId testId, String name) {
         assertShouldNotBeCalled();
     }
 
     @Override
-    public void onRunStarted(RunId runId, String testClass) {
-        this.testClass = testClass;
-        visitor.onRunStarted(runId, testClass);
+    public void onRunStarted(RunId runId, TestFile testFile) {
+        this.testFile = testFile;
+        visitor.onRunStarted(runId, testFile);
     }
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
         runningTests.push(testId);
-        visitor.onTestStarted(runId, testClass, testId);
+        visitor.onTestStarted(runId, testFile, testId);
     }
 
     @Override
     public void onPrintedOut(RunId runId, String text) {
-        visitor.onPrintedOut(runId, testClass, getTestId(), text);
+        visitor.onPrintedOut(runId, testFile, getTestId(), text);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
-        visitor.onPrintedErr(runId, testClass, getTestId(), text);
+        visitor.onPrintedErr(runId, testFile, getTestId(), text);
     }
 
     @Override
     public void onFailure(RunId runId, StackTrace cause) {
-        visitor.onFailure(runId, testClass, getTestId(), cause);
+        visitor.onFailure(runId, testFile, getTestId(), cause);
     }
 
     @Override
     public void onTestFinished(RunId runId) {
-        visitor.onTestFinished(runId, testClass, getTestId());
+        visitor.onTestFinished(runId, testFile, getTestId());
         runningTests.pop();
     }
 
     @Override
     public void onRunFinished(RunId runId) {
-        visitor.onRunFinished(runId, testClass);
-        this.testClass = null;
+        visitor.onRunFinished(runId, testFile);
+        this.testFile = null;
     }
 
     @Override
