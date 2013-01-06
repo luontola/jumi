@@ -78,7 +78,7 @@ public class AppRunner implements TestRule {
             protected OutputStream createDaemonOutputListener() {
                 return new TeeOutputStream(
                         new CloseShieldOutputStream(System.out),
-                        new WriterOutputStream(daemonOutput, daemonDefaultCharset));
+                        new WriterOutputStream(daemonOutput, daemonDefaultCharset, 1024, true));
             }
         }
 
