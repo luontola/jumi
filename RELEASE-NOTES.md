@@ -2,7 +2,7 @@
 Release Notes
 =============
 
-### Upcoming Changes
+### Jumi 0.3.257 (2013-01-07)
 
 This release makes it possible to use Java 7's glob patterns to configure that which test classes should be run. The default pattern finds all top-level classes whose name ends with "Test". For now only `.class` test files are supported, but in the future Jumi may also recognize tests in arbitrary files.
 
