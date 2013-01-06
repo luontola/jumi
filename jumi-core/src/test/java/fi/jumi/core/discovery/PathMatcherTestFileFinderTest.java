@@ -5,6 +5,7 @@
 package fi.jumi.core.discovery;
 
 import fi.jumi.actors.ActorRef;
+import fi.jumi.core.api.TestFile;
 import fi.jumi.core.discovery.dummies.DummyTest;
 import org.junit.Test;
 
@@ -25,8 +26,8 @@ public class PathMatcherTestFileFinderTest {
 
         finder.findTestFiles(ActorRef.wrap(listener));
 
-        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/discovery/dummies/DummyTest.class"));
-        verify(listener).onTestFileFound(Paths.get("fi/jumi/core/discovery/dummies/AnotherDummyTest.class"));
+        verify(listener).onTestFileFound(TestFile.fromPath(Paths.get("fi/jumi/core/discovery/dummies/DummyTest.class")));
+        verify(listener).onTestFileFound(TestFile.fromPath(Paths.get("fi/jumi/core/discovery/dummies/AnotherDummyTest.class")));
         verifyNoMoreInteractions(listener);
     }
 

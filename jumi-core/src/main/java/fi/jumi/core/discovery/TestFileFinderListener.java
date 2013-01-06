@@ -4,9 +4,9 @@
 
 package fi.jumi.core.discovery;
 
-import java.nio.file.Path;
+import fi.jumi.core.api.TestFile;
 
 public interface TestFileFinderListener {
 
-    void onTestFileFound(Path testFile);
+    void onTestFileFound(TestFile testFile);
 }

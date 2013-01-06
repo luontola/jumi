@@ -6,12 +6,11 @@ package fi.jumi.core.suite;
 
 import fi.jumi.actors.*;
 import fi.jumi.actors.workers.*;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.discovery.*;
 import fi.jumi.core.util.Startable;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.nio.file.Path;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
@@ -49,7 +48,7 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
     }
 
     @Override
-    public void onTestFileFound(Path testFile) {
+    public void onTestFileFound(TestFile testFile) {
         WorkerCounter executor = new WorkerCounter(testExecutor);
         executor.execute(driverFactory.createDriverRunner(testFile, executor));
         executor.afterPreviousWorkersFinished(childRunnerListener());

@@ -4,33 +4,60 @@
 
 package fi.jumi.core.api;
 
+import fi.jumi.core.util.ClassFiles;
+
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
+import java.nio.file.Path;
 
 @Immutable
 public class TestFile implements Serializable {
 
-    private final String className; // TODO: remove me
+    private final String path;
+
+    public static TestFile fromPath(Path path) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < path.getNameCount(); i++) {
+            sb.append(path.getName(i));
+            sb.append('/');
+        }
+        String filePath = sb.substring(0, sb.length() - 1);
+        return new TestFile(filePath);
+    }
 
     public static TestFile fromClass(Class<?> clazz) {
         return fromClassName(clazz.getName());
     }
 
     public static TestFile fromClassName(String className) {
-        return new TestFile(className);
+        return new TestFile(ClassFiles.classNameToPath(className));
     }
 
-    private TestFile(String className) {
-        this.className = className;
+    private TestFile(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public boolean isClass() {
+        return path.endsWith(".class");
     }
 
     public String getClassName() {
-        return className;
+        if (!isClass()) {
+            throw new IllegalStateException("not a class file: " + path);
+        }
+        return ClassFiles.pathToClassName(path);
     }
 
     @Override
     public String toString() {
-        return className;
+        if (isClass()) {
+            return getClassName();
+        }
+        return getPath();
     }
 
     @Override
@@ -39,11 +66,11 @@ public class TestFile implements Serializable {
             return false;
         }
         TestFile that = (TestFile) obj;
-        return this.className.equals(that.className);
+        return this.path.equals(that.path);
     }
 
     @Override
     public int hashCode() {
-        return className.hashCode();
+        return path.hashCode();
     }
 }

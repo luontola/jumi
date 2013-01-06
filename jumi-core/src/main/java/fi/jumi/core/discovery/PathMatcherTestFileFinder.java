@@ -5,6 +5,7 @@
 package fi.jumi.core.discovery;
 
 import fi.jumi.actors.ActorRef;
+import fi.jumi.core.api.TestFile;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class PathMatcherTestFileFinder implements TestFileFinder {
 
             @Override
             protected void fileFound(Path relativePath) {
-                listener.tell().onTestFileFound(relativePath);
+                listener.tell().onTestFileFound(TestFile.fromPath(relativePath));
             }
         }
 

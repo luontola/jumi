@@ -10,10 +10,8 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.*;
-import fi.jumi.core.util.ClassFiles;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.nio.file.Path;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
@@ -35,15 +33,14 @@ public class DriverFactory {
         this.testClassLoader = testClassLoader;
     }
 
-    public DriverRunner createDriverRunner(Path testFile, Executor testExecutor) {
+    public DriverRunner createDriverRunner(TestFile testFile, Executor testExecutor) {
         Class<?> testClass = loadTestClass(testClassLoader, testFile);
         Driver driver = driverFinder.findTestClassDriver(testClass);
-        TestFile testFile1 = TestFile.fromClass(testClass); // TODO
 
         SuiteNotifier suiteNotifier = new DefaultSuiteNotifier(
                 actorThread.bindActor(RunListener.class,
                         new DuplicateOnTestFoundEventFilter(
-                                new SuiteListenerAdapter(suiteListener, testFile1))),
+                                new SuiteListenerAdapter(suiteListener, testFile))),
                 runIdSequence,
                 outputCapturer
         );
@@ -51,11 +48,11 @@ public class DriverFactory {
         return new DriverRunner(driver, testClass, suiteNotifier, testExecutor);
     }
 
-    private static Class<?> loadTestClass(ClassLoader testClassLoader, Path testFile) {
+    private static Class<?> loadTestClass(ClassLoader testClassLoader, TestFile testFile) {
         try {
-            return testClassLoader.loadClass(ClassFiles.pathToClassName(testFile));
+            return testClassLoader.loadClass(testFile.getClassName());
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Cannot load class from " + testFile, e);
+            throw new RuntimeException("Cannot load class: " + testFile, e);
         }
     }
 }

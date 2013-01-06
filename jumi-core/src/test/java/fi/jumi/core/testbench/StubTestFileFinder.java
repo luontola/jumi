@@ -5,10 +5,8 @@
 package fi.jumi.core.testbench;
 
 import fi.jumi.actors.ActorRef;
+import fi.jumi.core.api.TestFile;
 import fi.jumi.core.discovery.*;
-import fi.jumi.core.util.ClassFiles;
-
-import java.nio.file.Paths;
 
 public class StubTestFileFinder implements TestFileFinder {
 
@@ -21,7 +19,7 @@ public class StubTestFileFinder implements TestFileFinder {
     @Override
     public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
         for (Class<?> testClass : testClasses) {
-            listener.tell().onTestFileFound(Paths.get(ClassFiles.classNameToPath(testClass.getName())));
+            listener.tell().onTestFileFound(TestFile.fromClass(testClass));
         }
     }
 }
