@@ -4,10 +4,14 @@ Release Notes
 
 ### Upcoming Changes
 
+This release makes it possible to use Java 7's glob patterns to configure that which test classes should be run. The default pattern finds all top-level classes whose name ends with "Test". For now only `.class` test files are supported, but in the future Jumi may also recognize tests in arbitrary files.
+
+After upgrading to this release, it is recommended to find and remove all `.jumi` directories on your hard drive (typically in a project's working copy). From this release onwards only one such directory will be created in `~/.jumi`
+
 - Automatic discovery of test classes based on file name patterns
+- Jumi writes its temporary files now to `~/.jumi` instead of under the current working directory
 - Doesn't anymore require all thrown exception classes to be in the launcher's classpath
 - The working directory is now configurable
-- Jumi writes its temporary files now to `~/.jumi` instead of under the current working directory
 
 ### Jumi 0.2.241 (2012-12-25)
 

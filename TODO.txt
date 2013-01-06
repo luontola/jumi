@@ -68,10 +68,10 @@ OK - misc refactoring:
 		OK - replace relevant occurrences of "testClass" with "testFile"
 		OK - support any files but pretty-print class files
 
-- release 0.3
-	- tidy up release notes
+!! - release 0.3
+	OK - tidy up release notes
 	OK - bump version
-	- release
+	!! - release
 	- update wiki for JumiBootstrap
 	- search & remove stale .jumi directories from all projects after upgrading them, remove from .gitignore
 
