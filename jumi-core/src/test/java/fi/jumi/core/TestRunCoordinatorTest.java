@@ -1,10 +1,11 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core;
 
 import fi.jumi.core.config.SuiteConfigurationBuilder;
+import fi.jumi.core.suite.SuiteFactory;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
@@ -33,7 +34,7 @@ public class TestRunCoordinatorTest {
                 .addToClassPath(folder1)
                 .addToClassPath(folder2);
 
-        List<Path> classesDirectories = TestRunCoordinator.getClassDirectories(suite.freeze());
+        List<Path> classesDirectories = SuiteFactory.getClassDirectories(suite.freeze());
         assertThat(classesDirectories, contains(folder1, folder2));
     }
 

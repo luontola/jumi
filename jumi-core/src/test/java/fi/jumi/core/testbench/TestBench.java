@@ -4,16 +4,19 @@
 
 package fi.jumi.core.testbench;
 
-import fi.jumi.actors.SingleThreadedActors;
+import fi.jumi.actors.*;
 import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
 import fi.jumi.actors.listeners.*;
+import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.drivers.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.results.SuiteEventDemuxer;
-import fi.jumi.core.suite.SuiteRunner;
+import fi.jumi.core.runs.RunIdSequence;
+import fi.jumi.core.suite.*;
 
 import java.io.PrintStream;
+import java.util.concurrent.Executor;
 
 public class TestBench {
 
@@ -46,14 +49,19 @@ public class TestBench {
                 actorsFailureHandler,
                 actorsMessageListener
         );
+        ActorThread actorThread = actors.startActorThread();
+        Executor testExecutor = actors.getExecutor();
+
+        SuiteListener suiteListener = new SuiteListenerEventizer().newFrontend(results);
+        RunIdSequence runIdSequence = new RunIdSequence();
+        ClassLoader classLoader = getClass().getClassLoader();
+
         SuiteRunner runner = new SuiteRunner(
-                new SuiteListenerEventizer().newFrontend(results),
-                getClass().getClassLoader(),
+                new DriverFactory(actorThread, outputCapturer, driverFinder, runIdSequence, suiteListener, classLoader),
+                suiteListener,
                 new StubTestFileFinder(testClasses),
-                driverFinder,
-                actors.startActorThread(),
-                actors.getExecutor(),
-                outputCapturer
+                actorThread,
+                testExecutor
         );
         runner.start();
         actors.processEventsUntilIdle();
