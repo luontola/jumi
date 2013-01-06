@@ -9,42 +9,58 @@ import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.CommandListener;
 import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.network.*;
+import fi.jumi.core.suite.SuiteFactory;
+import fi.jumi.core.util.Startable;
 import fi.jumi.daemon.timeout.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
-public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<CommandListener>, Event<SuiteListener>> {
+public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<CommandListener>, Event<SuiteListener>>, CommandListener {
 
-    private final ActorRef<CommandListener> coordinator;
+    private final SuiteFactory suiteFactory;
+    private final Runnable shutdownHook;
     private final Timeout startupTimeout;
     private final VacancyTimeout connections;
 
-    public DaemonNetworkEndpoint(ActorRef<CommandListener> coordinator, Timeout startupTimeout, Timeout idleTimeout) {
-        this.coordinator = coordinator;
+    private MessageSender<Event<SuiteListener>> sender;
+
+    public DaemonNetworkEndpoint(SuiteFactory suiteFactory, Runnable shutdownHook, Timeout startupTimeout, Timeout idleTimeout) {
+        this.suiteFactory = suiteFactory;
+        this.shutdownHook = shutdownHook;
         this.startupTimeout = startupTimeout;
         this.connections = new VacancyTimeout(idleTimeout);
     }
 
     @Override
     public void onConnected(NetworkConnection connection, MessageSender<Event<SuiteListener>> sender) {
+        this.sender = sender;
         startupTimeout.cancel();
         connections.checkIn();
-
-        // TODO: Notify the coordinator on disconnect? Defer implementing for now, in case memory-mapped files make this obsolete.
-        SuiteListener listener = new SuiteListenerEventizer().newFrontend(sender);
-        coordinator.tell().addSuiteListener(listener);
-    }
-
-    @Override
-    public void onMessage(Event<CommandListener> message) {
-        message.fireOn(coordinator.tell());
     }
 
     @Override
     public void onDisconnected() {
         connections.checkOut();
+    }
+
+    @Override
+    public void onMessage(Event<CommandListener> message) {
+        message.fireOn(this);
+    }
+
+    @Override
+    public void runTests(SuiteConfiguration suite) {
+        SuiteListener listener = new SuiteListenerEventizer().newFrontend(sender);
+        ActorRef<Startable> suiteRunner = suiteFactory.createSuiteRunner(listener, suite);
+        suiteRunner.tell().start();
+    }
+
+    @Override
+    public void shutdown() {
+        shutdownHook.run();
     }
 }

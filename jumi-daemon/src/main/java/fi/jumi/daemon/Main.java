@@ -7,11 +7,11 @@ package fi.jumi.daemon;
 import fi.jumi.actors.*;
 import fi.jumi.actors.eventizers.ComposedEventizerProvider;
 import fi.jumi.actors.listeners.*;
-import fi.jumi.core.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.*;
 import fi.jumi.core.network.*;
 import fi.jumi.core.output.*;
+import fi.jumi.core.suite.SuiteFactory;
 import fi.jumi.core.util.PrefixedThreadFactory;
 import fi.jumi.daemon.timeout.*;
 
@@ -81,11 +81,10 @@ public class Main {
 
         // bootstrap the system
         ActorThread actorThread = actors.startActorThread();
-        ActorRef<CommandListener> coordinator =
-                actorThread.bindActor(CommandListener.class,
-                        new TestRunCoordinator(actorThread, testsThreadPool, SHUTDOWN_ON_USER_COMMAND, outputCapturer));
+        SuiteFactory suiteFactory = new SuiteFactory(actorThread, outputCapturer, testsThreadPool);
 
         NetworkClient client = new NettyNetworkClient();
-        client.connect("127.0.0.1", config.launcherPort(), new DaemonNetworkEndpoint(coordinator, startupTimeout, idleTimeout));
+        client.connect("127.0.0.1", config.launcherPort(),
+                new DaemonNetworkEndpoint(suiteFactory, SHUTDOWN_ON_USER_COMMAND, startupTimeout, idleTimeout));
     }
 }

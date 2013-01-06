@@ -4,12 +4,9 @@
 
 package fi.jumi.core;
 
-import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.SuiteConfiguration;
 
 public interface CommandListener {
-
-    void addSuiteListener(SuiteListener listener);
 
     void runTests(SuiteConfiguration suiteConfiguration);
 

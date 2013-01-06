@@ -57,7 +57,7 @@ public class TestBench {
         ClassLoader classLoader = getClass().getClassLoader();
 
         SuiteRunner runner = new SuiteRunner(
-                new DriverFactory(actorThread, outputCapturer, driverFinder, runIdSequence, suiteListener, classLoader),
+                new DriverFactory(suiteListener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
                 suiteListener,
                 new StubTestFileFinder(testClasses),
                 actorThread,

@@ -40,7 +40,7 @@ public class SuiteFactory {
 
         return actorThread.bindActor(Startable.class,
                 new SuiteRunner(
-                        new DriverFactory(actorThread, outputCapturer, driverFinder, runIdSequence, suiteListener, classLoader),
+                        new DriverFactory(suiteListener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
                         suiteListener,
                         testFileFinder,
                         actorThread,

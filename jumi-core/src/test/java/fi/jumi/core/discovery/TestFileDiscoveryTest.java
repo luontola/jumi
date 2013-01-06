@@ -2,7 +2,7 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core;
+package fi.jumi.core.discovery;
 
 import fi.jumi.core.config.SuiteConfigurationBuilder;
 import fi.jumi.core.suite.SuiteFactory;
@@ -15,9 +15,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.mockito.Mockito.*;
 
-public class TestRunCoordinatorTest {
+public class TestFileDiscoveryTest {
 
     @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
@@ -36,15 +35,5 @@ public class TestRunCoordinatorTest {
 
         List<Path> classesDirectories = SuiteFactory.getClassDirectories(suite.freeze());
         assertThat(classesDirectories, contains(folder1, folder2));
-    }
-
-    @Test
-    public void runs_the_shutdown_hook_when_told_to_shutdown() {
-        Runnable shutdownHook = mock(Runnable.class);
-        TestRunCoordinator coordinator = new TestRunCoordinator(null, null, shutdownHook, null);
-
-        coordinator.shutdown();
-
-        verify(shutdownHook).run();
     }
 }

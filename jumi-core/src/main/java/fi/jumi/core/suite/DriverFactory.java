@@ -19,14 +19,14 @@ import java.util.concurrent.Executor;
 @NotThreadSafe
 public class DriverFactory {
 
+    private final SuiteListener suiteListener;
     private final ActorThread actorThread;
     private final OutputCapturer outputCapturer;
     private final DriverFinder driverFinder;
     private final RunIdSequence runIdSequence;
-    private final SuiteListener suiteListener;
     private final ClassLoader testClassLoader;
 
-    public DriverFactory(ActorThread actorThread, OutputCapturer outputCapturer, DriverFinder driverFinder, RunIdSequence runIdSequence, SuiteListener suiteListener, ClassLoader testClassLoader) {
+    public DriverFactory(SuiteListener suiteListener, ActorThread actorThread, OutputCapturer outputCapturer, DriverFinder driverFinder, RunIdSequence runIdSequence, ClassLoader testClassLoader) {
         this.actorThread = actorThread;
         this.outputCapturer = outputCapturer;
         this.driverFinder = driverFinder;

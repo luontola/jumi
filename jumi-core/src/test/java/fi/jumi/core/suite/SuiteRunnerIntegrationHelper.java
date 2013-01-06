@@ -61,7 +61,7 @@ public abstract class SuiteRunnerIntegrationHelper {
         ActorThread actorThread = actors.startActorThread();
         ActorRef<Startable> runner = actorThread.bindActor(Startable.class,
                 new SuiteRunner(
-                        new DriverFactory(actorThread, outputCapturer, driverFinder, runIdSequence, listener, classLoader),
+                        new DriverFactory(listener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
                         listener, testFileFinder, actorThread, executor));
         runner.tell().start();
         actors.processEventsUntilIdle();

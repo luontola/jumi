@@ -4,10 +4,8 @@
 
 package fi.jumi.daemon;
 
-import fi.jumi.actors.ActorRef;
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageQueue;
-import fi.jumi.core.CommandListener;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.network.NetworkConnection;
 import fi.jumi.daemon.timeout.SpyTimeout;
@@ -24,7 +22,7 @@ public class DaemonNetworkEndpointTest {
     private final SpyTimeout startupTimeout = new SpyTimeout();
     private final SpyTimeout idleTimeout = new SpyTimeout();
 
-    private final DaemonNetworkEndpoint endpoint = new DaemonNetworkEndpoint(ActorRef.wrap(mock(CommandListener.class)), startupTimeout, idleTimeout);
+    private final DaemonNetworkEndpoint endpoint = new DaemonNetworkEndpoint(null, null, startupTimeout, idleTimeout);
 
     @Before
     public void setInitialTimeoutStates() {
