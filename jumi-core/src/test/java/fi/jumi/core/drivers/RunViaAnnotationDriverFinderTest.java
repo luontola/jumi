@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -36,11 +36,10 @@ public class RunViaAnnotationDriverFinderTest {
     }
 
     @Test
-    public void raises_an_error_if_the_class_is_not_annotated_with_RunVia() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("NotAnnotatedClass was not annotated with fi.jumi.api.RunVia");
+    public void does_not_support_classes_that_are_not_annotated_with_RunVia() {
+        Driver driver = driverFinder.findTestClassDriver(NotAnnotatedClass.class);
 
-        driverFinder.findTestClassDriver(NotAnnotatedClass.class);
+        assertThat(driver, is(DriverFinder.DRIVER_NOT_FOUND));
     }
 
 
