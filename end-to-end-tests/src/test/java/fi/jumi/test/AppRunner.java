@@ -36,6 +36,7 @@ public class AppRunner implements TestRule {
     private final CloseAwaitableStringWriter daemonOutput = new CloseAwaitableStringWriter();
     private NetworkServer mockNetworkServer = null;
     private Charset daemonDefaultCharset = StandardCharsets.UTF_8;
+    private List<Path> customClasspath = new ArrayList<>();
 
     private JumiLauncher launcher;
     private TextUIParser ui;
@@ -49,6 +50,10 @@ public class AppRunner implements TestRule {
 
     public void setDaemonDefaultCharset(Charset daemonDefaultCharset) {
         this.daemonDefaultCharset = daemonDefaultCharset;
+    }
+
+    public void addToClasspath(Path path) {
+        customClasspath.add(path);
     }
 
     public JumiLauncher getLauncher() {
@@ -130,12 +135,17 @@ public class AppRunner implements TestRule {
 
         builder.workingDirectory(workingDirectory);
         builder.addJvmOptions("-Dfile.encoding=" + daemonDefaultCharset.name());
-        builder.addToClassPath(TestEnvironment.getProjectJar("simpleunit"));
-        builder.addToClassPath(TestEnvironment.getSampleClassesDir());
-        builder.addToClassPath(TestEnvironment.getExtraClasspath());
         if (TestSystemProperties.useThreadSafetyAgent()) {
             builder.addJvmOptions("-javaagent:" + TestEnvironment.getProjectJar("thread-safety-agent"));
         }
+
+        builder.addToClassPath(TestEnvironment.getProjectJar("simpleunit"));
+        builder.addToClassPath(TestEnvironment.getSampleClassesDir());
+        builder.addToClassPath(TestEnvironment.getExtraClasspath());
+        for (Path path : customClasspath) {
+            builder.addToClassPath(path);
+        }
+
         return builder.freeze();
     }
 

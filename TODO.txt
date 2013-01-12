@@ -1,6 +1,8 @@
 
 !! - JUnit backward compatibility
-	!! - end-to-end test: run tests written in JUnit 4, JUnit 3, custom JUnit runner
+	!! - run JUnit 3 tests
+	- run JUnit 4 tests
+	- run JUnit custom runner tests
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
@@ -40,6 +42,7 @@
 	- after upgrading to (presumably) JUnit 4.11, refactor BuildTest's parameterized descriptions
 		https://github.com/KentBeck/junit/pull/145
 		https://github.com/KentBeck/junit/pull/393
+		- also use junit:junit instead of junit:junit-dep, since it's now a proper Maven artifact
 	- check whether we still have many ASM versions we have on classpath (caliper depends on ASM 3), block "asm:*" artifacts with maven-enforcer-plugin?
 	- make JUnit print a thread dump when a test times out due to @Test(timeout)
 		- improve JUnit's test timeouts to show a stack trace of the timed out test, to help debugging sporadic timeouts in RunningTestsTest

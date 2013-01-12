@@ -40,6 +40,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Misc -->
 
         <dependency>
@@ -207,6 +213,13 @@
                                     <groupId>fi.jumi</groupId>
                                     <artifactId>simpleunit</artifactId>
                                     <version>${project.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>junit</groupId>
+                                    <artifactId>junit</artifactId>
+                                    <!-- JUnit 4.10 is the last all-in-one JAR release; we use it here to avoid handling the transitive dependencies manually -->
+                                    <version>4.10</version>
                                 </artifactItem>
 
                                 <artifactItem>
