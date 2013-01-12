@@ -3,8 +3,8 @@
 	!! - run JUnit 3 tests
 		OK - create CompositeDriverFinder
 			OK - refactor RunViaAnnotationDriverFinder to return null if the class was unsupported
-		!! - create JUnitDriverFinder
-		- ignore if JUnit not on classpath
+		OK - create JUnitDriverFinder
+		!! - plug in, ignore if JUnit not on classpath
 		- give Jumi the highest priority
 	- run JUnit 4 tests
 	- run JUnit custom runner tests
