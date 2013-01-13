@@ -39,8 +39,12 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <!-- XXX: We don't have a direct reference to JUnitCompatibilityDriver (it's loaded with use reflection), so it gets optimized away -->
+                            <minimizeJar>false</minimizeJar>
+
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>fi.jumi.daemon.Main</mainClass>
                                 </transformer>
                             </transformers>

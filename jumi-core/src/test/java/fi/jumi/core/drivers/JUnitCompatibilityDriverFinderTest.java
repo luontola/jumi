@@ -11,7 +11,7 @@ import org.junit.*;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 public class JUnitCompatibilityDriverFinderTest {
 
@@ -26,14 +26,16 @@ public class JUnitCompatibilityDriverFinderTest {
     public void supports_JUnit_3_tests() {
         Driver driver = finder.findTestClassDriver(JUnit3Test.class);
 
-        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
+        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
+        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
     }
 
     @Test
     public void supports_JUnit_3_suites() {
         Driver driver = finder.findTestClassDriver(JUnit3Suite.class);
 
-        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
+        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
+        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
     }
 
     @Test

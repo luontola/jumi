@@ -32,7 +32,8 @@ public class DriverFinderFactoryTest {
     public void supports_JUnit_tests() {
         Driver driver = finder.findTestClassDriver(JUnitTest.class);
 
-        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
+        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
+        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
     }
 
     @RunVia(DummyJumiDriver.class)

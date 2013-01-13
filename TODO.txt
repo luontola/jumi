@@ -18,6 +18,11 @@
 		- extract it automatically to ~/.jumi/plugins, the same way as the daemon jar
 		- load it (and other plugins) in the test classloader
 	- refactor JUnitCompatibilityDriverFinder et al to avoid reflection
+	- refactor tests that use JUnitCompatibilityDriver.class.getName() instead of instanceOf checks
+	- investigate maven-shade-plugin; can we now turn on minimizing? it used to remove the JUnitCompatibilityDriver from jumi-daemon.jar
+		- experiment:
+			- how much is daemon jar minimized? if it minimizes only a little, it might not be worth it
+			- write a test that the daemon jar contains everything from the jumi-core
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files

@@ -14,10 +14,6 @@ import java.util.concurrent.Executor;
 @NotThreadSafe
 public class JUnitCompatibilityDriver extends Driver {
 
-    public JUnitCompatibilityDriver(ClassLoader classLoader) {
-
-    }
-
     @Override
     public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
         executor.execute(new JUnitRunner(testClass, new RunListenerAdapter(notifier)));
