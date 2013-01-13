@@ -39,6 +39,14 @@ public class JUnitCompatibilityDriverFinderTest {
     }
 
     @Test
+    public void supports_JUnit_4_tests() {
+        Driver driver = finder.findTestClassDriver(JUnit4Test.class);
+
+        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
+        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
+    }
+
+    @Test
     public void does_not_support_non_JUnit_tests() {
         Driver driver = finder.findTestClassDriver(NotJUnitTest.class);
 
@@ -49,6 +57,12 @@ public class JUnitCompatibilityDriverFinderTest {
     }
 
     private static class JUnit3Suite extends TestSuite {
+    }
+
+    private static class JUnit4Test {
+        @Test
+        public void foo() {
+        }
     }
 
     private static class NotJUnitTest {

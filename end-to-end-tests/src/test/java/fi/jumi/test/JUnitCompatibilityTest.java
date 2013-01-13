@@ -27,7 +27,15 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit3Test", "testSomething", "/", "/");
     }
 
-    // TODO: runs JUnit 4 tests
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void runs_JUnit_4_tests() throws Exception {
+        app.runTestsMatching("glob:sample/JUnit4Test.class");
+
+        app.checkPassingAndFailingTests(2, 0);
+        app.checkTotalTestRuns(1);
+        app.checkContainsRun("JUnit4Test", "something", "/", "/");
+    }
+
     // TODO: runs JUnit 4 custom runners annotated with RunWith
     // TODO: check in unit tests that multiple tests, failures etc. are handled correctly
 }

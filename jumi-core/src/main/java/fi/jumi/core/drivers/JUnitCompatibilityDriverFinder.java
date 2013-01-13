@@ -9,31 +9,50 @@ import org.apache.commons.io.IOUtils;
 
 import javax.annotation.concurrent.*;
 import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 @NotThreadSafe
 public class JUnitCompatibilityDriverFinder implements DriverFinder {
 
+    private final Class<? extends Annotation> JUNIT_4_TEST;
     private final Class<?> JUNIT_3_TEST;
 
-    private final Class<?> driverClass;
+    private final Class<? extends Driver> driverClass;
 
+    @SuppressWarnings("unchecked")
     public JUnitCompatibilityDriverFinder(ClassLoader classLoader) throws ClassNotFoundException {
+        JUNIT_4_TEST = (Class<? extends Annotation>) classLoader.loadClass("org.junit.Test");
         JUNIT_3_TEST = classLoader.loadClass("junit.framework.Test");
-        driverClass = new PackageNonDelegatingClassLoader("fi.jumi.core.junit.", classLoader)
-                .loadClass("fi.jumi.core.junit.JUnitCompatibilityDriver");
+        driverClass = (Class<? extends Driver>)
+                new PackageNonDelegatingClassLoader("fi.jumi.core.junit.", classLoader)
+                        .loadClass("fi.jumi.core.junit.JUnitCompatibilityDriver");
     }
 
     @Override
     public Driver findTestClassDriver(Class<?> testClass) {
-        if (JUNIT_3_TEST.isAssignableFrom(testClass)) {
+        if (isJUnit4Test(testClass) || isJUnit3Test(testClass)) {
             try {
-                return (Driver) driverClass.newInstance();
+                return driverClass.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         } else {
             return DRIVER_NOT_FOUND;
         }
+    }
+
+    private boolean isJUnit4Test(Class<?> testClass) {
+        for (Method method : testClass.getMethods()) {
+            if (method.getAnnotation(JUNIT_4_TEST) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isJUnit3Test(Class<?> testClass) {
+        return JUNIT_3_TEST.isAssignableFrom(testClass);
     }
 
     @ThreadSafe
