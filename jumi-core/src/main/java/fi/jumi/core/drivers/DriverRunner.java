@@ -28,4 +28,9 @@ public class DriverRunner implements Runnable {
     public void run() {
         driver.findTests(testClass, suiteNotifier, executor);
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + driver + ", " + testClass + ")";
+    }
 }
