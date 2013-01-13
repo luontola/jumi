@@ -5,7 +5,7 @@
 package fi.jumi.core.drivers;
 
 import fi.jumi.api.drivers.Driver;
-import fi.jumi.core.junit.LegacyJUnitDriver;
+import fi.jumi.core.junit.JUnitCompatibilityDriver;
 import junit.framework.*;
 import org.junit.*;
 import org.junit.Test;
@@ -13,27 +13,27 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class JUnitDriverFinderTest {
+public class JUnitCompatibilityDriverFinderTest {
 
-    private JUnitDriverFinder finder;
+    private JUnitCompatibilityDriverFinder finder;
 
     @Before
     public void setup() throws Exception {
-        finder = new JUnitDriverFinder(getClass().getClassLoader());
+        finder = new JUnitCompatibilityDriverFinder(getClass().getClassLoader());
     }
 
     @Test
     public void supports_JUnit_3_tests() {
         Driver driver = finder.findTestClassDriver(JUnit3Test.class);
 
-        assertThat(driver, is(instanceOf(LegacyJUnitDriver.class)));
+        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
     }
 
     @Test
     public void supports_JUnit_3_suites() {
         Driver driver = finder.findTestClassDriver(JUnit3Suite.class);
 
-        assertThat(driver, is(instanceOf(LegacyJUnitDriver.class)));
+        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
     }
 
     @Test

@@ -8,7 +8,7 @@ import org.junit.*;
 
 import java.io.IOException;
 
-public class JUnitBackwardCompatibilityTest {
+public class JUnitCompatibilityTest {
 
     @Rule
     public final AppRunner app = new AppRunner();

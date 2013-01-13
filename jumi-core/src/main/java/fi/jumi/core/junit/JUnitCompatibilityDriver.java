@@ -10,7 +10,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
-public class LegacyJUnitDriver extends Driver {
+public class JUnitCompatibilityDriver extends Driver {
 
     @Override
     public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {

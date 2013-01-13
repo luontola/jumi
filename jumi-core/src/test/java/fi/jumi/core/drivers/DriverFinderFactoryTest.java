@@ -6,7 +6,7 @@ package fi.jumi.core.drivers;
 
 import fi.jumi.api.RunVia;
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.junit.LegacyJUnitDriver;
+import fi.jumi.core.junit.JUnitCompatibilityDriver;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +32,7 @@ public class DriverFinderFactoryTest {
     public void supports_JUnit_tests() {
         Driver driver = finder.findTestClassDriver(JUnitTest.class);
 
-        assertThat(driver, is(instanceOf(LegacyJUnitDriver.class)));
+        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
     }
 
     @RunVia(DummyJumiDriver.class)

@@ -14,7 +14,7 @@ public class DriverFinderFactory {
         List<DriverFinder> driverFinders = new ArrayList<>();
         driverFinders.add(new RunViaAnnotationDriverFinder());
         try {
-            driverFinders.add(new JUnitDriverFinder(classLoader));
+            driverFinders.add(new JUnitCompatibilityDriverFinder(classLoader));
         } catch (ClassNotFoundException e) {
             // JUnit not on classpath; ignore
         }

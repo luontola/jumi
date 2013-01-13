@@ -6,13 +6,14 @@
 		OK - create JUnitDriverFinder
 		OK - plug in, ignore if JUnit not on classpath: DriverFinderFactory
 		OK - give Jumi the highest priority
-		- rename all classes to use JUnitCompatibility* prefix, to assist code completion
+		OK - rename all classes to use JUnitCompatibility* prefix, to assist code completion
+		!! - implement JUnitCompatibilityDriver
 	- run JUnit 4 tests
 	- run JUnit custom runner tests
 
 - plugin system for custom DriverFinders
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
-	- refactor JUnitDriverFinder et al to avoid reflection
+	- refactor JUnitCompatibilityDriverFinder et al to avoid reflection
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
