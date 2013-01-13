@@ -6,6 +6,7 @@ package fi.jumi.core.drivers;
 
 import fi.jumi.api.RunVia;
 import fi.jumi.api.drivers.*;
+import fi.jumi.core.junit.LegacyJUnitDriver;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,15 +19,21 @@ import static org.hamcrest.Matchers.*;
 
 public class DriverFinderFactoryTest {
 
-    @Test
-    public void Jumi_has_higher_priority_than_JUnit() {
-        CompositeDriverFinder finder = DriverFinderFactory.createDriverFinder();
+    private final CompositeDriverFinder finder = DriverFinderFactory.createDriverFinder(getClass().getClassLoader());
 
+    @Test
+    public void Jumi_drivers_have_the_highest_priority() {
         Driver driver = finder.findTestClassDriver(EveryPossibleFrameworkTest.class);
 
         assertThat(driver, is(instanceOf(DummyJumiDriver.class)));
     }
 
+    @Test
+    public void supports_JUnit_tests() {
+        Driver driver = finder.findTestClassDriver(JUnitTest.class);
+
+        assertThat(driver, is(instanceOf(LegacyJUnitDriver.class)));
+    }
 
     @RunVia(DummyJumiDriver.class)
     @RunWith(Parameterized.class)
@@ -36,6 +43,9 @@ public class DriverFinderFactoryTest {
         @Test
         public void testFoo() {
         }
+    }
+
+    private static class JUnitTest extends TestCase {
     }
 
     static class DummyJumiDriver extends Driver {

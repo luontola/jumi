@@ -35,7 +35,7 @@ public class SuiteFactory {
     public ActorRef<Startable> createSuiteRunner(SuiteListener suiteListener, SuiteConfiguration suite) {
         ClassLoader classLoader = createClassLoader(suite.classPath());
         TestFileFinder testFileFinder = createTestFileFinder(suite);
-        DriverFinder driverFinder = DriverFinderFactory.createDriverFinder();
+        DriverFinder driverFinder = DriverFinderFactory.createDriverFinder(classLoader);
         RunIdSequence runIdSequence = new RunIdSequence();
 
         return actorThread.bindActor(Startable.class,

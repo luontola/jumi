@@ -5,13 +5,19 @@
 package fi.jumi.core.drivers;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.util.*;
 
 @NotThreadSafe
 public class DriverFinderFactory {
 
-    public static CompositeDriverFinder createDriverFinder() {
-        return new CompositeDriverFinder(
-                new RunViaAnnotationDriverFinder()
-        );
+    public static CompositeDriverFinder createDriverFinder(ClassLoader classLoader) {
+        List<DriverFinder> driverFinders = new ArrayList<>();
+        driverFinders.add(new RunViaAnnotationDriverFinder());
+        try {
+            driverFinders.add(new JUnitDriverFinder(classLoader));
+        } catch (ClassNotFoundException e) {
+            // JUnit not on classpath; ignore
+        }
+        return new CompositeDriverFinder(driverFinders);
     }
 }

@@ -7,6 +7,7 @@ package fi.jumi.core.drivers;
 import fi.jumi.api.drivers.Driver;
 import fi.jumi.core.junit.LegacyJUnitDriver;
 import junit.framework.*;
+import org.junit.*;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,7 +15,12 @@ import static org.hamcrest.Matchers.*;
 
 public class JUnitDriverFinderTest {
 
-    private final JUnitDriverFinder finder = new JUnitDriverFinder();
+    private JUnitDriverFinder finder;
+
+    @Before
+    public void setup() throws Exception {
+        finder = new JUnitDriverFinder(getClass().getClassLoader());
+    }
 
     @Test
     public void supports_JUnit_3_tests() {

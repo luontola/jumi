@@ -7,12 +7,16 @@ package fi.jumi.core.drivers;
 import fi.jumi.api.drivers.Driver;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.util.Arrays;
+import java.util.*;
 
 @NotThreadSafe
 public class CompositeDriverFinder implements DriverFinder {
 
     private final DriverFinder[] finders;
+
+    public CompositeDriverFinder(List<DriverFinder> finders) {
+        this(finders.toArray(new DriverFinder[finders.size()]));
+    }
 
     public CompositeDriverFinder(DriverFinder... finders) {
         this.finders = finders;
