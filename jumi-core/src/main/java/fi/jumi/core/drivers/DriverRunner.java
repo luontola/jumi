@@ -6,10 +6,10 @@ package fi.jumi.core.drivers;
 
 import fi.jumi.api.drivers.*;
 
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.Executor;
 
-@NotThreadSafe
+@ThreadSafe
 public class DriverRunner implements Runnable {
 
     private final Class<?> testClass;
