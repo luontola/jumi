@@ -13,6 +13,10 @@
 
 - plugin system for custom DriverFinders
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
+	- move JUnit compatibility into its own module
+		- create jumi-junit.jar
+		- extract it automatically to ~/.jumi/plugins, the same way as the daemon jar
+		- load it (and other plugins) in the test classloader
 	- refactor JUnitCompatibilityDriverFinder et al to avoid reflection
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)

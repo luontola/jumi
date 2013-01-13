@@ -14,14 +14,17 @@ public class JUnitCompatibilityDriverFinder implements DriverFinder {
 
     private final Class<?> JUNIT_3_TEST;
 
+    private final ClassLoader classLoader;
+
     public JUnitCompatibilityDriverFinder(ClassLoader classLoader) throws ClassNotFoundException {
+        this.classLoader = classLoader;
         JUNIT_3_TEST = classLoader.loadClass("junit.framework.Test");
     }
 
     @Override
     public Driver findTestClassDriver(Class<?> testClass) {
         if (JUNIT_3_TEST.isAssignableFrom(testClass)) {
-            return new JUnitCompatibilityDriver();
+            return new JUnitCompatibilityDriver(classLoader);
         } else {
             return DRIVER_NOT_FOUND;
         }
