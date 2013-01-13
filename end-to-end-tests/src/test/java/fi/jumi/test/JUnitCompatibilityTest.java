@@ -18,7 +18,6 @@ public class JUnitCompatibilityTest {
         app.addToClasspath(TestEnvironment.getProjectJar("junit"));
     }
 
-    @Ignore("not implemented")
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void runs_JUnit_3_tests() throws Exception {
         app.runTestsMatching("glob:sample/JUnit3Test.class");
@@ -30,4 +29,5 @@ public class JUnitCompatibilityTest {
 
     // TODO: runs JUnit 4 tests
     // TODO: runs JUnit 4 custom runners annotated with RunWith
+    // TODO: check in unit tests that multiple tests, failures etc. are handled correctly
 }

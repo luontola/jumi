@@ -17,6 +17,7 @@ public class DriverFinderFactory {
             driverFinders.add(new JUnitCompatibilityDriverFinder(classLoader));
         } catch (ClassNotFoundException e) {
             // JUnit not on classpath; ignore
+            System.out.println("JUnit not found on classpath; disabling JUnit compatibility");
         }
         return new CompositeDriverFinder(driverFinders);
     }

@@ -41,7 +41,8 @@ public class JUnitCompatibilityDriver extends Driver {
     @NotThreadSafe
     private static class RunListenerAdapter extends RunListener {
         private final SuiteNotifier notifier;
-        private TestNotifier tn;
+        private TestNotifier classTn;
+        private TestNotifier methodTn;
 
         public RunListenerAdapter(SuiteNotifier notifier) {
             this.notifier = notifier;
@@ -50,19 +51,14 @@ public class JUnitCompatibilityDriver extends Driver {
         @Override
         public void testRunStarted(Description description) throws Exception {
             System.out.println("testRunStarted " + description + "; children " + description.getChildren());
-            for (Description child : description.getChildren()) {
-                System.out.println("child = " + child);
-                System.out.println("child.isSuite() = " + child.isSuite());
-                System.out.println("child.getDisplayName() = " + child.getDisplayName());
-                System.out.println("child.getClassName() = " + child.getClassName());
-                System.out.println("child.getMethodName() = " + child.getMethodName());
+            for (Description classDesc : description.getChildren()) {
 
                 // TODO: what if the description's "class name" is free-form text? should we support such custom JUnit runners?
-                notifier.fireTestFound(TestId.ROOT, simpleClassName(child.getClassName()));
+                notifier.fireTestFound(TestId.ROOT, simpleClassName(classDesc.getClassName()));
 
-                for (Description grandchild : child.getChildren()) {
+                for (Description methodDesc : classDesc.getChildren()) {
                     // TODO: calculate test ids
-                    notifier.fireTestFound(TestId.of(0), grandchild.getMethodName());
+                    notifier.fireTestFound(TestId.of(0), methodDesc.getMethodName());
                 }
             }
         }
@@ -76,33 +72,41 @@ public class JUnitCompatibilityDriver extends Driver {
         @Override
         public void testRunFinished(Result result) throws Exception {
             System.out.println("testRunFinished " + result);
+            // TODO
         }
 
         @Override
         public void testStarted(Description description) throws Exception {
             System.out.println("testStarted " + description);
-            tn = notifier.fireTestStarted(TestId.ROOT);
+            // TODO
+            classTn = notifier.fireTestStarted(TestId.ROOT);
+            methodTn = notifier.fireTestStarted(TestId.of(0));
         }
 
         @Override
         public void testFinished(Description description) throws Exception {
             System.out.println("testFinished " + description);
-            tn.fireTestFinished();
+            // TODO
+            methodTn.fireTestFinished();
+            classTn.fireTestFinished();
         }
 
         @Override
         public void testFailure(Failure failure) throws Exception {
             System.out.println("testFailure " + failure);
+            // TODO
         }
 
         @Override
         public void testAssumptionFailure(Failure failure) {
             System.out.println("testAssumptionFailure " + failure);
+            // TODO
         }
 
         @Override
         public void testIgnored(Description description) throws Exception {
             System.out.println("testIgnored " + description);
+            // TODO
         }
     }
 }
