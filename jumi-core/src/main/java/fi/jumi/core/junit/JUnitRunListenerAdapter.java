@@ -28,9 +28,11 @@ public class JUnitRunListenerAdapter extends RunListener {
         // TODO: what if the description's "class name" is free-form text? should we support such custom JUnit runners?
         notifier.fireTestFound(TestId.ROOT, simpleClassName(description.getClassName()));
 
-        // TODO: calculate test ids
+        // TODO: calculate test ids properly
+        int i = 0;
+
         for (Description level1 : description.getChildren()) {
-            notifier.fireTestFound(TestId.of(0), level1.getMethodName());
+            notifier.fireTestFound(TestId.of(i++), level1.getMethodName());
 
 //            for (Description level2 : level1.getChildren()) {
 //                notifier.fireTestFound(TestId.of(0, 0), level2.getMethodName());
@@ -50,12 +52,15 @@ public class JUnitRunListenerAdapter extends RunListener {
         // TODO
     }
 
+
+    int testId = 0; // XXX
+
     @Override
     public void testStarted(Description description) throws Exception {
         System.out.println("testStarted " + description);
         // TODO
         classTn = notifier.fireTestStarted(TestId.ROOT);
-        methodTn = notifier.fireTestStarted(TestId.of(0));
+        methodTn = notifier.fireTestStarted(TestId.of(testId++));
     }
 
     @Override

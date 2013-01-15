@@ -26,7 +26,7 @@ public class JUnitCompatibilityDriverTest {
     }
 
     @Test
-    public void runs_JUnit_tests() {
+    public void single_passing_test() {
         Class<?> testClass = OnePassing.class;
         TestFile testFile = TestFile.fromClass(testClass);
         SuiteEventDemuxer results = testBench.run(testClass);
@@ -49,7 +49,38 @@ public class JUnitCompatibilityDriverTest {
         spy.verify();
     }
 
-    // TODO: multiple test methods
+    @Test
+    public void multiple_passing_tests() {
+        Class<?> testClass = TwoPassing.class;
+        TestFile testFile = TestFile.fromClass(testClass);
+        SuiteEventDemuxer results = testBench.run(testClass);
+
+        assertThat(results.getTestName(testFile, TestId.ROOT), is(testClass.getSimpleName()));
+        assertThat(results.getTestName(testFile, TestId.of(0)), is("testOne"));
+        assertThat(results.getTestName(testFile, TestId.of(1)), is("testTwo"));
+
+        SpyListener<RunVisitor> spy = new SpyListener<>(RunVisitor.class);
+        RunVisitor listener = spy.getListener();
+
+        listener.onRunStarted(new RunId(1), testFile);
+        listener.onTestStarted(new RunId(1), testFile, TestId.ROOT);
+        listener.onTestStarted(new RunId(1), testFile, TestId.of(0));
+        listener.onTestFinished(new RunId(1), testFile, TestId.of(0));
+        listener.onTestFinished(new RunId(1), testFile, TestId.ROOT);
+        listener.onRunFinished(new RunId(1), testFile);
+
+        listener.onRunStarted(new RunId(2), testFile);
+        listener.onTestStarted(new RunId(2), testFile, TestId.ROOT);
+        listener.onTestStarted(new RunId(2), testFile, TestId.of(1));
+        listener.onTestFinished(new RunId(2), testFile, TestId.of(1));
+        listener.onTestFinished(new RunId(2), testFile, TestId.ROOT);
+        listener.onRunFinished(new RunId(2), testFile);
+
+        spy.replay();
+        results.visitAllRuns(listener);
+        spy.verify();
+    }
+
     // TODO: deep test hierarchies
     // TODO: failures
     // TODO: ignored tests
@@ -58,6 +89,16 @@ public class JUnitCompatibilityDriverTest {
     public static class OnePassing {
         @Test
         public void testPassing() {
+        }
+    }
+
+    public static class TwoPassing {
+        @Test
+        public void testOne() {
+        }
+
+        @Test
+        public void testTwo() {
         }
     }
 }
