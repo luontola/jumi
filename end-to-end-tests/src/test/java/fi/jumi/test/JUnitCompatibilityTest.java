@@ -36,18 +36,14 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit4Test", "something", "/", "/");
     }
 
-    @Ignore("not implemented")
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void runs_RunWith_annotated_JUnit_4_tests() throws Exception {
+        // We are using org.junit.runners.Suite to test deep test hierarchies at the same time
         app.runTestsMatching("glob:sample/JUnit4AnnotatedTest.class");
 
         app.checkPassingAndFailingTests(5, 0);
-        app.checkTotalTestRuns(1);
-        app.checkContainsRun("JUnit4AnnotatedTest",
-                "JUnit4Test", "something", "/", "/",
-                "JUnit3Test", "testSomething", "/", "/",
-                "/");
+        app.checkTotalTestRuns(2);
+        app.checkContainsRun("JUnit4AnnotatedTest", "JUnit4Test", "something", "/", "/", "/");
+        app.checkContainsRun("JUnit4AnnotatedTest", "JUnit3Test", "testSomething", "/", "/", "/");
     }
-
-    // TODO: check in unit tests that multiple tests, failures etc. are handled correctly
 }

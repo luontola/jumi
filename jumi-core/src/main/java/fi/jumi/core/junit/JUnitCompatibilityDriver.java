@@ -6,7 +6,7 @@ package fi.jumi.core.junit;
 
 import fi.jumi.api.drivers.*;
 import org.junit.runner.*;
-import org.junit.runner.notification.RunListener;
+import org.junit.runner.notification.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.Executor;
@@ -34,7 +34,15 @@ public class JUnitCompatibilityDriver extends Driver {
         public void run() {
             JUnitCore junit = new JUnitCore();
             junit.addListener(listener);
-            junit.run(Request.aClass(testClass));
+            Result result = junit.run(Request.aClass(testClass));
+
+            // TODO: report these failures to Jumi
+            for (Failure failure : result.getFailures()) {
+                if (failure.getDescription().equals(Description.TEST_MECHANISM)) {
+                    System.err.println("Failure from JUnit: " + failure.getDescription());
+                    failure.getException().printStackTrace();
+                }
+            }
         }
     }
 }

@@ -17,13 +17,15 @@
 		OK - change fi.jumi.core.drivers.JUnitCompatibilityDriverFinder#JUNIT_3_TEST, rename to JUNIT_3_TEST_CASE
 		OK - remove fi.jumi.core.drivers.JUnitCompatibilityDriverFinderTest.JUnit3Suite
 	OK - pull the use of PackageNonDelegatingClassLoader from JUnitCompatibilityDriverFinder into DriverFinderFactory; load whole JUnitCompatibilityDriverFinder dynamically
-	!! - run JUnit 4 custom runner tests
+	OK - run JUnit 4 custom runner tests
 		OK - end-to-end test: use org.junit.runners.Suite to cover also nested tests
 		OK - JUnitCompatibilityDriverFinder#isJUnit4AnnotatedTest
-		!! - improve the driver
-	- JUnitCompatibilityDriver:
+		OK - improve the driver
+	!! - JUnitCompatibilityDriver:
 		OK - multiple test methods
-		- deep test hierarchies
+		OK - deep test hierarchies
+		!! - refactor Description-TestId mapping to use recursion
+		- report JUnit test mechanism failures to Jumi
 		- failures
 		- ignored tests
 		- assumptions

@@ -11,6 +11,8 @@ import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 
@@ -23,7 +25,6 @@ public class JUnitCompatibilityDriverTest {
     private final SpyListener<RunVisitor> spy = new SpyListener<>(RunVisitor.class);
     private final RunVisitor expect = spy.getListener();
 
-    private Class<?> testClass;
     private TestFile testFile;
     private SuiteEventDemuxer results;
 
@@ -34,7 +35,6 @@ public class JUnitCompatibilityDriverTest {
     }
 
     private void runTestClass(Class<?> testClass) {
-        this.testClass = testClass;
         testFile = TestFile.fromClass(testClass);
         results = testBench.run(testClass);
     }
@@ -50,7 +50,7 @@ public class JUnitCompatibilityDriverTest {
     public void single_passing_test() {
         runTestClass(OnePassing.class);
 
-        assertThat(results.getTestName(testFile, TestId.ROOT), is(testClass.getSimpleName()));
+        assertThat(results.getTestName(testFile, TestId.ROOT), is("OnePassing"));
         assertThat(results.getTestName(testFile, TestId.of(0)), is("testPassing"));
 
         expect.onRunStarted(new RunId(1), testFile);
@@ -89,8 +89,28 @@ public class JUnitCompatibilityDriverTest {
         checkExpectations();
     }
 
+    @Test
+    public void deep_test_hierarchies() {
+        runTestClass(DeepHierarchy.class);
 
-    // TODO: deep test hierarchies
+        assertThat(results.getTestName(testFile, TestId.ROOT), is("DeepHierarchy"));
+        assertThat(results.getTestName(testFile, TestId.of(0)), is("NestedContext"));
+        assertThat(results.getTestName(testFile, TestId.of(0, 0)), is("theLeaf"));
+
+        expect.onRunStarted(new RunId(1), testFile);
+        expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
+        expect.onTestStarted(new RunId(1), testFile, TestId.of(0));
+        expect.onTestStarted(new RunId(1), testFile, TestId.of(0, 0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.of(0, 0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.ROOT);
+        expect.onRunFinished(new RunId(1), testFile);
+
+        checkExpectations();
+    }
+
+
+    // TODO: report failures from JUnit test mechanism
     // TODO: failures
     // TODO: ignored tests
     // TODO: assumptions
@@ -108,6 +128,15 @@ public class JUnitCompatibilityDriverTest {
 
         @Test
         public void testTwo() {
+        }
+    }
+
+    @RunWith(Enclosed.class)
+    public static class DeepHierarchy {
+        public static class NestedContext {
+            @Test
+            public void theLeaf() {
+            }
         }
     }
 }

@@ -35,4 +35,9 @@ class GlobalTestId {
         result = 31 * result + testId.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + testFile + ", " + testId + ")";
+    }
 }
