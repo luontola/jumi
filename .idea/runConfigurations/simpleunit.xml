@@ -1,16 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="simpleunit" type="JUnit" factoryName="JUnit">
     <extension name="coverage" enabled="true" merge="false" track_test_folders="true" runner="idea">
       <pattern>
-        <option name="PATTERN" value="fi.jumi.*" />
+        <option name="PATTERN" value="fi.jumi.simpleunit.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
     <extension name="snapshooter" />
-    <module name="" />
+    <module name="simpleunit" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />
-    <option name="PACKAGE_NAME" value="fi.jumi" />
+    <option name="PACKAGE_NAME" value="fi.jumi.simpleunit" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="pattern" />
@@ -20,21 +20,15 @@
     <option name="ENV_VARIABLES" />
     <option name="PASS_PARENT_ENVS" value="true" />
     <option name="TEST_SEARCH_SCOPE">
-      <value defaultName="wholeProject" />
+      <value defaultName="singleModule" />
     </option>
     <envs />
     <patterns>
-      <pattern testClass="fi.jumi.*Test" />
+      <pattern testClass="fi.jumi.simpleunit.*Test" />
     </patterns>
     <RunnerSettings RunnerId="Cover" />
-    <RunnerSettings RunnerId="Debug">
-      <option name="DEBUG_PORT" value="51490" />
-      <option name="TRANSPORT" value="0" />
-      <option name="LOCAL" value="true" />
-    </RunnerSettings>
     <RunnerSettings RunnerId="Run" />
     <ConfigurationWrapper RunnerId="Cover" />
-    <ConfigurationWrapper RunnerId="Debug" />
     <ConfigurationWrapper RunnerId="Run" />
     <method />
   </configuration>
