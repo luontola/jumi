@@ -12,8 +12,10 @@ import fi.jumi.core.testbench.TestBench;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;
 
+import java.util.Arrays;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class JUnitCompatibilityDriverTest {
 
@@ -65,9 +67,10 @@ public class JUnitCompatibilityDriverTest {
     public void multiple_passing_tests() {
         runTestClass(TwoPassing.class);
 
-        assertThat(results.getTestName(testFile, TestId.ROOT), is(testClass.getSimpleName()));
-        assertThat(results.getTestName(testFile, TestId.of(0)), is("testOne"));
-        assertThat(results.getTestName(testFile, TestId.of(1)), is("testTwo"));
+        assertThat(results.getTestName(testFile, TestId.ROOT), is("TwoPassing"));
+        String name0 = results.getTestName(testFile, TestId.of(0));
+        String name1 = results.getTestName(testFile, TestId.of(1));
+        assertThat(Arrays.asList(name0, name1), containsInAnyOrder("testOne", "testTwo")); // JUnit's order of test methods is undefined
 
         expect.onRunStarted(new RunId(1), testFile);
         expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
