@@ -18,6 +18,12 @@ import static org.hamcrest.Matchers.is;
 public class JUnitCompatibilityDriverTest {
 
     private final TestBench testBench = new TestBench();
+    private final SpyListener<RunVisitor> spy = new SpyListener<>(RunVisitor.class);
+    private final RunVisitor expect = spy.getListener();
+
+    private Class<?> testClass;
+    private TestFile testFile;
+    private SuiteEventDemuxer results;
 
     @Before
     public void setup() throws Exception {
@@ -25,61 +31,61 @@ public class JUnitCompatibilityDriverTest {
 //        testBench.setActorsMessageListener(new PrintStreamMessageLogger(System.out));
     }
 
+    private void runTestClass(Class<?> testClass) {
+        this.testClass = testClass;
+        testFile = TestFile.fromClass(testClass);
+        results = testBench.run(testClass);
+    }
+
+    private void checkExpectations() {
+        spy.replay();
+        results.visitAllRuns(expect);
+        spy.verify();
+    }
+
+
     @Test
     public void single_passing_test() {
-        Class<?> testClass = OnePassing.class;
-        TestFile testFile = TestFile.fromClass(testClass);
-        SuiteEventDemuxer results = testBench.run(testClass);
+        runTestClass(OnePassing.class);
 
         assertThat(results.getTestName(testFile, TestId.ROOT), is(testClass.getSimpleName()));
         assertThat(results.getTestName(testFile, TestId.of(0)), is("testPassing"));
 
-        SpyListener<RunVisitor> spy = new SpyListener<>(RunVisitor.class);
-        RunVisitor listener = spy.getListener();
+        expect.onRunStarted(new RunId(1), testFile);
+        expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
+        expect.onTestStarted(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.ROOT);
+        expect.onRunFinished(new RunId(1), testFile);
 
-        listener.onRunStarted(new RunId(1), testFile);
-        listener.onTestStarted(new RunId(1), testFile, TestId.ROOT);
-        listener.onTestStarted(new RunId(1), testFile, TestId.of(0));
-        listener.onTestFinished(new RunId(1), testFile, TestId.of(0));
-        listener.onTestFinished(new RunId(1), testFile, TestId.ROOT);
-        listener.onRunFinished(new RunId(1), testFile);
-
-        spy.replay();
-        results.visitAllRuns(listener);
-        spy.verify();
+        checkExpectations();
     }
 
     @Test
     public void multiple_passing_tests() {
-        Class<?> testClass = TwoPassing.class;
-        TestFile testFile = TestFile.fromClass(testClass);
-        SuiteEventDemuxer results = testBench.run(testClass);
+        runTestClass(TwoPassing.class);
 
         assertThat(results.getTestName(testFile, TestId.ROOT), is(testClass.getSimpleName()));
         assertThat(results.getTestName(testFile, TestId.of(0)), is("testOne"));
         assertThat(results.getTestName(testFile, TestId.of(1)), is("testTwo"));
 
-        SpyListener<RunVisitor> spy = new SpyListener<>(RunVisitor.class);
-        RunVisitor listener = spy.getListener();
+        expect.onRunStarted(new RunId(1), testFile);
+        expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
+        expect.onTestStarted(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.ROOT);
+        expect.onRunFinished(new RunId(1), testFile);
 
-        listener.onRunStarted(new RunId(1), testFile);
-        listener.onTestStarted(new RunId(1), testFile, TestId.ROOT);
-        listener.onTestStarted(new RunId(1), testFile, TestId.of(0));
-        listener.onTestFinished(new RunId(1), testFile, TestId.of(0));
-        listener.onTestFinished(new RunId(1), testFile, TestId.ROOT);
-        listener.onRunFinished(new RunId(1), testFile);
+        expect.onRunStarted(new RunId(2), testFile);
+        expect.onTestStarted(new RunId(2), testFile, TestId.ROOT);
+        expect.onTestStarted(new RunId(2), testFile, TestId.of(1));
+        expect.onTestFinished(new RunId(2), testFile, TestId.of(1));
+        expect.onTestFinished(new RunId(2), testFile, TestId.ROOT);
+        expect.onRunFinished(new RunId(2), testFile);
 
-        listener.onRunStarted(new RunId(2), testFile);
-        listener.onTestStarted(new RunId(2), testFile, TestId.ROOT);
-        listener.onTestStarted(new RunId(2), testFile, TestId.of(1));
-        listener.onTestFinished(new RunId(2), testFile, TestId.of(1));
-        listener.onTestFinished(new RunId(2), testFile, TestId.ROOT);
-        listener.onRunFinished(new RunId(2), testFile);
-
-        spy.replay();
-        results.visitAllRuns(listener);
-        spy.verify();
+        checkExpectations();
     }
+
 
     // TODO: deep test hierarchies
     // TODO: failures
