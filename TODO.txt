@@ -24,11 +24,11 @@
 	!! - JUnitCompatibilityDriver:
 		OK - multiple test methods
 		OK - deep test hierarchies
-		!! - refactor Description-TestId mapping to use recursion
-		- report JUnit test mechanism failures to Jumi
-		- failures
+		OK - refactor Description-TestId mapping to use recursion
+		!! - failures
 		- ignored tests
 		- assumptions
+	- report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
 - plugin system for custom DriverFinders
 	- hook into fi.jumi.core.drivers.DriverFinderFactory

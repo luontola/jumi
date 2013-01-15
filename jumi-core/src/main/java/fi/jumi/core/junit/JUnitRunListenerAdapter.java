@@ -15,9 +15,7 @@ import java.util.*;
 public class JUnitRunListenerAdapter extends RunListener {
 
     private final SuiteNotifier notifier;
-    private TestNotifier tn3;
-    private TestNotifier tn2;
-    private TestNotifier tn1;
+    private final Deque<TestNotifier> activeTestsStack = new ArrayDeque<>();
 
     private final Map<Description, TestId> descriptionIds = new HashMap<>();
 
@@ -29,26 +27,21 @@ public class JUnitRunListenerAdapter extends RunListener {
     public void testRunStarted(Description description) throws Exception {
         System.out.println("testRunStarted " + description + "; children " + description.getChildren());
 
-        descriptionIds.put(description, TestId.ROOT);
-        notifier.fireTestFound(TestId.ROOT, format(description));
+        fireTestFound(TestId.ROOT, description);
+    }
 
-        TestId id1 = TestId.ROOT.getFirstChild();
-        for (Description level1 : description.getChildren()) {
-            descriptionIds.put(level1, id1);
-            notifier.fireTestFound(id1, format(level1));
+    private void fireTestFound(TestId testId, Description description) {
+        descriptionIds.put(description, testId);
+        notifier.fireTestFound(testId, formatTestName(description));
 
-            // TODO: recursion
-            for (Description level2 : level1.getChildren()) {
-                TestId id2 = id1.getFirstChild();
-                descriptionIds.put(level2, id2);
-                notifier.fireTestFound(id2, format(level2));
-            }
-
-            id1 = id1.getNextSibling();
+        TestId childId = testId.getFirstChild();
+        for (Description child : description.getChildren()) {
+            fireTestFound(childId, child);
+            childId = childId.getNextSibling();
         }
     }
 
-    private static String format(Description description) {
+    private static String formatTestName(Description description) {
         String methodName = description.getMethodName();
         if (methodName != null) {
             return methodName;
@@ -73,29 +66,31 @@ public class JUnitRunListenerAdapter extends RunListener {
     @Override
     public void testStarted(Description description) throws Exception {
         System.out.println("testStarted " + description);
+
         // TODO: handle it if id is null - new tests were discovered after testRunStarted
         TestId id = descriptionIds.get(description);
+        startTestAndItsParents(id);
+    }
 
-        // TODO: recursion
-        if (!id.getParent().isRoot()) {
-            tn3 = notifier.fireTestStarted(id.getParent().getParent());
+    private void startTestAndItsParents(TestId testId) {
+        if (!testId.isRoot()) {
+            startTestAndItsParents(testId.getParent());
         }
-        if (!id.isRoot()) {
-            tn2 = notifier.fireTestStarted(id.getParent());
-        }
-        tn1 = notifier.fireTestStarted(id);
+        TestNotifier tn = notifier.fireTestStarted(testId);
+        activeTestsStack.push(tn);
     }
 
     @Override
     public void testFinished(Description description) throws Exception {
         System.out.println("testFinished " + description);
-        // TODO: recursion
-        tn1.fireTestFinished();
-        if (tn2 != null) {
-            tn2.fireTestFinished();
-        }
-        if (tn3 != null) {
-            tn3.fireTestFinished();
+
+        finishAllTests();
+    }
+
+    private void finishAllTests() {
+        while (!activeTestsStack.isEmpty()) {
+            TestNotifier tn = activeTestsStack.pop();
+            tn.fireTestFinished();
         }
     }
 
