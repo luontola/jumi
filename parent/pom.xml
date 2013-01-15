@@ -60,7 +60,7 @@
 
         <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -184,9 +184,10 @@
 
             <dependency>
                 <groupId>junit</groupId>
-                <artifactId>junit-dep</artifactId>
-                <version>4.10</version>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
                 <exclusions>
+                    <!-- Avoid diverging hamcrest-library and hamcrest-core versions -->
                     <exclusion>
                         <groupId>org.hamcrest</groupId>
                         <artifactId>hamcrest-core</artifactId>
@@ -245,7 +246,6 @@
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
-
                     <execution>
                         <!-- XXX: Using a different ID than in oss-parent to avoid overriding its checks by accident. See https://issues.sonatype.org/browse/OSSRH-2004 -->
                         <id>enforce-maven-3</id>
@@ -260,24 +260,6 @@
                             </rules>
                         </configuration>
                     </execution>
-
-                    <execution>
-                        <id>enforce-banned-dependencies</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <bannedDependencies>
-                                    <excludes>
-                                        <!-- We use junit-dep instead of junit -->
-                                        <exclude>junit:junit</exclude>
-                                    </excludes>
-                                </bannedDependencies>
-                            </rules>
-                        </configuration>
-                    </execution>
-
                 </executions>
             </plugin>
 

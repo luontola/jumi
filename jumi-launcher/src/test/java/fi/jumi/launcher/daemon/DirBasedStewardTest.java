@@ -28,7 +28,7 @@ public class DirBasedStewardTest {
     private DirBasedSteward steward;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         jumiHome = tempDir.newFolder("jumiHome").toPath();
         steward = new DirBasedSteward(stubDaemonJar);
     }

@@ -21,7 +21,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: fi.jumi:jumi-actors:0.1.196" level="project" />
     <orderEntry type="module" module-name="jumi-api" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: junit:junit-dep:4.10" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: junit:junit:4.11" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty:3.5.5.Final" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.2.2" level="project" />
