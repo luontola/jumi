@@ -10,7 +10,6 @@ import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;
 import fi.jumi.core.util.SpyListener;
-import junit.framework.TestCase;
 import org.junit.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,8 +26,8 @@ public class JUnitCompatibilityDriverTest {
     }
 
     @Test
-    public void runs_JUnit_3_tests() { // TODO: rename test to be not JUnit 3 specific
-        Class<?> testClass = OnePassingJUnit3.class;
+    public void runs_JUnit_tests() {
+        Class<?> testClass = OnePassing.class;
         TestFile testFile = TestFile.fromClass(testClass);
         SuiteEventDemuxer results = testBench.run(testClass);
 
@@ -50,14 +49,14 @@ public class JUnitCompatibilityDriverTest {
         spy.verify();
     }
 
-    // TODO: JUnit 4
     // TODO: multiple test methods
     // TODO: deep test hierarchies
     // TODO: failures
     // TODO: ignored tests
     // TODO: assumptions
 
-    public static class OnePassingJUnit3 extends TestCase {
+    public static class OnePassing {
+        @Test
         public void testPassing() {
         }
     }
