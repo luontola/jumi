@@ -36,6 +36,18 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit4Test", "something", "/", "/");
     }
 
-    // TODO: runs JUnit 4 custom runners annotated with RunWith
+    @Ignore("not implemented")
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void runs_RunWith_annotated_JUnit_4_tests() throws Exception {
+        app.runTestsMatching("glob:sample/JUnit4AnnotatedTest.class");
+
+        app.checkPassingAndFailingTests(5, 0);
+        app.checkTotalTestRuns(1);
+        app.checkContainsRun("JUnit4AnnotatedTest",
+                "JUnit4Test", "something", "/", "/",
+                "JUnit3Test", "testSomething", "/", "/",
+                "/");
+    }
+
     // TODO: check in unit tests that multiple tests, failures etc. are handled correctly
 }

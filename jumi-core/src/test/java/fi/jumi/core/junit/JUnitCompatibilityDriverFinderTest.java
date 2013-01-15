@@ -9,6 +9,8 @@ import fi.jumi.core.drivers.DriverFinder;
 import junit.framework.TestCase;
 import org.hamcrest.Matchers;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -37,11 +39,21 @@ public class JUnitCompatibilityDriverFinderTest {
     }
 
     @Test
+    public void supports_RunWith_annotated_JUnit_4_tests() {
+        Driver driver = finder.findTestClassDriver(JUnit4AnnotatedTest.class);
+
+        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
+    }
+
+    @Test
     public void does_not_support_non_JUnit_tests() {
         Driver driver = finder.findTestClassDriver(NotJUnitTest.class);
 
         assertThat(driver, Matchers.is(DriverFinder.DRIVER_NOT_FOUND));
     }
+
+
+    // guinea pigs
 
     private static class JUnit3Test extends TestCase {
     }
@@ -50,6 +62,10 @@ public class JUnitCompatibilityDriverFinderTest {
         @Test
         public void foo() {
         }
+    }
+
+    @RunWith(Suite.class)
+    private static class JUnit4AnnotatedTest {
     }
 
     private static class NotJUnitTest {

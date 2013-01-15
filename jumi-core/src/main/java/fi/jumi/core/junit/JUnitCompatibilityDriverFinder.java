@@ -8,6 +8,7 @@ import fi.jumi.api.drivers.Driver;
 import fi.jumi.core.drivers.DriverFinder;
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.lang.reflect.Method;
@@ -17,11 +18,15 @@ public class JUnitCompatibilityDriverFinder implements DriverFinder {
 
     @Override
     public Driver findTestClassDriver(Class<?> testClass) {
-        if (isJUnit4Test(testClass) || isJUnit3Test(testClass)) {
+        if (isJUnit4AnnotatedTest(testClass) || isJUnit4Test(testClass) || isJUnit3Test(testClass)) {
             return new JUnitCompatibilityDriver();
         } else {
             return DRIVER_NOT_FOUND;
         }
+    }
+
+    private static boolean isJUnit4AnnotatedTest(Class<?> testClass) {
+        return testClass.getAnnotation(RunWith.class) != null;
     }
 
     private static boolean isJUnit4Test(Class<?> testClass) {
