@@ -6,9 +6,8 @@ package fi.jumi.core.drivers;
 
 import fi.jumi.api.drivers.Driver;
 import fi.jumi.core.junit.JUnitCompatibilityDriver;
-import junit.framework.*;
+import junit.framework.TestCase;
 import org.junit.*;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -31,14 +30,6 @@ public class JUnitCompatibilityDriverFinderTest {
     }
 
     @Test
-    public void supports_JUnit_3_suites() {
-        Driver driver = finder.findTestClassDriver(JUnit3Suite.class);
-
-        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
-        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
-    }
-
-    @Test
     public void supports_JUnit_4_tests() {
         Driver driver = finder.findTestClassDriver(JUnit4Test.class);
 
@@ -54,9 +45,6 @@ public class JUnitCompatibilityDriverFinderTest {
     }
 
     private static class JUnit3Test extends TestCase {
-    }
-
-    private static class JUnit3Suite extends TestSuite {
     }
 
     private static class JUnit4Test {

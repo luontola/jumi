@@ -16,14 +16,14 @@ import java.lang.reflect.Method;
 public class JUnitCompatibilityDriverFinder implements DriverFinder {
 
     private final Class<? extends Annotation> JUNIT_4_TEST;
-    private final Class<?> JUNIT_3_TEST;
+    private final Class<?> JUNIT_3_TEST_CASE;
 
     private final Class<? extends Driver> driverClass;
 
     @SuppressWarnings("unchecked")
     public JUnitCompatibilityDriverFinder(ClassLoader classLoader) throws ClassNotFoundException {
         JUNIT_4_TEST = (Class<? extends Annotation>) classLoader.loadClass("org.junit.Test");
-        JUNIT_3_TEST = classLoader.loadClass("junit.framework.Test");
+        JUNIT_3_TEST_CASE = classLoader.loadClass("junit.framework.TestCase");
         driverClass = (Class<? extends Driver>)
                 new PackageNonDelegatingClassLoader("fi.jumi.core.junit.", classLoader)
                         .loadClass("fi.jumi.core.junit.JUnitCompatibilityDriver");
@@ -52,7 +52,7 @@ public class JUnitCompatibilityDriverFinder implements DriverFinder {
     }
 
     private boolean isJUnit3Test(Class<?> testClass) {
-        return JUNIT_3_TEST.isAssignableFrom(testClass);
+        return JUNIT_3_TEST_CASE.isAssignableFrom(testClass);
     }
 
     @ThreadSafe

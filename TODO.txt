@@ -12,10 +12,10 @@
 	SKIP - should we support for all that's in org.junit.internal.builders.AllDefaultPossibilitiesBuilder?
 		SKIP - classes annotated with @Ignore: the common case is that the class contains @Test methods and that's already detected
 		SKIP - classes with static suite() methods: JUnit 3 is very old and the migration of Suites to JUnit 4 is easy enough
-	!! - JUnit 3 support should only check for junit.framework.TestCase
+	OK - JUnit 3 support should only check for junit.framework.TestCase
 		org.junit.internal.builders.JUnit3Builder
-		- change fi.jumi.core.drivers.JUnitCompatibilityDriverFinder#JUNIT_3_TEST, rename to JUNIT_3_TEST_CASE
-		- remove fi.jumi.core.drivers.JUnitCompatibilityDriverFinderTest.JUnit3Suite
+		OK - change fi.jumi.core.drivers.JUnitCompatibilityDriverFinder#JUNIT_3_TEST, rename to JUNIT_3_TEST_CASE
+		OK - remove fi.jumi.core.drivers.JUnitCompatibilityDriverFinderTest.JUnit3Suite
 	- pull the use of PackageNonDelegatingClassLoader from JUnitCompatibilityDriverFinder into DriverFinderFactory; load whole JUnitCompatibilityDriverFinder dynamically
 	- run JUnit 4 custom runner tests
 		- end-to-end test: use org.junit.runners.Suite to cover also nested tests
