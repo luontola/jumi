@@ -2,15 +2,16 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.drivers;
+package fi.jumi.core.junit;
 
 import fi.jumi.api.drivers.Driver;
-import fi.jumi.core.junit.JUnitCompatibilityDriver;
+import fi.jumi.core.drivers.DriverFinder;
 import junit.framework.TestCase;
+import org.hamcrest.Matchers;
 import org.junit.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class JUnitCompatibilityDriverFinderTest {
 
@@ -18,30 +19,28 @@ public class JUnitCompatibilityDriverFinderTest {
 
     @Before
     public void setup() throws Exception {
-        finder = new JUnitCompatibilityDriverFinder(getClass().getClassLoader());
+        finder = new JUnitCompatibilityDriverFinder();
     }
 
     @Test
     public void supports_JUnit_3_tests() {
         Driver driver = finder.findTestClassDriver(JUnit3Test.class);
 
-        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
-        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
+        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
     }
 
     @Test
     public void supports_JUnit_4_tests() {
         Driver driver = finder.findTestClassDriver(JUnit4Test.class);
 
-        //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
-        assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
+        assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class)));
     }
 
     @Test
     public void does_not_support_non_JUnit_tests() {
         Driver driver = finder.findTestClassDriver(NotJUnitTest.class);
 
-        assertThat(driver, is(DriverFinder.DRIVER_NOT_FOUND));
+        assertThat(driver, Matchers.is(DriverFinder.DRIVER_NOT_FOUND));
     }
 
     private static class JUnit3Test extends TestCase {

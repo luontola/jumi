@@ -6,7 +6,6 @@ package fi.jumi.core.junit;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.TestFile;
-import fi.jumi.core.drivers.JUnitCompatibilityDriverFinder;
 import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;
@@ -23,7 +22,7 @@ public class JUnitCompatibilityDriverTest {
 
     @Before
     public void setup() throws Exception {
-        testBench.setDriverFinder(new JUnitCompatibilityDriverFinder(getClass().getClassLoader()));
+        testBench.setDriverFinder(new JUnitCompatibilityDriverFinder());
 //        testBench.setActorsMessageListener(new PrintStreamMessageLogger(System.out));
     }
 

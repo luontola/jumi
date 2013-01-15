@@ -4,18 +4,23 @@
 
 package fi.jumi.core.drivers;
 
+import fi.jumi.core.util.LocallyDefiningClassLoader;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
 @NotThreadSafe
 public class DriverFinderFactory {
 
-    public static CompositeDriverFinder createDriverFinder(ClassLoader classLoader) {
+    public static CompositeDriverFinder createDriverFinder(ClassLoader testClassLoader) {
         List<DriverFinder> driverFinders = new ArrayList<>();
         driverFinders.add(new RunViaAnnotationDriverFinder());
         try {
-            driverFinders.add(new JUnitCompatibilityDriverFinder(classLoader));
-        } catch (ClassNotFoundException e) {
+            driverFinders.add((DriverFinder)
+                    new LocallyDefiningClassLoader("fi.jumi.core.junit.", testClassLoader)
+                            .loadClass("fi.jumi.core.junit.JUnitCompatibilityDriverFinder")
+                            .newInstance());
+        } catch (Exception e) {
             // JUnit not on classpath; ignore
             System.out.println("JUnit not found on classpath; disabling JUnit compatibility");
         }
