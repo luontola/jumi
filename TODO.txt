@@ -22,7 +22,7 @@
 		OK - JUnitCompatibilityDriverFinder#isJUnit4AnnotatedTest
 		!! - improve the driver
 	- JUnitCompatibilityDriver:
-		- multiple test methods
+		OK - multiple test methods
 		- deep test hierarchies
 		- failures
 		- ignored tests

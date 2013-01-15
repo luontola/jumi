@@ -9,6 +9,7 @@ import org.junit.runner.*;
 import org.junit.runner.notification.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.util.*;
 
 @NotThreadSafe
 public class JUnitRunListenerAdapter extends RunListener {
@@ -16,6 +17,8 @@ public class JUnitRunListenerAdapter extends RunListener {
     private final SuiteNotifier notifier;
     private TestNotifier classTn;
     private TestNotifier methodTn;
+
+    private final Map<Description, TestId> descriptionIds = new HashMap<>();
 
     public JUnitRunListenerAdapter(SuiteNotifier notifier) {
         this.notifier = notifier;
@@ -25,15 +28,16 @@ public class JUnitRunListenerAdapter extends RunListener {
     public void testRunStarted(Description description) throws Exception {
         System.out.println("testRunStarted " + description + "; children " + description.getChildren());
 
-        // TODO: what if the description's "class name" is free-form text? should we support such custom JUnit runners?
-        notifier.fireTestFound(TestId.ROOT, simpleClassName(description.getClassName()));
+        descriptionIds.put(description, TestId.ROOT);
+        notifier.fireTestFound(TestId.ROOT, simpleClassName(description.getClassName())); // TODO: what if the description's "class name" is free-form text? should we support such custom JUnit runners?
 
-        // TODO: calculate test ids properly
-        int i = 0;
-
+        TestId id = TestId.ROOT.getFirstChild();
         for (Description level1 : description.getChildren()) {
-            notifier.fireTestFound(TestId.of(i++), level1.getMethodName());
+            descriptionIds.put(level1, id);
+            notifier.fireTestFound(id, level1.getMethodName());
+            id = id.getNextSibling();
 
+            // TODO: recursion
 //            for (Description level2 : level1.getChildren()) {
 //                notifier.fireTestFound(TestId.of(0, 0), level2.getMethodName());
 //            }
@@ -52,15 +56,13 @@ public class JUnitRunListenerAdapter extends RunListener {
         // TODO
     }
 
-
-    int testId = 0; // XXX
-
     @Override
     public void testStarted(Description description) throws Exception {
         System.out.println("testStarted " + description);
         // TODO
-        classTn = notifier.fireTestStarted(TestId.ROOT);
-        methodTn = notifier.fireTestStarted(TestId.of(testId++));
+        TestId id = descriptionIds.get(description);
+        classTn = notifier.fireTestStarted(id.getParent());
+        methodTn = notifier.fireTestStarted(id);
     }
 
     @Override
