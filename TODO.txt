@@ -64,7 +64,7 @@ OK - JUnit backward compatibility
 
 - release 0.4
 	- tidy up release notes
-	- bump version
+	OK - bump version
 	- release
 	- create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
