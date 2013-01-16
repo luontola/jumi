@@ -21,7 +21,7 @@
 		OK - end-to-end test: use org.junit.runners.Suite to cover also nested tests
 		OK - JUnitCompatibilityDriverFinder#isJUnit4AnnotatedTest
 		OK - improve the driver
-	!! - JUnitCompatibilityDriver:
+	OK - JUnitCompatibilityDriver:
 		OK - multiple test methods
 		OK - deep test hierarchies
 		OK - refactor Description-TestId mapping to use recursion
@@ -29,8 +29,8 @@
 		OK - ignored tests (null implementation at first)
 		OK - assumptions (null implementation at first)
 		OK - tests discovered after starting the test run
-		!! - free-form test names
-	- remove debug printing from JUnitRunListenerAdapter
+		OK - free-form test names
+	!! - remove debug printing from JUnitRunListenerAdapter
 	- report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
 - plugin system for custom DriverFinders

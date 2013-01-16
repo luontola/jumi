@@ -10,13 +10,15 @@ import org.junit.runner.notification.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @NotThreadSafe
 public class JUnitRunListenerAdapter extends RunListener {
 
+    private static final Pattern JAVA_CLASS_NAME_PATTERN = Pattern.compile("[\\._$\\p{Alnum}]+");
+
     private final SuiteNotifier notifier;
     private final Deque<TestNotifier> activeTestsStack = new ArrayDeque<>();
-
     private final Map<Description, TestId> descriptionIds = new HashMap<>();
     private Description rootDescription;
 
@@ -49,10 +51,17 @@ public class JUnitRunListenerAdapter extends RunListener {
         String methodName = description.getMethodName();
         if (methodName != null) {
             return methodName;
-        } else {
-            // TODO: what if the description is free-form text? should we support such custom JUnit runners?
-            return simpleClassName(description.getClassName());
         }
+        String className = description.getClassName();
+        if (isJavaClassName(className)) {
+            return simpleClassName(className);
+        }
+        // not a class name, but actually free-form text
+        return className;
+    }
+
+    private static boolean isJavaClassName(String s) {
+        return JAVA_CLASS_NAME_PATTERN.matcher(s).matches();
     }
 
     private static String simpleClassName(String name) {

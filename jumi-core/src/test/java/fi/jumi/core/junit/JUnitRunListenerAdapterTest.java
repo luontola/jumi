@@ -71,6 +71,29 @@ public class JUnitRunListenerAdapterTest {
         spy.verify();
     }
 
+    @Test
+    public void descriptions_which_are_free_form_text() {
+        expect.onTestFound(TestId.ROOT, "suite name using $ and . special characters");
+        expect.onTestFound(TestId.of(0), "test name using $ and . special characters");
+        expect.onRunStarted(new RunId(1));
+        expect.onTestStarted(new RunId(1), TestId.ROOT);
+        expect.onTestStarted(new RunId(1), TestId.of(0));
+        expect.onTestFinished(new RunId(1), TestId.of(0));
+        expect.onTestFinished(new RunId(1), TestId.ROOT);
+        expect.onRunFinished(new RunId(1));
+
+        spy.replay();
+
+        Description suite = Description.createSuiteDescription("suite name using $ and . special characters");
+        Description test = Description.createSuiteDescription("test name using $ and . special characters");
+        suite.addChild(test);
+        adapter.testRunStarted(suite);
+        adapter.testStarted(test);
+        adapter.testFinished(test);
+
+        spy.verify();
+    }
+
 
     // guinea pigs
 
