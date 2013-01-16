@@ -472,7 +472,7 @@
                                 <pattern>fi.jumi.*</pattern>
                             </targetClasses>
                             <targetTests>
-                                <pattern>fi.jumi.*</pattern>
+                                <pattern>fi.jumi.*Test</pattern>
                             </targetTests>
                             <failWhenNoMutations>false</failWhenNoMutations>
                             <timestampedReports>false</timestampedReports>
