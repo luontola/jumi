@@ -28,8 +28,9 @@
 		OK - failures (create end-to-end test)
 		OK - ignored tests (null implementation at first)
 		OK - assumptions (null implementation at first)
-		!! - tests discovered after starting the test run
-		- free-form test names
+		OK - tests discovered after starting the test run
+		!! - free-form test names
+	- remove debug printing from JUnitRunListenerAdapter
 	- report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
 - plugin system for custom DriverFinders
