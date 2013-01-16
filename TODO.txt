@@ -27,8 +27,8 @@
 		OK - refactor Description-TestId mapping to use recursion
 		OK - failures (create end-to-end test)
 		OK - ignored tests (null implementation at first)
-		!! - assumptions (null implementation at first)
-		- tests discovered after starting the test run
+		OK - assumptions (null implementation at first)
+		!! - tests discovered after starting the test run
 		- free-form test names
 	- report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
@@ -54,7 +54,11 @@
 	- ignoring without running a test
 	- ignoring after test has started
 	- JUnit @Ignore
+		- update the test in fi.jumi.test.JUnitCompatibilityTest
+		- implement fi.jumi.core.junit.JUnitRunListenerAdapter#testIgnored (JUnitCompatibilityDriverTest)
 	- JUnit assumptions
+		- update the test in fi.jumi.test.JUnitCompatibilityTest
+		- implement fi.jumi.core.junit.JUnitRunListenerAdapter#testAssumptionFailure (JUnitCompatibilityDriverTest)
 
 - release 0.4
 	- tidy up release notes

@@ -105,12 +105,15 @@ public class JUnitRunListenerAdapter extends RunListener {
     @Override
     public void testAssumptionFailure(Failure failure) {
         System.out.println("testAssumptionFailure " + failure);
-        // TODO
+
+        // TODO: implement ignoring tests into Jumi, then fire the appropriate event here
+        failure.getException().printStackTrace();
     }
 
     @Override
     public void testIgnored(Description description) throws Exception {
         System.out.println("testIgnored " + description);
-        // TODO
+
+        // TODO: implement ignoring tests into Jumi, then fire the appropriate event here
     }
 }

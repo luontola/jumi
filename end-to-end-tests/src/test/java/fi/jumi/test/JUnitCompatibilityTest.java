@@ -66,4 +66,16 @@ public class JUnitCompatibilityTest {
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
     }
+
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void failing_assumptions_do_not_make_the_test_fail_but_report_the_stack_trace() throws Exception { // TODO: implement support for ignored tests
+        app.runTestsMatching("glob:sample/JUnitAssumptionsTest.class");
+
+        app.checkPassingAndFailingTests(2, 0);
+        app.checkTotalTestRuns(1);
+        app.checkContainsRun("JUnitAssumptionsTest", "failingAssumption", "/", "/");
+        app.checkHasStackTrace(
+                "org.junit.internal.AssumptionViolatedException: got: <false>, expected: is <true>",
+                "at sample.JUnitAssumptionsTest.failingAssumption");
+    }
 }
