@@ -1,5 +1,5 @@
 
-!! - JUnit backward compatibility
+OK - JUnit backward compatibility
 	OK - run JUnit 3 tests
 		OK - create CompositeDriverFinder
 			OK - refactor RunViaAnnotationDriverFinder to return null if the class was unsupported
@@ -30,8 +30,8 @@
 		OK - assumptions (null implementation at first)
 		OK - tests discovered after starting the test run
 		OK - free-form test names
-	!! - remove debug printing from JUnitRunListenerAdapter
-	- report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
+	OK - remove debug printing from JUnitRunListenerAdapter
+	SKIP - report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
 - plugin system for custom DriverFinders
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
@@ -48,6 +48,7 @@
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
+	- report JUnit test mechanism failures to Jumi
 	- given an error message if starting the daemon fails (for example out of memory)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 

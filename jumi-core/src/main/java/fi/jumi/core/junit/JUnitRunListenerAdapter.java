@@ -28,8 +28,6 @@ public class JUnitRunListenerAdapter extends RunListener {
 
     @Override
     public void testRunStarted(Description description) {
-        System.out.println("testRunStarted " + description + "; children " + description.getChildren());
-
         rootDescription = description;
         fireTestFound(TestId.ROOT, description);
     }
@@ -72,13 +70,10 @@ public class JUnitRunListenerAdapter extends RunListener {
 
     @Override
     public void testRunFinished(Result result) {
-        System.out.println("testRunFinished " + result);
     }
 
     @Override
     public void testStarted(Description description) {
-        System.out.println("testStarted " + description);
-
         TestId id = descriptionIds.get(description);
         if (id == null) {
             // Hoping that the runner added this description as a child to the top-level description
@@ -112,8 +107,6 @@ public class JUnitRunListenerAdapter extends RunListener {
 
     @Override
     public void testFinished(Description description) {
-        System.out.println("testFinished " + description);
-
         finishAllTests();
     }
 
@@ -126,24 +119,18 @@ public class JUnitRunListenerAdapter extends RunListener {
 
     @Override
     public void testFailure(Failure failure) {
-        System.out.println("testFailure " + failure);
-
         TestNotifier tn = activeTestsStack.peek();
         tn.fireFailure(failure.getException());
     }
 
     @Override
     public void testAssumptionFailure(Failure failure) {
-        System.out.println("testAssumptionFailure " + failure);
-
         // TODO: implement ignoring tests into Jumi, then fire the appropriate event here
         failure.getException().printStackTrace();
     }
 
     @Override
     public void testIgnored(Description description) {
-        System.out.println("testIgnored " + description);
-
         // TODO: implement ignoring tests into Jumi, then fire the appropriate event here
     }
 }
