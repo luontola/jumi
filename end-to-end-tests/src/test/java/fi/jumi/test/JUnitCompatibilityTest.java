@@ -58,4 +58,12 @@ public class JUnitCompatibilityTest {
                 "java.lang.AssertionError: dummy failure",
                 "at sample.JUnitFailingTest.failing");
     }
+
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void ignored_tests_are_not_run() throws Exception { // TODO: implement support for ignored tests
+        app.runTestsMatching("glob:sample/JUnitIgnoredTest.class");
+
+        app.checkPassingAndFailingTests(0, 0);
+        app.checkTotalTestRuns(0);
+    }
 }
