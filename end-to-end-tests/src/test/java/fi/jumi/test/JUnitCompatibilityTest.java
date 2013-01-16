@@ -46,4 +46,16 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit4AnnotatedTest", "JUnit4Test", "something", "/", "/", "/");
         app.checkContainsRun("JUnit4AnnotatedTest", "JUnit3Test", "testSomething", "/", "/", "/");
     }
+
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void reports_test_failures() throws Exception {
+        app.runTestsMatching("glob:sample/JUnitFailingTest.class");
+
+        app.checkPassingAndFailingTests(1, 1);
+        app.checkTotalTestRuns(1);
+        app.checkContainsRun("JUnitFailingTest", "failing", "/", "/");
+        app.checkHasStackTrace(
+                "java.lang.AssertionError: dummy failure",
+                "at sample.JUnitFailingTest.failing");
+    }
 }

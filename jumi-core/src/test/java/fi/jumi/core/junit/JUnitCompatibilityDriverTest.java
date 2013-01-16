@@ -5,7 +5,7 @@
 package fi.jumi.core.junit;
 
 import fi.jumi.api.drivers.TestId;
-import fi.jumi.core.api.TestFile;
+import fi.jumi.core.api.*;
 import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;
@@ -29,7 +29,7 @@ public class JUnitCompatibilityDriverTest {
     private SuiteEventDemuxer results;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         testBench.setDriverFinder(new JUnitCompatibilityDriverFinder());
 //        testBench.setActorsMessageListener(new PrintStreamMessageLogger(System.out));
     }
@@ -56,6 +56,24 @@ public class JUnitCompatibilityDriverTest {
         expect.onRunStarted(new RunId(1), testFile);
         expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
         expect.onTestStarted(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.of(0));
+        expect.onTestFinished(new RunId(1), testFile, TestId.ROOT);
+        expect.onRunFinished(new RunId(1), testFile);
+
+        checkExpectations();
+    }
+
+    @Test
+    public void single_failing_test() {
+        runTestClass(OneFailing.class);
+
+        assertThat(results.getTestName(testFile, TestId.ROOT), is("OneFailing"));
+        assertThat(results.getTestName(testFile, TestId.of(0)), is("testFailing"));
+
+        expect.onRunStarted(new RunId(1), testFile);
+        expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
+        expect.onTestStarted(new RunId(1), testFile, TestId.of(0));
+        expect.onFailure(new RunId(1), testFile, TestId.of(0), StackTrace.copyOf(new AssertionError("dummy failure")));
         expect.onTestFinished(new RunId(1), testFile, TestId.of(0));
         expect.onTestFinished(new RunId(1), testFile, TestId.ROOT);
         expect.onRunFinished(new RunId(1), testFile);
@@ -111,13 +129,19 @@ public class JUnitCompatibilityDriverTest {
 
 
     // TODO: report failures from JUnit test mechanism
-    // TODO: failures
     // TODO: ignored tests
     // TODO: assumptions
 
     public static class OnePassing {
         @Test
         public void testPassing() {
+        }
+    }
+
+    public static class OneFailing {
+        @Test
+        public void testFailing() {
+            throw new AssertionError("dummy failure");
         }
     }
 

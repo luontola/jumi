@@ -25,9 +25,11 @@
 		OK - multiple test methods
 		OK - deep test hierarchies
 		OK - refactor Description-TestId mapping to use recursion
-		!! - failures
-		- ignored tests
-		- assumptions
+		OK - failures (create end-to-end test)
+		!! - ignored tests (null implementation at first)
+		- assumptions (null implementation at first)
+		- tests discovered after starting the test run
+		- free-form test names
 	- report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
 - plugin system for custom DriverFinders
