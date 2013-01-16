@@ -1,8 +1,10 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.util;
+
+import fi.jumi.actors.eventizers.EventToString;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -90,8 +92,7 @@ public class SpyListener<T> implements InvocationHandler {
 
         @Override
         public String toString() {
-            String args = Arrays.toString(this.args);
-            return methodName + "(" + args.substring(1, args.length() - 1) + ")";
+            return EventToString.format("", methodName, args).substring(1);
         }
 
         @Override

@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -144,6 +144,18 @@ public class SpyListenerTest {
     }
 
     @Test
+    public void method_calls_show_arguments_and_string_arguments_are_escaped() {
+        spy.replay();
+
+        listener.onParameter(123);
+        listener.onStringParameter("foobar\n");
+
+        String message = fails();
+        assertThat(message, containsString("1. onParameter(123)"));
+        assertThat(message, containsString("2. onStringParameter(\"foobar\\n\")"));
+    }
+
+    @Test
     public void failure_messages_highlight_the_problematic_calls() {
         listener.onFirst();
         listener.onParameter(1);
@@ -206,6 +218,8 @@ public class SpyListenerTest {
         void onSecond();
 
         void onParameter(int parameter);
+
+        void onStringParameter(String parameter);
 
         void onException(Throwable cause);
 
