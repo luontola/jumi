@@ -33,6 +33,19 @@ OK - JUnit backward compatibility
 	OK - remove debug printing from JUnitRunListenerAdapter
 	SKIP - report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
+- end-to-end tests: reporting failures outside tests (in drivers and core)
+	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
+	- report JUnit test mechanism failures to Jumi
+	- given an error message if starting the daemon fails (for example out of memory)
+	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
+
+- release 0.4
+	- tidy up release notes
+	OK - bump version
+	- release
+	- create a performance comparison (e.g. with Dimdwarf's tests)
+	- promote widely
+
 - plugin system for custom DriverFinders
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
 	- move JUnit compatibility into its own module
@@ -46,12 +59,6 @@ OK - JUnit backward compatibility
 			- how much is daemon jar minimized? if it minimizes only a little, it might not be worth it
 			- write a test that the daemon jar contains everything from the jumi-core
 
-- end-to-end tests: reporting failures outside tests (in drivers and core)
-	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
-	- report JUnit test mechanism failures to Jumi
-	- given an error message if starting the daemon fails (for example out of memory)
-	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
-
 - ignoring tests
 	- ignoring without running a test
 	- ignoring after test has started
@@ -62,12 +69,11 @@ OK - JUnit backward compatibility
 		- update the test in fi.jumi.test.JUnitCompatibilityTest
 		- implement fi.jumi.core.junit.JUnitRunListenerAdapter#testAssumptionFailure (JUnitCompatibilityDriverTest)
 
-- release 0.4
+- release 0.5
 	- tidy up release notes
-	OK - bump version
+	- bump version
 	- release
-	- create a performance comparison (e.g. with Dimdwarf's tests)
-	- promote widely
+	- promote
 
 - configurable thread count
 	- add configuration parameter (DaemonConfiguration) for the number of test threads
@@ -140,7 +146,10 @@ OK - JUnit backward compatibility
 		- don't create background threads in the launcher automatically (the tests should create them explicitly, if any)
 		- also remove the hack in fi.jumi.test.ReleasingResourcesTest#launcher_stops_the_threads_it_started
 
-- release 0.4 update?
+- minor release 0.5
+	- tidy up release notes
+	- release
+	- promote
 
 - end-to-end tests: persistent daemon process
 	- spike communicating over memory-mapped files (see below)
@@ -176,7 +185,7 @@ OK - JUnit backward compatibility
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
 
-- release 0.5
+- release 0.6
 	- tidy up release notes
 	- bump version
 	- release
