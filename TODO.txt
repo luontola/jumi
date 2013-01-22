@@ -33,11 +33,15 @@ OK - JUnit backward compatibility
 	OK - remove debug printing from JUnitRunListenerAdapter
 	SKIP - report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
+- set context class loader for test threads
+	- verify that fixes https://github.com/orfjackal/jumi/issues/2
+
 - end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
 	- report JUnit test mechanism failures to Jumi
 	- given an error message if starting the daemon fails (for example out of memory)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
+		- verify that fixes https://github.com/orfjackal/jumi/issues/1
 
 - release 0.4
 	- tidy up release notes
@@ -69,15 +73,15 @@ OK - JUnit backward compatibility
 		- update the test in fi.jumi.test.JUnitCompatibilityTest
 		- implement fi.jumi.core.junit.JUnitRunListenerAdapter#testAssumptionFailure (JUnitCompatibilityDriverTest)
 
+- configurable thread count
+	- add configuration parameter (DaemonConfiguration) for the number of test threads
+	- make the number of test threads by default the number of CPUs + 1 or similar
+
 - release 0.5
 	- tidy up release notes
 	- bump version
 	- release
 	- promote
-
-- configurable thread count
-	- add configuration parameter (DaemonConfiguration) for the number of test threads
-	- make the number of test threads by default the number of CPUs + 1 or similar
 
 - make option 2 explicit by adding a test for it; check for "nihao: ??" and "umlauts: ???" on US-ASCII
 	> - when default charset is ISO-8859-1 (fi.jumi.test.StandardOutputTest#compensates_for_the_default_charset_of_the_daemon_process), Unicode chars are lost already when they are captured (nihao becomes ??); should we do something about it?

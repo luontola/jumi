@@ -22,7 +22,7 @@ ROADMAP:
 		- IDEA
 		- Eclipse
 		- NetBeans
-		- sbt (about same speed as Jumi?)
+		- sbt (find out whether sbt does class loader caching also for tests and not just the compiler)
 		- Jumi (1-thread, cold-start)
 		- Jumi (1-thread, warm-start)
 		- Jumi (4-thread, cold-start)
