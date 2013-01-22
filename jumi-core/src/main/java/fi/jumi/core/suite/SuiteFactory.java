@@ -5,34 +5,72 @@
 package fi.jumi.core.suite;
 
 import fi.jumi.actors.*;
+import fi.jumi.actors.eventizers.ComposedEventizerProvider;
+import fi.jumi.actors.listeners.*;
 import fi.jumi.core.api.SuiteListener;
-import fi.jumi.core.config.SuiteConfiguration;
+import fi.jumi.core.config.*;
 import fi.jumi.core.discovery.*;
 import fi.jumi.core.drivers.*;
+import fi.jumi.core.events.*;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.RunIdSequence;
-import fi.jumi.core.util.Startable;
+import fi.jumi.core.util.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.io.PrintStream;
 import java.net.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 
 @NotThreadSafe
 public class SuiteFactory {
 
-    private final ActorThread actorThread;
     private final OutputCapturer outputCapturer;
-    private final Executor testExecutor;
+    private final Executor testsThreadPool;
+    private final MultiThreadedActors actors;
+    private final ExecutorService actorsThreadPool;
 
-    public SuiteFactory(ActorThread actorThread, OutputCapturer outputCapturer, Executor testExecutor) {
-        this.actorThread = actorThread;
+    public SuiteFactory(DaemonConfiguration config, OutputCapturer outputCapturer, PrintStream logOutput) {
         this.outputCapturer = outputCapturer;
-        this.testExecutor = testExecutor;
+
+        // logging configuration
+        FailureHandler failureHandler = new PrintStreamFailureLogger(logOutput);
+        MessageListener messageListener = config.logActorMessages()
+                ? new PrintStreamMessageLogger(logOutput)
+                : new NullMessageListener();
+
+        // thread pool configuration
+        actorsThreadPool = // messages already logged by the Actors implementation
+                Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actors-"));
+        // TODO: make the number of test threads by default the number of CPUs + 1 or similar
+        testsThreadPool = messageListener.getListenedExecutor(
+                Executors.newFixedThreadPool(4, new PrefixedThreadFactory("jumi-tests-")));
+
+        // actors configuration
+        // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider
+        actors = new MultiThreadedActors(
+                actorsThreadPool,
+                new ComposedEventizerProvider(
+                        new StartableEventizer(),
+                        new RunnableEventizer(),
+                        new WorkerListenerEventizer(),
+                        new TestFileFinderListenerEventizer(),
+                        new SuiteListenerEventizer(),
+                        new CommandListenerEventizer(),
+                        new RunListenerEventizer()
+                ),
+                failureHandler,
+                messageListener
+        );
     }
 
+    /**
+     * Application entry point
+     */
     public ActorRef<Startable> createSuiteRunner(SuiteListener suiteListener, SuiteConfiguration suite) {
+        ActorThread actorThread = actors.startActorThread();
+
         ClassLoader classLoader = createClassLoader(suite.classPath());
         TestFileFinder testFileFinder = createTestFileFinder(suite);
         DriverFinder driverFinder = DriverFinderFactory.createDriverFinder(classLoader);
@@ -44,7 +82,7 @@ public class SuiteFactory {
                         suiteListener,
                         testFileFinder,
                         actorThread,
-                        testExecutor
+                        testsThreadPool
                 ));
     }
 
