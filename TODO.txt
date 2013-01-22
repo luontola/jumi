@@ -37,7 +37,8 @@ OK - JUnit backward compatibility
 	OK - end-to-end test
 	!! - unit test
 		OK - extract wiring from Main
-		!! - make the thread pools testable
+		OK - make the thread pools testable
+		!! - check the context class loader of the pool
 	- verify that fixes https://github.com/orfjackal/jumi/issues/2
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)

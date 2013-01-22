@@ -4,7 +4,6 @@
 
 package fi.jumi.daemon;
 
-import fi.jumi.actors.ActorRef;
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.CommandListener;
@@ -13,7 +12,6 @@ import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.network.*;
 import fi.jumi.core.suite.SuiteFactory;
-import fi.jumi.core.util.Startable;
 import fi.jumi.daemon.timeout.*;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -54,9 +52,9 @@ public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<CommandListe
 
     @Override
     public void runTests(SuiteConfiguration suite) {
-        SuiteListener listener = new SuiteListenerEventizer().newFrontend(sender);
-        ActorRef<Startable> suiteRunner = suiteFactory.createSuiteRunner(listener, suite);
-        suiteRunner.tell().start();
+        SuiteListener suiteListener = new SuiteListenerEventizer().newFrontend(sender);
+        suiteFactory.configure(suite);
+        suiteFactory.start(suiteListener);
     }
 
     @Override

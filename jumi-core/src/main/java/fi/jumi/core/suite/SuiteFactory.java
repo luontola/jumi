@@ -26,13 +26,38 @@ import java.util.concurrent.*;
 @NotThreadSafe
 public class SuiteFactory {
 
+    private final DaemonConfiguration config;
     private final OutputCapturer outputCapturer;
-    private final Executor testsThreadPool;
-    private final MultiThreadedActors actors;
-    private final ExecutorService actorsThreadPool;
+    private final PrintStream logOutput;
 
-    public SuiteFactory(DaemonConfiguration config, OutputCapturer outputCapturer, PrintStream logOutput) {
+    // some fields are package-private for testing purposes
+
+    private ExecutorService actorsThreadPool;
+    ExecutorService testsThreadPool;
+    ClassLoader testClassLoader;
+    private TestFileFinder testFileFinder;
+    private CompositeDriverFinder driverFinder;
+    private RunIdSequence runIdSequence;
+
+    public SuiteFactory(DaemonConfiguration daemonConfiguration, OutputCapturer outputCapturer, PrintStream logOutput) {
+        this.config = daemonConfiguration;
         this.outputCapturer = outputCapturer;
+        this.logOutput = logOutput;
+    }
+
+    public void configure(SuiteConfiguration suite) {
+        testClassLoader = createClassLoader(suite.classPath());
+        testFileFinder = createTestFileFinder(suite);
+        driverFinder = DriverFinderFactory.createDriverFinder(testClassLoader);
+        runIdSequence = new RunIdSequence();
+
+        // thread pool configuration
+        actorsThreadPool = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actors-"));
+        // TODO: make the number of test threads by default the number of CPUs + 1 or similar
+        testsThreadPool = Executors.newFixedThreadPool(4, new PrefixedThreadFactory("jumi-tests-"));
+    }
+
+    public void start(SuiteListener listener) {
 
         // logging configuration
         FailureHandler failureHandler = new PrintStreamFailureLogger(logOutput);
@@ -40,16 +65,12 @@ public class SuiteFactory {
                 ? new PrintStreamMessageLogger(logOutput)
                 : new NullMessageListener();
 
-        // thread pool configuration
-        actorsThreadPool = // messages already logged by the Actors implementation
-                Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actors-"));
-        // TODO: make the number of test threads by default the number of CPUs + 1 or similar
-        testsThreadPool = messageListener.getListenedExecutor(
-                Executors.newFixedThreadPool(4, new PrefixedThreadFactory("jumi-tests-")));
+        // actor messages are already logged by the actors container, but the test thread pool must be hooked separately
+        Executor testsThreadPool = messageListener.getListenedExecutor(this.testsThreadPool);
 
         // actors configuration
         // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider
-        actors = new MultiThreadedActors(
+        MultiThreadedActors actors = new MultiThreadedActors(
                 actorsThreadPool,
                 new ComposedEventizerProvider(
                         new StartableEventizer(),
@@ -63,27 +84,18 @@ public class SuiteFactory {
                 failureHandler,
                 messageListener
         );
-    }
 
-    /**
-     * Application entry point
-     */
-    public ActorRef<Startable> createSuiteRunner(SuiteListener suiteListener, SuiteConfiguration suite) {
+        // bootstrap the system
         ActorThread actorThread = actors.startActorThread();
-
-        ClassLoader classLoader = createClassLoader(suite.classPath());
-        TestFileFinder testFileFinder = createTestFileFinder(suite);
-        DriverFinder driverFinder = DriverFinderFactory.createDriverFinder(classLoader);
-        RunIdSequence runIdSequence = new RunIdSequence();
-
-        return actorThread.bindActor(Startable.class,
+        ActorRef<Startable> suiteRunner = actorThread.bindActor(Startable.class,
                 new SuiteRunner(
-                        new DriverFactory(suiteListener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
-                        suiteListener,
+                        new DriverFactory(listener, actorThread, outputCapturer, driverFinder, runIdSequence, testClassLoader),
+                        listener,
                         testFileFinder,
                         actorThread,
                         testsThreadPool
                 ));
+        suiteRunner.tell().start();
     }
 
     private static ClassLoader createClassLoader(List<URI> classpath) {
