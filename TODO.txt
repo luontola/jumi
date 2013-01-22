@@ -41,8 +41,14 @@ OK - JUnit backward compatibility
 		OK - check the context class loader of the pool
 	!! - verify that fixes https://github.com/orfjackal/jumi/issues/2
 
-- end-to-end tests: reporting failures outside tests (in drivers and core)
-	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
+!! - end-to-end tests: reporting failures outside tests (in drivers and core)
+	!! - exceptions from actors
+		OK - test: malformed .class file
+		!! - create SuiteListener event
+		- ui: print internal errors
+		- hook into the actors
+	- exceptions from test threads
+		- test: throw exception from a driver
 	- report JUnit test mechanism failures to Jumi
 	- given an error message if starting the daemon fails (for example out of memory)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
