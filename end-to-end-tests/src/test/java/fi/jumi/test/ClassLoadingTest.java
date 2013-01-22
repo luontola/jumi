@@ -12,7 +12,6 @@ public class ClassLoadingTest {
     @Rule
     public final AppRunner app = new AppRunner();
 
-    @Ignore("not implemented") // TODO
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void context_class_loader_and_current_class_loader_are_the_same() throws Exception {
         app.runTests(ContextClassLoaderTest.class);

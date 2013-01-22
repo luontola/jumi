@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @NotThreadSafe
-public class SuiteFactory {
+public class SuiteFactory implements AutoCloseable {
 
     private final DaemonConfiguration config;
     private final OutputCapturer outputCapturer;
@@ -54,7 +54,8 @@ public class SuiteFactory {
         // thread pool configuration
         actorsThreadPool = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actors-"));
         // TODO: make the number of test threads by default the number of CPUs + 1 or similar
-        testsThreadPool = Executors.newFixedThreadPool(4, new PrefixedThreadFactory("jumi-tests-"));
+        testsThreadPool = Executors.newFixedThreadPool(4,
+                new ContextClassLoaderThreadFactory(testClassLoader, new PrefixedThreadFactory("jumi-tests-")));
     }
 
     public void start(SuiteListener listener) {
@@ -96,6 +97,16 @@ public class SuiteFactory {
                         testsThreadPool
                 ));
         suiteRunner.tell().start();
+    }
+
+    @Override
+    public void close() {
+        if (actorsThreadPool != null) {
+            actorsThreadPool.shutdownNow();
+        }
+        if (testsThreadPool != null) {
+            testsThreadPool.shutdownNow();
+        }
     }
 
     private static ClassLoader createClassLoader(List<URI> classpath) {

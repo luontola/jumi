@@ -35,11 +35,11 @@ OK - JUnit backward compatibility
 
 !! - set context class loader for test threads
 	OK - end-to-end test
-	!! - unit test
+	OK - unit test
 		OK - extract wiring from Main
 		OK - make the thread pools testable
-		!! - check the context class loader of the pool
-	- verify that fixes https://github.com/orfjackal/jumi/issues/2
+		OK - check the context class loader of the pool
+	!! - verify that fixes https://github.com/orfjackal/jumi/issues/2
 
 - end-to-end tests: reporting failures outside tests (in drivers and core)
 	- maybe testable by throwing exceptions from a driver or by producing non-valid .class files
