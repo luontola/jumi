@@ -5,7 +5,7 @@ Release Notes
 ### Upcoming Changes
 
 - JUnit backward compatibilty: Jumi now runs JUnit 3, JUnit 4 and `@RunWith` annotated test classes. Requires you to have JUnit on your test classpath
-- Sets the context class loader for test threads ([issue #2](https://github.com/orfjackal/jumi/issues/2))
+- Sets the context class loader for test threads ([Issue #2](https://github.com/orfjackal/jumi/issues/2))
 
 ### Jumi 0.3.257 (2013-01-07)
 

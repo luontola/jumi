@@ -39,7 +39,11 @@ OK - JUnit backward compatibility
 		OK - extract wiring from Main
 		OK - make the thread pools testable
 		OK - check the context class loader of the pool
-	!! - verify that fixes https://github.com/orfjackal/jumi/issues/2
+	OK - verify that fixes https://github.com/orfjackal/jumi/issues/2
+	!! - e2e test for also driver thread; it may change in the future
+		!! - run tests annotated @SimpleUnit.RunInDriverThread without the Executor
+		- similar test as for the test thread, but with the annotation
+		- also make the tests print the current thread, and assert (?) that what it is (test vs actor thread), to know when it changes
 
 !! - end-to-end tests: reporting failures outside tests (in drivers and core)
 	!! - exceptions from actors
