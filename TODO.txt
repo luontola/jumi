@@ -45,6 +45,24 @@ OK - JUnit backward compatibility
 		- similar test as for the test thread, but with the annotation
 		- also make the tests print the current thread, and assert (?) that what it is (test vs actor thread), to know when it changes
 
+- deadlock in printing to standard output
+	https://github.com/orfjackal/jumi/issues/3
+	analysis:
+		1. Throwable.printStackTrace locks on StderrProxy, then uses StderrProxy.y() thus locking SynchronizedPrintStream
+		2. somebody uses StderrProxy.x() thus locking SynchronizedPrintStream, which invokes StderrProxy.super.x() thus locking StderrProxy
+	- reproduce with a unit test: one thread locks PrintStream and then prints, another thread just prints
+	- fix idea: synchronize on obj before locking in fi.jumi.core.output.SynchronizedPrintStream.SynchronizedMethodInterceptor#intercept
+	- verify that fixes https://github.com/orfjackal/jumi/issues/3
+
+- consider preventing Throwable.printStackTrace(System.out) from being wrapped around System.out.print()
+	For the common case "synchronized(System.err){}" we could make all actions on System.out to lock System.err's monitor after locking System.out's monitor. Only one direction is possible without deadlock.
+	Locking order: System.out -> System.err -> shared lock (though shared lock then not necessary)
+	- write unit test: one thread calls Throwable.printStackTrace(err), another prints garbage to out (start first & end last), check that result contains stack trace coherently
+	- change fi.jumi.core.output.SynchronizedPrintStream#create to take an Object to lock on instead of ReentrantLock
+	- update SynchronizedPrintStreamTest to use Thread#holdsLock instead of ReentrantLock#isHeldByCurrentThread
+	- pass the other PrintStream as the object to lock on to the other
+	- probably only one of them needs to be a proxy
+
 !! - end-to-end tests: reporting failures outside tests (in drivers and core)
 	!! - exceptions from actors
 		OK - test: malformed .class file
@@ -58,13 +76,9 @@ OK - JUnit backward compatibility
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
 
-- deadlock in printing to standard output
-	https://github.com/orfjackal/jumi/issues/3
-	analysis:
-		1. Throwable.printStackTrace locks on StderrProxy, then uses StderrProxy.y() thus locking SynchronizedPrintStream
-		2. somebody uses StderrProxy.x() thus locking SynchronizedPrintStream, which invokes StderrProxy.super.x() thus locking StderrProxy
-	- reproduce with a unit test: one thread locks PrintStream and then prints, another thread just prints
-	- verify that fixes https://github.com/orfjackal/jumi/issues/3
+- configurable thread count
+	- add configuration parameter (DaemonConfiguration) for the number of test threads
+	- make the number of test threads by default the number of CPUs + 1 or similar
 
 - release 0.4
 	- tidy up release notes
@@ -95,10 +109,6 @@ OK - JUnit backward compatibility
 	- JUnit assumptions
 		- update the test in fi.jumi.test.JUnitCompatibilityTest
 		- implement fi.jumi.core.junit.JUnitRunListenerAdapter#testAssumptionFailure (JUnitCompatibilityDriverTest)
-
-- configurable thread count
-	- add configuration parameter (DaemonConfiguration) for the number of test threads
-	- make the number of test threads by default the number of CPUs + 1 or similar
 
 - release 0.5
 	- tidy up release notes
