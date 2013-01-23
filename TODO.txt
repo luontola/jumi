@@ -58,6 +58,14 @@ OK - JUnit backward compatibility
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
 
+- deadlock in printing to standard output
+	https://github.com/orfjackal/jumi/issues/3
+	analysis:
+		1. Throwable.printStackTrace locks on StderrProxy, then uses StderrProxy.y() thus locking SynchronizedPrintStream
+		2. somebody uses StderrProxy.x() thus locking SynchronizedPrintStream, which invokes StderrProxy.super.x() thus locking StderrProxy
+	- reproduce with a unit test: one thread locks PrintStream and then prints, another thread just prints
+	- verify that fixes https://github.com/orfjackal/jumi/issues/3
+
 - release 0.4
 	- tidy up release notes
 	OK - bump version
