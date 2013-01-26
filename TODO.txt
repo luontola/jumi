@@ -45,14 +45,14 @@ OK - set context class loader for test threads
 		OK - similar test as for the test thread, but with the annotation
 		OK - also make the tests print the current thread, and assert (?) that what it is (test vs actor thread), to know when it changes
 
-!! - deadlock in printing to standard output
+OK - deadlock in printing to standard output
 	https://github.com/orfjackal/jumi/issues/3
 	analysis:
 		1. Throwable.printStackTrace locks on StderrProxy, then uses StderrProxy.y() thus locking SynchronizedPrintStream
 		2. somebody uses StderrProxy.x() thus locking SynchronizedPrintStream, which invokes StderrProxy.super.x() thus locking StderrProxy
-	!! - reproduce with a unit test: one thread locks PrintStream and then prints, another thread just prints
-	- fix idea: synchronize on obj before locking in fi.jumi.core.output.SynchronizedPrintStream.SynchronizedMethodInterceptor#intercept
-	- verify that fixes https://github.com/orfjackal/jumi/issues/3
+	OK - reproduce with a unit test: one thread locks PrintStream and then prints, another thread just prints
+	OK - fix idea: synchronize on obj before locking in fi.jumi.core.output.SynchronizedPrintStream.SynchronizedMethodInterceptor#intercept
+	OK - verify that fixes https://github.com/orfjackal/jumi/issues/3
 
 - consider preventing Throwable.printStackTrace(System.out) from being wrapped around System.out.print()
 	For the common case "synchronized(System.err){}" we could make all actions on System.out to lock System.err's monitor after locking System.out's monitor. Only one direction is possible without deadlock.
