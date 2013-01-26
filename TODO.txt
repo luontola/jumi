@@ -33,17 +33,17 @@ OK - JUnit backward compatibility
 	OK - remove debug printing from JUnitRunListenerAdapter
 	SKIP - report JUnit test mechanism failures to Jumi (or do this after we have support in Jumi for reporting internal errors?)
 
-!! - set context class loader for test threads
+OK - set context class loader for test threads
 	OK - end-to-end test
 	OK - unit test
 		OK - extract wiring from Main
 		OK - make the thread pools testable
 		OK - check the context class loader of the pool
 	OK - verify that fixes https://github.com/orfjackal/jumi/issues/2
-	!! - e2e test for also driver thread; it may change in the future
+	OK - e2e test for also driver thread; it may change in the future
 		OK - run tests annotated @SimpleUnit.RunInDriverThread without the Executor
-		!! - similar test as for the test thread, but with the annotation
-		- also make the tests print the current thread, and assert (?) that what it is (test vs actor thread), to know when it changes
+		OK - similar test as for the test thread, but with the annotation
+		OK - also make the tests print the current thread, and assert (?) that what it is (test vs actor thread), to know when it changes
 
 - deadlock in printing to standard output
 	https://github.com/orfjackal/jumi/issues/3

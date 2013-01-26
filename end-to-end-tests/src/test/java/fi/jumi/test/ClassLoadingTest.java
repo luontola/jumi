@@ -5,7 +5,7 @@
 package fi.jumi.test;
 
 import org.junit.*;
-import sample.ContextClassLoaderTest;
+import sample.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -17,12 +17,22 @@ public class ClassLoadingTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void test_thread_context_class_loader_and_current_class_loader_are_the_same() throws Exception {
-        app.runTests(ContextClassLoaderTest.class);
+        Class<?> testClass = ContextClassLoaderTest.class;
 
-        assertThat(app.getRunOutput(ContextClassLoaderTest.class, "testContextClassLoader"),
-                containsString("Current thread is jumi-test-"));
+        app.runTests(testClass);
+
+        assertThat(app.getRunOutput(testClass, "testContextClassLoader"), containsString("Current thread is jumi-test-"));
         app.checkSuitePasses();
     }
 
-    // TODO: driver_thread_context_class_loader_and_current_class_loader_are_the_same
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void driver_thread_context_class_loader_and_current_class_loader_are_the_same() throws Exception {
+        Class<?> testClass = ContextClassLoaderOfDriverTest.class;
+
+        app.runTests(testClass);
+
+        // TODO: in the future we may move driver to its own actor; this test will then remind us to set the context class loader
+        assertThat(app.getRunOutput(testClass, "testContextClassLoader"), containsString("Current thread is jumi-test-"));
+        app.checkSuitePasses();
+    }
 }
