@@ -49,7 +49,7 @@ public class JumiBootstrapTest {
 
         bootstrap.runTestClasses(OnePassingTest.class);
 
-        assertThat(daemonOutput.toString(), containsString("[jumi-actors-1]"));
+        assertThat(daemonOutput.toString(), containsString("[jumi-actor-1]"));
     }
 
 
