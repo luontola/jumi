@@ -17,6 +17,10 @@ public class NullSuiteListener implements SuiteListener {
     }
 
     @Override
+    public void onInternalError(String message, StackTrace cause) {
+    }
+
+    @Override
     public void onTestFound(TestFile testFile, TestId testId, String name) {
     }
 

@@ -11,6 +11,8 @@ public interface SuiteListener {
 
     void onSuiteStarted();
 
+    void onInternalError(String message, StackTrace cause);
+
     void onTestFound(TestFile testFile, TestId testId, String name);
 
     void onRunStarted(RunId runId, TestFile testFile);

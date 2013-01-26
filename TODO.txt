@@ -69,9 +69,12 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 !! - end-to-end tests: reporting failures outside tests (in drivers and core)
 	!! - exceptions from actors
 		OK - test: malformed .class file
-		!! - create SuiteListener event
-		- ui: print internal errors
+		OK - create SuiteListener event
+		!! - ui: print internal errors
+		- ui: make the suite fail on internal error (TextUI#hasFailures returns false)
 		- hook into the actors
+	- double-check that implemented:
+		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
 	- exceptions from test threads
 		- test: throw exception from a driver
 	- report JUnit test mechanism failures to Jumi

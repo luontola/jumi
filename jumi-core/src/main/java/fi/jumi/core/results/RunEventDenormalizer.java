@@ -32,6 +32,11 @@ public class RunEventDenormalizer implements SuiteListener {
     }
 
     @Override
+    public void onInternalError(String message, StackTrace cause) {
+        assertShouldNotBeCalled();
+    }
+
+    @Override
     public final void onTestFound(TestFile testFile, TestId testId, String name) {
         assertShouldNotBeCalled();
     }

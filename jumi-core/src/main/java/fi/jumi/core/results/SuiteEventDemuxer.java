@@ -92,6 +92,11 @@ public class SuiteEventDemuxer implements MessageSender<Event<SuiteListener>> {
         }
 
         @Override
+        public void onInternalError(String message, StackTrace cause) {
+            // TODO: save the error
+        }
+
+        @Override
         public void onTestFound(TestFile testFile, TestId testId, String name) {
             addTestName(testFile, testId, name);
         }
