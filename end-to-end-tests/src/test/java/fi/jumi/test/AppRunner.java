@@ -176,6 +176,10 @@ public class AppRunner implements TestRule {
 
     // assertions
 
+    public void checkSuitePasses() {
+        assertThat("failing tests", ui.getFailingCount(), is(0));
+    }
+
     public void checkPassingAndFailingTests(int expectedPassing, int expectedFailing) {
         assertThat("total tests", ui.getTotalCount(), is(expectedPassing + expectedFailing));
         assertThat("passing tests", ui.getPassingCount(), is(expectedPassing));

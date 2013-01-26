@@ -7,16 +7,22 @@ package fi.jumi.test;
 import org.junit.*;
 import sample.ContextClassLoaderTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 public class ClassLoadingTest {
 
     @Rule
     public final AppRunner app = new AppRunner();
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
-    public void context_class_loader_and_current_class_loader_are_the_same() throws Exception {
+    public void test_thread_context_class_loader_and_current_class_loader_are_the_same() throws Exception {
         app.runTests(ContextClassLoaderTest.class);
 
-        app.checkPassingAndFailingTests(2, 0);
-        app.checkTotalTestRuns(1);
+        assertThat(app.getRunOutput(ContextClassLoaderTest.class, "testContextClassLoader"),
+                containsString("Current thread is jumi-test-"));
+        app.checkSuitePasses();
     }
+
+    // TODO: driver_thread_context_class_loader_and_current_class_loader_are_the_same
 }

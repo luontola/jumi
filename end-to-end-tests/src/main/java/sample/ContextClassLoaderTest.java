@@ -12,7 +12,10 @@ import fi.jumi.simpleunit.SimpleUnit;
 public class ContextClassLoaderTest {
 
     public void testContextClassLoader() {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        System.out.println("Current thread is " + currentThread.getName());
+
+        ClassLoader contextClassLoader = currentThread.getContextClassLoader();
         ClassLoader currentClassLoader = getClass().getClassLoader();
         if (contextClassLoader != currentClassLoader) {
             throw new AssertionError("Expected to be the same, but were not: " +
