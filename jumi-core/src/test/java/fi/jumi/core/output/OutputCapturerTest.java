@@ -1,17 +1,19 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.output;
 
+import fi.jumi.core.util.ConcurrencyUtil;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
 
+import static fi.jumi.core.util.ConcurrencyUtil.*;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -211,29 +213,8 @@ public class OutputCapturerTest {
 
     // helpers
 
-    private static void runConcurrently(Runnable... commands) throws InterruptedException {
-        List<Thread> threads = new ArrayList<>();
-        for (Runnable command : commands) {
-            threads.add(startThread(command));
-        }
-        for (Thread thread : threads) {
-            thread.join();
-        }
-    }
-
-    private static Thread startThread(Runnable command) {
-        Thread t = new Thread(command);
-        t.start();
-        return t;
-    }
-
-    private void sync(CountDownLatch barrier) {
-        barrier.countDown();
-        try {
-            barrier.await(TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    private static void sync(CountDownLatch beforeFinished) {
+        ConcurrencyUtil.sync(beforeFinished, TIMEOUT);
     }
 
     private static class OutputListenerSpy implements OutputListener {
