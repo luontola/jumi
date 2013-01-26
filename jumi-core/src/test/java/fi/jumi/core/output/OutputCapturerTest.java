@@ -153,29 +153,29 @@ public class OutputCapturerTest {
     }
 
     @Test(timeout = TIMEOUT)
-    public void spawned_threads_outliving_the_main_thread_do_WHAT() throws InterruptedException {
+    public void when_spawned_threads_print_something_after_the_capture_ends_they_are_still_include_in_the_original_capture() throws InterruptedException {
         final CountDownLatch beforeFinished = new CountDownLatch(2);
         final CountDownLatch afterFinished = new CountDownLatch(2);
-        OutputListenerSpy listener1 = new OutputListenerSpy();
-        OutputListenerSpy listener2 = new OutputListenerSpy();
+        OutputListenerSpy capture1 = new OutputListenerSpy();
+        OutputListenerSpy capture2 = new OutputListenerSpy();
 
-        capturer.captureTo(listener1);
+        capturer.captureTo(capture1);
         Thread t = startThread(new Runnable() {
             @Override
             public void run() {
-                capturer.out().print("before main finished");
+                capturer.out().print("before capture finished");
                 sync(beforeFinished);
                 sync(afterFinished);
-                capturer.out().print("after main finished");
+                capturer.out().print("after capture finished");
             }
         });
         sync(beforeFinished);
-        capturer.captureTo(listener2);
+        capturer.captureTo(capture2);
         sync(afterFinished);
         t.join();
 
-        assertThat(listener1.out).containsExactly("before main finished", "after main finished");
-        assertThat(listener2.out).containsExactly();
+        assertThat(capture1.out).containsExactly("before capture finished", "after capture finished");
+        assertThat(capture2.out).containsExactly();
     }
 
     /**
