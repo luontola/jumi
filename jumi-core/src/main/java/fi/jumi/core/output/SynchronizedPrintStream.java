@@ -11,7 +11,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.util.concurrent.locks.ReentrantLock;
 
 @ThreadSafe
 class SynchronizedPrintStream {
@@ -40,31 +39,28 @@ class SynchronizedPrintStream {
         );
     }
 
-    public static PrintStream create(OutputStream out, Charset charset, ReentrantLock lock) {
+    public static PrintStream create(OutputStream out, Charset charset, Object sharedLock) {
         return (PrintStream) factory.newInstance(
                 new Class[]{OutputStream.class, boolean.class, String.class},
                 new Object[]{out, false, charset.name()},
-                new Callback[]{new SynchronizedMethodInterceptor(lock)}
+                new Callback[]{new SynchronizedMethodInterceptor(sharedLock)}
         );
     }
 
     @ThreadSafe
     private static class SynchronizedMethodInterceptor implements MethodInterceptor {
-        private final ReentrantLock lock;
+        private final Object sharedLock;
 
-        public SynchronizedMethodInterceptor(ReentrantLock lock) {
-            this.lock = lock;
+        public SynchronizedMethodInterceptor(Object sharedLock) {
+            this.sharedLock = sharedLock;
         }
 
         @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
         @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
             synchronized (obj) {
-                lock.lock();
-                try {
+                synchronized (sharedLock) {
                     return proxy.invokeSuper(obj, args);
-                } finally {
-                    lock.unlock();
                 }
             }
         }

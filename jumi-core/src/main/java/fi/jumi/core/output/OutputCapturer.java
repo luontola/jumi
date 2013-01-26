@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -9,7 +9,6 @@ import org.apache.commons.io.output.*;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.*;
 import java.nio.charset.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 @ThreadSafe
 public class OutputCapturer {
@@ -28,9 +27,16 @@ public class OutputCapturer {
     public OutputCapturer(OutputStream realOut, OutputStream realErr, Charset charset) {
         OutputStream capturedOut = new WriterOutputStream(outCapturer, charset);
         OutputStream capturedErr = new WriterOutputStream(errCapturer, charset);
-        ReentrantLock lock = new ReentrantLock();
-        out = SynchronizedPrintStream.create(new OutputStreamReplicator(realOut, capturedOut), charset, lock);
-        err = SynchronizedPrintStream.create(new OutputStreamReplicator(realErr, capturedErr), charset, lock);
+        err = createNonSynchronizedPrintStream(new OutputStreamReplicator(realErr, capturedErr), charset);
+        out = SynchronizedPrintStream.create(new OutputStreamReplicator(realOut, capturedOut), charset, err);
+    }
+
+    private static PrintStream createNonSynchronizedPrintStream(OutputStream out, Charset charset) {
+        try {
+            return new PrintStream(out, false, charset.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public PrintStream out() {

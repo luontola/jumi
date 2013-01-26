@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,7 +18,7 @@ public class SynchronizedPrintStreamTest {
 
     private static final long TIMEOUT = 1000;
 
-    private final ReentrantLock lock = new ReentrantLock();
+    private final Object lock = new Object();
 
     @Test
     public void synchronizes_all_methods_on_the_lock_given_as_parameter() {
@@ -75,7 +74,7 @@ public class SynchronizedPrintStreamTest {
         @Override
         public void write(int b) {
             wasCalled = true;
-            lockWasHeldByCurrentThread = lock.isHeldByCurrentThread();
+            lockWasHeldByCurrentThread = Thread.holdsLock(lock);
         }
     }
 }

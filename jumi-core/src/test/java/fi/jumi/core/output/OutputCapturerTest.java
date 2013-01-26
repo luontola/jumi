@@ -4,6 +4,7 @@
 
 package fi.jumi.core.output;
 
+import com.google.common.base.Throwables;
 import fi.jumi.core.util.ConcurrencyUtil;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import static fi.jumi.core.util.ConcurrencyUtil.*;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class OutputCapturerTest {
 
@@ -179,9 +180,9 @@ public class OutputCapturerTest {
     }
 
     /**
-     * PrintStream synchronizes all its operations on itself, but since println() does two calls to the underlying
-     * OutputStream (or if the printed text is longer than all the internal buffers), it's possible for stdout and
-     * stderr to get interleaved.
+     * {@link PrintStream} synchronizes all its operations on itself, but since {@link PrintStream#println} does two
+     * calls to the underlying {@link OutputStream} (or if the printed text is longer than all the internal buffers),
+     * it's possible for stdout and stderr to get interleaved.
      */
     @Test(timeout = TIMEOUT)
     public void printing_to_stdout_and_stderr_concurrently() throws InterruptedException {
@@ -210,11 +211,51 @@ public class OutputCapturerTest {
         assertThat(combinedOutput.toString()).matches("(O\\r?\\n|E\\r?\\n)+");
     }
 
+    /**
+     * {@link Throwable#printStackTrace} synchronizes on {@code System.err}, but it can still interleave with something
+     * that is printed to {@code System.out}. We can fix that by synchronizing all printing on {@code System.err}, but
+     * only in one direction; the output from {@code Throwable.printStackTrace(System.out)} may still interleave with
+     * printing to {@code System.err}.
+     */
+    @Test(timeout = TIMEOUT)
+    public void printing_a_stack_trace_to_stderr_and_normally_to_stdout_concurrently() throws InterruptedException {
+        final CountDownLatch isPrintingToOut = new CountDownLatch(1);
+        final CountDownLatch hasPrintedStackTrace = new CountDownLatch(1);
+        final Exception exception = new Exception("dummy exception");
+        CombinedOutput combinedOutput = new CombinedOutput();
+        capturer.captureTo(combinedOutput);
+
+        runConcurrently(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        await(isPrintingToOut);
+                        exception.printStackTrace(capturer.err());
+                        hasPrintedStackTrace.countDown();
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        while (hasPrintedStackTrace.getCount() > 0) {
+                            capturer.out().println("*garbage*");
+                            isPrintingToOut.countDown();
+                        }
+                    }
+                }
+        );
+
+        assertThat(combinedOutput.toString(), containsString(Throwables.getStackTraceAsString(exception)));
+    }
+
 
     // helpers
 
-    private static void sync(CountDownLatch beforeFinished) {
-        ConcurrencyUtil.sync(beforeFinished, TIMEOUT);
+    private static void sync(CountDownLatch barrier) {
+        ConcurrencyUtil.sync(barrier, TIMEOUT);
+    }
+
+    private static void await(CountDownLatch barrier) {
+        ConcurrencyUtil.await(barrier, TIMEOUT);
     }
 
     private static class OutputListenerSpy implements OutputListener {

@@ -27,6 +27,10 @@ public class ConcurrencyUtil {
 
     public static void sync(CountDownLatch barrier, long timeoutMillis) {
         barrier.countDown();
+        await(barrier, timeoutMillis);
+    }
+
+    public static void await(CountDownLatch barrier, long timeoutMillis) {
         try {
             barrier.await(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
