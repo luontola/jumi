@@ -4,6 +4,7 @@
 
 package fi.jumi.core.output;
 
+import net.sf.cglib.proxy.Factory;
 import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Test;
 
@@ -67,10 +68,17 @@ public class SynchronizedPrintStreamTest {
     }
 
     @Test
-    public void the_proxy_class_name_gives_a_hint_of_where_the_class_was_generated() {
+    public void the_class_name_in_stack_traces_gives_a_hint_of_who_generated_the_proxy_class() {
         PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);
 
         assertThat(printStream.getClass().getName(), startsWith(SynchronizedPrintStream.class.getName()));
+    }
+
+    @Test
+    public void does_not_expose_the_CGLIB_Factory_interface() {
+        PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);
+
+        assertThat(printStream, not(instanceOf(Factory.class)));
     }
 
 

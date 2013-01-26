@@ -6,7 +6,6 @@ package fi.jumi.core.output;
 
 import net.sf.cglib.core.*;
 import net.sf.cglib.proxy.*;
-import org.apache.commons.io.output.NullOutputStream;
 
 import javax.annotation.concurrent.*;
 import java.io.*;
@@ -28,24 +27,15 @@ class SynchronizedPrintStream {
             ProxyRefDispatcher.class,
     };
 
-    private static final Factory factory;
-
-    static {
+    public static PrintStream create(OutputStream out, Charset charset, Object sharedLock) {
         Enhancer e = new Enhancer();
         e.setSuperclass(PrintStream.class);
-        e.setCallback(new SynchronizedMethodInterceptor(null));
+        e.setCallback(new SynchronizedMethodInterceptor(sharedLock));
         e.setNamingPolicy(new PrefixOverridingNamingPolicy(SynchronizedPrintStream.class.getName()));
-        factory = (Factory) e.create(
-                new Class[]{OutputStream.class},
-                new Object[]{new NullOutputStream()}
-        );
-    }
-
-    public static PrintStream create(OutputStream out, Charset charset, Object sharedLock) {
-        return (PrintStream) factory.newInstance(
+        e.setUseFactory(false);
+        return (PrintStream) e.create(
                 new Class[]{OutputStream.class, boolean.class, String.class},
-                new Object[]{out, false, charset.name()},
-                new Callback[]{new SynchronizedMethodInterceptor(sharedLock)}
+                new Object[]{out, false, charset.name()}
         );
     }
 
