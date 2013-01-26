@@ -63,8 +63,8 @@ OK - deadlock in printing to standard output
 	OK - pass the other PrintStream as the object to lock on to the other
 	OK - probably only one of them needs to be a proxy
 	!! - consider customizing SynchronizedPrintStream's Enhancer
-		!! - improve thread dumps with setNamingPolicy: extend DefaultNamingPolicy, override prefix: super.getClassName(SynchronizedPrintStream.class.getName(), source, key, names)
-		- harden the interface with setUseFactory(false): create a new Enhancer for each create() (it anyways has internal cache)
+		OK - improve thread dumps with setNamingPolicy: extend DefaultNamingPolicy, override prefix: super.getClassName(SynchronizedPrintStream.class.getName(), source, key, names)
+		!! - harden the interface with setUseFactory(false): create a new Enhancer for each create() (it anyways has internal cache)
 
 !! - end-to-end tests: reporting failures outside tests (in drivers and core)
 	!! - exceptions from actors

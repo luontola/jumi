@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 
 import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class SynchronizedPrintStreamTest {
 
@@ -64,6 +64,13 @@ public class SynchronizedPrintStreamTest {
                     }
                 }
         );
+    }
+
+    @Test
+    public void the_proxy_class_name_gives_a_hint_of_where_the_class_was_generated() {
+        PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);
+
+        assertThat(printStream.getClass().getName(), startsWith(SynchronizedPrintStream.class.getName()));
     }
 
 

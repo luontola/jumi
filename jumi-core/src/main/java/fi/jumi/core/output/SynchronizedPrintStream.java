@@ -4,10 +4,11 @@
 
 package fi.jumi.core.output;
 
+import net.sf.cglib.core.*;
 import net.sf.cglib.proxy.*;
 import org.apache.commons.io.output.NullOutputStream;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
@@ -33,6 +34,7 @@ class SynchronizedPrintStream {
         Enhancer e = new Enhancer();
         e.setSuperclass(PrintStream.class);
         e.setCallback(new SynchronizedMethodInterceptor(null));
+        e.setNamingPolicy(new PrefixOverridingNamingPolicy(SynchronizedPrintStream.class.getName()));
         factory = (Factory) e.create(
                 new Class[]{OutputStream.class},
                 new Object[]{new NullOutputStream()}
@@ -63,6 +65,20 @@ class SynchronizedPrintStream {
                     return proxy.invokeSuper(obj, args);
                 }
             }
+        }
+    }
+
+    @Immutable
+    private static class PrefixOverridingNamingPolicy extends DefaultNamingPolicy {
+        private final String prefix;
+
+        private PrefixOverridingNamingPolicy(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @Override
+        public String getClassName(String prefix, String source, Object key, Predicate names) {
+            return super.getClassName(this.prefix, source, key, names);
         }
     }
 }
