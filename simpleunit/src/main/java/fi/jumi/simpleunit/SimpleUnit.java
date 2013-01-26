@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -7,12 +7,18 @@ package fi.jumi.simpleunit;
 import fi.jumi.api.drivers.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
 public class SimpleUnit extends Driver {
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RunInDriverThread {
+    }
 
     @Override
     public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
@@ -23,6 +29,10 @@ public class SimpleUnit extends Driver {
             TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
             tn.fireFailure(new IllegalArgumentException("No test methods in " + testClass));
             tn.fireTestFinished();
+        }
+
+        if (testClass.isAnnotationPresent(RunInDriverThread.class)) {
+            executor = new SynchronousExecutor();
         }
 
         TestId testMethodId = TestId.ROOT.getFirstChild();
@@ -82,6 +92,15 @@ public class SimpleUnit extends Driver {
             } finally {
                 tn.fireTestFinished();
             }
+        }
+    }
+
+    @NotThreadSafe
+    private static class SynchronousExecutor implements Executor {
+
+        @Override
+        public void execute(Runnable command) {
+            command.run();
         }
     }
 }

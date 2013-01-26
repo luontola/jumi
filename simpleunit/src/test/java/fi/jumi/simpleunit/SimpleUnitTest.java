@@ -4,17 +4,23 @@
 
 package fi.jumi.simpleunit;
 
+import fi.jumi.actors.ActorRef;
 import fi.jumi.api.RunVia;
-import fi.jumi.api.drivers.TestId;
+import fi.jumi.api.drivers.*;
 import fi.jumi.core.api.*;
+import fi.jumi.core.drivers.DriverRunner;
+import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.results.*;
-import fi.jumi.core.runs.RunId;
+import fi.jumi.core.runs.*;
 import fi.jumi.core.testbench.TestBench;
 import fi.jumi.core.util.SpyListener;
 import org.junit.Test;
 
+import java.util.concurrent.Executor;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 public class SimpleUnitTest {
 
@@ -149,6 +155,22 @@ public class SimpleUnitTest {
         spy.verify();
     }
 
+    @Test
+    public void if_test_class_annotated_with_RunInDriverThread_then_does_not_use_the_Executor() {
+        RunListener runListener = mock(RunListener.class);
+        Executor executor = mock(Executor.class);
+        Class<AnnotatedWithRunInDriverThreadTest> testClass = AnnotatedWithRunInDriverThreadTest.class;
+        SuiteNotifier notifier = new DefaultSuiteNotifier(ActorRef.wrap(runListener), new RunIdSequence(), new OutputCapturer());
+        DriverRunner driverRunner = new DriverRunner(new SimpleUnit(), testClass, notifier, executor);
+
+        driverRunner.run();
+
+        verifyZeroInteractions(executor);
+        // should anyways run the tests
+        verify(runListener).onTestStarted(new RunId(1), TestId.ROOT);
+        verify(runListener).onTestStarted(new RunId(1), TestId.of(0));
+    }
+
 
     // guinea pigs
 
@@ -196,5 +218,14 @@ public class SimpleUnitTest {
     @RunVia(SimpleUnit.class)
     @SuppressWarnings({"UnusedDeclaration"})
     public static class NoTestMethodsTest {
+    }
+
+    @RunVia(SimpleUnit.class)
+    @SuppressWarnings({"UnusedDeclaration"})
+    @SimpleUnit.RunInDriverThread
+    public static class AnnotatedWithRunInDriverThreadTest {
+
+        public void testUnimportant() {
+        }
     }
 }
