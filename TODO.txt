@@ -77,7 +77,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 	SKIP - double-check that implemented:
 		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
 	!! - exceptions from test threads
-		- test: throw exception from a driver
+		!! - test: throw exception from a driver
 		- test: throw exception from test Executor, without the driver catching it
 	- report JUnit test mechanism failures to Jumi
 	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
