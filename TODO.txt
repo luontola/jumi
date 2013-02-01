@@ -74,9 +74,9 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - ui: make the suite fail on internal error (TextUI#hasFailures returns false)
 		SKIP - implement ui parsing, or do the end-to-end tests already have what they need?
 		OK - hook into the actors
-	!! - double-check that implemented:
+	SKIP - double-check that implemented:
 		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
-	- exceptions from test threads
+	!! - exceptions from test threads
 		- test: throw exception from a driver
 		- test: throw exception from test Executor, without the driver catching it
 	- report JUnit test mechanism failures to Jumi

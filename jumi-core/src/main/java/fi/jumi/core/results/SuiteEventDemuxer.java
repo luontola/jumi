@@ -93,7 +93,7 @@ public class SuiteEventDemuxer implements MessageSender<Event<SuiteListener>> {
 
         @Override
         public void onInternalError(String message, StackTrace cause) {
-            // TODO: save the error
+            // TODO: save the error? or ignore because this is not a run-level error?
         }
 
         @Override
