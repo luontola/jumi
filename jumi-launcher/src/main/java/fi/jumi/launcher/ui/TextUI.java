@@ -68,6 +68,19 @@ public class TextUI {
     private class SuitePrinter extends NullSuiteListener {
 
         @Override
+        public void onInternalError(String message, StackTrace cause) {
+            printer.printlnMeta(" > Internal Error: " + message);
+            printer.printErr(getStackTraceAsString(cause));
+            printer.printErr("\n");
+            hasFailures = true;
+        }
+
+        @Override
+        public void onFailure(RunId runId, StackTrace cause) {
+            hasFailures = true;
+        }
+
+        @Override
         public void onRunFinished(RunId runId) {
             if (passingTestsVisible || hasFailures(runId)) {
                 demuxer.visitRun(runId, new RunPrinter());
@@ -85,7 +98,6 @@ public class TextUI {
             SuiteResultsSummary summary = new SuiteResultsSummary();
             demuxer.visitAllRuns(summary);
             printSuiteFooter(summary);
-            hasFailures = summary.getFailingTests() > 0;
         }
 
         // visual style

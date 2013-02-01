@@ -172,4 +172,14 @@ public class SuiteMother {
 
         suite.end();
     }
+
+
+    // internal errors
+
+    public static void internalError(SuiteListener listener) {
+        EventBuilder suite = new EventBuilder(listener);
+        suite.begin();
+        suite.internalError("the internal error message", new Throwable("dummy exception"));
+        suite.end();
+    }
 }

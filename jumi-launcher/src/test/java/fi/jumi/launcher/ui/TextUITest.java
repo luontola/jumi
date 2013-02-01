@@ -398,4 +398,34 @@ public class TextUITest {
 
         assertThat("has failures", ui.hasFailures(), is(true));
     }
+
+    @Test
+    public void empty_suite_is_considered_to_be_passing() {
+        SuiteMother.emptySuite(listener);
+        runAndGetOutput();
+
+        assertThat("has failures", ui.hasFailures(), is(false));
+    }
+
+
+    // internal errors
+
+    @Test
+    public void prints_internal_error_stack_traces() {
+        SuiteMother.internalError(listener);
+        runAndGetOutput();
+
+        assertInOutput(
+                "> Internal Error: the internal error message",
+                "java.lang.Throwable: dummy exception"
+        );
+    }
+
+    @Test
+    public void internal_errors_fail_the_whole_suite() {
+        SuiteMother.internalError(listener);
+        runAndGetOutput();
+
+        assertThat("has failures", ui.hasFailures(), is(true));
+    }
 }

@@ -70,9 +70,9 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 	!! - exceptions from actors
 		OK - test: malformed .class file
 		OK - create SuiteListener event
-		!! - ui: print internal errors
-		- ui: make the suite fail on internal error (TextUI#hasFailures returns false)
-		- implement ui parsing, or do the end-to-end tests already have what they need?
+		OK - ui: print internal errors
+		OK - ui: make the suite fail on internal error (TextUI#hasFailures returns false)
+		!! - implement ui parsing, or do the end-to-end tests already have what they need?
 		- hook into the actors
 	- double-check that implemented:
 		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
@@ -80,7 +80,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		- test: throw exception from a driver
 		- test: throw exception from test Executor, without the driver catching it
 	- report JUnit test mechanism failures to Jumi
-	- given an error message if starting the daemon fails (for example out of memory)
+	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
 

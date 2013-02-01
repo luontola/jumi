@@ -37,6 +37,10 @@ public class EventBuilder {
         listener.onSuiteFinished();
     }
 
+    public void internalError(String message, Throwable cause) {
+        listener.onInternalError(message, StackTrace.copyOf(cause));
+    }
+
     public void runStarted(RunId runId, TestFile testFile) {
         testFilesByRunId.put(runId, testFile);
         listener.onRunStarted(runId, testFile);
@@ -64,11 +68,11 @@ public class EventBuilder {
         });
     }
 
-    public void failingTest(final RunId runId, final TestId testId, String name, final Throwable failure) {
+    public void failingTest(final RunId runId, final TestId testId, String name, final Throwable cause) {
         test(runId, testId, name, new Runnable() {
             @Override
             public void run() {
-                listener.onFailure(runId, StackTrace.copyOf(failure));
+                listener.onFailure(runId, StackTrace.copyOf(cause));
             }
         });
     }
