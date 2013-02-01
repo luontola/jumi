@@ -72,8 +72,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - create SuiteListener event
 		OK - ui: print internal errors
 		OK - ui: make the suite fail on internal error (TextUI#hasFailures returns false)
-		!! - implement ui parsing, or do the end-to-end tests already have what they need?
-		- hook into the actors
+		SKIP - implement ui parsing, or do the end-to-end tests already have what they need?
+		!! - hook into the actors
 	- double-check that implemented:
 		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
 	- exceptions from test threads

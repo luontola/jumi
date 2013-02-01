@@ -25,7 +25,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class AppRunner implements TestRule {
 
@@ -40,6 +40,7 @@ public class AppRunner implements TestRule {
 
     private JumiLauncher launcher;
     private TextUIParser ui;
+    private String uiRawOutput;
 
     public Path workingDirectory = Paths.get(SuiteConfiguration.DEFAULTS.workingDirectory());
     public final DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
@@ -163,6 +164,7 @@ public class AppRunner implements TestRule {
 
         String output = outputBuffer.toString();
         printTextUIOutput(output);
+        this.uiRawOutput = output;
         this.ui = new TextUIParser(output);
     }
 
@@ -216,13 +218,7 @@ public class AppRunner implements TestRule {
     }
 
     public void checkHasStackTrace(String... expectedElements) {
-        for (RunId id : ui.getRunIds()) {
-            String output = ui.getRunOutput(id);
-            if (Strings.containsSubStrings(output, expectedElements)) {
-                return;
-            }
-        }
-        throw new AssertionError("stack trace not found");
+        assertTrue("stack trace not found in UI output", Strings.containsSubStrings(uiRawOutput, expectedElements));
     }
 
     // JUnit integration
