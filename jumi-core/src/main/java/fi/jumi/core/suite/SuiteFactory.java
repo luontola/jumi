@@ -38,6 +38,7 @@ public class SuiteFactory implements AutoCloseable {
     private TestFileFinder testFileFinder;
     private CompositeDriverFinder driverFinder;
     private RunIdSequence runIdSequence;
+    MultiThreadedActors actors;
 
     public SuiteFactory(DaemonConfiguration daemonConfiguration, OutputCapturer outputCapturer, PrintStream logOutput) {
         this.config = daemonConfiguration;
@@ -58,10 +59,10 @@ public class SuiteFactory implements AutoCloseable {
                 new ContextClassLoaderThreadFactory(testClassLoader, new PrefixedThreadFactory("jumi-test-")));
     }
 
-    public void start(SuiteListener listener) {
+    public void start(final SuiteListener listener) {
 
         // logging configuration
-        FailureHandler failureHandler = new PrintStreamFailureLogger(logOutput);
+        FailureHandler failureHandler = new InternalErrorReportingFailureHandler(listener, logOutput);
         MessageListener messageListener = config.logActorMessages()
                 ? new PrintStreamMessageLogger(logOutput)
                 : new NullMessageListener();
@@ -71,7 +72,7 @@ public class SuiteFactory implements AutoCloseable {
 
         // actors configuration
         // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider
-        MultiThreadedActors actors = new MultiThreadedActors(
+        actors = new MultiThreadedActors(
                 actorsThreadPool,
                 new ComposedEventizerProvider(
                         new StartableEventizer(),

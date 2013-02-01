@@ -67,14 +67,14 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - harden the interface with setUseFactory(false): create a new Enhancer for each create() (it anyways has internal cache)
 
 !! - end-to-end tests: reporting failures outside tests (in drivers and core)
-	!! - exceptions from actors
+	OK - exceptions from actors
 		OK - test: malformed .class file
 		OK - create SuiteListener event
 		OK - ui: print internal errors
 		OK - ui: make the suite fail on internal error (TextUI#hasFailures returns false)
 		SKIP - implement ui parsing, or do the end-to-end tests already have what they need?
-		!! - hook into the actors
-	- double-check that implemented:
+		OK - hook into the actors
+	!! - double-check that implemented:
 		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
 	- exceptions from test threads
 		- test: throw exception from a driver
