@@ -80,8 +80,16 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - test: throw exception from a driver
 		OK - test: throw exception from test Executor, without the driver catching it
 		OK - create InternalErrorReportingExecutor
-		!! - the e2e tests are flaky; the suite ends before the internal error is reported
-			!! - move the reporting inside WorkerCounter instead of outside it? other options?
+		!! - the e2e tests are flaky; the suite ends (onSuiteFinished) before the internal error is reported
+			!! - prepare for inlining/heavy refactoring of SuiteRunner
+				!! - SuiteRunnerIntegrationHelper: use TestBench instead of SuiteRunner directly
+					!! - TestBench: allow injecting SuiteListener, instead of hiding it behind SuiteEventDemuxer
+			- move the reporting inside WorkerCounter instead of outside it? do this first and then refactor mercilessly?
+			- try extracting from SuiteRunner the code that deals with WorkerCounter into an injectable object?
+				runWorker((executor) -> new TestFileFinderRunner(testFileFinder, actorThread.bindActor(TestFileFinderListener.class, this)))
+				runWorker((executor) -> driverFactory.createDriverRunner(testFile, executor))
+			(!) - move worker counting and onSuiteStarted/onSuiteFinished calls to SuiteFactory?
+			(!) - extract TestFileFinderListener implementation from SuiteRunner, to create TestFileRunner and remove SuiteRunner? would also remove StubTestFileFinder (injected to SuiteRunner in TestBench)
 		- extract base class for InternalErrorReportingExecutor & InternalErrorReportingFailureHandler
 		- refactor SuiteFactory: move MessageListener construction out of start()?
 	- report JUnit test mechanism failures to Jumi
