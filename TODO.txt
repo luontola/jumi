@@ -83,6 +83,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
+	- ui: show in the summary line "There were internal errors"
+	- ui: show in the summary line "There were test failures"
 
 - skip abstract test classes silently
 	- find out how Surefire does it; should also interfaces have special handling?

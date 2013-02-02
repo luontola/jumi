@@ -8,7 +8,8 @@ import org.junit.*;
 import sample.BuggyDriverTest;
 
 import static fi.jumi.core.util.AsyncAssert.assertEventually;
-import static org.hamcrest.Matchers.*;
+import static fi.jumi.core.util.StringMatchers.containsSubStrings;
+import static org.hamcrest.Matchers.hasProperty;
 
 public class ErrorHandlingTest {
 
@@ -19,13 +20,19 @@ public class ErrorHandlingTest {
     public void reports_uncaught_exceptions_from_actor_threads() throws Exception {
         app.runTestsMatching("glob:sample/extra/CorruptTest.class");
 
-        app.checkHasStackTrace(
+        assertReportsInternalError(
                 "Uncaught exception in thread jumi-actor-",
                 "java.lang.ClassFormatError");
-        app.checkPassingAndFailingTests(0, 0);
-        app.checkTotalTestRuns(0);
-        assertEventually("internal errors are also logged",
-                app, hasProperty("currentDaemonOutput", containsString("java.lang.ClassFormatError")), Timeouts.ASSERTION);
+    }
+
+    @Ignore("not implemented") // TODO
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void reports_uncaught_exceptions_from_driver_threads() throws Exception {
+        app.runTests(BuggyDriverTest.class);
+
+        assertReportsInternalError(
+                "Uncaught exception in thread jumi-test-",
+                "java.lang.RuntimeException: dummy exception from driver thread");
     }
 
     @Ignore("not implemented") // TODO
@@ -33,12 +40,16 @@ public class ErrorHandlingTest {
     public void reports_uncaught_exceptions_from_test_threads() throws Exception {
         app.runTests(BuggyDriverTest.class);
 
-        app.checkHasStackTrace(
+        assertReportsInternalError(
                 "Uncaught exception in thread jumi-test-",
                 "java.lang.RuntimeException: dummy exception from test thread");
+    }
+
+    private void assertReportsInternalError(String... expectedErrorMessages) {
+        app.checkHasStackTrace(expectedErrorMessages);
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
-        assertEventually("internal errors are also logged",
-                app, hasProperty("currentDaemonOutput", containsString("dummy exception from test thread")), Timeouts.ASSERTION);
+        assertEventually("internal errors should have been logged",
+                app, hasProperty("currentDaemonOutput", containsSubStrings(expectedErrorMessages)), Timeouts.ASSERTION);
     }
 }

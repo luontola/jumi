@@ -7,7 +7,6 @@ package fi.jumi.test;
 import fi.jumi.core.config.*;
 import fi.jumi.core.network.*;
 import fi.jumi.core.runs.RunId;
-import fi.jumi.core.util.Strings;
 import fi.jumi.launcher.*;
 import fi.jumi.launcher.process.*;
 import fi.jumi.launcher.ui.*;
@@ -23,9 +22,10 @@ import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 
+import static fi.jumi.core.util.StringMatchers.containsSubStrings;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class AppRunner implements TestRule {
 
@@ -218,7 +218,7 @@ public class AppRunner implements TestRule {
     }
 
     public void checkHasStackTrace(String... expectedElements) {
-        assertTrue("stack trace not found in UI output", Strings.containsSubStrings(uiRawOutput, expectedElements));
+        assertThat("stack trace not found in UI output", uiRawOutput, containsSubStrings(expectedElements));
     }
 
     // JUnit integration
