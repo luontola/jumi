@@ -32,8 +32,9 @@ public class SuiteFactory implements AutoCloseable {
 
     // some fields are package-private for testing purposes
 
-    private ExecutorService actorsThreadPool;
-    ExecutorService testsThreadPool;
+    private ExecutorService actorThreadPool;
+    private ExecutorService testThreadPool;
+    Executor testExecutor;
     ClassLoader testClassLoader;
     private TestFileFinder testFileFinder;
     private CompositeDriverFinder driverFinder;
@@ -53,9 +54,9 @@ public class SuiteFactory implements AutoCloseable {
         runIdSequence = new RunIdSequence();
 
         // thread pool configuration
-        actorsThreadPool = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actor-"));
+        actorThreadPool = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actor-"));
         // TODO: make the number of test threads by default the number of CPUs + 1 or similar
-        testsThreadPool = Executors.newFixedThreadPool(4,
+        testThreadPool = Executors.newFixedThreadPool(4,
                 new ContextClassLoaderThreadFactory(testClassLoader, new PrefixedThreadFactory("jumi-test-")));
     }
 
@@ -63,17 +64,18 @@ public class SuiteFactory implements AutoCloseable {
 
         // logging configuration
         FailureHandler failureHandler = new InternalErrorReportingFailureHandler(listener, logOutput);
-        MessageListener messageListener = config.logActorMessages()
+        MessageListener messageListener = config.logActorMessages() // TODO: move to constructor?
                 ? new PrintStreamMessageLogger(logOutput)
                 : new NullMessageListener();
 
         // actor messages are already logged by the actors container, but the test thread pool must be hooked separately
-        Executor testsThreadPool = messageListener.getListenedExecutor(this.testsThreadPool);
+        testExecutor = messageListener.getListenedExecutor(testThreadPool); // TODO: move to constructor?
+        testExecutor = new InternalErrorReportingExecutor(testExecutor, listener, logOutput);
 
         // actors configuration
         // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider
         actors = new MultiThreadedActors(
-                actorsThreadPool,
+                actorThreadPool,
                 new ComposedEventizerProvider(
                         new StartableEventizer(),
                         new RunnableEventizer(),
@@ -95,18 +97,18 @@ public class SuiteFactory implements AutoCloseable {
                         listener,
                         testFileFinder,
                         actorThread,
-                        testsThreadPool
+                        testExecutor
                 ));
         suiteRunner.tell().start();
     }
 
     @Override
     public void close() {
-        if (actorsThreadPool != null) {
-            actorsThreadPool.shutdownNow();
+        if (actorThreadPool != null) {
+            actorThreadPool.shutdownNow();
         }
-        if (testsThreadPool != null) {
-            testsThreadPool.shutdownNow();
+        if (testThreadPool != null) {
+            testThreadPool.shutdownNow();
         }
     }
 

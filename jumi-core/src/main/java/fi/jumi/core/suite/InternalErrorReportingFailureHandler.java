@@ -11,7 +11,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.io.PrintStream;
 
 @ThreadSafe
-public class InternalErrorReportingFailureHandler implements FailureHandler {
+class InternalErrorReportingFailureHandler implements FailureHandler {
 
     private final SuiteListener listener;
     private final PrintStream out;

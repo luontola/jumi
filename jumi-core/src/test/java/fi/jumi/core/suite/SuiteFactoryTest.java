@@ -31,9 +31,10 @@ public class SuiteFactoryTest {
     @Test(timeout = TIMEOUT)
     public void sets_the_context_class_loader_for_test_threads() throws InterruptedException {
         factory.configure(new SuiteConfiguration());
+        factory.start(new NullSuiteListener());
         final BlockingQueue<ClassLoader> spy = new LinkedBlockingQueue<>();
 
-        factory.testsThreadPool.execute(new Runnable() {
+        factory.testExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 spy.add(Thread.currentThread().getContextClassLoader());
@@ -65,5 +66,26 @@ public class SuiteFactoryTest {
         dummyActor.tell().run();
 
         assertThat(spy.take(), startsWith("Uncaught exception in thread jumi-actor-"));
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void reports_uncaught_exceptions_from_test_threads_as_internal_errors() throws InterruptedException {
+        final BlockingQueue<String> spy = new LinkedBlockingQueue<>();
+        factory.configure(new SuiteConfiguration());
+        factory.start(new NullSuiteListener() {
+            @Override
+            public void onInternalError(String message, StackTrace cause) {
+                spy.add(message);
+            }
+        });
+
+        factory.testExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                throw new RuntimeException("dummy exception");
+            }
+        });
+
+        assertThat(spy.take(), startsWith("Uncaught exception in thread jumi-test-"));
     }
 }

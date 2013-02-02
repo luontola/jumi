@@ -25,7 +25,7 @@ public class ErrorHandlingTest {
                 "java.lang.ClassFormatError");
     }
 
-    @Ignore("not implemented") // TODO
+    @Ignore("not implemented") // TODO: passes only randomly
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_uncaught_exceptions_from_driver_threads() throws Exception {
         app.runTests(BuggyDriverTest.class);
@@ -35,7 +35,7 @@ public class ErrorHandlingTest {
                 "java.lang.RuntimeException: dummy exception from driver thread");
     }
 
-    @Ignore("not implemented") // TODO
+    @Ignore("not implemented") // TODO: passes only randomly
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_uncaught_exceptions_from_test_threads() throws Exception {
         app.runTests(BuggyDriverTest.class);
