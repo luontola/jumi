@@ -25,7 +25,8 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
     private final Executor testExecutor;
     private final PrintStream logOutput;
 
-    private int childRunners = 0;
+    private int activeTestFiles = 0;
+    private boolean allTestFilesStarted;
 
     // XXX: too many constructor parameters, could we group some of them together?
     public SuiteRunner(DriverFactory driverFactory,
@@ -46,9 +47,7 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
     public void start() {
         suiteListener.onSuiteStarted();
 
-        WorkerCounter executor = new WorkerCounter(testExecutor);
-        executor.execute(new TestFileFinderRunner(testFileFinder, actorThread.bindActor(TestFileFinderListener.class, this)));
-        executor.afterPreviousWorkersFinished(childRunnerListener());
+        testExecutor.execute(new TestFileFinderRunner(testFileFinder, actorThread.bindActor(TestFileFinderListener.class, this)));
     }
 
     @Override
@@ -61,7 +60,8 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
 
     @Override
     public void onAllTestFilesFound() {
-        // TODO
+        allTestFilesStarted = true;
+        checkSuiteFinished();
     }
 
     private ActorRef<WorkerListener> childRunnerListener() {
@@ -78,12 +78,16 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
     }
 
     private void fireChildRunnerStarted() {
-        childRunners++;
+        activeTestFiles++;
     }
 
     private void fireChildRunnerFinished() {
-        childRunners--;
-        if (childRunners == 0) {
+        activeTestFiles--;
+        checkSuiteFinished();
+    }
+
+    private void checkSuiteFinished() {
+        if (allTestFilesStarted && activeTestFiles == 0) {
             suiteListener.onSuiteFinished();
         }
     }
