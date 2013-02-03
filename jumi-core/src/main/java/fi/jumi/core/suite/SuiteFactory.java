@@ -63,12 +63,12 @@ public class SuiteFactory implements AutoCloseable {
 
         // logging configuration
         FailureHandler failureHandler = new InternalErrorReportingFailureHandler(suiteListener, logOutput);
-        MessageListener messageListener = config.logActorMessages() // TODO: move to constructor?
+        MessageListener messageListener = config.logActorMessages()
                 ? new PrintStreamMessageLogger(logOutput)
                 : new NullMessageListener();
 
         // actor messages are already logged by the actors container, but the test thread pool must be hooked separately
-        Executor testExecutor = messageListener.getListenedExecutor(testThreadPool); // TODO: move to constructor?
+        Executor testExecutor = messageListener.getListenedExecutor(testThreadPool);
 
         // actors configuration
         // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider

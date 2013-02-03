@@ -76,7 +76,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - hook into the actors
 	SKIP - double-check that implemented:
 		fi.jumi.core.results.SuiteEventDemuxer.InternalDemuxer#onInternalError
-	!! - exceptions from test threads
+	OK - exceptions from test threads
 		OK - test: throw exception from a driver
 		OK - test: throw exception from test Executor, without the driver catching it
 		OK - create InternalErrorReportingExecutor
@@ -96,8 +96,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 				OK - move starting TestFileFinderRunner out of SuiteRunner, maybe to its own actor thread (which is stopped after it finishes)
 				OK - call fi.jumi.actors.workers.WorkerCounter#afterPreviousWorkersFinished in onAllTestFilesFound, remove the separate counting?
 		OK - extract base class for InternalErrorReportingExecutor & InternalErrorReportingFailureHandler
-		!! - refactor SuiteFactory: move MessageListener construction out of start()?
-	- report JUnit test mechanism failures to Jumi
+		SKIP - refactor SuiteFactory: move MessageListener construction out of start()?
+	!! - report JUnit test mechanism failures to Jumi
 	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
