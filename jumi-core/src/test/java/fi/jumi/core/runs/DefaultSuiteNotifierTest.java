@@ -65,4 +65,12 @@ public class DefaultSuiteNotifierTest {
 
         verify(listener, never()).onPrintedOut(any(RunId.class), anyString());
     }
+
+    @Test
+    public void forwards_internal_errors_to_the_listener() {
+        Throwable cause = new Throwable("dummy exception");
+        notifier.fireInternalError("the message", cause);
+
+        verify(listener).onInternalError("the message", cause);
+    }
 }

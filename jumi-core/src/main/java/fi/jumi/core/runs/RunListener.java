@@ -8,6 +8,8 @@ import fi.jumi.api.drivers.TestId;
 
 public interface RunListener {
 
+    void onInternalError(String message, Throwable cause);
+
     void onTestFound(TestId testId, String name);
 
     void onRunStarted(RunId runId);

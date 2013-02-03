@@ -55,6 +55,11 @@ class DuplicateOnTestFoundEventFilter implements RunListener {
     // events which are delegated as-is
 
     @Override
+    public void onInternalError(String message, Throwable cause) {
+        target.onInternalError(message, cause); // TODO: not tested
+    }
+
+    @Override
     public void onRunStarted(RunId runId) {
         target.onRunStarted(runId);
     }

@@ -29,4 +29,9 @@ public class DefaultSuiteNotifier implements SuiteNotifier {
         currentRun.fireTestStarted(testId);
         return new DefaultTestNotifier(currentRun, testId);
     }
+
+    @Override
+    public void fireInternalError(String message, Throwable cause) {
+        currentRun.fireInternalError(message, cause);
+    }
 }

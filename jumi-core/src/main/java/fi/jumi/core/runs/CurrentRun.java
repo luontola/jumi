@@ -74,6 +74,10 @@ class CurrentRun {
         listener.tell().onFailure(currentRun.runId, testId, cause);
     }
 
+    public void fireInternalError(String message, Throwable cause) {
+        listener.tell().onInternalError(message, cause);
+    }
+
 
     @ThreadSafe
     private static class RunContext {
