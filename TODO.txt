@@ -81,9 +81,9 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - test: throw exception from test Executor, without the driver catching it
 		OK - create InternalErrorReportingExecutor
 		!! - the e2e tests are flaky; the suite ends (onSuiteFinished) before the internal error is reported
-			!! - prepare for inlining/heavy refactoring of SuiteRunner
-				!! - SuiteRunnerIntegrationHelper: use TestBench instead of SuiteRunner directly
-					!! - TestBench: allow injecting SuiteListener, instead of hiding it behind SuiteEventDemuxer
+			OK - prepare for inlining/heavy refactoring of SuiteRunner
+				OK - SuiteRunnerIntegrationHelper: use TestBench instead of SuiteRunner directly
+					OK - TestBench: allow injecting SuiteListener, instead of hiding it behind SuiteEventDemuxer
 			- move the reporting layer below WorkerCounter instead of above it? do this first and then refactor mercilessly?
 			- try extracting from SuiteRunner the code that deals with WorkerCounter into an injectable object?
 				runWorker((executor) -> new TestFileFinderRunner(testFileFinder, actorThread.bindActor(TestFileFinderListener.class, this)))

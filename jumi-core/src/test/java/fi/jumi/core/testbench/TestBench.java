@@ -43,7 +43,11 @@ public class TestBench {
 
     public SuiteEventDemuxer run(Class<?>... testClasses) {
         SuiteEventDemuxer results = new SuiteEventDemuxer();
+        run(new SuiteListenerEventizer().newFrontend(results), testClasses);
+        return results;
+    }
 
+    public void run(SuiteListener suiteListener, Class<?>... testClasses) {
         SingleThreadedActors actors = new SingleThreadedActors(
                 new DynamicEventizerProvider(),
                 actorsFailureHandler,
@@ -52,7 +56,6 @@ public class TestBench {
         ActorThread actorThread = actors.startActorThread();
         Executor testExecutor = actors.getExecutor();
 
-        SuiteListener suiteListener = new SuiteListenerEventizer().newFrontend(results);
         RunIdSequence runIdSequence = new RunIdSequence();
         ClassLoader classLoader = getClass().getClassLoader();
 
@@ -65,8 +68,6 @@ public class TestBench {
         );
         runner.start();
         actors.processEventsUntilIdle();
-
-        return results;
     }
 
 

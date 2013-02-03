@@ -4,36 +4,22 @@
 
 package fi.jumi.core.suite;
 
-import fi.jumi.actors.*;
-import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
-import fi.jumi.actors.listeners.*;
 import fi.jumi.api.drivers.Driver;
 import fi.jumi.core.api.SuiteListener;
-import fi.jumi.core.discovery.TestFileFinder;
 import fi.jumi.core.drivers.DriverFinder;
-import fi.jumi.core.output.OutputCapturer;
-import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.testbench.*;
-import fi.jumi.core.util.*;
+import fi.jumi.core.util.SpyListener;
 
 import java.io.PrintStream;
-import java.util.concurrent.Executor;
 
 public abstract class SuiteRunnerIntegrationHelper {
-
-    // TODO: replace with TestBench?
 
     private final SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
     protected final SuiteListener expect = spy.getListener();
 
-    private final FailureHandler failureHandler = new CrashEarlyFailureHandler();
-    private final MessageListener messageListener = new NullMessageListener();
-    private final SingleThreadedActors actors = new SingleThreadedActors(new DynamicEventizerProvider(), failureHandler, messageListener);
-    private final Executor executor = actors.getExecutor();
-
-    private final OutputCapturer outputCapturer = new OutputCapturer();
-    protected final PrintStream stdout = outputCapturer.out();
-    protected final PrintStream stderr = outputCapturer.err();
+    private final TestBench testBench = new TestBench();
+    protected final PrintStream stdout = testBench.out;
+    protected final PrintStream stderr = testBench.err;
 
     protected void runAndCheckExpectations(Driver driver, Class<?>... testClasses) {
         spy.replay();
@@ -49,21 +35,12 @@ public abstract class SuiteRunnerIntegrationHelper {
         run(expect, driverFinder, testClasses);
     }
 
-    protected void run(SuiteListener listener, Driver driver, Class<?>... testClasses) {
-        run(listener, new StubDriverFinder(driver), testClasses);
+    protected void run(SuiteListener suiteListener, Driver driver, Class<?>... testClasses) {
+        run(suiteListener, new StubDriverFinder(driver), testClasses);
     }
 
-    protected void run(SuiteListener listener, DriverFinder driverFinder, Class<?>... testClasses) {
-        TestFileFinder testFileFinder = new StubTestFileFinder(testClasses);
-        RunIdSequence runIdSequence = new RunIdSequence();
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        ActorThread actorThread = actors.startActorThread();
-        ActorRef<Startable> runner = actorThread.bindActor(Startable.class,
-                new SuiteRunner(
-                        new DriverFactory(listener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
-                        listener, testFileFinder, actorThread, executor));
-        runner.tell().start();
-        actors.processEventsUntilIdle();
+    protected void run(SuiteListener suiteListener, DriverFinder driverFinder, Class<?>... testClasses) {
+        testBench.setDriverFinder(driverFinder);
+        testBench.run(suiteListener, testClasses);
     }
 }
