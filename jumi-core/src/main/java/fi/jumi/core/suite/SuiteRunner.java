@@ -4,7 +4,7 @@
 
 package fi.jumi.core.suite;
 
-import fi.jumi.actors.*;
+import fi.jumi.actors.ActorThread;
 import fi.jumi.actors.workers.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.discovery.TestFileFinderListener;
@@ -20,11 +20,8 @@ public class SuiteRunner implements TestFileFinderListener {
 
     private final SuiteListener suiteListener;
     private final ActorThread actorThread;
-    private final Executor testExecutor;
-    private final PrintStream logOutput;
-
-    private int activeTestFiles = 0;
-    private boolean allTestFilesStarted;
+    private final WorkerCounter workerCounter;
+    private InternalErrorReportingExecutor testExecutor;
 
     // XXX: too many constructor parameters, could we group some of them together?
     public SuiteRunner(DriverFactory driverFactory,
@@ -35,49 +32,27 @@ public class SuiteRunner implements TestFileFinderListener {
         this.driverFactory = driverFactory;
         this.suiteListener = suiteListener;
         this.actorThread = actorThread;
-        this.testExecutor = testExecutor;
-        this.logOutput = logOutput;
+        this.workerCounter = new WorkerCounter(testExecutor);
+        this.testExecutor = new InternalErrorReportingExecutor(workerCounter, suiteListener, logOutput);
     }
 
     @Override
     public void onTestFileFound(TestFile testFile) {
-        WorkerCounter workerCounter = new WorkerCounter(testExecutor);
-        Executor executor = new InternalErrorReportingExecutor(workerCounter, suiteListener, logOutput);
-        executor.execute(driverFactory.createDriverRunner(testFile, executor));
-        workerCounter.afterPreviousWorkersFinished(childRunnerListener());
+        testExecutor.execute(driverFactory.createDriverRunner(testFile, testExecutor));
     }
 
     @Override
     public void onAllTestFilesFound() {
-        allTestFilesStarted = true;
-        checkSuiteFinished();
-    }
-
-    private ActorRef<WorkerListener> childRunnerListener() {
-        fireChildRunnerStarted();
-
         @NotThreadSafe
-        class OnRunnerFinished implements WorkerListener {
+        class FireSuiteFinished implements WorkerListener {
             @Override
             public void onAllWorkersFinished() {
-                fireChildRunnerFinished();
+                suiteListener.onSuiteFinished();
             }
         }
-        return actorThread.bindActor(WorkerListener.class, new OnRunnerFinished());
+
+        workerCounter.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireSuiteFinished()));
     }
 
-    private void fireChildRunnerStarted() {
-        activeTestFiles++;
-    }
-
-    private void fireChildRunnerFinished() {
-        activeTestFiles--;
-        checkSuiteFinished();
-    }
-
-    private void checkSuiteFinished() {
-        if (allTestFilesStarted && activeTestFiles == 0) {
-            suiteListener.onSuiteFinished();
-        }
-    }
+    // TODO: If we need events about individual test files finishing, consider the design that this class had in revision 8d3526b29f378
 }
