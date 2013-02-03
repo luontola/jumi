@@ -90,8 +90,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 				runWorker((executor) -> driverFactory.createDriverRunner(testFile, executor))
 			SKIP - move worker counting and onSuiteStarted/onSuiteFinished calls to SuiteFactory?
 			!! - extract TestFileFinderListener implementation from SuiteRunner, to create TestFileRunner and remove SuiteRunner? would also remove StubTestFileFinder (injected to SuiteRunner in TestBench)
-				!! - add TestFileFinderListener.onAllTestFilesFound()
-				- don't use WorkerCounter for TestFileFinderRunner, but use a flag SuiteRunner.allTestFilesStarted
+				OK - add TestFileFinderListener.onAllTestFilesFound()
+				!! - don't use WorkerCounter for TestFileFinderRunner, but use a flag SuiteRunner.allTestFilesStarted
 				- rename SuiteRunner.childRunners to activeTestFiles
 				- move starting TestFileFinderRunner out of SuiteRunner, maybe to its own actor thread (which is stopped after it finishes)
 				- call fi.jumi.actors.workers.WorkerCounter#afterPreviousWorkersFinished in onAllTestFilesFound, remove the separate counting?

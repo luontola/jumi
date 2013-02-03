@@ -32,6 +32,7 @@ public class PathMatcherTestFileFinder implements TestFileFinder {
 
             @Override
             protected void fileFound(Path relativePath) {
+                // XXX: This class must not call onAllTestFilesFound, but only CompositeTestFileFinder does, to avoid duplicate calls
                 listener.tell().onTestFileFound(TestFile.fromPath(relativePath));
             }
         }

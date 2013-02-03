@@ -21,5 +21,6 @@ public class StubTestFileFinder implements TestFileFinder {
         for (Class<?> testClass : testClasses) {
             listener.tell().onTestFileFound(TestFile.fromClass(testClass));
         }
+        listener.tell().onAllTestFilesFound();
     }
 }

@@ -5,6 +5,8 @@
 package fi.jumi.core.discovery;
 
 import fi.jumi.actors.ActorRef;
+import fi.jumi.core.api.TestFile;
+import fi.jumi.core.util.SpyListener;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -24,5 +26,41 @@ public class CompositeTestFileFinderTest {
 
         verify(finder1).findTestFiles(listenerRef);
         verify(finder2).findTestFiles(listenerRef);
+    }
+
+    @Test
+    public void notifies_after_all_test_files_have_been_found() {
+        SpyListener<TestFileFinderListener> spy = new SpyListener<>(TestFileFinderListener.class);
+        TestFileFinderListener expect = spy.getListener();
+        CompositeTestFileFinder composite = new CompositeTestFileFinder(Arrays.<TestFileFinder>asList(
+                new FakeTestFileFinder(DummyTest1.class), new FakeTestFileFinder(DummyTest2.class)));
+
+        expect.onTestFileFound(TestFile.fromClass(DummyTest1.class));
+        expect.onTestFileFound(TestFile.fromClass(DummyTest2.class));
+        expect.onAllTestFilesFound();
+
+        spy.replay();
+        composite.findTestFiles(ActorRef.wrap(expect));
+        spy.verify();
+    }
+
+
+    private static class DummyTest1 {
+    }
+
+    private static class DummyTest2 {
+    }
+
+    private static class FakeTestFileFinder implements TestFileFinder {
+        private final Class<?> testClass;
+
+        private FakeTestFileFinder(Class<?> testClass) {
+            this.testClass = testClass;
+        }
+
+        @Override
+        public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
+            listener.tell().onTestFileFound(TestFile.fromClass(testClass));
+        }
     }
 }

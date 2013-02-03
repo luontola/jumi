@@ -59,6 +59,11 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
         workerCounter.afterPreviousWorkersFinished(childRunnerListener());
     }
 
+    @Override
+    public void onAllTestFilesFound() {
+        // TODO
+    }
+
     private ActorRef<WorkerListener> childRunnerListener() {
         fireChildRunnerStarted();
 

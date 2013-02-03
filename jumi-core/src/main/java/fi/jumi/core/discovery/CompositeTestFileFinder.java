@@ -20,8 +20,12 @@ public class CompositeTestFileFinder implements TestFileFinder {
 
     @Override
     public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
-        for (TestFileFinder finder : finders) {
-            finder.findTestFiles(listener);
+        try {
+            for (TestFileFinder finder : finders) {
+                finder.findTestFiles(listener);
+            }
+        } finally {
+            listener.tell().onAllTestFilesFound();
         }
     }
 

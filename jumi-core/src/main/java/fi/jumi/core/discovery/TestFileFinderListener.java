@@ -9,4 +9,6 @@ import fi.jumi.core.api.TestFile;
 public interface TestFileFinderListener {
 
     void onTestFileFound(TestFile testFile);
+
+    void onAllTestFilesFound();
 }
