@@ -59,10 +59,10 @@ public class SuiteFactory implements AutoCloseable {
                 new ContextClassLoaderThreadFactory(testClassLoader, new PrefixedThreadFactory("jumi-test-")));
     }
 
-    public void start(final SuiteListener listener) {
+    public void start(final SuiteListener suiteListener) {
 
         // logging configuration
-        FailureHandler failureHandler = new InternalErrorReportingFailureHandler(listener, logOutput);
+        FailureHandler failureHandler = new InternalErrorReportingFailureHandler(suiteListener, logOutput);
         MessageListener messageListener = config.logActorMessages() // TODO: move to constructor?
                 ? new PrintStreamMessageLogger(logOutput)
                 : new NullMessageListener();
@@ -89,16 +89,17 @@ public class SuiteFactory implements AutoCloseable {
 
         // bootstrap the system
         ActorThread actorThread = actors.startActorThread();
-        ActorRef<Startable> suiteRunner = actorThread.bindActor(Startable.class,
+        ActorRef<TestFileFinderListener> suiteRunner = actorThread.bindActor(TestFileFinderListener.class,
                 new SuiteRunner(
-                        new DriverFactory(listener, actorThread, outputCapturer, driverFinder, runIdSequence, testClassLoader),
-                        listener,
-                        testFileFinder,
+                        new DriverFactory(suiteListener, actorThread, outputCapturer, driverFinder, runIdSequence, testClassLoader),
+                        suiteListener,
                         actorThread,
                         testExecutor,
                         logOutput
                 ));
-        suiteRunner.tell().start();
+
+        suiteListener.onSuiteStarted();
+        actorThreadPool.execute(new TestFileFinderRunner(testFileFinder, suiteRunner));
     }
 
     @Override

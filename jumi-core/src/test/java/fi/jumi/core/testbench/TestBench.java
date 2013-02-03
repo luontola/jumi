@@ -8,6 +8,7 @@ import fi.jumi.actors.*;
 import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
 import fi.jumi.actors.listeners.*;
 import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.discovery.*;
 import fi.jumi.core.drivers.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.output.OutputCapturer;
@@ -60,15 +61,17 @@ public class TestBench {
         RunIdSequence runIdSequence = new RunIdSequence();
         ClassLoader classLoader = getClass().getClassLoader();
 
-        SuiteRunner runner = new SuiteRunner(
-                new DriverFactory(suiteListener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
-                suiteListener,
-                new StubTestFileFinder(testClasses),
-                actorThread,
-                testExecutor,
-                new PrintStream(new NullOutputStream())
-        );
-        runner.start();
+        ActorRef<TestFileFinderListener> suiteRunner = actorThread.bindActor(TestFileFinderListener.class,
+                new SuiteRunner(
+                        new DriverFactory(suiteListener, actorThread, outputCapturer, driverFinder, runIdSequence, classLoader),
+                        suiteListener,
+                        actorThread,
+                        testExecutor,
+                        new PrintStream(new NullOutputStream())
+                ));
+
+        suiteListener.onSuiteStarted();
+        testExecutor.execute(new TestFileFinderRunner(new StubTestFileFinder(testClasses), suiteRunner));
         actors.processEventsUntilIdle();
     }
 

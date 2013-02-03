@@ -7,20 +7,18 @@ package fi.jumi.core.suite;
 import fi.jumi.actors.*;
 import fi.jumi.actors.workers.*;
 import fi.jumi.core.api.*;
-import fi.jumi.core.discovery.*;
-import fi.jumi.core.util.Startable;
+import fi.jumi.core.discovery.TestFileFinderListener;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.PrintStream;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
-public class SuiteRunner implements Startable, TestFileFinderListener {
+public class SuiteRunner implements TestFileFinderListener {
 
     private final DriverFactory driverFactory;
 
     private final SuiteListener suiteListener;
-    private final TestFileFinder testFileFinder;
     private final ActorThread actorThread;
     private final Executor testExecutor;
     private final PrintStream logOutput;
@@ -31,23 +29,14 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
     // XXX: too many constructor parameters, could we group some of them together?
     public SuiteRunner(DriverFactory driverFactory,
                        SuiteListener suiteListener,
-                       TestFileFinder testFileFinder,
                        ActorThread actorThread,
                        Executor testExecutor,
                        PrintStream logOutput) {
         this.driverFactory = driverFactory;
         this.suiteListener = suiteListener;
-        this.testFileFinder = testFileFinder;
         this.actorThread = actorThread;
         this.testExecutor = testExecutor;
         this.logOutput = logOutput;
-    }
-
-    @Override
-    public void start() {
-        suiteListener.onSuiteStarted();
-
-        testExecutor.execute(new TestFileFinderRunner(testFileFinder, actorThread.bindActor(TestFileFinderListener.class, this)));
     }
 
     @Override
