@@ -34,7 +34,7 @@ public class SuiteFactoryTest {
         factory.start(new NullSuiteListener());
         final BlockingQueue<ClassLoader> spy = new LinkedBlockingQueue<>();
 
-        factory.testExecutor.execute(new Runnable() {
+        factory.testThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 spy.add(Thread.currentThread().getContextClassLoader());

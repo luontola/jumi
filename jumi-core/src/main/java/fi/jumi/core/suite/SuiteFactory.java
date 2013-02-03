@@ -33,8 +33,7 @@ public class SuiteFactory implements AutoCloseable {
     // some fields are package-private for testing purposes
 
     private ExecutorService actorThreadPool;
-    private ExecutorService testThreadPool;
-    Executor testExecutor;
+    ExecutorService testThreadPool;
     ClassLoader testClassLoader;
     private TestFileFinder testFileFinder;
     private CompositeDriverFinder driverFinder;
@@ -69,7 +68,7 @@ public class SuiteFactory implements AutoCloseable {
                 : new NullMessageListener();
 
         // actor messages are already logged by the actors container, but the test thread pool must be hooked separately
-        testExecutor = messageListener.getListenedExecutor(testThreadPool); // TODO: move to constructor?
+        Executor testExecutor = messageListener.getListenedExecutor(testThreadPool); // TODO: move to constructor?
 
         // actors configuration
         // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider
