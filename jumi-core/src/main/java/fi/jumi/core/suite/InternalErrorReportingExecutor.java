@@ -4,36 +4,33 @@
 
 package fi.jumi.core.suite;
 
-import fi.jumi.core.api.*;
+import fi.jumi.core.api.SuiteListener;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.PrintStream;
 import java.util.concurrent.Executor;
 
 @ThreadSafe
-class InternalErrorReportingExecutor implements Executor {
+class InternalErrorReportingExecutor extends InternalErrorReporter implements Executor {
 
     private final Executor backingExecutor;
-    private final SuiteListener listener;
-    private final PrintStream out;
 
     public InternalErrorReportingExecutor(Executor backingExecutor, SuiteListener listener, PrintStream out) {
+        super(listener, out);
         this.backingExecutor = backingExecutor;
-        this.listener = listener;
-        this.out = out;
     }
 
     @Override
     public void execute(Runnable command) {
-        backingExecutor.execute(new InternalErrorReporter(command));
+        backingExecutor.execute(new InternalErrorReportingCommand(command));
     }
 
 
     @ThreadSafe
-    private class InternalErrorReporter implements Runnable {
+    private class InternalErrorReportingCommand implements Runnable {
         private final Runnable command;
 
-        public InternalErrorReporter(Runnable command) {
+        public InternalErrorReportingCommand(Runnable command) {
             this.command = command;
         }
 
@@ -42,12 +39,7 @@ class InternalErrorReportingExecutor implements Executor {
             try {
                 command.run();
             } catch (Throwable t) {
-                String description = "Uncaught exception in thread " + Thread.currentThread().getName();
-                synchronized (out) {
-                    out.println(description);
-                    t.printStackTrace(out);
-                }
-                listener.onInternalError(description, StackTrace.copyOf(t));
+                reportInternalError("Uncaught exception in thread " + Thread.currentThread().getName(), t);
             }
         }
     }

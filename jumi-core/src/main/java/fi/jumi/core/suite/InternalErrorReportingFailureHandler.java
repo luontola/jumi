@@ -5,30 +5,21 @@
 package fi.jumi.core.suite;
 
 import fi.jumi.actors.listeners.FailureHandler;
-import fi.jumi.core.api.*;
+import fi.jumi.core.api.SuiteListener;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.PrintStream;
 
 @ThreadSafe
-class InternalErrorReportingFailureHandler implements FailureHandler {
-
-    private final SuiteListener listener;
-    private final PrintStream out;
+class InternalErrorReportingFailureHandler extends InternalErrorReporter implements FailureHandler {
 
     public InternalErrorReportingFailureHandler(SuiteListener listener, PrintStream out) {
-        this.listener = listener;
-        this.out = out;
+        super(listener, out);
     }
 
     @Override
     public void uncaughtException(Object actor, Object message, Throwable exception) {
-        String description = "Uncaught exception in thread " + Thread.currentThread().getName() +
-                " from " + actor + " when processing " + message;
-        synchronized (out) {
-            out.println(description);
-            exception.printStackTrace(out);
-        }
-        listener.onInternalError(description, StackTrace.copyOf(exception));
+        reportInternalError("Uncaught exception in thread " + Thread.currentThread().getName() +
+                " from " + actor + " when processing " + message, exception);
     }
 }
