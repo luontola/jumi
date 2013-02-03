@@ -135,7 +135,7 @@ public class JUnitCompatibilityDriverTest {
     public void reports_JUnit_test_mechanism_failures_as_internal_errors() {
         SuiteListener listener = mock(SuiteListener.class);
 
-        testBench.run(listener, BuggyTest.class);
+        testBench.run(listener, Buggy.class);
 
         verify(listener).onInternalError(eq("Failure in JUnit test mechanism"), notNull(StackTrace.class));
     }
@@ -177,7 +177,7 @@ public class JUnitCompatibilityDriverTest {
     }
 
     @RunWith(BuggyJUnitRunner.class)
-    private static class BuggyTest {
+    private static class Buggy {
     }
 
     public static class BuggyJUnitRunner extends Runner {
