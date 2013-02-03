@@ -70,7 +70,6 @@ public class SuiteFactory implements AutoCloseable {
 
         // actor messages are already logged by the actors container, but the test thread pool must be hooked separately
         testExecutor = messageListener.getListenedExecutor(testThreadPool); // TODO: move to constructor?
-        testExecutor = new InternalErrorReportingExecutor(testExecutor, listener, logOutput);
 
         // actors configuration
         // TODO: not all of these eventizers might be needed - create a statistics gathering EventizerProvider
@@ -97,7 +96,8 @@ public class SuiteFactory implements AutoCloseable {
                         listener,
                         testFileFinder,
                         actorThread,
-                        testExecutor
+                        testExecutor,
+                        logOutput
                 ));
         suiteRunner.tell().start();
     }

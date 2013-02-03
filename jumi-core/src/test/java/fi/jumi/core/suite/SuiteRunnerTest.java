@@ -73,6 +73,26 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
         assertThat("should happen last", spy.getLastCall(), is("onSuiteFinished"));
     }
 
+    @Test
+    public void reports_uncaught_exceptions_from_driver_threads_as_internal_errors() {
+        expect.onSuiteStarted();
+        expect.onInternalError("Uncaught exception in thread " + Thread.currentThread().getName(),
+                StackTrace.copyOf(new RuntimeException("dummy exception from driver thread")));
+        expect.onSuiteFinished();
+
+        runAndCheckExpectations(new ThrowsExceptionFromDriverThread(), CLASS_1);
+    }
+
+    @Test
+    public void reports_uncaught_exceptions_from_test_threads_as_internal_errors() {
+        expect.onSuiteStarted();
+        expect.onInternalError("Uncaught exception in thread " + Thread.currentThread().getName(),
+                StackTrace.copyOf(new RuntimeException("dummy exception from test thread")));
+        expect.onSuiteFinished();
+
+        runAndCheckExpectations(new ThrowsExceptionFromTestThread(), CLASS_1);
+    }
+
 
     // guinea pigs
 
@@ -96,6 +116,25 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
             notifier.fireTestStarted(TestId.ROOT)
                     .fireTestFinished();
+        }
+    }
+
+    public static class ThrowsExceptionFromDriverThread extends Driver {
+        @Override
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
+            throw new RuntimeException("dummy exception from driver thread");
+        }
+    }
+
+    public static class ThrowsExceptionFromTestThread extends Driver {
+        @Override
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    throw new RuntimeException("dummy exception from test thread");
+                }
+            });
         }
     }
 

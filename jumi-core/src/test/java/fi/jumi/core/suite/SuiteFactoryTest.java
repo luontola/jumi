@@ -67,25 +67,4 @@ public class SuiteFactoryTest {
 
         assertThat(spy.take(), startsWith("Uncaught exception in thread jumi-actor-"));
     }
-
-    @Test(timeout = TIMEOUT)
-    public void reports_uncaught_exceptions_from_test_threads_as_internal_errors() throws InterruptedException {
-        final BlockingQueue<String> spy = new LinkedBlockingQueue<>();
-        factory.configure(new SuiteConfiguration());
-        factory.start(new NullSuiteListener() {
-            @Override
-            public void onInternalError(String message, StackTrace cause) {
-                spy.add(message);
-            }
-        });
-
-        factory.testExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("dummy exception");
-            }
-        });
-
-        assertThat(spy.take(), startsWith("Uncaught exception in thread jumi-test-"));
-    }
 }

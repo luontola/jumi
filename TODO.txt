@@ -84,16 +84,17 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 			OK - prepare for inlining/heavy refactoring of SuiteRunner
 				OK - SuiteRunnerIntegrationHelper: use TestBench instead of SuiteRunner directly
 					OK - TestBench: allow injecting SuiteListener, instead of hiding it behind SuiteEventDemuxer
-			- move the reporting layer below WorkerCounter instead of above it? do this first and then refactor mercilessly?
-			- try extracting from SuiteRunner the code that deals with WorkerCounter into an injectable object?
+			OK - move the reporting layer below WorkerCounter instead of above it? do this first and then refactor mercilessly?
+			SKIP - try extracting from SuiteRunner the code that deals with WorkerCounter into an injectable object?
 				runWorker((executor) -> new TestFileFinderRunner(testFileFinder, actorThread.bindActor(TestFileFinderListener.class, this)))
 				runWorker((executor) -> driverFactory.createDriverRunner(testFile, executor))
-			(!) - move worker counting and onSuiteStarted/onSuiteFinished calls to SuiteFactory?
-			(!) - extract TestFileFinderListener implementation from SuiteRunner, to create TestFileRunner and remove SuiteRunner? would also remove StubTestFileFinder (injected to SuiteRunner in TestBench)
-				- add TestFileFinderListener.onAllTestFilesFound()
+			SKIP - move worker counting and onSuiteStarted/onSuiteFinished calls to SuiteFactory?
+			!! - extract TestFileFinderListener implementation from SuiteRunner, to create TestFileRunner and remove SuiteRunner? would also remove StubTestFileFinder (injected to SuiteRunner in TestBench)
+				!! - add TestFileFinderListener.onAllTestFilesFound()
 				- don't use WorkerCounter for TestFileFinderRunner, but use a flag SuiteRunner.allTestFilesStarted
 				- rename SuiteRunner.childRunners to activeTestFiles
 				- move starting TestFileFinderRunner out of SuiteRunner, maybe to its own actor thread (which is stopped after it finishes)
+				- call fi.jumi.actors.workers.WorkerCounter#afterPreviousWorkersFinished in onAllTestFilesFound, remove the separate counting?
 		- extract base class for InternalErrorReportingExecutor & InternalErrorReportingFailureHandler
 		- refactor SuiteFactory: move MessageListener construction out of start()?
 	- report JUnit test mechanism failures to Jumi

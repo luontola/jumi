@@ -14,6 +14,7 @@ import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.results.SuiteEventDemuxer;
 import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.suite.*;
+import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.PrintStream;
 import java.util.concurrent.Executor;
@@ -64,7 +65,8 @@ public class TestBench {
                 suiteListener,
                 new StubTestFileFinder(testClasses),
                 actorThread,
-                testExecutor
+                testExecutor,
+                new PrintStream(new NullOutputStream())
         );
         runner.start();
         actors.processEventsUntilIdle();

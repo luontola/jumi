@@ -11,6 +11,7 @@ import fi.jumi.core.discovery.*;
 import fi.jumi.core.util.Startable;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.io.PrintStream;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
@@ -22,6 +23,7 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
     private final TestFileFinder testFileFinder;
     private final ActorThread actorThread;
     private final Executor testExecutor;
+    private final PrintStream logOutput;
 
     private int childRunners = 0;
 
@@ -30,12 +32,14 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
                        SuiteListener suiteListener,
                        TestFileFinder testFileFinder,
                        ActorThread actorThread,
-                       Executor testExecutor) {
+                       Executor testExecutor,
+                       PrintStream logOutput) {
         this.driverFactory = driverFactory;
         this.suiteListener = suiteListener;
         this.testFileFinder = testFileFinder;
         this.actorThread = actorThread;
         this.testExecutor = testExecutor;
+        this.logOutput = logOutput;
     }
 
     @Override
@@ -49,9 +53,10 @@ public class SuiteRunner implements Startable, TestFileFinderListener {
 
     @Override
     public void onTestFileFound(TestFile testFile) {
-        WorkerCounter executor = new WorkerCounter(testExecutor);
+        WorkerCounter workerCounter = new WorkerCounter(testExecutor);
+        Executor executor = new InternalErrorReportingExecutor(workerCounter, suiteListener, logOutput);
         executor.execute(driverFactory.createDriverRunner(testFile, executor));
-        executor.afterPreviousWorkersFinished(childRunnerListener());
+        workerCounter.afterPreviousWorkersFinished(childRunnerListener());
     }
 
     private ActorRef<WorkerListener> childRunnerListener() {
