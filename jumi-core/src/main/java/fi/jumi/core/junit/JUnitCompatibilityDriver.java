@@ -6,7 +6,6 @@ package fi.jumi.core.junit;
 
 import fi.jumi.api.drivers.*;
 import org.junit.runner.*;
-import org.junit.runner.notification.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.Executor;
@@ -16,33 +15,26 @@ public class JUnitCompatibilityDriver extends Driver {
 
     @Override
     public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
-        executor.execute(new JUnitRunner(testClass, new JUnitRunListenerAdapter(notifier)));
+        executor.execute(new JUnitRunner(testClass, notifier));
     }
 
 
     @NotThreadSafe
     private static class JUnitRunner implements Runnable {
         private final Class<?> testClass;
-        private final RunListener listener;
+        private final SuiteNotifier notifier;
 
-        public JUnitRunner(Class<?> testClass, RunListener listener) {
+        public JUnitRunner(Class<?> testClass, SuiteNotifier notifier) {
             this.testClass = testClass;
-            this.listener = listener;
+            this.notifier = notifier;
         }
 
         @Override
         public void run() {
             JUnitCore junit = new JUnitCore();
-            junit.addListener(listener);
-            Result result = junit.run(Request.aClass(testClass));
-
-            // TODO: report these failures to Jumi
-            for (Failure failure : result.getFailures()) {
-                if (failure.getDescription().equals(Description.TEST_MECHANISM)) {
-                    System.err.println("Failure from JUnit: " + failure.getDescription());
-                    failure.getException().printStackTrace();
-                }
-            }
+            junit.addListener(new JUnitRunListenerAdapter(notifier));
+            junit.addListener(new JUnitTestMechanismFailureReporter(notifier));
+            junit.run(Request.aClass(testClass));
         }
     }
 }

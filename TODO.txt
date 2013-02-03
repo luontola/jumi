@@ -97,10 +97,10 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 				OK - call fi.jumi.actors.workers.WorkerCounter#afterPreviousWorkersFinished in onAllTestFilesFound, remove the separate counting?
 		OK - extract base class for InternalErrorReportingExecutor & InternalErrorReportingFailureHandler
 		SKIP - refactor SuiteFactory: move MessageListener construction out of start()?
-	!! - report JUnit test mechanism failures to Jumi
+	OK - report JUnit test mechanism failures to Jumi
 		OK - add fireInternalError to SuiteNotifier
-		!! - write a test using a custom JUnit runner that repots test mechanism error with RunNotifier#fireTestFailure
-		- implement JUnitTestMechanismFailureReporter
+		OK - write a test using a custom JUnit runner that repots test mechanism error with RunNotifier#fireTestFailure
+		OK - implement JUnitTestMechanismFailureReporter
 	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1

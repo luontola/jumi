@@ -12,12 +12,16 @@ import fi.jumi.core.testbench.TestBench;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.runner.*;
+import org.junit.runner.notification.*;
 
 import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.*;
 
 public class JUnitCompatibilityDriverTest {
 
@@ -127,8 +131,16 @@ public class JUnitCompatibilityDriverTest {
         checkExpectations();
     }
 
+    @Test
+    public void reports_JUnit_test_mechanism_failures_as_internal_errors() {
+        SuiteListener listener = mock(SuiteListener.class);
 
-    // TODO: report failures from JUnit test mechanism
+        testBench.run(listener, BuggyTest.class);
+
+        verify(listener).onInternalError(eq("Failure in JUnit test mechanism"), notNull(StackTrace.class));
+    }
+
+
     // TODO: ignored tests
     // TODO: assumptions
 
@@ -161,6 +173,28 @@ public class JUnitCompatibilityDriverTest {
             @Test
             public void theLeaf() {
             }
+        }
+    }
+
+    @RunWith(BuggyJUnitRunner.class)
+    private static class BuggyTest {
+    }
+
+    public static class BuggyJUnitRunner extends Runner {
+        private final Class<?> testClass;
+
+        public BuggyJUnitRunner(Class<?> testClass) {
+            this.testClass = testClass;
+        }
+
+        @Override
+        public Description getDescription() {
+            return Description.createSuiteDescription(testClass);
+        }
+
+        @Override
+        public void run(RunNotifier notifier) {
+            notifier.fireTestFailure(new Failure(Description.TEST_MECHANISM, new RuntimeException("dummy exception")));
         }
     }
 }

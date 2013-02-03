@@ -120,7 +120,9 @@ public class JUnitRunListenerAdapter extends RunListener {
     @Override
     public void testFailure(Failure failure) {
         TestNotifier tn = activeTestsStack.peek();
-        tn.fireFailure(failure.getException());
+        if (tn != null) {
+            tn.fireFailure(failure.getException());
+        }
     }
 
     @Override
