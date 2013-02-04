@@ -109,11 +109,22 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - end-to-end test
 		OK - create InitialMessageTimeout
 		!! - hook into ProcessStartingDaemonSummoner or RemoteSuiteLauncher; send onSuiteStarted, onInternalError, onSuiteFinished
-	- ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
-		- verify that fixes https://github.com/orfjackal/jumi/issues/1
-	- ui: show in the summary line "There were internal errors"
-	- ui: show in the summary line "There were test failures"
-	- ui: " > Internal Error\n > ..."
+			- unit test
+			- OneTimeDaemonListenerFactory: push listener.tell() outside the constructor, should make the timeout easier
+			- hack InitialMessageTimeout in; first make it work
+			- (would it be cleaner if InitialMessageTimeout were a dynamic proxy that forwards any method calls? smells like re-inventing dynamic eventizers)
+			- consider generating eventizers instead of using dynamic eventizers
+	- TextUI fine tuning
+		- show in the summary: "There were internal errors"
+		- show in the summary: "There were test failures"
+		- reformat: " > Internal Error\n > ..."
+		- no need for the total test count
+
+- ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
+	- suite mother: test that prints to out & err after ending
+	- ui: print a warning line, but only once " > Warning: Continued printing after the test run finished"
+	- annotate as @CheckForNull the relevant TestId parameters in RunVisitor?
+	- verify that fixes https://github.com/orfjackal/jumi/issues/1
 
 - skip abstract test classes silently
 	- find out how Surefire does it; should also interfaces have special handling?
@@ -192,6 +203,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		<pomPropertiesFile> element: http://maven.apache.org/shared/maven-archiver/index.html
 	- unit tests for fi.jumi.core.results
 	- combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
+	- DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
 	- there might be unnecessary eventizers in fi.jumi.daemon.Main and /jumi-core/pom.xml
 		- create EventizerUsageStatistics (extends EventizerProvider), print usage statistics when program exits
 	- organize the project so that it's possible to run unit tests separate from end-to-end tests

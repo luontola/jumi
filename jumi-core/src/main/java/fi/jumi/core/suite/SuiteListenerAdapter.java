@@ -23,7 +23,7 @@ class SuiteListenerAdapter implements RunListener {
 
     @Override
     public void onInternalError(String message, Throwable cause) {
-        suiteListener.onInternalError(message, StackTrace.copyOf(cause)); // TODO: not tested
+        suiteListener.onInternalError(message, StackTrace.copyOf(cause));
     }
 
     @Override

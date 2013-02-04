@@ -56,5 +56,5 @@ public class InternalErrorReportingExecutorTest {
         assertThat(output, containsString("java.lang.RuntimeException: the-exception-message"));
     }
 
-    // TODO: should we have special handling of InterruptedException and ThreadDeath
+    // TODO: should we have special handling of InterruptedException and ThreadDeath?
 }

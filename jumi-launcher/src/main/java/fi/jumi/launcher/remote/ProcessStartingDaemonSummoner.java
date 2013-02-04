@@ -64,6 +64,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
     }
 
     private static void copyInBackground(final InputStream src, final OutputStream dest) {
+        // TODO: after removing me, update also ReleasingResourcesTest
         @NotThreadSafe
         class Copier implements Runnable {
             @Override

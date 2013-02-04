@@ -56,7 +56,7 @@ class DuplicateOnTestFoundEventFilter implements RunListener {
 
     @Override
     public void onInternalError(String message, Throwable cause) {
-        target.onInternalError(message, cause); // TODO: not tested
+        target.onInternalError(message, cause);
     }
 
     @Override

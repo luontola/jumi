@@ -60,9 +60,6 @@ public class CompositeDriverFinderTest {
         new CompositeDriverFinder(finder1).findTestClassDriver(testClass);
     }
 
-    // TODO: return first
-    // TODO: not found case
-
 
     private static class DummyTest {
     }
