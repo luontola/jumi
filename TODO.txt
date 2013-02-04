@@ -101,10 +101,10 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - add fireInternalError to SuiteNotifier
 		OK - write a test using a custom JUnit runner that repots test mechanism error with RunNotifier#fireTestFailure
 		OK - implement JUnitTestMechanismFailureReporter
-	!! - refactor test file finders
-		- PathMatcherTestFileFinder: send onAllTestFilesFound()
-			- also update others, such as CompositeTestFileFinderTest.FakeTestFileFinder
-		- CompositeTestFileFinder: pass to the finders a proxy listener (wrapped in ActorRef) which counts how many times onAllTestFilesFound() was used and hides all but last
+	OK - refactor test file finders
+		OK - PathMatcherTestFileFinder: send onAllTestFilesFound()
+			OK - also update others, such as CompositeTestFileFinderTest.FakeTestFileFinder
+		OK - CompositeTestFileFinder: pass to the finders a proxy listener (wrapped in ActorRef) which counts how many times onAllTestFilesFound() was used and hides all but last
 	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 		- create NoFirstMessageTimeout
 		- hook into ProcessStartingDaemonSummoner; send onSuiteStarted, onInternalError, onSuiteFinished

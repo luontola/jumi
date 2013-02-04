@@ -11,29 +11,17 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.mockito.Mockito.*;
-
 public class CompositeTestFileFinderTest {
 
-    @Test
-    public void invokes_each_of_the_finders() {
-        TestFileFinder finder1 = mock(TestFileFinder.class);
-        TestFileFinder finder2 = mock(TestFileFinder.class);
-        ActorRef<TestFileFinderListener> listenerRef = ActorRef.wrap(mock(TestFileFinderListener.class));
-
-        CompositeTestFileFinder composite = new CompositeTestFileFinder(Arrays.asList(finder1, finder2));
-        composite.findTestFiles(listenerRef);
-
-        verify(finder1).findTestFiles(listenerRef);
-        verify(finder2).findTestFiles(listenerRef);
-    }
+    private final SpyListener<TestFileFinderListener> spy = new SpyListener<>(TestFileFinderListener.class);
+    private final TestFileFinderListener expect = spy.getListener();
 
     @Test
-    public void notifies_after_all_test_files_have_been_found() {
-        SpyListener<TestFileFinderListener> spy = new SpyListener<>(TestFileFinderListener.class);
-        TestFileFinderListener expect = spy.getListener();
+    public void invokes_each_of_the_finders_and_notifies_once_after_all_of_them_are_finished() {
         CompositeTestFileFinder composite = new CompositeTestFileFinder(Arrays.<TestFileFinder>asList(
-                new FakeTestFileFinder(DummyTest1.class), new FakeTestFileFinder(DummyTest2.class)));
+                new FakeTestFileFinder(DummyTest1.class),
+                new FakeTestFileFinder(DummyTest2.class)
+        ));
 
         expect.onTestFileFound(TestFile.fromClass(DummyTest1.class));
         expect.onTestFileFound(TestFile.fromClass(DummyTest2.class));
@@ -61,6 +49,7 @@ public class CompositeTestFileFinderTest {
         @Override
         public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
             listener.tell().onTestFileFound(TestFile.fromClass(testClass));
+            listener.tell().onAllTestFilesFound();
         }
     }
 }

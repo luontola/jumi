@@ -41,6 +41,8 @@ public class PathMatcherTestFileFinder implements TestFileFinder {
             Files.walkFileTree(baseDir, new ListenerNotifyingFileVisitor(matcher, baseDir));
         } catch (IOException e) {
             throw new RuntimeException("Failed to traverse " + baseDir, e);
+        } finally {
+            listener.tell().onAllTestFilesFound();
         }
     }
 

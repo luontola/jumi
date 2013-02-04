@@ -28,6 +28,7 @@ public class PathMatcherTestFileFinderTest {
 
         verify(listener).onTestFileFound(TestFile.fromPath(Paths.get("fi/jumi/core/discovery/dummies/DummyTest.class")));
         verify(listener).onTestFileFound(TestFile.fromPath(Paths.get("fi/jumi/core/discovery/dummies/AnotherDummyTest.class")));
+        verify(listener).onAllTestFilesFound();
         verifyNoMoreInteractions(listener);
     }
 
@@ -38,6 +39,7 @@ public class PathMatcherTestFileFinderTest {
 
         finder.findTestFiles(ActorRef.wrap(listener));
 
+        verify(listener).onAllTestFilesFound();
         verifyNoMoreInteractions(listener);
     }
 
