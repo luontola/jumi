@@ -107,8 +107,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - CompositeTestFileFinder: pass to the finders a proxy listener (wrapped in ActorRef) which counts how many times onAllTestFilesFound() was used and hides all but last
 	!! - give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 		OK - end-to-end test
-		!! - create InitialMessageTimeout
-		- hook into ProcessStartingDaemonSummoner; send onSuiteStarted, onInternalError, onSuiteFinished
+		OK - create InitialMessageTimeout
+		!! - hook into ProcessStartingDaemonSummoner or RemoteSuiteLauncher; send onSuiteStarted, onInternalError, onSuiteFinished
 	- ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
 	- ui: show in the summary line "There were internal errors"

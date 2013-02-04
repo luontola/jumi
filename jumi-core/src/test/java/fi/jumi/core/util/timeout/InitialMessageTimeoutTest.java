@@ -5,18 +5,21 @@
 package fi.jumi.core.util.timeout;
 
 import fi.jumi.actors.eventizers.Event;
-import fi.jumi.actors.eventizers.dynamic.DynamicEventizer;
+import fi.jumi.actors.eventizers.dynamic.*;
 import fi.jumi.actors.queue.*;
 import fi.jumi.core.util.SpyListener;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotNull;
 
 public class InitialMessageTimeoutTest {
 
     private static final long NEVER = 10 * 1000;
+    private static final DynamicEventizer<DummyListener> EVENTIZER = new DynamicEventizer<>(DummyListener.class);
 
     private final SpyListener<DummyListener> spy = new SpyListener<>(DummyListener.class);
     private final DummyListener expect = spy.getListener();
@@ -65,7 +68,25 @@ public class InitialMessageTimeoutTest {
         assertNotNull(target.take());
     }
 
-    // TODO: make threads safe
+    @Test(timeout = 1000)
+    public void is_thread_safe() throws InterruptedException {
+        final int ITERATIONS = 10;
+        for (int i = 0; i < ITERATIONS; i++) {
+            SpyDummyListener target = new SpyDummyListener();
+
+            MessageReceiver<Event<DummyListener>> timeoutMessages = onBar123();
+            InitialMessageTimeout<Event<DummyListener>> timeout = new InitialMessageTimeout<>(new EventToDynamicListener<DummyListener>(target), timeoutMessages, 0, TimeUnit.MILLISECONDS);
+            sendTo(timeout).onFoo(1);
+            sendTo(timeout).onFoo(2);
+            sendTo(timeout).onFoo(3);
+
+            String[] notTimedOutEvents = {"foo1", "foo2", "foo3"};
+            String[] timedOutEvents = {"bar1", "bar2", "bar3"};
+            String[] actual = {target.received.take(), target.received.take(), target.received.take()};
+            assertThat(actual, either(arrayContaining(notTimedOutEvents)).or(arrayContaining(timedOutEvents)));
+            assertThat(target.received, is(empty()));
+        }
+    }
 
 
     // helpers
@@ -79,7 +100,7 @@ public class InitialMessageTimeoutTest {
     }
 
     private static DummyListener sendTo(MessageSender<Event<DummyListener>> timeout) {
-        return new DynamicEventizer<>(DummyListener.class).newFrontend(timeout);
+        return EVENTIZER.newFrontend(timeout);
     }
 
     private void verifyExpected(MessageReceiver<Event<DummyListener>> messages) {
@@ -96,5 +117,19 @@ public class InitialMessageTimeoutTest {
         void onFoo(int i);
 
         void onBar(int i);
+    }
+
+    private static class SpyDummyListener implements DummyListener {
+        public final BlockingQueue<String> received = new ArrayBlockingQueue<>(10);
+
+        @Override
+        public void onFoo(int i) {
+            received.add("foo" + i);
+        }
+
+        @Override
+        public void onBar(int i) {
+            received.add("bar" + i);
+        }
     }
 }

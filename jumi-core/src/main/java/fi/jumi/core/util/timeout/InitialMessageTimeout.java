@@ -6,8 +6,9 @@ package fi.jumi.core.util.timeout;
 
 import fi.jumi.actors.queue.*;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 @ThreadSafe
 public class InitialMessageTimeout<T> implements MessageSender<T> {
@@ -16,8 +17,9 @@ public class InitialMessageTimeout<T> implements MessageSender<T> {
     private final MessageReceiver<T> timeoutMessages;
     private final Timeout timeoutTimer;
 
-    private State state = State.NO_MESSAGES_YET;
+    private final AtomicReference<State> state = new AtomicReference<>(State.NO_MESSAGES_YET);
 
+    @Immutable
     private enum State {
         NO_MESSAGES_YET, TIMED_OUT, GOT_INITIAL_MESSAGE
     }
@@ -31,23 +33,29 @@ public class InitialMessageTimeout<T> implements MessageSender<T> {
 
     @Override
     public void send(T message) {
-        if (state == State.TIMED_OUT) {
-            return;
-        }
-        if (state == State.NO_MESSAGES_YET) {
-            state = State.GOT_INITIAL_MESSAGE;
+        State prev;
+        do {
+            prev = state.get();
+            if (prev == State.TIMED_OUT) {
+                return;
+            }
+        } while (prev != State.GOT_INITIAL_MESSAGE && !state.compareAndSet(prev, State.GOT_INITIAL_MESSAGE));
+
+        if (prev == State.NO_MESSAGES_YET) {
             timeoutTimer.cancel(); // not really needed, but disposes of the timer thread a bit sooner
         }
         target.send(message);
     }
 
     public void timedOut() {
-        if (state == State.GOT_INITIAL_MESSAGE) {
-            return;
-        }
-        if (state == State.NO_MESSAGES_YET) {
-            state = State.TIMED_OUT;
-        }
+        State prev;
+        do {
+            prev = state.get();
+            if (prev != State.NO_MESSAGES_YET) {
+                return;
+            }
+        } while (!state.compareAndSet(prev, State.TIMED_OUT));
+
         copy(timeoutMessages, target);
     }
 
