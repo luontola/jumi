@@ -7,21 +7,26 @@ package fi.jumi.core.util.timeout;
 import fi.jumi.actors.queue.*;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.concurrent.TimeUnit;
 
 @ThreadSafe
 public class InitialMessageTimeout<T> implements MessageSender<T> {
+
+    private final MessageSender<T> target;
+    private final MessageReceiver<T> timeoutMessages;
+    private final Timeout timeoutTimer;
+
+    private State state = State.NO_MESSAGES_YET;
 
     private enum State {
         NO_MESSAGES_YET, TIMED_OUT, GOT_INITIAL_MESSAGE
     }
 
-    private final MessageSender<T> target;
-    private final MessageReceiver<T> timeoutMessages;
-    private State state = State.NO_MESSAGES_YET;
-
-    public InitialMessageTimeout(MessageSender<T> target, MessageReceiver<T> timeoutMessages) {
+    public InitialMessageTimeout(MessageSender<T> target, MessageReceiver<T> timeoutMessages, long timeout, TimeUnit unit) {
         this.target = target;
         this.timeoutMessages = timeoutMessages;
+        this.timeoutTimer = new CommandExecutingTimeout(new TimedOut(), timeout, unit);
+        this.timeoutTimer.start();
     }
 
     @Override
@@ -31,6 +36,7 @@ public class InitialMessageTimeout<T> implements MessageSender<T> {
         }
         if (state == State.NO_MESSAGES_YET) {
             state = State.GOT_INITIAL_MESSAGE;
+            timeoutTimer.cancel(); // not really needed, but disposes of the timer thread a bit sooner
         }
         target.send(message);
     }
@@ -49,6 +55,15 @@ public class InitialMessageTimeout<T> implements MessageSender<T> {
         T message;
         while ((message = source.poll()) != null) {
             target.send(message);
+        }
+    }
+
+
+    @ThreadSafe
+    private class TimedOut implements Runnable {
+        @Override
+        public void run() {
+            timedOut();
         }
     }
 }
