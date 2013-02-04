@@ -5,7 +5,7 @@
 package fi.jumi.test;
 
 import org.junit.*;
-import sample.BuggyDriverTest;
+import sample.*;
 
 import static fi.jumi.core.util.AsyncAssert.assertEventually;
 import static fi.jumi.core.util.StringMatchers.containsSubStrings;
@@ -41,6 +41,19 @@ public class ErrorHandlingTest {
         assertReportsInternalError(
                 "Uncaught exception in thread jumi-test-",
                 "java.lang.RuntimeException: dummy exception from test thread");
+    }
+
+    @Ignore("not implemented") // TODO
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void gives_an_error_if_starting_the_daemon_process_failed() throws Exception {
+        app.suite.addJvmOptions("-Xmx1M"); // too small heap space for the JVM to start
+        app.runTests(OnePassingTest.class);
+
+        assertReportsInternalError(
+                "Failed to start the test runner daemon process",
+                // the error message printed by the JVM:
+                "Error occurred during initialization of VM",
+                "Too small initial heap for new size specified");
     }
 
     private void assertReportsInternalError(String... expectedErrorMessages) {

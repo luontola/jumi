@@ -43,6 +43,7 @@ public class AppRunner implements TestRule {
     private String uiRawOutput;
 
     public Path workingDirectory = Paths.get(SuiteConfiguration.DEFAULTS.workingDirectory());
+    public final SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder();
     public final DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
     public void setMockNetworkServer(NetworkServer mockNetworkServer) {
@@ -106,7 +107,7 @@ public class AppRunner implements TestRule {
     }
 
     public void runTests(Class<?>... testClasses) throws Exception {
-        startSuite(new SuiteConfigurationBuilder()
+        startSuiteAsynchronously(suite
                 .testClasses(toClassNames(testClasses))
                 .freeze());
         receiveTestOutput();
@@ -121,13 +122,13 @@ public class AppRunner implements TestRule {
     }
 
     public void runTestsMatching(String syntaxAndPattern) throws Exception {
-        startSuite(new SuiteConfigurationBuilder()
+        startSuiteAsynchronously(suite
                 .includedTestsPattern(syntaxAndPattern)
                 .freeze());
         receiveTestOutput();
     }
 
-    public void startSuite(SuiteConfiguration suite) throws IOException {
+    public void startSuiteAsynchronously(SuiteConfiguration suite) throws IOException {
         getLauncher().start(configure(suite), configure(daemon.freeze()));
     }
 
