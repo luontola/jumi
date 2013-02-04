@@ -8,7 +8,7 @@ import fi.jumi.core.config.*;
 import fi.jumi.core.network.*;
 import fi.jumi.core.output.*;
 import fi.jumi.core.suite.SuiteFactory;
-import fi.jumi.daemon.timeout.*;
+import fi.jumi.core.util.timeout.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.*;

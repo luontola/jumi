@@ -8,7 +8,7 @@ import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageQueue;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.network.NetworkConnection;
-import fi.jumi.daemon.timeout.SpyTimeout;
+import fi.jumi.core.util.timeout.SpyTimeout;
 import org.junit.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -12,7 +12,7 @@ import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.network.*;
 import fi.jumi.core.suite.SuiteFactory;
-import fi.jumi.daemon.timeout.*;
+import fi.jumi.core.util.timeout.*;
 
 import javax.annotation.concurrent.ThreadSafe;
 

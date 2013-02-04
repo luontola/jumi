@@ -53,7 +53,7 @@ public class ErrorHandlingTest {
                 "Failed to start the test runner daemon process",
                 // the error message printed by the JVM:
                 "Error occurred during initialization of VM",
-                "Too small initial heap for new size specified");
+                "Too small initial heap for new size specified"); // TODO: show the path of where the JVM output was logged?
     }
 
     private void assertReportsInternalError(String... expectedErrorMessages) {
