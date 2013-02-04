@@ -101,11 +101,18 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - add fireInternalError to SuiteNotifier
 		OK - write a test using a custom JUnit runner that repots test mechanism error with RunNotifier#fireTestFailure
 		OK - implement JUnitTestMechanismFailureReporter
+	!! - refactor test file finders
+		- PathMatcherTestFileFinder: send onAllTestFilesFound()
+			- also update others, such as CompositeTestFileFinderTest.FakeTestFileFinder
+		- CompositeTestFileFinder: pass to the finders a proxy listener (wrapped in ActorRef) which counts how many times onAllTestFilesFound() was used and hides all but last
 	- give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
-	- give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
+		- create NoFirstMessageTimeout
+		- hook into ProcessStartingDaemonSummoner; send onSuiteStarted, onInternalError, onSuiteFinished
+	- ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 		- verify that fixes https://github.com/orfjackal/jumi/issues/1
 	- ui: show in the summary line "There were internal errors"
 	- ui: show in the summary line "There were test failures"
+	- ui: " > Internal Error\n > ..."
 
 - skip abstract test classes silently
 	- find out how Surefire does it; should also interfaces have special handling?
