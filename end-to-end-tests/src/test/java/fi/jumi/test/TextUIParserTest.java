@@ -44,18 +44,6 @@ public class TextUIParserTest {
     }
 
     @Test
-    public void get_total_number_of_tests() {
-        SuiteMother.emptySuite(listener);
-        assertThat(textUI().getTotalCount(), is(0));
-
-        SuiteMother.onePassingTest(listener);
-        assertThat(textUI().getTotalCount(), is(1));
-
-        SuiteMother.oneFailingTest(listener);
-        assertThat(textUI().getTotalCount(), is(1));
-    }
-
-    @Test
     public void get_test_start_and_end_events() {
         SuiteMother.onePassingTest(listener);
         assertThat(textUI().getTestStartAndEndEvents(RUN_1), is(asList("DummyTest", "/")));

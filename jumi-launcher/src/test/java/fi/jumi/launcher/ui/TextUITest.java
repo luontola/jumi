@@ -79,28 +79,28 @@ public class TextUITest {
     public void summary_line_for_no_tests() {
         SuiteMother.emptySuite(listener);
 
-        assertInOutput("Pass: 0, Fail: 0, Total: 0");
+        assertInOutput("Pass: 0, Fail: 0");
     }
 
     @Test
     public void summary_line_for_one_passing_test() {
         SuiteMother.onePassingTest(listener);
 
-        assertInOutput("Pass: 1, Fail: 0, Total: 1");
+        assertInOutput("Pass: 1, Fail: 0");
     }
 
     @Test
     public void summary_line_for_one_failing_test() {
         SuiteMother.oneFailingTest(listener);
 
-        assertInOutput("Pass: 0, Fail: 1, Total: 1");
+        assertInOutput("Pass: 0, Fail: 1");
     }
 
     @Test
     public void summary_line_for_multiple_nested_tests() {
         SuiteMother.nestedFailingAndPassingTests(listener);
 
-        assertInOutput("Pass: 2, Fail: 1, Total: 3");
+        assertInOutput("Pass: 2, Fail: 1");
     }
 
     @Test
@@ -144,7 +144,7 @@ public class TextUITest {
         suite.runFinished(run3);
         suite.end();
 
-        assertInOutput("Pass: 4, Fail: 0, Total: 4");
+        assertInOutput("Pass: 4, Fail: 0");
     }
 
 

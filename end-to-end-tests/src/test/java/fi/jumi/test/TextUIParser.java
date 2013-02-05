@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -23,16 +23,14 @@ public class TextUIParser {
 
     private static final String ANY_LINES = "(?s:(.*?))";
 
-    private static final String FOOTER = "(^Pass: (\\d+), Fail: (\\d+), Total: (\\d+)$)";
+    private static final String FOOTER = "(^Pass: (\\d+), Fail: (\\d+)$)";
     private static final int PASSING_COUNT = 2;
     private static final int FAILING_COUNT = 3;
-    private static final int TOTAL_COUNT = 4;
 
     private final String fullOutput;
     private final Map<RunId, RunParsed> runsById = new HashMap<>();
     private int passingCount;
     private int failingCount;
-    private int totalCount;
 
     public TextUIParser(String output) {
         this.fullOutput = output;
@@ -58,7 +56,6 @@ public class TextUIParser {
         m.find();
         passingCount = Integer.parseInt(m.group(PASSING_COUNT));
         failingCount = Integer.parseInt(m.group(FAILING_COUNT));
-        totalCount = Integer.parseInt(m.group(TOTAL_COUNT));
     }
 
     public int getPassingCount() {
@@ -67,10 +64,6 @@ public class TextUIParser {
 
     public int getFailingCount() {
         return failingCount;
-    }
-
-    public int getTotalCount() {
-        return totalCount;
     }
 
     public int getRunCount() {

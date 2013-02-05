@@ -106,8 +106,7 @@ public class TextUI {
         private void printSuiteFooter(SuiteResultsSummary summary) {
             int pass = summary.getPassingTests();
             int fail = summary.getFailingTests();
-            int total = summary.getTotalTests();
-            printer.printlnMeta(String.format("Pass: %d, Fail: %d, Total: %d", pass, fail, total));
+            printer.printlnMeta(String.format("Pass: %d, Fail: %d", pass, fail));
         }
     }
 
