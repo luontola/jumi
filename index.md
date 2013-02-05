@@ -31,7 +31,7 @@ Project Goals
 
 - **Speed** - When tests are run after each change to a line of code, many times per minute, [speed matters](http://agileinaflash.blogspot.com/2009/02/first.html). Jumi will take any measures necessary (which don't compromise reliability) to give faster feedback.
 
-- **Usability** - Many times high usability in the user interface affects also design decisions at the system's lowest implementation levels. By covering the whole stack of running tests, from UI to class loading, Jumi will be able to maximize its usability.
+- **Usability** - Oftentimes, high usability in the user interface affects also design decisions at the system's lowest implementation levels. By covering the whole stack of running tests, from UI to class loading, Jumi will be able to maximize its usability.
 
 - **Compatibility** - Jumi attempts to become the next *de facto* test runner on the JVM. Thus it needs to integrate well with all tools and testing frameworks. We take backward compatibility seriously and will run any [consumer contract tests](http://martinfowler.com/articles/consumerDrivenContracts.html) from framework and tool developers. Any incompatible changes will be done carefully over a transition period.
 
