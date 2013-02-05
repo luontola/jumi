@@ -112,7 +112,7 @@ public class SpyListener<T> implements InvocationHandler {
                     if (!sameTypeAndMessage((Throwable) arg1, (Throwable) arg2)) {
                         return false;
                     }
-                } else if (!arg1.equals(arg2)) {
+                } else if (!Objects.equals(arg1, arg2)) {
                     return false;
                 }
             }
@@ -120,8 +120,8 @@ public class SpyListener<T> implements InvocationHandler {
         }
 
         private boolean sameTypeAndMessage(Throwable t1, Throwable t2) {
-            return t1.getClass().equals(t2.getClass()) &&
-                    t1.getMessage().equals(t2.getMessage());
+            return Objects.equals(t1.getClass(), t2.getClass()) &&
+                    Objects.equals(t1.getMessage(), t2.getMessage());
         }
     }
 }
