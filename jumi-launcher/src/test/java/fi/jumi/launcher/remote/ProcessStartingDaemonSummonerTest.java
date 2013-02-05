@@ -10,6 +10,7 @@ import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.CommandListener;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
+import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.network.*;
 import fi.jumi.core.util.SpyListener;
 import fi.jumi.launcher.FakeProcess;
@@ -19,6 +20,7 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.concurrent.*;
 
 import static fi.jumi.core.util.AsyncAssert.assertEventually;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,25 +66,26 @@ public class ProcessStartingDaemonSummonerTest {
         assertEventually(outputListener, hasToString("hello"), TIMEOUT);
     }
 
-    @Test
+    @Test(timeout = TIMEOUT)
     public void reports_an_internal_error_if_the_daemon_fails_to_connect_within_a_timeout() throws InterruptedException {
-        processStarter.processToReturn.inputStream = new ByteArrayInputStream("dummy JVM failure".getBytes());
-
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         SuiteListener expect = spy.getListener();
+        CountDownLatch expectedMessagesArrived = new CountDownLatch(3);
 
         expect.onSuiteStarted();
         expect.onInternalError("Failed to start the test runner daemon process",
                 StackTrace.copyOf(new RuntimeException("Could not connect to the daemon: timed out after 0 ms")));
         expect.onSuiteFinished();
-
         spy.replay();
-        DaemonConfiguration daemon = new DaemonConfigurationBuilder()
-                .startupTimeout(0)
-                .freeze();
-        daemonSummoner.connectToDaemon(dummySuiteConfig, daemon, actorRef(new FakeDaemonListener(expect)));
 
-        Thread.sleep(100); // XXX
+        daemonSummoner.connectToDaemon(
+                dummySuiteConfig,
+                new DaemonConfigurationBuilder()
+                        .startupTimeout(0)
+                        .freeze(),
+                actorRef(new FakeDaemonListener(countMessages(expect, expectedMessagesArrived))));
+
+        expectedMessagesArrived.await(TIMEOUT / 2, TimeUnit.MILLISECONDS);
         spy.verify();
     }
 
@@ -99,6 +102,19 @@ public class ProcessStartingDaemonSummonerTest {
         return new DaemonConfigurationBuilder()
                 .parseProgramArgs(args)
                 .freeze();
+    }
+
+    private static SuiteListener countMessages(SuiteListener target, final CountDownLatch latch) {
+        SuiteListenerEventizer eventizer = new SuiteListenerEventizer();
+        final MessageSender<Event<SuiteListener>> backend = eventizer.newBackend(target);
+        MessageSender<Event<SuiteListener>> counter = new MessageSender<Event<SuiteListener>>() {
+            @Override
+            public void send(Event<SuiteListener> message) {
+                backend.send(message);
+                latch.countDown();
+            }
+        };
+        return eventizer.newFrontend(counter);
     }
 
     private static class SpyProcessStarter implements ProcessStarter {

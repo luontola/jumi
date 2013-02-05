@@ -115,6 +115,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 			FAIL - consider generating eventizers instead of using dynamic eventizers
 			SKIP - (would it be cleaner if InitialMessageTimeout were a dynamic proxy that forwards any method calls? smells like re-inventing dynamic eventizers)
 		SKIP - show the message printed by the JVM
+		OK - refactor ProcessStartingDaemonSummonerTest
 		!! - write a unit test that the normal events are forwarded from daemon to daemon listener
 	- TextUI fine tuning
 		- show in the summary: "There were internal errors"
