@@ -6,10 +6,14 @@ package fi.jumi.launcher.remote;
 
 import fi.jumi.actors.ActorRef;
 import fi.jumi.actors.eventizers.Event;
+import fi.jumi.actors.eventizers.dynamic.DynamicEventizer;
+import fi.jumi.actors.queue.*;
 import fi.jumi.core.CommandListener;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
+import fi.jumi.core.events.suiteListener.*;
 import fi.jumi.core.network.*;
+import fi.jumi.core.util.timeout.InitialMessageTimeout;
 import fi.jumi.launcher.daemon.Steward;
 import fi.jumi.launcher.process.*;
 import org.apache.commons.io.IOUtils;
@@ -21,6 +25,8 @@ import java.util.concurrent.*;
 
 @NotThreadSafe
 public class ProcessStartingDaemonSummoner implements DaemonSummoner {
+
+    private static final DynamicEventizer<DaemonListener> eventizer = new DynamicEventizer<>(DaemonListener.class);
 
     private final Steward steward;
     private final ProcessStarter processStarter;
@@ -43,7 +49,9 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
                                 DaemonConfiguration daemon,
                                 ActorRef<DaemonListener> listener) {
         // XXX: should we handle multiple connections properly, even though we are expecting only one?
-        int port = daemonConnector.listenOnAnyPort(new OneTimeDaemonListenerFactory(listener));
+        int port = daemonConnector.listenOnAnyPort(
+                new OneTimeDaemonListenerFactory(
+                        withInitialMessageTimeout(listener.tell(), daemon.startupTimeout())));
         daemon = daemon.melt()
                 .launcherPort(port)
                 .freeze();
@@ -61,6 +69,24 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static DaemonListener withInitialMessageTimeout(DaemonListener listener, long timeoutMillis) {
+        return eventizer.newFrontend(
+                new InitialMessageTimeout<>(
+                        eventizer.newBackend(listener),
+                        getTimeoutMessages(timeoutMillis),
+                        timeoutMillis, TimeUnit.MILLISECONDS));
+    }
+
+    private static MessageReceiver<Event<DaemonListener>> getTimeoutMessages(long timeoutMillis) {
+        MessageQueue<Event<DaemonListener>> timeoutMessages = new MessageQueue<>();
+        DaemonListener listener = eventizer.newFrontend(timeoutMessages);
+        listener.onMessage(new OnSuiteStartedEvent());
+        listener.onMessage(new OnInternalErrorEvent("Failed to start the test runner daemon process",
+                StackTrace.copyOf(new RuntimeException("Could not connect to the daemon: timed out after " + timeoutMillis + " ms"))));
+        listener.onMessage(new OnSuiteFinishedEvent());
+        return timeoutMessages;
     }
 
     private static void copyInBackground(final InputStream src, final OutputStream dest) {
@@ -87,19 +113,19 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
     @ThreadSafe
     private static class OneTimeDaemonListenerFactory implements NetworkEndpointFactory<Event<SuiteListener>, Event<CommandListener>> {
 
-        private final BlockingQueue<ActorRef<DaemonListener>> oneTimeListener = new ArrayBlockingQueue<>(1);
+        private final BlockingQueue<DaemonListener> oneTimeListener = new ArrayBlockingQueue<>(1);
 
-        public OneTimeDaemonListenerFactory(ActorRef<DaemonListener> listener) {
+        public OneTimeDaemonListenerFactory(DaemonListener listener) {
             this.oneTimeListener.add(listener);
         }
 
         @Override
         public NetworkEndpoint<Event<SuiteListener>, Event<CommandListener>> createEndpoint() {
-            ActorRef<DaemonListener> listener = oneTimeListener.poll();
+            DaemonListener listener = oneTimeListener.poll();
             if (listener == null) {
                 throw new IllegalStateException("already connected once");
             }
-            return listener.tell();
+            return listener;
         }
     }
 }

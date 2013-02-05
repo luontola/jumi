@@ -108,12 +108,14 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 	!! - give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 		OK - end-to-end test
 		OK - create InitialMessageTimeout
-		!! - hook into ProcessStartingDaemonSummoner or RemoteSuiteLauncher; send onSuiteStarted, onInternalError, onSuiteFinished
-			- unit test
-			- OneTimeDaemonListenerFactory: push listener.tell() outside the constructor, should make the timeout easier
-			- hack InitialMessageTimeout in; first make it work
-			- (would it be cleaner if InitialMessageTimeout were a dynamic proxy that forwards any method calls? smells like re-inventing dynamic eventizers)
-			- consider generating eventizers instead of using dynamic eventizers
+		OK - hook into ProcessStartingDaemonSummoner or RemoteSuiteLauncher; send onSuiteStarted, onInternalError, onSuiteFinished
+			OK - unit test
+			OK - OneTimeDaemonListenerFactory: push listener.tell() outside the constructor, should make the timeout easier
+			OK - hack InitialMessageTimeout in; first make it work
+			FAIL - consider generating eventizers instead of using dynamic eventizers
+			SKIP - (would it be cleaner if InitialMessageTimeout were a dynamic proxy that forwards any method calls? smells like re-inventing dynamic eventizers)
+		SKIP - show the message printed by the JVM
+		!! - write a unit test that the normal events are forwarded from daemon to daemon listener
 	- TextUI fine tuning
 		- show in the summary: "There were internal errors"
 		- show in the summary: "There were test failures"
@@ -139,6 +141,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 	- tidy up release notes
 	OK - bump version
 	- release
+	- web site: feature list on front page, project goals/principles/values maybe moved to wiki
 	- create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
 
@@ -238,6 +241,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 	- get rid of fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#copyInBackground
 		- don't create background threads in the launcher automatically (the tests should create them explicitly, if any)
 		- also remove the hack in fi.jumi.test.ReleasingResourcesTest#launcher_stops_the_threads_it_started
+	- update ErrorHandlingTest#gives_an_error_if_starting_the_daemon_process_failed
+		- show the path to the daemon log file in the error message
 
 - minor release 0.5
 	- tidy up release notes

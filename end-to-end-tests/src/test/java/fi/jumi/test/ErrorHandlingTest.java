@@ -43,17 +43,16 @@ public class ErrorHandlingTest {
                 "java.lang.RuntimeException: dummy exception from test thread");
     }
 
-    @Ignore("not implemented") // TODO
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void gives_an_error_if_starting_the_daemon_process_failed() throws Exception {
+        app.daemon.startupTimeout(500); // TODO: detect it if the daemon process dies before the timeout? (to avoid this long timeout slowing down this test)
+
         app.suite.addJvmOptions("-Xmx1M"); // too small heap space for the JVM to start
         app.runTests(OnePassingTest.class);
 
-        assertReportsInternalError(
+        app.checkHasStackTrace(
                 "Failed to start the test runner daemon process",
-                // the error message printed by the JVM:
-                "Error occurred during initialization of VM",
-                "Too small initial heap for new size specified"); // TODO: show the path of where the JVM output was logged?
+                "timed out after 500 ms"); // TODO: show the path of where the JVM output was logged
     }
 
     private void assertReportsInternalError(String... expectedErrorMessages) {
