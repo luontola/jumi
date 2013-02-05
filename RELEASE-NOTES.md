@@ -4,10 +4,15 @@ Release Notes
 
 ### Upcoming Changes
 
-- JUnit backward compatibilty: Jumi now runs JUnit 3, JUnit 4 and `@RunWith` annotated test classes. Requires you to have JUnit on your test classpath
-- Sets the context class loader for test threads ([Issue #2](https://github.com/orfjackal/jumi/issues/2))
-- Fixed a deadlock when calling `Throwable.printStackTrace()` and printing to standard output concurrently ([Issue #3](https://github.com/orfjackal/jumi/issues/3))
-- Prevents `Throwable.printStackTrace()` from being wrapped around `System.out.print()`. Note that this doesn't prevent `Throwable.printStackTrace(System.out)` from being wrapped around `System.err.print()` - we handle only the common case
+This release makes it possible to run your existing JUnit tests using the Jumi test runner. All testing frameworks that run on JUnit should also run on Jumi, though incompatibilities are possible for testing frameworks that use JUnit's APIs incorrectly, because Jumi is stricter than JUnit about incorrect API usage.
+
+JUnit tests benefit from test class level parallelism through Jumi's JUnit compatibility layer. For test method level parallelism, JUnit and other testing frameworks will need to implement their own Jumi driver. Visit [our wiki](https://github.com/orfjackal/jumi/wiki) for tips on making your test suites capable of being run in parallel (e.g. avoiding various forms of global mutable state).
+
+- JUnit backward compatibility: Jumi now runs JUnit 3, JUnit 4 and `@RunWith` annotated test classes. Requires you to have JUnit on your test classpath
+- Sets the context class loader for test threads ([Issue #2](https://github.com/orfjackal/jumi/issues/2)), as required by many frameworks
+- Fixed a deadlock when calling `Throwable.printStackTrace()` and printing to `System.err` concurrently ([Issue #3](https://github.com/orfjackal/jumi/issues/3))
+- Prevents `Throwable.printStackTrace()` from being interleaved with printing to `System.out` from parallel threads of the same test run (this is in addition to the stdout/stderr isolation of parallel test runs that we've had since ever). Note that we can handle only the common case; `Throwable.printStackTrace(System.out)` can still interleave with printing to `System.err` as usual
+- Reports internal errors to the user
 
 ### Jumi 0.3.257 (2013-01-07)
 
