@@ -416,7 +416,8 @@ public class TextUITest {
         runAndGetOutput();
 
         assertInOutput(
-                "> Internal Error: the internal error message",
+                "> Internal Error",
+                "> the internal error message",
                 "java.lang.Throwable: dummy exception"
         );
     }

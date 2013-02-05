@@ -69,7 +69,8 @@ public class TextUI {
 
         @Override
         public void onInternalError(String message, StackTrace cause) {
-            printer.printlnMeta(" > Internal Error: " + message);
+            printer.printlnMeta(" > Internal Error");
+            printer.printlnMeta(" > " + message);
             printer.printErr(getStackTraceAsString(cause));
             printer.printErr("\n");
             hasFailures = true;

@@ -118,9 +118,9 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - refactor ProcessStartingDaemonSummonerTest
 		OK - write a unit test that the normal events are forwarded from daemon to daemon listener
 	!! - TextUI fine tuning
+		OK - reformat: " > Internal Error\n > ..."
 		- show in the summary: "There were internal errors"
 		- show in the summary: "There were test failures"
-		- reformat: " > Internal Error\n > ..."
 		- no need for the total test count
 
 - ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
