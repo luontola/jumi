@@ -11,6 +11,7 @@ import fi.jumi.core.CommandListener;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
+import fi.jumi.core.events.suiteListener.OnSuiteStartedEvent;
 import fi.jumi.core.network.*;
 import fi.jumi.core.util.SpyListener;
 import fi.jumi.launcher.FakeProcess;
@@ -25,7 +26,7 @@ import java.util.concurrent.*;
 import static fi.jumi.core.util.AsyncAssert.assertEventually;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 public class ProcessStartingDaemonSummonerTest {
 
@@ -45,13 +46,13 @@ public class ProcessStartingDaemonSummonerTest {
 
     private final SuiteConfiguration dummySuiteConfig = new SuiteConfiguration();
     private final DaemonConfiguration dummyDaemonConfig = new DaemonConfiguration();
-    private final ActorRef<DaemonListener> dummyListener = ActorRef.wrap(mock(DaemonListener.class));
+    private final DaemonListener daemonListener = mock(DaemonListener.class);
 
     @Test
     public void tells_to_daemon_the_socket_to_contact() {
         daemonConnector.portToReturn = 123;
 
-        daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, dummyListener);
+        daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, ActorRef.wrap(daemonListener));
 
         DaemonConfiguration daemonConfig = parseDaemonArguments(processStarter.lastArgs);
         assertThat(daemonConfig.launcherPort(), is(123));
@@ -61,9 +62,20 @@ public class ProcessStartingDaemonSummonerTest {
     public void tells_to_output_listener_what_the_daemon_prints() {
         processStarter.processToReturn.inputStream = new ByteArrayInputStream("hello".getBytes());
 
-        daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, dummyListener);
+        daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, ActorRef.wrap(daemonListener));
 
         assertEventually(outputListener, hasToString("hello"), TIMEOUT);
+    }
+
+    @Test
+    public void tells_to_daemon_listener_what_events_the_daemon_sends() {
+        daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, ActorRef.wrap(daemonListener));
+
+        NetworkEndpoint<Event<SuiteListener>, Event<CommandListener>> endpoint = daemonConnector.lastEndpointFactory.createEndpoint();
+
+        OnSuiteStartedEvent anyMessage = new OnSuiteStartedEvent();
+        endpoint.onMessage(anyMessage);
+        verify(daemonListener).onMessage(anyMessage);
     }
 
     @Test(timeout = TIMEOUT)
@@ -88,8 +100,6 @@ public class ProcessStartingDaemonSummonerTest {
         expectedMessagesArrived.await(TIMEOUT / 2, TimeUnit.MILLISECONDS);
         spy.verify();
     }
-
-    // TODO: unit test that the events from the daemon are sent to the listener
 
 
     // helpers
@@ -131,10 +141,12 @@ public class ProcessStartingDaemonSummonerTest {
 
     private static class SpyNetworkServer implements NetworkServer {
 
+        public NetworkEndpointFactory<Event<SuiteListener>, Event<CommandListener>> lastEndpointFactory;
         public int portToReturn = 1;
 
         @Override
         public <In, Out> int listenOnAnyPort(NetworkEndpointFactory<In, Out> endpointFactory) {
+            this.lastEndpointFactory = (NetworkEndpointFactory<Event<SuiteListener>, Event<CommandListener>>) endpointFactory;
             return portToReturn;
         }
 

@@ -105,7 +105,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - PathMatcherTestFileFinder: send onAllTestFilesFound()
 			OK - also update others, such as CompositeTestFileFinderTest.FakeTestFileFinder
 		OK - CompositeTestFileFinder: pass to the finders a proxy listener (wrapped in ActorRef) which counts how many times onAllTestFilesFound() was used and hides all but last
-	!! - give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
+	OK - give an error message if starting the daemon fails (for example out of memory; maybe testable with bad JVM options)
 		OK - end-to-end test
 		OK - create InitialMessageTimeout
 		OK - hook into ProcessStartingDaemonSummoner or RemoteSuiteLauncher; send onSuiteStarted, onInternalError, onSuiteFinished
@@ -116,8 +116,8 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 			SKIP - (would it be cleaner if InitialMessageTimeout were a dynamic proxy that forwards any method calls? smells like re-inventing dynamic eventizers)
 		SKIP - show the message printed by the JVM
 		OK - refactor ProcessStartingDaemonSummonerTest
-		!! - write a unit test that the normal events are forwarded from daemon to daemon listener
-	- TextUI fine tuning
+		OK - write a unit test that the normal events are forwarded from daemon to daemon listener
+	!! - TextUI fine tuning
 		- show in the summary: "There were internal errors"
 		- show in the summary: "There were test failures"
 		- reformat: " > Internal Error\n > ..."
