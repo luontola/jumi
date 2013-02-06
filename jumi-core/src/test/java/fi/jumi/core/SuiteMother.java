@@ -173,6 +173,25 @@ public class SuiteMother {
         suite.end();
     }
 
+    public static void printsAfterTestRunFinished(SuiteListener listener) {
+        final EventBuilder suite = new EventBuilder(listener);
+        suite.begin();
+
+        final RunId run1 = suite.nextRunId();
+        suite.runStarted(run1, TEST_FILE);
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
+            @Override
+            public void run() {
+            }
+        });
+        suite.runFinished(run1);
+        suite.printOut(run1, "printed to stdout "); // any warnings should happen only once, even though printed many times
+        suite.printOut(run1, "after run\n");
+        suite.printErr(run1, "and the same for stderr\n");
+
+        suite.end();
+    }
+
 
     // internal errors
 

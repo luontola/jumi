@@ -8,6 +8,7 @@ import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.runs.RunId;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
@@ -24,6 +25,11 @@ public class RunEventDenormalizer implements SuiteListener {
 
     private TestId getTestId() {
         return runningTests.getFirst();
+    }
+
+    @CheckForNull
+    private TestId getTestIdOrNull() {
+        return runningTests.peekFirst();
     }
 
     @Override
@@ -55,12 +61,12 @@ public class RunEventDenormalizer implements SuiteListener {
 
     @Override
     public void onPrintedOut(RunId runId, String text) {
-        visitor.onPrintedOut(runId, testFile, getTestId(), text);
+        visitor.onPrintedOut(runId, testFile, getTestIdOrNull(), text);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
-        visitor.onPrintedErr(runId, testFile, getTestId(), text);
+        visitor.onPrintedErr(runId, testFile, getTestIdOrNull(), text);
     }
 
     @Override

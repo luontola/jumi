@@ -125,11 +125,11 @@ OK - end-to-end tests: reporting failures outside tests (in drivers and core)
 
 OK - daemon idle timeout could be 0, increase it only for tests that require a larger value (if any)
 
-- ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
-	- suite mother: test that prints to out & err after ending
-	- ui: print a warning line, but only once " > Warning: Continued printing after the test run finished"
-	- annotate as @CheckForNull the relevant TestId parameters in RunVisitor?
-	- verify that fixes https://github.com/orfjackal/jumi/issues/1
+OK - ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
+	OK - suite mother: test that prints to out & err after ending
+	SKIP - ui: print a warning line, but only once " > Warning: Continued printing after the test run finished"
+	OK - annotate as @CheckForNull the relevant TestId parameters in RunVisitor?
+	OK - verify that fixes https://github.com/orfjackal/jumi/issues/1
 
 - skip abstract test classes silently
 	- find out how Surefire does it; should also interfaces have special handling?

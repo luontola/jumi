@@ -378,6 +378,16 @@ public class TextUITest {
         assertInOutput(printedToStdout + "\n" + theNextMetaLine);
     }
 
+    @Test
+    public void does_not_crash_if_a_test_continues_printing_after_the_test_run_has_finished() {
+        SuiteMother.printsAfterTestRunFinished(listener);
+
+        assertNotInOutput("printed to stdout");
+        // The following are hard to do with the current design; maybe implement them only in the GUI
+        // TODO: show a warning if a test continued printing after the test run finished
+        // TODO: show the thing that was printed
+    }
+
 
     // configuration
 

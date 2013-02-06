@@ -8,15 +8,23 @@ import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.runs.RunId;
 
+import javax.annotation.CheckForNull;
+
 public interface RunVisitor {
 
     void onRunStarted(RunId runId, TestFile testFile);
 
     void onTestStarted(RunId runId, TestFile testFile, TestId testId);
 
-    void onPrintedOut(RunId runId, TestFile testFile, TestId testId, String text);
+    /**
+     * @param testId null if the test continued printing after the test run finished.
+     */
+    void onPrintedOut(RunId runId, TestFile testFile, @CheckForNull TestId testId, String text);
 
-    void onPrintedErr(RunId runId, TestFile testFile, TestId testId, String text);
+    /**
+     * @param testId null if the test continued printing after the test run finished.
+     */
+    void onPrintedErr(RunId runId, TestFile testFile, @CheckForNull TestId testId, String text);
 
     void onFailure(RunId runId, TestFile testFile, TestId testId, StackTrace cause);
 

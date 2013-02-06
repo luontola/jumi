@@ -11,6 +11,7 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.results.*;
 import fi.jumi.core.runs.RunId;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
 
@@ -134,12 +135,12 @@ public class TextUI {
         }
 
         @Override
-        public void onPrintedOut(RunId runId, TestFile testFile, TestId testId, String text) {
+        public void onPrintedOut(RunId runId, TestFile testFile, @CheckForNull TestId testId, String text) {
             printer.printOut(text);
         }
 
         @Override
-        public void onPrintedErr(RunId runId, TestFile testFile, TestId testId, String text) {
+        public void onPrintedErr(RunId runId, TestFile testFile, @CheckForNull TestId testId, String text) {
             printer.printErr(text);
         }
 
