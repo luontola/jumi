@@ -131,8 +131,9 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 	OK - annotate as @CheckForNull the relevant TestId parameters in RunVisitor?
 	OK - verify that fixes https://github.com/orfjackal/jumi/issues/1
 
-- skip abstract test classes silently
-	- find out how Surefire does it; should also interfaces have special handling?
+!! - skip abstract test classes silently
+	OK - end-to-end test
+	!! - find out how Surefire does it; should also interfaces have special handling?
 	- (unit) test: abstract class annotated with @RunVia, returns IgnoreSilentlyDriver or similar
 	- verify that fixes https://github.com/orfjackal/jumi/issues/4
 
