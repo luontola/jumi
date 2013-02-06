@@ -34,7 +34,7 @@ public class DaemonConfiguration {
         launcherPort = 0;
         logActorMessages = false;
         startupTimeout = TimeUnit.SECONDS.toMillis(30);
-        idleTimeout = TimeUnit.SECONDS.toMillis(5);  // TODO: increase to 15 min, after implementing persistent daemons
+        idleTimeout = TimeUnit.SECONDS.toMillis(1);  // TODO: increase to 15 min, after implementing persistent daemons
     }
 
     DaemonConfiguration(DaemonConfigurationBuilder src) {

@@ -123,7 +123,7 @@ OK - end-to-end tests: reporting failures outside tests (in drivers and core)
 		OK - show in the summary: "There were internal errors"
 		OK - show in the summary: "There were test failures"
 
-- daemon idle timeout could be 0, increase it only for tests that require a larger value (if any)
+OK - daemon idle timeout could be 0, increase it only for tests that require a larger value (if any)
 
 - ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 	- suite mother: test that prints to out & err after ending

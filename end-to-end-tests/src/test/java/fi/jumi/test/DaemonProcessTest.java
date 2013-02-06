@@ -35,8 +35,10 @@ public class DaemonProcessTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void daemon_process_can_be_closed_by_sending_it_a_shutdown_command() throws Exception {
-        startDaemonProcess();
+        // Use a high enough idle timeout to avoid the daemon shutting down automatically
+        app.daemon.idleTimeout(Timeouts.END_TO_END_TEST * 2);
 
+        startDaemonProcess();
         launcher.shutdownDaemon();
 
         assertEventually(daemonProcess, is(dead()), Timeouts.ASSERTION);
@@ -45,10 +47,9 @@ public class DaemonProcessTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void daemon_process_will_exit_after_a_timeout_after_all_clients_disconnect() throws Exception {
-        launcher = app.getLauncher();
         app.daemon.idleTimeout(0);
-        startDaemonProcess();
 
+        startDaemonProcess();
         launcher.close();
 
         assertEventually(daemonProcess, is(dead()), Timeouts.ASSERTION);
@@ -58,7 +59,6 @@ public class DaemonProcessTest {
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void daemon_process_will_exit_if_it_cannot_connect_to_the_launcher_on_startup() throws Exception {
         app.setMockNetworkServer(new NonFunctionalNetworkServer());
-        launcher = app.getLauncher();
         app.daemon.startupTimeout(0);
 
         startDaemonProcessAsynchronously();
