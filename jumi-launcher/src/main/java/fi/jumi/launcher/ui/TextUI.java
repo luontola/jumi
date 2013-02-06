@@ -24,6 +24,7 @@ public class TextUI {
     private final SuiteEventDemuxer demuxer = new SuiteEventDemuxer();
     private final SuitePrinter suitePrinter = new SuitePrinter();
     private boolean passingTestsVisible = true;
+    private boolean hasInternalErrors = false;
     private boolean hasFailures = false;
 
     public TextUI(MessageReceiver<Event<SuiteListener>> eventStream, Printer printer) {
@@ -36,7 +37,7 @@ public class TextUI {
     }
 
     public boolean hasFailures() {
-        return hasFailures;
+        return hasFailures || hasInternalErrors;
     }
 
     public void update() {
@@ -73,7 +74,7 @@ public class TextUI {
             printer.printlnMeta(" > " + message);
             printer.printErr(getStackTraceAsString(cause));
             printer.printErr("\n");
-            hasFailures = true;
+            hasInternalErrors = true;
         }
 
         @Override
@@ -107,6 +108,12 @@ public class TextUI {
             int pass = summary.getPassingTests();
             int fail = summary.getFailingTests();
             printer.printlnMeta(String.format("Pass: %d, Fail: %d", pass, fail));
+            if (hasFailures) {
+                printer.printlnMeta("There were test failures");
+            }
+            if (hasInternalErrors) {
+                printer.printlnMeta("There were internal errors");
+            }
         }
     }
 

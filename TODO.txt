@@ -66,7 +66,7 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		OK - improve thread dumps with setNamingPolicy: extend DefaultNamingPolicy, override prefix: super.getClassName(SynchronizedPrintStream.class.getName(), source, key, names)
 		OK - harden the interface with setUseFactory(false): create a new Enhancer for each create() (it anyways has internal cache)
 
-!! - end-to-end tests: reporting failures outside tests (in drivers and core)
+OK - end-to-end tests: reporting failures outside tests (in drivers and core)
 	OK - exceptions from actors
 		OK - test: malformed .class file
 		OK - create SuiteListener event
@@ -117,11 +117,13 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		SKIP - show the message printed by the JVM
 		OK - refactor ProcessStartingDaemonSummonerTest
 		OK - write a unit test that the normal events are forwarded from daemon to daemon listener
-	!! - TextUI fine tuning
+	OK - TextUI fine tuning
 		OK - reformat: " > Internal Error\n > ..."
 		OK - no need for the total test count
-		- show in the summary: "There were internal errors"
-		- show in the summary: "There were test failures"
+		OK - show in the summary: "There were internal errors"
+		OK - show in the summary: "There were test failures"
+
+- daemon idle timeout could be 0, increase it only for tests that require a larger value (if any)
 
 - ui: give a warning if a test spawned a thread which prints something after the test ended (but don't hide the output)
 	- suite mother: test that prints to out & err after ending
@@ -283,6 +285,11 @@ OK - consider preventing Throwable.printStackTrace() from being wrapped around S
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
+
+- run tests in a loop on a weakly ordered, multi-core CPU, to look for cache coherency issues
+	- where to find a multi-core ARM for a test drive?
+		http://www.calxeda.com/trystack/
+		http://trystack.org/
 
 - release 0.6
 	- tidy up release notes

@@ -113,6 +113,27 @@ public class TextUITest {
     }
 
     @Test
+    public void summary_is_silent_if_everything_was_fine() {
+        SuiteMother.onePassingTest(listener);
+
+        assertNotInOutput("There were");
+    }
+
+    @Test
+    public void summary_tells_whether_there_were_test_failures() {
+        SuiteMother.oneFailingTest(listener);
+
+        assertInOutput("There were test failures");
+    }
+
+    @Test
+    public void summary_tells_whether_there_were_internal_errors() {
+        SuiteMother.internalError(listener);
+
+        assertInOutput("There were internal errors");
+    }
+
+    @Test
     public void each_TestClass_TestId_pair_is_counted_only_once_in_the_summary() {
         suite.begin();
 
