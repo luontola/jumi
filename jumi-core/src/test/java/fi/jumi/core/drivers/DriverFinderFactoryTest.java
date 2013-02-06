@@ -8,7 +8,7 @@ import fi.jumi.api.RunVia;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.junit.JUnitCompatibilityDriver;
 import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -22,10 +22,14 @@ public class DriverFinderFactoryTest {
     private final CompositeDriverFinder finder = DriverFinderFactory.createDriverFinder(getClass().getClassLoader());
 
     @Test
-    public void Jumi_drivers_have_the_highest_priority() {
-        Driver driver = finder.findTestClassDriver(EveryPossibleFrameworkTest.class);
+    public void supports_RunVia_annotated_Jumi_tests() {
+        @RunVia(DummyJumiDriver.class)
+        class RunViaAnnotatedClass {
+        }
 
-        assertThat(driver, is(instanceOf(DummyJumiDriver.class)));
+        Driver driver = finder.findTestClassDriver(RunViaAnnotatedClass.class);
+
+        Assert.assertThat(driver, is(instanceOf(DummyJumiDriver.class)));
     }
 
     @Test
@@ -35,6 +39,16 @@ public class DriverFinderFactoryTest {
         //assertThat(driver, is(instanceOf(JUnitCompatibilityDriver.class))); // TODO: use me instead
         assertThat(driver.getClass().getName(), is(JUnitCompatibilityDriver.class.getName()));
     }
+
+    @Test
+    public void Jumi_drivers_have_the_highest_priority() {
+        Driver driver = finder.findTestClassDriver(EveryPossibleFrameworkTest.class);
+
+        assertThat(driver, is(instanceOf(DummyJumiDriver.class)));
+    }
+
+
+    // helpers
 
     @RunVia(DummyJumiDriver.class)
     @RunWith(Parameterized.class)
