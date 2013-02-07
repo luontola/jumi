@@ -14,6 +14,7 @@ public class DriverFinderFactory {
 
     public static CompositeDriverFinder createDriverFinder(ClassLoader testClassLoader) {
         List<DriverFinder> driverFinders = new ArrayList<>();
+        driverFinders.add(new AbstractClassIgnoringDriverFinder());
         driverFinders.add(new RunViaAnnotationDriverFinder());
         try {
             driverFinders.add((DriverFinder)

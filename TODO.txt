@@ -140,8 +140,8 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 			"This is the second most popular issue for Surefire"
 			http://jira.codehaus.org/browse/SUREFIRE-482
 	OK - IgnoreSilentlyDriverTest: test that does nothing to the args when called
-	!! - DriverFinderFactoryTest: abstract class annotated with @RunVia, should use IgnoreSilentlyDriver
-	- DriverFinderFactoryTest: concrete class with no annotations or other stuff, should use IgnoreSilentlyDriver
+	OK - DriverFinderFactoryTest: abstract class annotated with @RunVia, should use IgnoreSilentlyDriver
+	!! - DriverFinderFactoryTest: concrete class with no annotations or other stuff, should use IgnoreSilentlyDriver
 		- write also as end-to-end test
 		- print a warning maybe? nagging the users indefinitely about intentional use is bad, so only show the warning in daemon logs
 			~ Surefire gives an error for such classes if the "-Dsurefire.junit4.upgradecheck" flag is set (see org.apache.maven.surefire.junit4.JUnit4Provider#upgradeCheck and http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit.html)

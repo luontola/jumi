@@ -13,9 +13,8 @@ public class IgnoringTestsTest {
     public final AppRunner app = new AppRunner();
 
 
-    @Ignore("not implemented") // TODO
     @Test(timeout = Timeouts.END_TO_END_TEST)
-    public void ignores_abstract_test_classes_silently() throws Exception {
+    public void silently_ignores_abstract_test_classes() throws Exception {
         app.runTests(AbstractTest.class);
 
         app.checkPassingAndFailingTests(0, 0);

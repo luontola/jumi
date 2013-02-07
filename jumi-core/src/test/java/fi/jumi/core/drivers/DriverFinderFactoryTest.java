@@ -47,8 +47,22 @@ public class DriverFinderFactoryTest {
         assertThat(driver, is(instanceOf(DummyJumiDriver.class)));
     }
 
+    @Test
+    public void silently_ignores_abstract_classes() {
+        Driver driver = finder.findTestClassDriver(AbstractTest.class);
 
-    // helpers
+        assertThat(driver, is(instanceOf(IgnoreSilentlyDriver.class)));
+    }
+
+    @Test
+    public void silently_ignores_interfaces() {
+        Driver driver = finder.findTestClassDriver(InterfaceTest.class);
+
+        assertThat(driver, is(instanceOf(IgnoreSilentlyDriver.class)));
+    }
+
+
+    // guinea pigs
 
     @RunVia(DummyJumiDriver.class)
     @RunWith(Parameterized.class)
@@ -61,6 +75,14 @@ public class DriverFinderFactoryTest {
     }
 
     private static class JUnitTest extends TestCase {
+    }
+
+    @RunVia(DummyJumiDriver.class)
+    private static abstract class AbstractTest {
+    }
+
+    @RunVia(DummyJumiDriver.class)
+    private interface InterfaceTest {
     }
 
     static class DummyJumiDriver extends Driver {
