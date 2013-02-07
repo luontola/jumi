@@ -135,12 +135,12 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 	OK - end-to-end test
 	OK - find out how Surefire does it; should also interfaces have special handling?
 		~ subclasses of org.apache.maven.surefire.util.ScannerFilter only check "!Modifier.isAbstract(testClass.getModifiers())" (plus JUnit annotations etc.)
-		~ but Modifier.isAbstract() returns false also for interfaces, so we don't need to check interfaces separately
+		~ but Modifier.isAbstract() returns true also for interfaces, so we don't need to check interfaces separately
 		~ ignores files that match the name pattern, but don't have @Test/@RunWith etc.
 			"This is the second most popular issue for Surefire"
 			http://jira.codehaus.org/browse/SUREFIRE-482
-	!! - IgnoreSilentlyDriverTest: test that does nothing to the args when called
-	- DriverFinderFactoryTest: abstract class annotated with @RunVia, should use IgnoreSilentlyDriver
+	OK - IgnoreSilentlyDriverTest: test that does nothing to the args when called
+	!! - DriverFinderFactoryTest: abstract class annotated with @RunVia, should use IgnoreSilentlyDriver
 	- DriverFinderFactoryTest: concrete class with no annotations or other stuff, should use IgnoreSilentlyDriver
 		- write also as end-to-end test
 		- print a warning maybe? nagging the users indefinitely about intentional use is bad, so only show the warning in daemon logs
