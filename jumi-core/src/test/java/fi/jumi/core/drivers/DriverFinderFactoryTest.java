@@ -7,6 +7,7 @@ package fi.jumi.core.drivers;
 import fi.jumi.api.RunVia;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.junit.JUnitCompatibilityDriver;
+import fi.jumi.core.util.BlacklistClassLoader;
 import junit.framework.TestCase;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -43,11 +44,25 @@ public class DriverFinderFactoryTest {
     }
 
     @Test
-    public void Jumi_drivers_have_the_highest_priority() {
+    public void does_not_support_JUnit_tests_if_JUnit_not_on_test_classpath() {
+        BlacklistClassLoader noJUnitInThisClassLoader = new BlacklistClassLoader("org.junit.", getClass().getClassLoader());
+        CompositeDriverFinder finder = DriverFinderFactory.createDriverFinder(noJUnitInThisClassLoader, new PrintStream(logOutput));
+
+        Driver driver = finder.findTestClassDriver(JUnitTest.class);
+
+        assertThat(driver, is(instanceOf(IgnoreSilentlyDriver.class)));
+        assertThat(logOutput.toString(), containsString("JUnit not found on classpath; disabling JUnit compatibility"));
+    }
+
+    @Test
+    public void Jumi_drivers_have_priority_over_all_other_testing_frameworks() {
         Driver driver = finder.findTestClassDriver(EveryPossibleFrameworkTest.class);
 
         assertThat(driver, is(instanceOf(DummyJumiDriver.class)));
     }
+
+
+    // ignored class categories
 
     @Test
     public void silently_ignores_abstract_classes() {

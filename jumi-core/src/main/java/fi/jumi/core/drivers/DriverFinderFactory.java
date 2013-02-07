@@ -18,16 +18,35 @@ public class DriverFinderFactory {
         List<DriverFinder> driverFinders = new ArrayList<>();
         driverFinders.add(new AbstractClassIgnoringDriverFinder());
         driverFinders.add(new RunViaAnnotationDriverFinder());
-        try {
-            LocallyDefiningClassLoader classLoader = new LocallyDefiningClassLoader("fi.jumi.core.junit.", testClassLoader);
-            classLoader.loadClass("org.junit.Test");
-            driverFinders.add((DriverFinder) classLoader.loadClass("fi.jumi.core.junit.JUnitCompatibilityDriverFinder").newInstance());
-        } catch (Exception e) {
-            // JUnit not on classpath; ignore
-            System.out.println("JUnit not found on classpath; disabling JUnit compatibility"); // TODO: test me
+        if (isOnClasspath("org.junit.Test", testClassLoader)) {
+            driverFinders.add(createJUnitCompatibilityDriverFinder(testClassLoader));
+        } else {
+            logOutput.println("JUnit not found on classpath; disabling JUnit compatibility");
         }
         driverFinders.add(new NonTestClassesIgnoringDriverFinder(logOutput));
         return new CompositeDriverFinder(driverFinders);
+    }
+
+    private static DriverFinder createJUnitCompatibilityDriverFinder(ClassLoader classLoader) {
+        try {
+            // XXX: JUnitCompatibilityDriverFinder must be loaded from a class loader that has JUnit on its classpath,
+            // but our current class loader is the Jumi daemon's class loader, and only the test class loader has JUnit.
+            return (DriverFinder)
+                    new LocallyDefiningClassLoader("fi.jumi.core.junit.", classLoader)
+                            .loadClass("fi.jumi.core.junit.JUnitCompatibilityDriverFinder")
+                            .newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isOnClasspath(String className, ClassLoader classLoader) {
+        try {
+            classLoader.loadClass(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 

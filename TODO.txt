@@ -146,8 +146,9 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 		OK - implement
 		OK - print a warning maybe? nagging the users indefinitely about intentional use is bad, so only show the warning in daemon logs
 			~ Surefire gives an error for such classes if the "-Dsurefire.junit4.upgradecheck" flag is set (see org.apache.maven.surefire.junit4.JUnit4Provider#upgradeCheck and http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit.html)
-	!! - DriverFinderFactoryTest: test that prints a message if JUnit not on classpath
-	- verify that fixes https://github.com/orfjackal/jumi/issues/4
+	OK - DriverFinderFactoryTest: test that prints a message if JUnit not on classpath
+		OK - custom class loader: don't check for JUnit from our own hack, but from the argument class loader
+	!! - verify that fixes https://github.com/orfjackal/jumi/issues/4
 
 - refactor to use get/set style accessors
 	- DaemonConfigurationBuilder
