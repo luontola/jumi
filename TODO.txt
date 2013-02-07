@@ -131,7 +131,7 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 	OK - annotate as @CheckForNull the relevant TestId parameters in RunVisitor?
 	OK - verify that fixes https://github.com/orfjackal/jumi/issues/1
 
-!! - skip abstract test classes silently
+OK - skip abstract test classes silently
 	OK - end-to-end test
 	OK - find out how Surefire does it; should also interfaces have special handling?
 		~ subclasses of org.apache.maven.surefire.util.ScannerFilter only check "!Modifier.isAbstract(testClass.getModifiers())" (plus JUnit annotations etc.)
@@ -148,7 +148,7 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 			~ Surefire gives an error for such classes if the "-Dsurefire.junit4.upgradecheck" flag is set (see org.apache.maven.surefire.junit4.JUnit4Provider#upgradeCheck and http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit.html)
 	OK - DriverFinderFactoryTest: test that prints a message if JUnit not on classpath
 		OK - custom class loader: don't check for JUnit from our own hack, but from the argument class loader
-	!! - verify that fixes https://github.com/orfjackal/jumi/issues/4
+	OK - verify that fixes https://github.com/orfjackal/jumi/issues/4
 
 !! - refactor to use get/set style accessors
 	OK - DaemonConfigurationBuilder
