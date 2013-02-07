@@ -5,7 +5,7 @@
 package fi.jumi.test;
 
 import org.junit.*;
-import sample.AbstractTest;
+import sample.*;
 
 public class IgnoringTestsTest {
 
@@ -16,6 +16,15 @@ public class IgnoringTestsTest {
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void silently_ignores_abstract_test_classes() throws Exception {
         app.runTests(AbstractTest.class);
+
+        app.checkPassingAndFailingTests(0, 0);
+        app.checkTotalTestRuns(0);
+    }
+
+    @Ignore("not implemented") // TODO
+    @Test(timeout = Timeouts.END_TO_END_TEST)
+    public void silently_ignores_non_test_classes_that_anyways_match_the_file_name_pattern() throws Exception {
+        app.runTests(NotReallyTest.class);
 
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
