@@ -55,6 +55,9 @@ public class ErrorHandlingTest {
                 "timed out after 500 ms"); // TODO: show the path of where the JVM output was logged
     }
 
+    // TODO: report it if the daemon dies in the middle of the suite, before onSuiteFinished
+
+
     private void assertReportsInternalError(String... expectedErrorMessages) {
         app.checkHasStackTrace(expectedErrorMessages);
         app.checkPassingAndFailingTests(0, 0);
