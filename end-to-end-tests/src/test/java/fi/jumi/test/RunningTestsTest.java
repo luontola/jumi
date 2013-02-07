@@ -28,6 +28,7 @@ public class RunningTestsTest {
 
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
+        app.checkSuitePasses();
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)

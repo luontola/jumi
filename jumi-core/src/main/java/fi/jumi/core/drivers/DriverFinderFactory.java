@@ -17,10 +17,9 @@ public class DriverFinderFactory {
         driverFinders.add(new AbstractClassIgnoringDriverFinder());
         driverFinders.add(new RunViaAnnotationDriverFinder());
         try {
-            driverFinders.add((DriverFinder)
-                    new LocallyDefiningClassLoader("fi.jumi.core.junit.", testClassLoader)
-                            .loadClass("fi.jumi.core.junit.JUnitCompatibilityDriverFinder")
-                            .newInstance());
+            LocallyDefiningClassLoader classLoader = new LocallyDefiningClassLoader("fi.jumi.core.junit.", testClassLoader);
+            classLoader.loadClass("org.junit.Test");
+            driverFinders.add((DriverFinder) classLoader.loadClass("fi.jumi.core.junit.JUnitCompatibilityDriverFinder").newInstance());
         } catch (Exception e) {
             // JUnit not on classpath; ignore
             System.out.println("JUnit not found on classpath; disabling JUnit compatibility");

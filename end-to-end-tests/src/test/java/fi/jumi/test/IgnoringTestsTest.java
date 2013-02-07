@@ -19,6 +19,7 @@ public class IgnoringTestsTest {
 
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
+        app.checkSuitePasses();
     }
 
     @Ignore("not implemented") // TODO
@@ -28,5 +29,6 @@ public class IgnoringTestsTest {
 
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
+        app.checkSuitePasses();
     }
 }

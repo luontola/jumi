@@ -24,7 +24,7 @@ import java.util.*;
 
 import static fi.jumi.core.util.StringMatchers.containsSubStrings;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotNull;
 
 public class AppRunner implements TestRule {
@@ -181,6 +181,7 @@ public class AppRunner implements TestRule {
 
     public void checkSuitePasses() {
         assertThat("failing tests", ui.getFailingCount(), is(0));
+        assertThat("no internal errors", uiRawOutput, not(containsString("Internal Error")));
     }
 
     public void checkPassingAndFailingTests(int expectedPassing, int expectedFailing) {

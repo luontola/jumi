@@ -65,6 +65,7 @@ public class JUnitCompatibilityTest {
 
         app.checkPassingAndFailingTests(0, 0);
         app.checkTotalTestRuns(0);
+        app.checkSuitePasses();
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
@@ -73,6 +74,7 @@ public class JUnitCompatibilityTest {
 
         app.checkPassingAndFailingTests(2, 0);
         app.checkTotalTestRuns(1);
+        app.checkSuitePasses();
         app.checkContainsRun("JUnitAssumptionsTest", "failingAssumption", "/", "/");
         app.checkHasStackTrace(
                 "org.junit.internal.AssumptionViolatedException: got: <false>, expected: is <true>",
