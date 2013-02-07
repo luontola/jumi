@@ -26,9 +26,7 @@ public class RunningTestsTest {
     public void suite_with_zero_tests() throws Exception {
         app.runTestsMatching("glob:sample/NoSuchTest.class");
 
-        app.checkPassingAndFailingTests(0, 0);
-        app.checkTotalTestRuns(0);
-        app.checkSuitePasses();
+        app.checkEmptyPassingSuite();
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)

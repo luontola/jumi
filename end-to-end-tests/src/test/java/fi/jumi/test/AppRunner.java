@@ -179,6 +179,12 @@ public class AppRunner implements TestRule {
 
     // assertions
 
+    public void checkEmptyPassingSuite() {
+        checkPassingAndFailingTests(0, 0);
+        checkTotalTestRuns(0);
+        checkSuitePasses();
+    }
+
     public void checkSuitePasses() {
         assertThat("failing tests", ui.getFailingCount(), is(0));
         assertThat("no internal errors", uiRawOutput, not(containsString("Internal Error")));

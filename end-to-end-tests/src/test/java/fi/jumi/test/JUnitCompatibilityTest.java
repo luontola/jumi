@@ -63,9 +63,7 @@ public class JUnitCompatibilityTest {
     public void ignored_tests_are_not_run() throws Exception { // TODO: implement support for ignored tests
         app.runTestsMatching("glob:sample/JUnitIgnoredTest.class");
 
-        app.checkPassingAndFailingTests(0, 0);
-        app.checkTotalTestRuns(0);
-        app.checkSuitePasses();
+        app.checkEmptyPassingSuite();
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)

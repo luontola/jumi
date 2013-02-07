@@ -17,9 +17,7 @@ public class IgnoringTestsTest {
     public void silently_ignores_abstract_test_classes() throws Exception {
         app.runTests(AbstractTest.class);
 
-        app.checkPassingAndFailingTests(0, 0);
-        app.checkTotalTestRuns(0);
-        app.checkSuitePasses();
+        app.checkEmptyPassingSuite();
     }
 
     @Ignore("not implemented") // TODO
@@ -27,8 +25,6 @@ public class IgnoringTestsTest {
     public void silently_ignores_non_test_classes_that_anyways_match_the_file_name_pattern() throws Exception {
         app.runTests(NotReallyTest.class);
 
-        app.checkPassingAndFailingTests(0, 0);
-        app.checkTotalTestRuns(0);
-        app.checkSuitePasses();
+        app.checkEmptyPassingSuite();
     }
 }
