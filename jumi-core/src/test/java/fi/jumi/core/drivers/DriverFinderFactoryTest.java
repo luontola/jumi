@@ -12,6 +12,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.*;
 import java.util.concurrent.Executor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,7 +20,8 @@ import static org.hamcrest.Matchers.*;
 
 public class DriverFinderFactoryTest {
 
-    private final CompositeDriverFinder finder = DriverFinderFactory.createDriverFinder(getClass().getClassLoader());
+    private final ByteArrayOutputStream logOutput = new ByteArrayOutputStream();
+    private final CompositeDriverFinder finder = DriverFinderFactory.createDriverFinder(getClass().getClassLoader(), new PrintStream(logOutput));
 
     @Test
     public void supports_RunVia_annotated_Jumi_tests() {
@@ -61,6 +63,15 @@ public class DriverFinderFactoryTest {
         assertThat(driver, is(instanceOf(IgnoreSilentlyDriver.class)));
     }
 
+    @Test
+    public void ignores_non_test_classes_with_a_warning_in_the_daemon_logs() {
+        Driver driver = finder.findTestClassDriver(NotReallyTest.class);
+
+        assertThat(driver, is(instanceOf(IgnoreSilentlyDriver.class)));
+        // We don't want to nag the users indefinitely, but may be a good idea to have some way of knowing these:
+        assertThat(logOutput.toString(), containsString("Not recognized as a test class: fi.jumi.core.drivers.DriverFinderFactoryTest$NotReallyTest"));
+    }
+
 
     // guinea pigs
 
@@ -83,6 +94,9 @@ public class DriverFinderFactoryTest {
 
     @RunVia(DummyJumiDriver.class)
     private interface InterfaceTest {
+    }
+
+    private static class NotReallyTest {
     }
 
     static class DummyJumiDriver extends Driver {

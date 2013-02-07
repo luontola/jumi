@@ -4,15 +4,17 @@
 
 package fi.jumi.core.drivers;
 
+import fi.jumi.api.drivers.Driver;
 import fi.jumi.core.util.LocallyDefiningClassLoader;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.io.PrintStream;
 import java.util.*;
 
 @NotThreadSafe
 public class DriverFinderFactory {
 
-    public static CompositeDriverFinder createDriverFinder(ClassLoader testClassLoader) {
+    public static CompositeDriverFinder createDriverFinder(ClassLoader testClassLoader, PrintStream logOutput) {
         List<DriverFinder> driverFinders = new ArrayList<>();
         driverFinders.add(new AbstractClassIgnoringDriverFinder());
         driverFinders.add(new RunViaAnnotationDriverFinder());
@@ -22,8 +24,25 @@ public class DriverFinderFactory {
             driverFinders.add((DriverFinder) classLoader.loadClass("fi.jumi.core.junit.JUnitCompatibilityDriverFinder").newInstance());
         } catch (Exception e) {
             // JUnit not on classpath; ignore
-            System.out.println("JUnit not found on classpath; disabling JUnit compatibility");
+            System.out.println("JUnit not found on classpath; disabling JUnit compatibility"); // TODO: test me
         }
+        driverFinders.add(new NonTestClassesIgnoringDriverFinder(logOutput));
         return new CompositeDriverFinder(driverFinders);
+    }
+
+
+    @NotThreadSafe
+    private static class NonTestClassesIgnoringDriverFinder implements DriverFinder {
+        private final PrintStream logOutput;
+
+        public NonTestClassesIgnoringDriverFinder(PrintStream logOutput) {
+            this.logOutput = logOutput;
+        }
+
+        @Override
+        public Driver findTestClassDriver(Class<?> testClass) {
+            logOutput.println("Not recognized as a test class: " + testClass.getName());
+            return new IgnoreSilentlyDriver();
+        }
     }
 }

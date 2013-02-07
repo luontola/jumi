@@ -20,7 +20,6 @@ public class IgnoringTestsTest {
         app.checkEmptyPassingSuite();
     }
 
-    @Ignore("not implemented") // TODO
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void silently_ignores_non_test_classes_that_anyways_match_the_file_name_pattern() throws Exception {
         app.runTests(NotReallyTest.class);

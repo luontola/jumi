@@ -6,10 +6,10 @@ package fi.jumi.core.drivers;
 
 import fi.jumi.api.drivers.Driver;
 
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.lang.reflect.Modifier;
 
-@Immutable
+@NotThreadSafe
 public class AbstractClassIgnoringDriverFinder implements DriverFinder {
 
     @Override

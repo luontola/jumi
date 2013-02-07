@@ -49,7 +49,7 @@ public class SuiteFactory implements AutoCloseable {
     public void configure(SuiteConfiguration suite) {
         testClassLoader = createClassLoader(suite.classPath());
         testFileFinder = createTestFileFinder(suite);
-        driverFinder = DriverFinderFactory.createDriverFinder(testClassLoader);
+        driverFinder = DriverFinderFactory.createDriverFinder(testClassLoader, logOutput);
         runIdSequence = new RunIdSequence();
 
         // thread pool configuration
