@@ -38,11 +38,11 @@ public class DaemonConfiguration {
     }
 
     DaemonConfiguration(DaemonConfigurationBuilder src) {
-        jumiHome = src.jumiHome();
-        launcherPort = src.launcherPort();
-        logActorMessages = src.logActorMessages();
-        startupTimeout = src.startupTimeout();
-        idleTimeout = src.idleTimeout();
+        jumiHome = src.getJumiHome();
+        launcherPort = src.getLauncherPort();
+        logActorMessages = src.getLogActorMessages();
+        startupTimeout = src.getStartupTimeout();
+        idleTimeout = src.getIdleTimeout();
     }
 
     public DaemonConfigurationBuilder melt() {
@@ -54,8 +54,8 @@ public class DaemonConfiguration {
 
     public String[] toProgramArgs() {
         return new String[]{
-                JUMI_HOME, jumiHome().toString(),
-                LAUNCHER_PORT, String.valueOf(launcherPort())
+                JUMI_HOME, getJumiHome().toString(),
+                LAUNCHER_PORT, String.valueOf(getLauncherPort())
         };
     }
 
@@ -70,23 +70,23 @@ public class DaemonConfiguration {
 
     // getters
 
-    public Path jumiHome() {
+    public Path getJumiHome() {
         return jumiHome;
     }
 
-    public int launcherPort() {
+    public int getLauncherPort() {
         return launcherPort;
     }
 
-    public boolean logActorMessages() {
+    public boolean getLogActorMessages() {
         return logActorMessages;
     }
 
-    public long startupTimeout() {
+    public long getStartupTimeout() {
         return startupTimeout;
     }
 
-    public long idleTimeout() {
+    public long getIdleTimeout() {
         return idleTimeout;
     }
 }

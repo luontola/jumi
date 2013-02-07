@@ -45,7 +45,7 @@ public class ErrorHandlingTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void gives_an_error_if_starting_the_daemon_process_failed() throws Exception {
-        app.daemon.startupTimeout(500); // TODO: detect it if the daemon process dies before the timeout? (to avoid this long timeout slowing down this test)
+        app.daemon.setStartupTimeout(500); // TODO: detect it if the daemon process dies before the timeout? (to avoid this long timeout slowing down this test)
 
         app.suite.addJvmOptions("-Xmx1M"); // too small heap space for the JVM to start
         app.runTests(OnePassingTest.class);

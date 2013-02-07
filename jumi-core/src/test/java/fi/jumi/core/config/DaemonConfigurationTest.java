@@ -27,7 +27,7 @@ public class DaemonConfigurationTest {
     @Before
     public void setup() {
         // initialize required parameters to avoid failing unrelated tests
-        builder.launcherPort(new Random().nextInt(100) + 1);
+        builder.setLauncherPort(new Random().nextInt(100) + 1);
 
         // make sure that melting makes all fields back mutable
         builder = builder.freeze().melt();
@@ -48,9 +48,9 @@ public class DaemonConfigurationTest {
 
     @Test
     public void jumi_home_is_configurable() {
-        builder.jumiHome(Paths.get("foo"));
+        builder.setJumiHome(Paths.get("foo"));
 
-        assertThat(configuration().jumiHome(), is(Paths.get("foo")));
+        assertThat(configuration().getJumiHome(), is(Paths.get("foo")));
     }
 
     @Test
@@ -58,21 +58,21 @@ public class DaemonConfigurationTest {
         String userHome = System.getProperty("user.home");
         assertNotNull(userHome);
 
-        assertThat(configuration().jumiHome().getParent(), is(Paths.get(userHome)));
+        assertThat(configuration().getJumiHome().getParent(), is(Paths.get(userHome)));
     }
 
     // launcherPort
 
     @Test
     public void launcher_port_is_configurable() {
-        builder.launcherPort(123);
+        builder.setLauncherPort(123);
 
-        assertThat(configuration().launcherPort(), is(123));
+        assertThat(configuration().getLauncherPort(), is(123));
     }
 
     @Test
     public void launcher_port_is_required() {
-        builder.launcherPort(DaemonConfiguration.DEFAULTS.launcherPort());
+        builder.setLauncherPort(DaemonConfiguration.DEFAULTS.getLauncherPort());
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("missing required parameter: " + DaemonConfiguration.LAUNCHER_PORT);
@@ -95,42 +95,42 @@ public class DaemonConfigurationTest {
 
     @Test
     public void logging_actor_messages_can_be_enabled() {
-        builder.logActorMessages(true);
+        builder.setLogActorMessages(true);
 
-        assertThat(configuration().logActorMessages(), is(true));
+        assertThat(configuration().getLogActorMessages(), is(true));
     }
 
     @Test
     public void logging_actor_messages_defaults_to_disabled() {
-        assertThat(configuration().logActorMessages(), is(false));
+        assertThat(configuration().getLogActorMessages(), is(false));
     }
 
     // startupTimeout
 
     @Test
     public void startup_timeout_can_be_changed() {
-        builder.startupTimeout(42L);
+        builder.setStartupTimeout(42L);
 
-        assertThat(configuration().startupTimeout(), is(42L));
+        assertThat(configuration().getStartupTimeout(), is(42L));
     }
 
     @Test
     public void startup_timeout_has_a_default_value() {
-        assertThat(configuration().startupTimeout(), is(greaterThanOrEqualTo(ONE_SECOND)));
+        assertThat(configuration().getStartupTimeout(), is(greaterThanOrEqualTo(ONE_SECOND)));
     }
 
     // idleTimeout
 
     @Test
     public void idle_timeout_can_be_changed() {
-        builder.idleTimeout(42L);
+        builder.setIdleTimeout(42L);
 
-        assertThat(configuration().idleTimeout(), is(42L));
+        assertThat(configuration().getIdleTimeout(), is(42L));
     }
 
     @Test
     public void idle_timeout_has_a_default_value() {
-        assertThat(configuration().idleTimeout(), is(greaterThanOrEqualTo(ONE_SECOND)));
+        assertThat(configuration().getIdleTimeout(), is(greaterThanOrEqualTo(ONE_SECOND)));
     }
 
 

@@ -51,14 +51,14 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
         // XXX: should we handle multiple connections properly, even though we are expecting only one?
         int port = daemonConnector.listenOnAnyPort(
                 new OneTimeDaemonListenerFactory(
-                        withInitialMessageTimeout(listener.tell(), daemon.startupTimeout())));
+                        withInitialMessageTimeout(listener.tell(), daemon.getStartupTimeout())));
         daemon = daemon.melt()
-                .launcherPort(port)
+                .setLauncherPort(port)
                 .freeze();
 
         try {
             JvmArgs jvmArgs = new JvmArgsBuilder()
-                    .executableJar(steward.getDaemonJar(daemon.jumiHome()))
+                    .executableJar(steward.getDaemonJar(daemon.getJumiHome()))
                     .workingDir(Paths.get(suite.workingDirectory()))
                     .jvmOptions(suite.jvmOptions())
                     .systemProperties(daemon.toSystemProperties())

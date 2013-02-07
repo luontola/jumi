@@ -36,11 +36,11 @@ public class Main {
 
         // timeouts for shutting down this daemon process
         Timeout startupTimeout = new CommandExecutingTimeout(
-                SHUTDOWN_ON_STARTUP_TIMEOUT, config.startupTimeout(), TimeUnit.MILLISECONDS
+                SHUTDOWN_ON_STARTUP_TIMEOUT, config.getStartupTimeout(), TimeUnit.MILLISECONDS
         );
         startupTimeout.start();
         Timeout idleTimeout = new CommandExecutingTimeout(
-                SHUTDOWN_ON_IDLE_TIMEOUT, config.idleTimeout(), TimeUnit.MILLISECONDS
+                SHUTDOWN_ON_IDLE_TIMEOUT, config.getIdleTimeout(), TimeUnit.MILLISECONDS
         );
 
         // replacing System.out/err with the output capturer
@@ -51,7 +51,7 @@ public class Main {
         SuiteFactory suiteFactory = new SuiteFactory(config, outputCapturer, stdout);
 
         NetworkClient client = new NettyNetworkClient();
-        client.connect("127.0.0.1", config.launcherPort(),
+        client.connect("127.0.0.1", config.getLauncherPort(),
                 new DaemonNetworkEndpoint(suiteFactory, SHUTDOWN_ON_USER_COMMAND, startupTimeout, idleTimeout));
     }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -104,7 +104,7 @@ public class JumiBootstrap {
 
     public void runSuite(SuiteConfiguration suite) throws IOException, InterruptedException {
         DaemonConfiguration daemon = new DaemonConfigurationBuilder()
-                .logActorMessages(debugOutput != null)
+                .setLogActorMessages(debugOutput != null)
                 .freeze();
 
         try (JumiLauncher launcher = createLauncher()) {

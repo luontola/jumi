@@ -22,11 +22,11 @@ public class DaemonConfigurationBuilder {
     }
 
     DaemonConfigurationBuilder(DaemonConfiguration src) {
-        jumiHome = src.jumiHome();
-        launcherPort = src.launcherPort();
-        logActorMessages = src.logActorMessages();
-        startupTimeout = src.startupTimeout();
-        idleTimeout = src.idleTimeout();
+        jumiHome = src.getJumiHome();
+        launcherPort = src.getLauncherPort();
+        logActorMessages = src.getLogActorMessages();
+        startupTimeout = src.getStartupTimeout();
+        idleTimeout = src.getIdleTimeout();
     }
 
     public DaemonConfiguration freeze() {
@@ -42,10 +42,10 @@ public class DaemonConfigurationBuilder {
             String parameter = it.next();
             switch (parameter) {
                 case DaemonConfiguration.JUMI_HOME:
-                    jumiHome(Paths.get(it.next()));
+                    setJumiHome(Paths.get(it.next()));
                     break;
                 case DaemonConfiguration.LAUNCHER_PORT:
-                    launcherPort(Integer.parseInt(it.next()));
+                    setLauncherPort(Integer.parseInt(it.next()));
                     break;
                 default:
                     throw new IllegalArgumentException("unsupported parameter: " + parameter);
@@ -56,7 +56,7 @@ public class DaemonConfigurationBuilder {
     }
 
     private void checkRequiredParameters() {
-        if (launcherPort() <= 0) {
+        if (getLauncherPort() <= 0) {
             throw new IllegalArgumentException("missing required parameter: " + DaemonConfiguration.LAUNCHER_PORT);
         }
     }
@@ -71,47 +71,47 @@ public class DaemonConfigurationBuilder {
 
     // getters and setters
 
-    public Path jumiHome() {
+    public Path getJumiHome() {
         return jumiHome;
     }
 
-    public DaemonConfigurationBuilder jumiHome(Path jumiHome) {
+    public DaemonConfigurationBuilder setJumiHome(Path jumiHome) {
         this.jumiHome = jumiHome;
         return this;
     }
 
-    public int launcherPort() {
+    public int getLauncherPort() {
         return launcherPort;
     }
 
-    public DaemonConfigurationBuilder launcherPort(int launcherPort) {
+    public DaemonConfigurationBuilder setLauncherPort(int launcherPort) {
         this.launcherPort = launcherPort;
         return this;
     }
 
-    public boolean logActorMessages() {
+    public boolean getLogActorMessages() {
         return logActorMessages;
     }
 
-    public DaemonConfigurationBuilder logActorMessages(boolean logActorMessages) {
+    public DaemonConfigurationBuilder setLogActorMessages(boolean logActorMessages) {
         this.logActorMessages = logActorMessages;
         return this;
     }
 
-    public long startupTimeout() {
+    public long getStartupTimeout() {
         return startupTimeout;
     }
 
-    public DaemonConfigurationBuilder startupTimeout(long startupTimeout) {
+    public DaemonConfigurationBuilder setStartupTimeout(long startupTimeout) {
         this.startupTimeout = startupTimeout;
         return this;
     }
 
-    public long idleTimeout() {
+    public long getIdleTimeout() {
         return idleTimeout;
     }
 
-    public DaemonConfigurationBuilder idleTimeout(long idleTimeout) {
+    public DaemonConfigurationBuilder setIdleTimeout(long idleTimeout) {
         this.idleTimeout = idleTimeout;
         return this;
     }

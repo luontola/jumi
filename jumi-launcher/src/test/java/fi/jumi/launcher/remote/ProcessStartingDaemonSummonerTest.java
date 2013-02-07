@@ -55,7 +55,7 @@ public class ProcessStartingDaemonSummonerTest {
         daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, ActorRef.wrap(daemonListener));
 
         DaemonConfiguration daemonConfig = parseDaemonArguments(processStarter.lastArgs);
-        assertThat(daemonConfig.launcherPort(), is(123));
+        assertThat(daemonConfig.getLauncherPort(), is(123));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ProcessStartingDaemonSummonerTest {
         daemonSummoner.connectToDaemon(
                 dummySuiteConfig,
                 new DaemonConfigurationBuilder()
-                        .startupTimeout(0)
+                        .setStartupTimeout(0)
                         .freeze(),
                 actorRef(new FakeDaemonListener(countMessages(expect, expectedMessagesArrived))));
 

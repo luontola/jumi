@@ -153,8 +153,8 @@ public class AppRunner implements TestRule {
 
     private DaemonConfiguration configure(DaemonConfiguration daemon) {
         return daemon.melt()
-                .jumiHome(sandboxDir.resolve("jumi-home"))
-                .logActorMessages(true)
+                .setJumiHome(sandboxDir.resolve("jumi-home"))
+                .setLogActorMessages(true)
                 .freeze();
     }
 

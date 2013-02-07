@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -13,19 +13,19 @@ class SystemProperty {
 
     // TODO: make generic and decouple from DaemonConfiguration?
 
-    private final String beanProperty;
     private final String systemProperty;
     private final DaemonConfiguration defaults;
     private final Method getter;
+    private final Method setter;
     private final Class<?> type;
 
     public SystemProperty(String beanProperty, String systemProperty, DaemonConfiguration defaults) {
-        this.beanProperty = beanProperty;
         this.systemProperty = systemProperty;
         this.defaults = defaults;
         try {
-            getter = defaults.getClass().getMethod(beanProperty);
+            getter = DaemonConfiguration.class.getMethod(getterName(beanProperty));
             type = getter.getReturnType();
+            setter = DaemonConfigurationBuilder.class.getMethod(setterName(beanProperty), type);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +57,6 @@ class SystemProperty {
 
     private void set(DaemonConfigurationBuilder target, String value) {
         try {
-            Method setter = target.getClass().getMethod(beanProperty, type);
             setter.invoke(target, parse(type, value));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -72,5 +71,17 @@ class SystemProperty {
             return Boolean.parseBoolean(value);
         }
         throw new IllegalArgumentException("unsupported type: " + type);
+    }
+
+    private static String getterName(String beanProperty) {
+        return "get" + capitalize(beanProperty);
+    }
+
+    private static String setterName(String beanProperty) {
+        return "set" + capitalize(beanProperty);
+    }
+
+    private static String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

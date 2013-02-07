@@ -63,7 +63,7 @@ public class SuiteFactory implements AutoCloseable {
 
         // logging configuration
         FailureHandler failureHandler = new InternalErrorReportingFailureHandler(suiteListener, logOutput);
-        MessageListener messageListener = config.logActorMessages()
+        MessageListener messageListener = config.getLogActorMessages()
                 ? new PrintStreamMessageLogger(logOutput)
                 : new NullMessageListener();
 
