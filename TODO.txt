@@ -147,6 +147,14 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 			~ Surefire gives an error for such classes if the "-Dsurefire.junit4.upgradecheck" flag is set (see org.apache.maven.surefire.junit4.JUnit4Provider#upgradeCheck and http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit.html)
 	- verify that fixes https://github.com/orfjackal/jumi/issues/4
 
+- refactor to use get/set style accessors
+	- DaemonConfigurationBuilder
+	- DaemonConfiguration
+	- SuiteConfigurationBuilder
+	- SuiteConfiguration
+	- JvmArgsBuilder
+	- JvmArgs: pass builder to constructor
+
 - configurable thread count
 	- add configuration parameter (DaemonConfiguration) for the number of test threads
 	- make the number of test threads by default the number of CPUs + 1 or similar
@@ -163,7 +171,7 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 	- create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
 
-- plugin system for custom DriverFinders
+- plugin system for custom DriverFinders (keep it minimal, nearly walking skeleton level, until we have more plugins)
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
 	- move JUnit compatibility into its own module
 		- create jumi-junit.jar
@@ -174,7 +182,7 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 	- investigate maven-shade-plugin; can we now turn on minimizing? it used to remove the JUnitCompatibilityDriver from jumi-daemon.jar
 		- experiment:
 			- how much is daemon jar minimized? if it minimizes only a little, it might not be worth it
-			- write a test that the daemon jar contains everything from the jumi-core
+			- otherwise: write a test that the daemon jar contains everything from the jumi-core
 
 - ignoring tests
 	- ignoring without running a test
@@ -261,6 +269,7 @@ OK - ui: give a warning if a test spawned a thread which prints something after 
 		- also remove the hack in fi.jumi.test.ReleasingResourcesTest#launcher_stops_the_threads_it_started
 	- update ErrorHandlingTest#gives_an_error_if_starting_the_daemon_process_failed
 		- show the path to the daemon log file in the error message
+		- consider showing the log file path for all internal errors? or leave it for later, for another mechanism to tell stats about the process?
 
 - minor release 0.5
 	- tidy up release notes

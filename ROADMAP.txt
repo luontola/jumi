@@ -1,7 +1,5 @@
 
 ROADMAP:
-- JUnit backward compatibility
-
 - Integration test project
 	- Infrastructure for running tests against specified Jumi version
 	- Tests for Specsy
