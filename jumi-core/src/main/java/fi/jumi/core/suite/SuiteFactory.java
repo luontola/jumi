@@ -40,6 +40,8 @@ public class SuiteFactory implements AutoCloseable {
     private RunIdSequence runIdSequence;
     MultiThreadedActors actors;
 
+    private URLClassLoader cachedClassLoader;
+
     public SuiteFactory(DaemonConfiguration daemonConfiguration, OutputCapturer outputCapturer, PrintStream logOutput) {
         this.config = daemonConfiguration;
         this.outputCapturer = outputCapturer;
@@ -47,7 +49,29 @@ public class SuiteFactory implements AutoCloseable {
     }
 
     public void configure(SuiteConfiguration suite) {
-        testClassLoader = createClassLoader(suite.getClassPath());
+        List<URI> dependencies = new ArrayList<>();
+        List<URI> application = new ArrayList<>();
+        for (URI uri : suite.getClassPath()) {
+            String path = uri.getPath();
+            if (path.contains("dimdwarf") ||
+                    path.contains("jdave") ||
+                    path.contains("mockito") ||
+                    path.contains("jmock")) {
+                application.add(uri);
+            } else {
+                dependencies.add(uri);
+            }
+        }
+
+        if (cachedClassLoader == null) {
+            cachedClassLoader = createClassLoader(dependencies);
+        }
+        try {
+            testClassLoader = new URLClassLoader(asUrls(application), cachedClassLoader);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
         testFileFinder = createTestFileFinder(suite);
         driverFinder = DriverFinderFactory.createDriverFinder(testClassLoader, logOutput);
         runIdSequence = new RunIdSequence();
