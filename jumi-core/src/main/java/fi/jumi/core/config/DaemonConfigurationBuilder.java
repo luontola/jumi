@@ -11,8 +11,12 @@ import java.util.*;
 @NotThreadSafe
 public class DaemonConfigurationBuilder {
 
+    // command line arguments
     private Path jumiHome;
     private int launcherPort;
+
+    // system properties
+    private int testThreadsCount;
     private boolean logActorMessages;
     private long startupTimeout;
     private long idleTimeout;
@@ -24,6 +28,7 @@ public class DaemonConfigurationBuilder {
     DaemonConfigurationBuilder(DaemonConfiguration src) {
         jumiHome = src.getJumiHome();
         launcherPort = src.getLauncherPort();
+        testThreadsCount = src.getTestThreadsCount();
         logActorMessages = src.getLogActorMessages();
         startupTimeout = src.getStartupTimeout();
         idleTimeout = src.getIdleTimeout();
@@ -86,6 +91,15 @@ public class DaemonConfigurationBuilder {
 
     public DaemonConfigurationBuilder setLauncherPort(int launcherPort) {
         this.launcherPort = launcherPort;
+        return this;
+    }
+
+    public int getTestThreadsCount() {
+        return testThreadsCount;
+    }
+
+    public DaemonConfigurationBuilder setTestThreadsCount(int testThreadsCount) {
+        this.testThreadsCount = testThreadsCount;
         return this;
     }
 

@@ -91,6 +91,23 @@ public class DaemonConfigurationTest {
         assertThat(systemProperties).isEmpty();
     }
 
+    // testThreadsCount
+
+    @Test
+    public void test_threads_count_can_be_changed() {
+        builder.setTestThreadsCount(10);
+
+        assertThat("count", configuration().getTestThreadsCount(), is(10));
+        assertThat("is automatic", configuration().isTestThreadsCountAutomatic(), is(false));
+    }
+
+    @Test
+    public void test_threads_count_defaults_to_the_number_of_CPUs() {
+        assertThat("count", configuration().getTestThreadsCount(), is(0));
+        assertThat("is automatic", configuration().isTestThreadsCountAutomatic(), is(true));
+    }
+
+
     // logActorMessages
 
     @Test

@@ -64,6 +64,9 @@ class SystemProperty {
     }
 
     private static Object parse(Class<?> type, String value) {
+        if (type == int.class) {
+            return Integer.parseInt(value);
+        }
         if (type == long.class) {
             return Long.parseLong(value);
         }

@@ -18,13 +18,19 @@ public class DaemonConfiguration {
     public static final String JUMI_HOME = "--jumi-home";
     public static final String LAUNCHER_PORT = "--launcher-port";
 
+    // system properties
+    public static final SystemProperty TEST_THREADS_COUNT = new SystemProperty("testThreadsCount", "jumi.daemon.testThreadsCount", DEFAULTS);
     public static final SystemProperty IDLE_TIMEOUT = new SystemProperty("idleTimeout", "jumi.daemon.idleTimeout", DEFAULTS);
     public static final SystemProperty STARTUP_TIMEOUT = new SystemProperty("startupTimeout", "jumi.daemon.startupTimeout", DEFAULTS);
     public static final SystemProperty LOG_ACTOR_MESSAGES = new SystemProperty("logActorMessages", "jumi.daemon.logActorMessages", DEFAULTS);
-    public static final List<SystemProperty> PROPERTIES = Arrays.asList(LOG_ACTOR_MESSAGES, STARTUP_TIMEOUT, IDLE_TIMEOUT);
+    public static final List<SystemProperty> PROPERTIES = Arrays.asList(TEST_THREADS_COUNT, LOG_ACTOR_MESSAGES, STARTUP_TIMEOUT, IDLE_TIMEOUT);
 
+    // command line arguments
     private final Path jumiHome;
     private final int launcherPort;
+
+    // system properties
+    private final int testThreadsCount;
     private final boolean logActorMessages;
     private final long startupTimeout;
     private final long idleTimeout;
@@ -32,6 +38,7 @@ public class DaemonConfiguration {
     public DaemonConfiguration() {
         jumiHome = Paths.get(System.getProperty("user.home"), ".jumi");
         launcherPort = 0;
+        testThreadsCount = 0;
         logActorMessages = false;
         startupTimeout = TimeUnit.SECONDS.toMillis(30);
         idleTimeout = TimeUnit.SECONDS.toMillis(1);  // TODO: increase to 15 min, after implementing persistent daemons
@@ -40,6 +47,7 @@ public class DaemonConfiguration {
     DaemonConfiguration(DaemonConfigurationBuilder src) {
         jumiHome = src.getJumiHome();
         launcherPort = src.getLauncherPort();
+        testThreadsCount = src.getTestThreadsCount();
         logActorMessages = src.getLogActorMessages();
         startupTimeout = src.getStartupTimeout();
         idleTimeout = src.getIdleTimeout();
@@ -76,6 +84,14 @@ public class DaemonConfiguration {
 
     public int getLauncherPort() {
         return launcherPort;
+    }
+
+    public int getTestThreadsCount() {
+        return testThreadsCount;
+    }
+
+    public boolean isTestThreadsCountAutomatic() {
+        return testThreadsCount < 1;
     }
 
     public boolean getLogActorMessages() {
