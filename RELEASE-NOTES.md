@@ -2,7 +2,7 @@
 Release Notes
 =============
 
-### Upcoming Changes
+### Jumi 0.4.313 (2013-02-09)
 
 This release makes it possible to run your existing JUnit tests using the Jumi test runner. All testing frameworks that run on JUnit should also run on Jumi, though incompatibilities are possible for testing frameworks that use JUnit's APIs incorrectly, because Jumi is stricter than JUnit about incorrect API usage.
 
