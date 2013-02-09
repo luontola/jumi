@@ -25,7 +25,7 @@ public interface SuiteNotifier {
     TestNotifier fireTestStarted(TestId testId);
 
     /**
-     * Notifies about an internal error e.g. in the Driver, not in a test.
+     * Notifies about an internal error in the Driver (that is, not a regular test failure).
      */
     void fireInternalError(String message, Throwable cause);
 }
