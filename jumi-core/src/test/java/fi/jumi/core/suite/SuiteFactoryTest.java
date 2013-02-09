@@ -83,20 +83,8 @@ public class SuiteFactoryTest {
         daemon.setTestThreadsCount(3);
         createSuiteFactory();
 
-        assertThat(getMaxThreads(factory.testThreadPool), is(3));
-    }
+        ThreadPoolExecutor testThreadPool = (ThreadPoolExecutor) factory.testThreadPool;
 
-    @Test(timeout = TIMEOUT)
-    public void test_thread_pool_uses_as_many_threads_as_CPU_cores_by_default() {
-        createSuiteFactory();
-
-        assertThat(getMaxThreads(factory.testThreadPool), is(4));
-    }
-
-    // helpers
-
-    private static int getMaxThreads(ExecutorService executorService) {
-        ThreadPoolExecutor threadPool = (ThreadPoolExecutor) executorService;
-        return threadPool.getMaximumPoolSize();
+        assertThat(testThreadPool.getMaximumPoolSize(), is(3));
     }
 }

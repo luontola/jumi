@@ -87,7 +87,11 @@ public class DaemonConfiguration {
     }
 
     public int getTestThreadsCount() {
-        return testThreadsCount;
+        if (isTestThreadsCountAutomatic()) {
+            return Runtime.getRuntime().availableProcessors();
+        } else {
+            return testThreadsCount;
+        }
     }
 
     public boolean isTestThreadsCountAutomatic() {
