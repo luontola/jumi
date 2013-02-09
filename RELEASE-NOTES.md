@@ -9,14 +9,14 @@ This release makes it possible to run your existing JUnit tests using the Jumi t
 JUnit tests benefit from test class level parallelism through Jumi's JUnit compatibility layer. For test method level parallelism, JUnit and other testing frameworks will need to implement their own Jumi driver. Visit [our wiki](https://github.com/orfjackal/jumi/wiki) for tips on making your test suites capable of being run in parallel (e.g. avoiding various forms of global mutable state).
 
 - JUnit backward compatibility: Jumi now runs JUnit 3, JUnit 4 and `@RunWith` annotated test classes. Requires you to have JUnit on your test classpath
-- Can set the number of test threads to use. Defaults to the number of CPU cores
+- Can configure the number of threads to use for running tests. Defaults to the number of CPU cores
 - Reports internal errors to the user
 - Sets the context class loader for test threads ([Issue #2](https://github.com/orfjackal/jumi/issues/2)), as required by many frameworks
 - Fixed a deadlock when calling `Throwable.printStackTrace()` and printing to `System.err` concurrently ([Issue #3](https://github.com/orfjackal/jumi/issues/3))
 - Prevents `Throwable.printStackTrace()` from being interleaved with printing to `System.out` from parallel threads of the same test run (this is in addition to the stdout/stderr isolation of parallel test runs that we've had since ever). Note that we can handle only the common case; `Throwable.printStackTrace(System.out)` can still interleave with printing to `System.err` as usual
-- Fixed a crash if a test prints something (from a background thread) after it's finished ([Issue #1](https://github.com/orfjackal/jumi/issues/1)). The current text UI hides the late printed output, but in the future we'll create a GUI that shows all of the output
+- Fixed a crash if a test prints something (from a background thread) after it's finished ([Issue #1](https://github.com/orfjackal/jumi/issues/1)). The current text UI hides the late printed output, but in the future we'll create a GUI that will show all of the output
 - Will not try to run abstract test classes ([Issue #4](https://github.com/orfjackal/jumi/issues/4))
-- Will not try to run classes that are not identified as a test class, even though the class name matches the test file pattern. This the same way as how the Maven Surefire Plugin and most IDEs operate
+- Will not try to run classes that are not identified as a test class, even though the class name matches the test file pattern. This the same as how the Maven Surefire Plugin and most IDEs work
 
 ### Jumi 0.3.257 (2013-01-07)
 

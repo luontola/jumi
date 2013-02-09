@@ -169,10 +169,10 @@ OK - report it if the daemon dies in the middle of the suite, before onSuiteFini
 	OK - end-to-end test: wait for the onSuiteStarted event, then signal the guinea pig (by creating a temp file) to kill the process
 	OK - RemoteSuiteLauncher: listen for onSuiteStarted & onSuiteFinished events, if disconnected between them two, send onInternalError + onSuiteFinished
 
-- release 0.4
-	- tidy up release notes
+!! - release 0.4
+	OK - tidy up release notes
 	OK - bump version
-	- release
+	!! - release
 	- web site: feature list on front page, project goals/principles/values maybe moved to wiki
 	- create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
