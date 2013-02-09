@@ -17,7 +17,7 @@ import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.*;
+import java.io.PrintStream;
 import java.net.*;
 import java.nio.file.*;
 import java.util.*;
@@ -49,29 +49,10 @@ public class SuiteFactory implements AutoCloseable {
     }
 
     public void configure(SuiteConfiguration suite) {
-        List<URI> dependencies = new ArrayList<>();
-        List<URI> application = new ArrayList<>();
-        for (URI uri : suite.getClassPath()) {
-            String path = uri.getPath();
-            if (path.contains("dimdwarf") ||
-                    path.contains("jdave") ||
-                    path.contains("mockito") ||
-                    path.contains("jmock")) {
-                application.add(uri);
-            } else {
-                dependencies.add(uri);
-            }
-        }
-
         if (cachedClassLoader == null) {
-            cachedClassLoader = createClassLoader(dependencies);
+            cachedClassLoader = createClassLoader(suite.getClassPath());
         }
-        try {
-            testClassLoader = new URLClassLoader(asUrls(application), cachedClassLoader);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-
+        testClassLoader = cachedClassLoader;
         testFileFinder = createTestFileFinder(suite);
         driverFinder = DriverFinderFactory.createDriverFinder(testClassLoader, logOutput);
         runIdSequence = new RunIdSequence();
@@ -132,13 +113,6 @@ public class SuiteFactory implements AutoCloseable {
         }
         if (testThreadPool != null) {
             testThreadPool.shutdownNow();
-        }
-        if (testClassLoader != null) {
-            try {
-                testClassLoader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
