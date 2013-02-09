@@ -20,6 +20,8 @@
 - Running a subset of tests based on groups/tags
 	- Probably string based (http://tech.groups.yahoo.com/group/junit/message/24017) or hybrid (http://tech.groups.yahoo.com/group/junit/message/24024)
 
+- Reporting system properties, hostname, hardware and other metadata about the JVM on which the tests were run
+
 
 	PERFORMANCE
 
