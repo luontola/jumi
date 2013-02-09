@@ -165,8 +165,8 @@ OK - configurable thread count
 	OK - JumiBootstrap: setter for it
 	OK - AppRunner: set a fixed value
 
-- report it if the daemon dies in the middle of the suite, before onSuiteFinished
-	- end-to-end test: wait for the onSuiteStarted event, then signal the guinea pig (by creating a temp file) to kill the process
+!! - report it if the daemon dies in the middle of the suite, before onSuiteFinished
+	!! - end-to-end test: wait for the onSuiteStarted event, then signal the guinea pig (by creating a temp file) to kill the process
 	- RemoteSuiteLauncher: listen for onSuiteStarted & onSuiteFinished events, if disconnected between them two, send onInternalError + onSuiteFinished
 
 - release 0.4

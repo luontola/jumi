@@ -11,7 +11,7 @@ import static fi.jumi.core.util.AsyncAssert.assertEventually;
 import static fi.jumi.core.util.StringMatchers.containsSubStrings;
 import static org.hamcrest.Matchers.hasProperty;
 
-public class ErrorHandlingTest {
+public class InternalErrorReportingTest {
 
     @Rule
     public final AppRunner app = new AppRunner();
@@ -44,7 +44,7 @@ public class ErrorHandlingTest {
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
-    public void gives_an_error_if_starting_the_daemon_process_failed() throws Exception {
+    public void reports_it_if_starting_the_daemon_process_failed() throws Exception {
         app.daemon.setStartupTimeout(500); // TODO: detect it if the daemon process dies before the timeout? (to avoid this long timeout slowing down this test)
 
         app.suite.addJvmOptions("-Xmx1M"); // too small heap space for the JVM to start
