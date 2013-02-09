@@ -98,6 +98,8 @@ public class RunningTestsTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void tests_are_run_in_parallel() throws Exception {
+        app.daemon.setTestThreadsCount(2);
+
         app.runTests(ParallelismTest.class);
 
         app.checkPassingAndFailingTests(3, 0);

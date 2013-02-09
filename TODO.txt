@@ -158,12 +158,12 @@ OK - refactor to use get/set style accessors
 	OK - JvmArgsBuilder
 	OK - JvmArgs: pass builder to constructor
 
-!! - configurable thread count
+OK - configurable thread count
 	OK - add configuration parameter (DaemonConfiguration) for the number of test threads
 	OK - hook it in, make the number of test threads by default the number of CPUs + 1 or similar
 	OK - move fi.jumi.core.suite.SuiteFactory#getTestThreadsCount?
 	OK - JumiBootstrap: setter for it
-	!! - AppRunner: set a fixed value
+	OK - AppRunner: set a fixed value
 
 - report it if the daemon dies in the middle of the suite, before onSuiteFinished
 	- end-to-end test: wait for the onSuiteStarted event, then signal the guinea pig (by creating a temp file) to kill the process
