@@ -5,8 +5,6 @@ layout: page
 
 Common test runner for the JVM. Natively supports running tests in parallel, class loader caching, test order priorization and other measures to run tests faster. Contains the full stack for running tests (the responsibilities which used to be spread over build tools, IDEs and test runners) in order to overcome limitations of previously existing tools. Will overcome JUnit's test runner's limitations to better support all testing frameworks on the JVM.
 
-Motivation and benefits of the Jumi test runner are explained in its announcement video, [Announcing the First Release of the Jumi Test Runner for the JVM](http://www.youtube.com/watch?v=Ggi6yutRZ9Y). It also explains how testing framework, build tool and IDE developers can get started on implementing Jumi support.
-
 Jumi is not only open source, but also open development. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code> The long-term roadmap is in [ROADMAP.txt](https://github.com/orfjackal/jumi/blob/master/ROADMAP.txt) and the short-term task list is in [TODO.txt](https://github.com/orfjackal/jumi/blob/master/TODO.txt).
 
 - Mailing list: <https://groups.google.com/d/forum/jumi-test-runner>
@@ -16,15 +14,20 @@ Jumi is not only open source, but also open development. The process of how Jumi
 - Developer: [Esko Luontola](https://github.com/orfjackal) ([@orfjackal](http://twitter.com/orfjackal))
 
 
-Features
---------
+Main Features
+-------------
 
-- **Runs tests in parallel** - Faster feedback by distributing the load over all your CPU cores
+Motivation and benefits of the Jumi test runner are explained in its announcement video, [Announcing the First Release of the Jumi Test Runner for the JVM](http://www.youtube.com/watch?v=Ggi6yutRZ9Y). It also explains how testing framework, build tool and IDE developers can get started on implementing Jumi support.
 
-- **Accurate test output** - When a test prints something to System.out/err, Jumi will show the output exactly inside that test in the results (unlike JUnit and many IDEs). Also when multiple tests are run in parallel, the output from each of them is isolated from each other.
+- **Runs Tests in Parallel** - Faster feedback by distributing the load over all your CPU cores. A testing framework that runs on Jumi can easily run even each test method in its own thread.
 
-- **Backward compatible with JUnit** - Runs your existing JUnit tests and also tests for the numerous other testing frameworks that support the JUnit test runner
+- **Accurate Test Output** - When a test prints something to System.out/err, Jumi will show the output exactly inside that test in the results (unlike JUnit and many IDEs). Also when multiple tests are run in parallel, the output from each of them is isolated from each other.
 
+- **Backward Compatible with JUnit** - Runs your existing JUnit tests and also tests for the numerous other testing frameworks that support the JUnit test runner.
+
+- **Expressive Execution Model** - Supports better all testing frameworks. Unlike with JUnit, with Jumi it's not necessary for a testing framework to know what tests exist before it executes the tests. Also tests may consist of multiple steps ("nested tests"), instead of just a flat JUnit-like organization.
+
+[Continue to the documentation](https://github.com/orfjackal/jumi/wiki) to find out how to run your tests on Jumi.
 
 
 What's compatible with Jumi?
