@@ -10,6 +10,7 @@ import fi.jumi.core.CommandListener;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.SuiteListenerEventizer;
+import fi.jumi.core.events.suiteListener.OnSuiteFinishedEvent;
 import fi.jumi.core.network.*;
 import fi.jumi.core.suite.SuiteFactory;
 import fi.jumi.core.util.timeout.*;
@@ -50,9 +51,48 @@ public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<CommandListe
         message.fireOn(this);
     }
 
+    private int iterations = 0;
+
     @Override
-    public void runTests(SuiteConfiguration suite) {
-        SuiteListener suiteListener = new SuiteListenerEventizer().newFrontend(sender);
+    public void runTests(final SuiteConfiguration suite) {
+        final long start = System.currentTimeMillis();
+        SuiteListener suiteListener = new SuiteListenerEventizer().newFrontend(new MessageSender<Event<SuiteListener>>() {
+            @Override
+            public void send(Event<SuiteListener> message) {
+
+                // don't end the suite until we have done enough iterations
+                if (message.getClass() != OnSuiteFinishedEvent.class) {
+                    sender.send(message);
+                    return;
+                }
+
+                long end = System.currentTimeMillis();
+                long duration = end - start;
+                System.out.println(iterations + ": took " + duration + " ms");
+
+                iterations++;
+                if (iterations < 11) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // release resources
+                            suiteFactory.close();
+                            try {
+                                // must be done in a new thread, because else the above call would interrupt this
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
+
+                            // restart suite
+                            runTests(suite);
+                        }
+                    }).start();
+                } else {
+                    sender.send(message); // last iteration, end the suite
+                }
+            }
+        });
         suiteFactory.configure(suite);
         suiteFactory.start(suiteListener);
     }

@@ -17,7 +17,7 @@ import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.util.*;
@@ -34,7 +34,7 @@ public class SuiteFactory implements AutoCloseable {
 
     private ExecutorService actorThreadPool;
     ExecutorService testThreadPool;
-    ClassLoader testClassLoader;
+    URLClassLoader testClassLoader;
     private TestFileFinder testFileFinder;
     private CompositeDriverFinder driverFinder;
     private RunIdSequence runIdSequence;
@@ -109,9 +109,16 @@ public class SuiteFactory implements AutoCloseable {
         if (testThreadPool != null) {
             testThreadPool.shutdownNow();
         }
+        if (testClassLoader != null) {
+            try {
+                testClassLoader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private static ClassLoader createClassLoader(List<URI> classpath) {
+    private static URLClassLoader createClassLoader(List<URI> classpath) {
         try {
             return new URLClassLoader(asUrls(classpath));
         } catch (MalformedURLException e) {

@@ -12,6 +12,7 @@ import org.apache.commons.io.output.NullOutputStream;
 import org.junit.*;
 
 import java.io.PrintStream;
+import java.net.URLClassLoader;
 import java.util.concurrent.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,7 +50,7 @@ public class SuiteFactoryTest {
                 spy.add(Thread.currentThread().getContextClassLoader());
             }
         });
-        ClassLoader contextClassLoader = spy.take();
+        URLClassLoader contextClassLoader = (URLClassLoader) spy.take();
 
         assertThat(contextClassLoader, is(factory.testClassLoader));
     }
