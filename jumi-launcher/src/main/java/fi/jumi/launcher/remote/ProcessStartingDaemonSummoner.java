@@ -58,12 +58,12 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
 
         try {
             JvmArgs jvmArgs = new JvmArgsBuilder()
-                    .executableJar(steward.getDaemonJar(daemon.getJumiHome()))
-                    .workingDir(Paths.get(suite.getWorkingDirectory()))
-                    .jvmOptions(suite.getJvmOptions())
-                    .systemProperties(daemon.toSystemProperties())
-                    .programArgs(daemon.toProgramArgs())
-                    .toJvmArgs();
+                    .setExecutableJar(steward.getDaemonJar(daemon.getJumiHome()))
+                    .setWorkingDir(Paths.get(suite.getWorkingDirectory()))
+                    .setJvmOptions(suite.getJvmOptions())
+                    .setSystemProperties(daemon.toSystemProperties())
+                    .setProgramArgs(daemon.toProgramArgs())
+                    .freeze();
             Process process = processStarter.startJavaProcess(jvmArgs);
             copyInBackground(process.getInputStream(), outputListener); // TODO: write the output to a log file using OS pipes, read it from there with AppRunner
         } catch (Exception e) {

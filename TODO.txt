@@ -150,13 +150,13 @@ OK - skip abstract test classes silently
 		OK - custom class loader: don't check for JUnit from our own hack, but from the argument class loader
 	OK - verify that fixes https://github.com/orfjackal/jumi/issues/4
 
-!! - refactor to use get/set style accessors
+OK - refactor to use get/set style accessors
 	OK - DaemonConfigurationBuilder
 	OK - DaemonConfiguration
 	OK - SuiteConfigurationBuilder
 	OK - SuiteConfiguration
-	- JvmArgsBuilder
-	- JvmArgs: pass builder to constructor
+	OK - JvmArgsBuilder
+	OK - JvmArgs: pass builder to constructor
 
 - configurable thread count
 	- add configuration parameter (DaemonConfiguration) for the number of test threads

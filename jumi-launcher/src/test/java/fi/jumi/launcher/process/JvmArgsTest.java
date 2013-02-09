@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -20,8 +20,8 @@ public class JvmArgsTest {
         Path executableJar = Paths.get("executable.jar");
 
         List<String> command = newBuilder()
-                .executableJar(executableJar)
-                .toJvmArgs()
+                .setExecutableJar(executableJar)
+                .freeze()
                 .toCommand();
 
         assertThat(command, containsSubSequence("-jar", executableJar.toAbsolutePath().toString()));
@@ -30,8 +30,8 @@ public class JvmArgsTest {
     @Test
     public void passes_program_arguments_as_is() {
         List<String> command = newBuilder()
-                .programArgs("foo", "bar")
-                .toJvmArgs()
+                .setProgramArgs("foo", "bar")
+                .freeze()
                 .toCommand();
 
         assertThat(command, containsSubSequence("foo", "bar"));
@@ -40,8 +40,8 @@ public class JvmArgsTest {
     @Test
     public void passes_JVM_options_as_is() {
         List<String> command = newBuilder()
-                .jvmOptions(Arrays.asList("-ea", "-mx100M"))
-                .toJvmArgs()
+                .setJvmOptions(Arrays.asList("-ea", "-mx100M"))
+                .freeze()
                 .toCommand();
 
         assertThat(command, containsSubSequence("-ea", "-mx100M"));
@@ -53,8 +53,8 @@ public class JvmArgsTest {
         p.setProperty("foo", "bar");
 
         List<String> command = newBuilder()
-                .systemProperties(p)
-                .toJvmArgs()
+                .setSystemProperties(p)
+                .freeze()
                 .toCommand();
 
         assertThat(command, containsSubSequence("-Dfoo=bar"));
@@ -65,8 +65,8 @@ public class JvmArgsTest {
         Path workingDir = Paths.get("working-dir");
 
         JvmArgs jvmArgs = newBuilder()
-                .workingDir(workingDir)
-                .toJvmArgs();
+                .setWorkingDir(workingDir)
+                .freeze();
 
         assertThat(jvmArgs.getWorkingDir(), is(workingDir));
     }
@@ -76,8 +76,8 @@ public class JvmArgsTest {
         Path javaHome = Paths.get("custom-jre");
 
         List<String> command = newBuilder()
-                .javaHome(javaHome)
-                .toJvmArgs()
+                .setJavaHome(javaHome)
+                .freeze()
                 .toCommand();
 
         assertThat(command.get(0), is(Paths.get("custom-jre/bin/java").toAbsolutePath().toString()));
@@ -86,7 +86,7 @@ public class JvmArgsTest {
     @Test
     public void defaults_to_current_java_home() {
         List<String> command = newBuilder()
-                .toJvmArgs()
+                .freeze()
                 .toCommand();
 
         assertThat(command.get(0), is(Paths.get(System.getProperty("java.home")).resolve("bin/java").toString()));
@@ -98,7 +98,7 @@ public class JvmArgsTest {
     private JvmArgsBuilder newBuilder() {
         // dummy values for required parameters
         return new JvmArgsBuilder()
-                .executableJar(Paths.get("dummy.jar"));
+                .setExecutableJar(Paths.get("dummy.jar"));
     }
 
     private static Matcher<List<String>> containsSubSequence(String... expectedSubSequence) {

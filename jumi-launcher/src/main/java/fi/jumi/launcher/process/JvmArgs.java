@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -22,20 +22,13 @@ public class JvmArgs {
     public final Path executableJar;
     public final List<String> programArgs;
 
-    // TODO: pass builder to constructor? would reduce the number of these parameters
-
-    public JvmArgs(Path workingDir,
-                   Path javaHome,
-                   List<String> jvmOptions,
-                   Properties systemProperties,
-                   Path executableJar,
-                   String[] programArgs) {
-        this.workingDir = workingDir;
-        this.javaHome = javaHome;
-        this.jvmOptions = Immutables.list(jvmOptions);
-        this.systemProperties = Immutables.map(systemProperties);
-        this.executableJar = executableJar;
-        this.programArgs = Immutables.list(programArgs);
+    public JvmArgs(JvmArgsBuilder src) {
+        this.workingDir = src.getWorkingDir();
+        this.javaHome = src.getJavaHome();
+        this.jvmOptions = Immutables.list(src.getJvmOptions());
+        this.systemProperties = Immutables.map(src.getSystemProperties());
+        this.executableJar = src.getExecutableJar();
+        this.programArgs = Immutables.list(src.getProgramArgs());
     }
 
     public Path getWorkingDir() {
