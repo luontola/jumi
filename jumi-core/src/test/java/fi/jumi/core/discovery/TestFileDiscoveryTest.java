@@ -28,7 +28,7 @@ public class TestFileDiscoveryTest {
         Path folder2 = tempDir.newFolder("folder2").toPath();
 
         SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
-                .includedTestsPattern("glob:the pattern")
+                .setIncludedTestsPattern("glob:the pattern")
                 .addToClassPath(libraryJar)
                 .addToClassPath(folder1)
                 .addToClassPath(folder2);

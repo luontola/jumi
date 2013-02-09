@@ -42,7 +42,7 @@ public class AppRunner implements TestRule {
     private TextUIParser ui;
     private String uiRawOutput;
 
-    public Path workingDirectory = Paths.get(SuiteConfiguration.DEFAULTS.workingDirectory());
+    public Path workingDirectory = Paths.get(SuiteConfiguration.DEFAULTS.getWorkingDirectory());
     public final SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder();
     public final DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
@@ -108,7 +108,7 @@ public class AppRunner implements TestRule {
 
     public void runTests(Class<?>... testClasses) throws Exception {
         startSuiteAsynchronously(suite
-                .testClasses(toClassNames(testClasses))
+                .setTestClasses(toClassNames(testClasses))
                 .freeze());
         receiveTestOutput();
     }
@@ -123,7 +123,7 @@ public class AppRunner implements TestRule {
 
     public void runTestsMatching(String syntaxAndPattern) throws Exception {
         startSuiteAsynchronously(suite
-                .includedTestsPattern(syntaxAndPattern)
+                .setIncludedTestsPattern(syntaxAndPattern)
                 .freeze());
         receiveTestOutput();
     }
@@ -135,7 +135,7 @@ public class AppRunner implements TestRule {
     private SuiteConfiguration configure(SuiteConfiguration suite) throws IOException {
         SuiteConfigurationBuilder builder = suite.melt();
 
-        builder.workingDirectory(workingDirectory);
+        builder.setWorkingDirectory(workingDirectory);
         builder.addJvmOptions("-Dfile.encoding=" + daemonDefaultCharset.name());
         if (TestSystemProperties.useThreadSafetyAgent()) {
             builder.addJvmOptions("-javaagent:" + TestEnvironment.getProjectJar("thread-safety-agent"));

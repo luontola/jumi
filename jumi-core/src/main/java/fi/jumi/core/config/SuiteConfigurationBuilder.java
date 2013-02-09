@@ -25,11 +25,11 @@ public class SuiteConfigurationBuilder {
     }
 
     SuiteConfigurationBuilder(SuiteConfiguration src) {
-        classPath = new ArrayList<>(src.classPath());
-        jvmOptions = new ArrayList<>(src.jvmOptions());
-        workingDirectory = src.workingDirectory();
-        includedTestsPattern = src.includedTestsPattern();
-        excludedTestsPattern = src.excludedTestsPattern();
+        classPath = new ArrayList<>(src.getClassPath());
+        jvmOptions = new ArrayList<>(src.getJvmOptions());
+        workingDirectory = src.getWorkingDirectory();
+        includedTestsPattern = src.getIncludedTestsPattern();
+        excludedTestsPattern = src.getExcludedTestsPattern();
     }
 
     public SuiteConfiguration freeze() {
@@ -39,7 +39,7 @@ public class SuiteConfigurationBuilder {
 
     // getters and setters
 
-    public List<URI> classPath() {
+    public List<URI> getClassPath() {
         return classPath;
     }
 
@@ -52,7 +52,7 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public List<String> jvmOptions() {
+    public List<String> getJvmOptions() {
         return jvmOptions;
     }
 
@@ -61,24 +61,24 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    public URI workingDirectory() {
+    public URI getWorkingDirectory() {
         return workingDirectory;
     }
 
-    public SuiteConfigurationBuilder workingDirectory(Path workingDirectory) {
-        return workingDirectory(workingDirectory.toUri());
+    public SuiteConfigurationBuilder setWorkingDirectory(Path workingDirectory) {
+        return setWorkingDirectory(workingDirectory.toUri());
     }
 
-    public SuiteConfigurationBuilder workingDirectory(URI workingDirectory) {
+    public SuiteConfigurationBuilder setWorkingDirectory(URI workingDirectory) {
         this.workingDirectory = workingDirectory;
         return this;
     }
 
-    public SuiteConfigurationBuilder testClasses(String... testClasses) {
-        return testClasses(Arrays.asList(testClasses));
+    public SuiteConfigurationBuilder setTestClasses(String... testClasses) {
+        return setTestClasses(Arrays.asList(testClasses));
     }
 
-    public SuiteConfigurationBuilder testClasses(List<String> testClasses) {
+    public SuiteConfigurationBuilder setTestClasses(List<String> testClasses) {
         List<String> paths = new ArrayList<>();
         for (String testClass : testClasses) {
             paths.add(ClassFiles.classNameToPath(testClass));
@@ -90,32 +90,32 @@ public class SuiteConfigurationBuilder {
             }
             pattern.append(path);
         }
-        includedTestsPattern("glob:{" + pattern + "}");
-        excludedTestsPattern("");
+        setIncludedTestsPattern("glob:{" + pattern + "}");
+        setExcludedTestsPattern("");
         return this;
     }
 
-    public String includedTestsPattern() {
+    public String getIncludedTestsPattern() {
         return includedTestsPattern;
     }
 
     /**
      * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
      */
-    public SuiteConfigurationBuilder includedTestsPattern(String syntaxAndPattern) {
+    public SuiteConfigurationBuilder setIncludedTestsPattern(String syntaxAndPattern) {
         checkPathMatcherSyntaxAndPattern(syntaxAndPattern);
         this.includedTestsPattern = syntaxAndPattern;
         return this;
     }
 
-    public String excludedTestsPattern() {
+    public String getExcludedTestsPattern() {
         return excludedTestsPattern;
     }
 
     /**
      * The parameter's format is the same in {@link java.nio.file.FileSystem#getPathMatcher(String)}
      */
-    public SuiteConfigurationBuilder excludedTestsPattern(String syntaxAndPattern) {
+    public SuiteConfigurationBuilder setExcludedTestsPattern(String syntaxAndPattern) {
         if (!syntaxAndPattern.isEmpty()) {
             checkPathMatcherSyntaxAndPattern(syntaxAndPattern);
         }

@@ -57,7 +57,7 @@ public class JumiBootstrap {
      */
     public void runTestsMatching(String syntaxAndPattern) throws IOException, InterruptedException {
         runSuite(commonConfiguration()
-                .includedTestsPattern(syntaxAndPattern)
+                .setIncludedTestsPattern(syntaxAndPattern)
                 .freeze());
     }
 
@@ -75,7 +75,7 @@ public class JumiBootstrap {
 
     public void runTestClasses(String... testClasses) throws IOException, InterruptedException {
         runSuite(commonConfiguration()
-                .testClasses(testClasses)
+                .setTestClasses(testClasses)
                 .freeze());
     }
 

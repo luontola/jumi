@@ -153,8 +153,8 @@ OK - skip abstract test classes silently
 !! - refactor to use get/set style accessors
 	OK - DaemonConfigurationBuilder
 	OK - DaemonConfiguration
-	- SuiteConfigurationBuilder
-	- SuiteConfiguration
+	OK - SuiteConfigurationBuilder
+	OK - SuiteConfiguration
 	- JvmArgsBuilder
 	- JvmArgs: pass builder to constructor
 

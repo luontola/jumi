@@ -33,11 +33,11 @@ public class SuiteConfiguration implements Serializable {
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
-        classPath = Immutables.list(src.classPath());
-        jvmOptions = Immutables.list(src.jvmOptions());
-        workingDirectory = src.workingDirectory();
-        includedTestsPattern = src.includedTestsPattern();
-        excludedTestsPattern = src.excludedTestsPattern();
+        classPath = Immutables.list(src.getClassPath());
+        jvmOptions = Immutables.list(src.getJvmOptions());
+        workingDirectory = src.getWorkingDirectory();
+        includedTestsPattern = src.getIncludedTestsPattern();
+        excludedTestsPattern = src.getExcludedTestsPattern();
     }
 
     public SuiteConfigurationBuilder melt() {
@@ -48,29 +48,29 @@ public class SuiteConfiguration implements Serializable {
     // factory methods
 
     public PathMatcher createTestFileMatcher(FileSystem fileSystem) {
-        return new IncludeExcludePathMatcher(fileSystem, includedTestsPattern(), excludedTestsPattern());
+        return new IncludeExcludePathMatcher(fileSystem, getIncludedTestsPattern(), getExcludedTestsPattern());
     }
 
 
     // getters
 
-    public List<URI> classPath() {
+    public List<URI> getClassPath() {
         return classPath;
     }
 
-    public List<String> jvmOptions() {
+    public List<String> getJvmOptions() {
         return jvmOptions;
     }
 
-    public URI workingDirectory() {
+    public URI getWorkingDirectory() {
         return workingDirectory;
     }
 
-    public String includedTestsPattern() {
+    public String getIncludedTestsPattern() {
         return includedTestsPattern;
     }
 
-    public String excludedTestsPattern() {
+    public String getExcludedTestsPattern() {
         return excludedTestsPattern;
     }
 }

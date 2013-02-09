@@ -35,12 +35,12 @@ public class SuiteConfigurationTest {
         builder.addToClassPath(Paths.get("foo.jar"))
                 .addToClassPath(Paths.get("bar.jar"));
 
-        assertThat(configuration().classPath(), contains(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri()));
+        assertThat(configuration().getClassPath(), contains(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri()));
     }
 
     @Test
     public void class_path_defaults_to_empty() {
-        assertThat(configuration().classPath(), is(empty()));
+        assertThat(configuration().getClassPath(), is(empty()));
     }
 
 
@@ -51,12 +51,12 @@ public class SuiteConfigurationTest {
         builder.addJvmOptions("-option")
                 .addJvmOptions("-more", "options");
 
-        assertThat(configuration().jvmOptions(), contains("-option", "-more", "options"));
+        assertThat(configuration().getJvmOptions(), contains("-option", "-more", "options"));
     }
 
     @Test
     public void jvm_options_defaults_to_empty() {
-        assertThat(configuration().jvmOptions(), is(empty()));
+        assertThat(configuration().getJvmOptions(), is(empty()));
     }
 
 
@@ -64,14 +64,14 @@ public class SuiteConfigurationTest {
 
     @Test
     public void working_directory_can_be_changed() {
-        builder.workingDirectory(Paths.get("foo"));
+        builder.setWorkingDirectory(Paths.get("foo"));
 
-        assertThat(configuration().workingDirectory(), is(Paths.get("foo").toAbsolutePath().toUri()));
+        assertThat(configuration().getWorkingDirectory(), is(Paths.get("foo").toAbsolutePath().toUri()));
     }
 
     @Test
     public void working_directory_defaults_to_current_working_directory() throws IOException {
-        assertThat(configuration().workingDirectory(), is(Paths.get(".").toRealPath().toUri()));
+        assertThat(configuration().getWorkingDirectory(), is(Paths.get(".").toRealPath().toUri()));
     }
 
 
@@ -79,33 +79,33 @@ public class SuiteConfigurationTest {
 
     @Test
     public void included_tests_pattern_can_be_changed() {
-        builder.includedTestsPattern("glob:*Foo.class");
+        builder.setIncludedTestsPattern("glob:*Foo.class");
 
-        assertThat(configuration().includedTestsPattern(), is("glob:*Foo.class"));
+        assertThat(configuration().getIncludedTestsPattern(), is("glob:*Foo.class"));
     }
 
     @Test
     public void disallows_invalid_included_tests_pattern() {
         thrown.expect(IllegalArgumentException.class);
-        builder.includedTestsPattern("garbage");
+        builder.setIncludedTestsPattern("garbage");
     }
 
     @Test
     public void excluded_tests_pattern_can_be_changed() {
-        builder.excludedTestsPattern("glob:*Bar.class");
+        builder.setExcludedTestsPattern("glob:*Bar.class");
 
-        assertThat(configuration().excludedTestsPattern(), is("glob:*Bar.class"));
+        assertThat(configuration().getExcludedTestsPattern(), is("glob:*Bar.class"));
     }
 
     @Test
     public void disallows_invalid_excluded_tests_pattern() {
         thrown.expect(IllegalArgumentException.class);
-        builder.excludedTestsPattern("garbage");
+        builder.setExcludedTestsPattern("garbage");
     }
 
     @Test
     public void excluded_tests_pattern_can_be_disabled_by_setting_it_empty() {
-        builder.excludedTestsPattern("");
+        builder.setExcludedTestsPattern("");
 
         PathMatcher matcher = configuration().createTestFileMatcher(FileSystems.getDefault());
         assertThat("shouldn't anymore exclude inner classes", matcher, matches(Paths.get("Test$Test.class")));
@@ -126,11 +126,11 @@ public class SuiteConfigurationTest {
 
     @Test
     public void convenience_method_for_running_specific_test_classes() {
-        builder.testClasses("TheClass", "com.example.AnotherClass");
+        builder.setTestClasses("TheClass", "com.example.AnotherClass");
 
         SuiteConfiguration suite = configuration();
-        assertThat(suite.includedTestsPattern(), is("glob:{TheClass.class,com/example/AnotherClass.class}"));
-        assertThat(suite.excludedTestsPattern(), is(""));
+        assertThat(suite.getIncludedTestsPattern(), is("glob:{TheClass.class,com/example/AnotherClass.class}"));
+        assertThat(suite.getExcludedTestsPattern(), is(""));
     }
 
 
