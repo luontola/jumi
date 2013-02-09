@@ -21,16 +21,25 @@ public class SuiteFactoryTest {
 
     private static final long TIMEOUT = 1000;
 
-    private final SuiteFactory factory = new SuiteFactory(new DaemonConfiguration(), new OutputCapturer(), new PrintStream(new NullOutputStream()));
+    private DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
+    private SuiteFactory factory;
+
+    private void createSuiteFactory() {
+        factory = new SuiteFactory(daemon.freeze(), new OutputCapturer(), new PrintStream(new NullOutputStream()));
+        factory.configure(new SuiteConfiguration());
+    }
 
     @After
     public void tearDown() {
-        factory.close();
+        if (factory != null) {
+            factory.close();
+        }
     }
 
     @Test(timeout = TIMEOUT)
     public void sets_the_context_class_loader_for_test_threads() throws InterruptedException {
-        factory.configure(new SuiteConfiguration());
+        createSuiteFactory();
+
         factory.start(new NullSuiteListener());
         final BlockingQueue<ClassLoader> spy = new LinkedBlockingQueue<>();
 
@@ -47,8 +56,9 @@ public class SuiteFactoryTest {
 
     @Test(timeout = TIMEOUT)
     public void reports_uncaught_exceptions_from_actors_as_internal_errors() throws InterruptedException {
+        createSuiteFactory();
+
         final BlockingQueue<String> spy = new LinkedBlockingQueue<>();
-        factory.configure(new SuiteConfiguration());
         factory.start(new NullSuiteListener() {
             @Override
             public void onInternalError(String message, StackTrace cause) {
@@ -66,5 +76,27 @@ public class SuiteFactoryTest {
         dummyActor.tell().run();
 
         assertThat(spy.take(), startsWith("Uncaught exception in thread jumi-actor-"));
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void test_thread_pool_uses_the_specified_number_of_threads() {
+        daemon.setTestThreadsCount(3);
+        createSuiteFactory();
+
+        assertThat(getMaxThreads(factory.testThreadPool), is(3));
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void test_thread_pool_uses_as_many_threads_as_CPU_cores_by_default() {
+        createSuiteFactory();
+
+        assertThat(getMaxThreads(factory.testThreadPool), is(4));
+    }
+
+    // helpers
+
+    private static int getMaxThreads(ExecutorService executorService) {
+        ThreadPoolExecutor threadPool = (ThreadPoolExecutor) executorService;
+        return threadPool.getMaximumPoolSize();
     }
 }

@@ -54,9 +54,16 @@ public class SuiteFactory implements AutoCloseable {
 
         // thread pool configuration
         actorThreadPool = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actor-"));
-        // TODO: make the number of test threads by default the number of CPUs + 1 or similar
-        testThreadPool = Executors.newFixedThreadPool(4,
+        testThreadPool = Executors.newFixedThreadPool(getTestThreadsCount(config),
                 new ContextClassLoaderThreadFactory(testClassLoader, new PrefixedThreadFactory("jumi-test-")));
+    }
+
+    private static int getTestThreadsCount(DaemonConfiguration config) { // TODO: move to DaemonConfiguration?
+        if (config.isTestThreadsCountAutomatic()) {
+            return Runtime.getRuntime().availableProcessors();
+        } else {
+            return config.getTestThreadsCount();
+        }
     }
 
     public void start(final SuiteListener suiteListener) {

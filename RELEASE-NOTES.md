@@ -9,6 +9,7 @@ This release makes it possible to run your existing JUnit tests using the Jumi t
 JUnit tests benefit from test class level parallelism through Jumi's JUnit compatibility layer. For test method level parallelism, JUnit and other testing frameworks will need to implement their own Jumi driver. Visit [our wiki](https://github.com/orfjackal/jumi/wiki) for tips on making your test suites capable of being run in parallel (e.g. avoiding various forms of global mutable state).
 
 - JUnit backward compatibility: Jumi now runs JUnit 3, JUnit 4 and `@RunWith` annotated test classes. Requires you to have JUnit on your test classpath
+- Can set the number of test threads to use. Defaults to the number of CPU cores
 - Reports internal errors to the user
 - Sets the context class loader for test threads ([Issue #2](https://github.com/orfjackal/jumi/issues/2)), as required by many frameworks
 - Fixed a deadlock when calling `Throwable.printStackTrace()` and printing to `System.err` concurrently ([Issue #3](https://github.com/orfjackal/jumi/issues/3))
