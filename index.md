@@ -16,11 +16,23 @@ Jumi is not only open source, but also open development. The process of how Jumi
 - Developer: [Esko Luontola](https://github.com/orfjackal) ([@orfjackal](http://twitter.com/orfjackal))
 
 
-Who is using Jumi?
+Features
+--------
+
+- **Runs tests in parallel** - Faster feedback by distributing the load over all your CPU cores
+
+- **Accurate test output** - When a test prints something to System.out/err, Jumi will show the output exactly inside that test in the results (unlike JUnit and many IDEs). Also when multiple tests are run in parallel, the output from each of them is isolated from each other.
+
+- **Backward compatible with JUnit** - Runs your existing JUnit tests and also tests for the numerous other testing frameworks that support the JUnit test runner
+
+
+
+What's compatible with Jumi?
 ------------------
 
 Jumi has just recently been released and it's missing some important features, but it's already at a stage where early adopters can start using it and testing framework developers can implement support for it. Here is a list of frameworks and tools that already have Jumi support:
 
+- [JUnit](http://www.junit.org/) and **any testing frameworks that run on JUnit**, through Jumi's JUnit backward compatibility (parallelism is limited to test class level)
 - [Specsy](http://specsy.org/), a testing framework for Scala, Groovy, Java and easily any other JVM-based language
 
 
