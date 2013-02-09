@@ -172,9 +172,10 @@ OK - report it if the daemon dies in the middle of the suite, before onSuiteFini
 !! - release 0.4
 	OK - tidy up release notes
 	OK - bump version
-	!! - release
-	- web site: feature list on front page, project goals/principles/values maybe moved to wiki
-	- create a performance comparison (e.g. with Dimdwarf's tests)
+	OK - release
+	OK - web site: feature list on front page, project goals/principles/values maybe moved to wiki
+	OK - web site: update javadocs
+	!! - create a performance comparison (e.g. with Dimdwarf's tests)
 	- promote widely
 
 - plugin system for custom DriverFinders (keep it minimal, nearly walking skeleton level, until we have more plugins)
