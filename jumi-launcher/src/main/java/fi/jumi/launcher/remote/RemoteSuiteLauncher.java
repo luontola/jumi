@@ -8,9 +8,10 @@ import fi.jumi.actors.*;
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.CommandListener;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.CommandListenerEventizer;
+import fi.jumi.core.events.suiteListener.*;
 import fi.jumi.core.network.NetworkConnection;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -24,6 +25,7 @@ public class RemoteSuiteLauncher implements SuiteLauncher, DaemonListener {
     private SuiteConfiguration suiteConfiguration;
     private MessageSender<Event<SuiteListener>> suiteListener;
     private CommandListener daemon;
+    private final SuiteState suiteState = new SuiteState();
 
     public RemoteSuiteLauncher(ActorThread currentThread, ActorRef<DaemonSummoner> daemonSummoner) {
         this.currentThread = currentThread;
@@ -56,10 +58,17 @@ public class RemoteSuiteLauncher implements SuiteLauncher, DaemonListener {
     @Override
     public void onMessage(Event<SuiteListener> message) {
         suiteListener.send(message);
+        message.fireOn(suiteState);
     }
 
     @Override
     public void onDisconnected() {
+        if (suiteState.inProgress) {
+            suiteListener.send(new OnInternalErrorEvent("The test runner daemon process disconnected or died unexpectedly",
+                    StackTrace.copyOf(new Exception("disconnected"))));
+            suiteListener.send(new OnSuiteFinishedEvent());
+        }
+
         // TODO: Should we reconnect or something? For now let's defer implementing this, because
         // this feature might not be needed if we switch to communicating over memory-mapped files.
     }
@@ -69,5 +78,22 @@ public class RemoteSuiteLauncher implements SuiteLauncher, DaemonListener {
 
     private ActorRef<DaemonListener> self() {
         return currentThread.bindActor(DaemonListener.class, this);
+    }
+
+
+    @NotThreadSafe
+    private static class SuiteState extends NullSuiteListener {
+
+        public boolean inProgress = false;
+
+        @Override
+        public void onSuiteStarted() {
+            inProgress = true;
+        }
+
+        @Override
+        public void onSuiteFinished() {
+            inProgress = false;
+        }
     }
 }

@@ -55,7 +55,6 @@ public class InternalErrorReportingTest {
                 "timed out after 500 ms"); // TODO: show the path of where the JVM output was logged
     }
 
-    @Ignore("not implemented") // TODO
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_it_if_the_daemon_process_dies_in_the_middle_of_a_suite() throws Exception {
         app.runTests(DaemonKillingTest.class);

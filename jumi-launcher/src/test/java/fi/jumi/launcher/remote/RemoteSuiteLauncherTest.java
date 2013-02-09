@@ -8,9 +8,11 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.*;
 import fi.jumi.core.CommandListener;
-import fi.jumi.core.api.SuiteListener;
+import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.CommandListenerEventizer;
+import fi.jumi.core.events.suiteListener.*;
+import fi.jumi.core.util.SpyListener;
 import fi.jumi.launcher.FakeActorThread;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
@@ -78,6 +80,63 @@ public class RemoteSuiteLauncherTest {
         thrown.expectMessage("daemon not connected");
 
         suiteLauncher.shutdownDaemon();
+    }
+
+
+    // reporting a daemon which dies unexpectedly
+
+    @Test
+    public void reports_an_internal_error_if_the_daemon_disconnects_between_onSuiteStarted_and_onSuiteFinished() {
+        SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
+        SuiteListener expect = spy.getListener();
+
+        expect.onSuiteStarted();
+        expect.onInternalError("The test runner daemon process disconnected or died unexpectedly", StackTrace.copyOf(new Exception("disconnected")));
+        expect.onSuiteFinished();
+
+        spy.replay();
+
+        suiteLauncher.runTests(dummySuiteConfig, dummyDaemonConfig, new EventToSuiteListener(expect));
+        callback().tell().onConnected(null, senderToDaemon);
+        callback().tell().onMessage(new OnSuiteStartedEvent()); // suite is in progress
+        callback().tell().onDisconnected(); // daemon dies, network connection is disconnection
+
+        spy.verify();
+    }
+
+    @Test
+    public void does_not_report_any_errors_if_daemon_disconnects_before_onSuiteStarted() {
+        SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
+        SuiteListener expect = spy.getListener();
+
+        // expect no events; another component will report whether starting the daemon failed
+
+        spy.replay();
+
+        suiteLauncher.runTests(dummySuiteConfig, dummyDaemonConfig, new EventToSuiteListener(expect));
+        callback().tell().onConnected(null, senderToDaemon);
+        callback().tell().onDisconnected();
+
+        spy.verify();
+    }
+
+    @Test
+    public void does_not_report_any_errors_if_daemon_disconnects_after_onSuiteFinished() {
+        SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
+        SuiteListener expect = spy.getListener();
+
+        expect.onSuiteStarted();
+        expect.onSuiteFinished();
+
+        spy.replay();
+
+        suiteLauncher.runTests(dummySuiteConfig, dummyDaemonConfig, new EventToSuiteListener(expect));
+        callback().tell().onConnected(null, senderToDaemon);
+        callback().tell().onMessage(new OnSuiteStartedEvent());
+        callback().tell().onMessage(new OnSuiteFinishedEvent());
+        callback().tell().onDisconnected();
+
+        spy.verify();
     }
 
 
