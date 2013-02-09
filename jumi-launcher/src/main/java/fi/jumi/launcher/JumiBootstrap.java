@@ -24,9 +24,15 @@ public class JumiBootstrap {
         }
     }
 
+    private int testThreadsCount = 0;
     private boolean passingTestsVisible = false;
     private Appendable out = System.out;
     private OutputStream debugOutput = null;
+
+    public JumiBootstrap setTestThreadsCount(int testThreadsCount) {
+        this.testThreadsCount = testThreadsCount;
+        return this;
+    }
 
     public JumiBootstrap setPassingTestsVisible(boolean passingTestsVisible) {
         this.passingTestsVisible = passingTestsVisible;
@@ -104,6 +110,7 @@ public class JumiBootstrap {
 
     public void runSuite(SuiteConfiguration suite) throws IOException, InterruptedException {
         DaemonConfiguration daemon = new DaemonConfigurationBuilder()
+                .setTestThreadsCount(testThreadsCount)
                 .setLogActorMessages(debugOutput != null)
                 .freeze();
 
