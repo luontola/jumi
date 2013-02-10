@@ -7,10 +7,10 @@
 	OK - web site: update javadocs
 	!! - create a performance comparison (e.g. with Dimdwarf's tests)
 		OK - modify code to make the optimization estimates
-		!! - reword the commits, push to a branch
-		- run measurements 11x, take median
-		- estimate the proportion of class loading overhead, and how parallelizable it is, by running on one thread
-		- write an article
+		OK - reword the commits, push to a branch
+		OK - run measurements 11x, take median
+		OK - estimate the proportion of class loading overhead, and how parallelizable it is, by running on one thread
+		!! - write an article
 	- promote widely
 
 OK - JumiBootstrap usability improvements
@@ -27,6 +27,8 @@ OK - JumiBootstrap usability improvements
 OK - minor release 0.4
 
 OK - create example class: JumiSuite
+
+- create toString for better logging: "-> 0x6403b70c fi.jumi.core.suite.InternalErrorReportingExecutor$InternalErrorReportingCommand@2fe6a820"
 
 - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
 
