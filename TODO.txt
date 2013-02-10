@@ -24,7 +24,9 @@ OK - JumiBootstrap usability improvements
 		OK - update usages of old method
 	OK - look for more more reusable things, make public in JumiBootstrap
 
-!! - minor release 0.4
+OK - minor release 0.4
+
+OK - create example class: JumiSuite
 
 - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
 
