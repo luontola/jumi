@@ -43,6 +43,22 @@ public class SuiteConfigurationBuilder {
         return classPath;
     }
 
+    public SuiteConfigurationBuilder setClassPath(Path... files) {
+        classPath.clear();
+        for (Path file : files) {
+            addToClassPath(file);
+        }
+        return this;
+    }
+
+    public SuiteConfigurationBuilder setClassPath(URI... files) {
+        classPath.clear();
+        for (URI file : files) {
+            addToClassPath(file);
+        }
+        return this;
+    }
+
     public SuiteConfigurationBuilder addToClassPath(Path file) {
         return addToClassPath(file.toUri());
     }

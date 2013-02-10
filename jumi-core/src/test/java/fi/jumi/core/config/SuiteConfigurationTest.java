@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.*;
 
 import static fi.jumi.core.util.PathMatchers.matches;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -31,11 +32,27 @@ public class SuiteConfigurationTest {
     // classPath
 
     @Test
+    public void class_path_can_be_changed__Path() {
+        builder.setClassPath(Paths.get("old.jar"))
+                .setClassPath(Paths.get("foo.jar"), Paths.get("bar.jar"));
+
+        assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
+    }
+
+    @Test
+    public void class_path_can_be_changed__URI() {
+        builder.setClassPath(Paths.get("old.jar").toUri())
+                .setClassPath(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri());
+
+        assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
+    }
+
+    @Test
     public void class_path_can_be_appended_to() {
         builder.addToClassPath(Paths.get("foo.jar"))
                 .addToClassPath(Paths.get("bar.jar"));
 
-        assertThat(configuration().getClassPath(), contains(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri()));
+        assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
     }
 
     @Test
@@ -51,7 +68,7 @@ public class SuiteConfigurationTest {
         builder.addJvmOptions("-option")
                 .addJvmOptions("-more", "options");
 
-        assertThat(configuration().getJvmOptions(), contains("-option", "-more", "options"));
+        assertThat(configuration().getJvmOptions(), is(asList("-option", "-more", "options")));
     }
 
     @Test
