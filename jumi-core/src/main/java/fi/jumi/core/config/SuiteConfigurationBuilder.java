@@ -72,6 +72,12 @@ public class SuiteConfigurationBuilder {
         return jvmOptions;
     }
 
+    public SuiteConfigurationBuilder setJvmOptions(String... jvmOptions) {
+        this.jvmOptions.clear();
+        this.addJvmOptions(jvmOptions);
+        return this;
+    }
+
     public SuiteConfigurationBuilder addJvmOptions(String... jvmOptions) {
         this.jvmOptions.addAll(Arrays.asList(jvmOptions));
         return this;

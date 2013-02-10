@@ -16,8 +16,8 @@
 !! - JumiBootstrap usability improvements
 	!! - make it easy to set the class path with one setter call
 		OK - SuiteConfiguration: setClassPath(List<URI>)
-		!! - same for jvm options
-		- refactor Dimdwarf's bootstrap code
+		OK - same for jvm options
+		!! - refactor Dimdwarf's bootstrap code
 	- look for more more reusable things, make public in JumiBootstrap
 	- make it easy to show daemon output without enabling actor message logging
 	- make it easy to change any individual suite/daemon configuration parameters; make them public fields (non-final)

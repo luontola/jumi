@@ -64,6 +64,14 @@ public class SuiteConfigurationTest {
     // jvmOptions
 
     @Test
+    public void jvm_options_can_be_changed() {
+        builder.setJvmOptions("-old")
+                .setJvmOptions("-new", "options");
+
+        assertThat(configuration().getJvmOptions(), is(asList("-new", "options")));
+    }
+
+    @Test
     public void jvm_options_can_be_appended_to() {
         builder.addJvmOptions("-option")
                 .addJvmOptions("-more", "options");
