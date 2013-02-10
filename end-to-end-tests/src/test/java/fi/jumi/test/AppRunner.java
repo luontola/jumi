@@ -108,17 +108,9 @@ public class AppRunner implements TestRule {
 
     public void runTests(Class<?>... testClasses) throws Exception {
         startSuiteAsynchronously(suite
-                .setTestClasses(toClassNames(testClasses))
+                .setTestClasses(testClasses)
                 .freeze());
         receiveTestOutput();
-    }
-
-    private static String[] toClassNames(Class<?>[] classes) {
-        String[] names = new String[classes.length];
-        for (int i = 0; i < classes.length; i++) {
-            names[i] = classes[i].getName();
-        }
-        return names;
     }
 
     public void runTestsMatching(String syntaxAndPattern) throws Exception {

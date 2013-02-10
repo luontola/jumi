@@ -4,6 +4,7 @@
 
 package fi.jumi.core.config;
 
+import fi.jumi.core.discovery.dummies.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -150,11 +151,21 @@ public class SuiteConfigurationTest {
     }
 
     @Test
-    public void convenience_method_for_running_specific_test_classes() {
+    public void convenience_method_for_running_specific_test_classes__String() {
         builder.setTestClasses("TheClass", "com.example.AnotherClass");
 
         SuiteConfiguration suite = configuration();
         assertThat(suite.getIncludedTestsPattern(), is("glob:{TheClass.class,com/example/AnotherClass.class}"));
+        assertThat(suite.getExcludedTestsPattern(), is(""));
+    }
+
+    @Test
+    public void convenience_method_for_running_specific_test_classes__Class() {
+        builder.setTestClasses(DummyTest.class, AnotherDummyTest.class);
+
+        SuiteConfiguration suite = configuration();
+        assertThat(suite.getIncludedTestsPattern(), containsString("DummyTest"));
+        assertThat(suite.getIncludedTestsPattern(), containsString("AnotherDummyTest"));
         assertThat(suite.getExcludedTestsPattern(), is(""));
     }
 

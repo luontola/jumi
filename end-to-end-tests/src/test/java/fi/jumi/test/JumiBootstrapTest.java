@@ -25,7 +25,7 @@ public class JumiBootstrapTest {
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void runs_tests_with_current_classpath() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out);
-        bootstrap.suite.setTestClasses(OnePassingTest.class.getName());
+        bootstrap.suite.setTestClasses(OnePassingTest.class);
 
         bootstrap.runSuite();
 
@@ -37,7 +37,7 @@ public class JumiBootstrapTest {
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_failures_by_throwing_AssertionError() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out);
-        bootstrap.suite.setTestClasses(OneFailingTest.class.getName());
+        bootstrap.suite.setTestClasses(OneFailingTest.class);
 
         thrown.expect(AssertionError.class);
         thrown.expectMessage("There were test failures");
@@ -48,7 +48,7 @@ public class JumiBootstrapTest {
     public void can_debug_the_daemons_actor_messages() throws Exception {
         ByteArrayOutputStream daemonOutput = new ByteArrayOutputStream();
         JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out).enableDebugMode(daemonOutput);
-        bootstrap.suite.setTestClasses(OnePassingTest.class.getName());
+        bootstrap.suite.setTestClasses(OnePassingTest.class);
 
         bootstrap.runSuite();
 

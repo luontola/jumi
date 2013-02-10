@@ -96,6 +96,14 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
+    public SuiteConfigurationBuilder setTestClasses(Class<?>... testClasses) {
+        String[] classNames = new String[testClasses.length];
+        for (int i = 0; i < testClasses.length; i++) {
+            classNames[i] = testClasses[i].getName();
+        }
+        return setTestClasses(classNames);
+    }
+
     public SuiteConfigurationBuilder setTestClasses(String... testClasses) {
         return setTestClasses(Arrays.asList(testClasses));
     }
