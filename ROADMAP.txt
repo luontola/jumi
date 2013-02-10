@@ -26,6 +26,8 @@
 	PERFORMANCE
 
 - Cache library JARs (implies a persistent daemon process)
+	- May need to allow excluding some dependencies from caching, in case some mocking or testing frameworks don't work well from a parent class loader
+	- May need to be able to detect class loader leaks
 
 - Publish a benchmark (video or article) demonstrating the speed. Use Dimdwarf as a sample project. Compare test run times:
 	- Maven (only the test stage of the build)

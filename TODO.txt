@@ -176,7 +176,19 @@ OK - report it if the daemon dies in the middle of the suite, before onSuiteFini
 	OK - web site: feature list on front page, project goals/principles/values maybe moved to wiki
 	OK - web site: update javadocs
 	!! - create a performance comparison (e.g. with Dimdwarf's tests)
+		OK - modify code to make the optimization estimates
+		!! - reword the commits, push to a branch
+		- run measurements 11x, take median
+		- write an article
 	- promote widely
+
+- JumiBootstrap usability improvements
+	- make it easy to set the class path with one setter call
+		- SuiteConfiguration: setClassPath(List<URI>)
+		- refactor Dimdwarf's bootstrap code
+	- look for more more reusable things, make public in JumiBootstrap
+	- make it easy to show daemon output without enabling actor message logging
+	- make it easy to change any individual suite/daemon configuration parameters
 
 - plugin system for custom DriverFinders (keep it minimal, nearly walking skeleton level, until we have more plugins)
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
