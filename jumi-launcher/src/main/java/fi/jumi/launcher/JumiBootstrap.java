@@ -86,15 +86,12 @@ public class JumiBootstrap {
     }
 
     private static SuiteConfigurationBuilder commonConfiguration() {
-        SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder();
-        suite.addJvmOptions("-ea");
-        for (Path path : currentClasspath()) {
-            suite.addToClassPath(path);
-        }
-        return suite;
+        return new SuiteConfigurationBuilder()
+                .addJvmOptions("-ea")
+                .setClassPath(currentClasspath());
     }
 
-    public static List<Path> currentClasspath() {
+    public static Path[] currentClasspath() {
         Path javaHome = Paths.get(System.getProperty("java.home"));
 
         List<Path> classpath = new ArrayList<>();
@@ -105,7 +102,7 @@ public class JumiBootstrap {
                 classpath.add(libraryPath);
             }
         }
-        return classpath;
+        return classpath.toArray(new Path[classpath.size()]);
     }
 
     public void runSuite(SuiteConfiguration suite) throws IOException, InterruptedException {
