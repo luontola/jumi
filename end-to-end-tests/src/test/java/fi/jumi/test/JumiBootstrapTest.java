@@ -24,9 +24,10 @@ public class JumiBootstrapTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void runs_tests_with_current_classpath() throws Exception {
-        JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
+        JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out);
+        bootstrap.suite.setTestClasses(OnePassingTest.class.getName());
 
-        bootstrap.runTestsMatching("glob:**/OnePassingTest.class");
+        bootstrap.runSuite();
 
         String out = this.out.toString();
         assertThat("should show test results", out, containsString("Pass: 2"));
@@ -35,19 +36,21 @@ public class JumiBootstrapTest {
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void reports_failures_by_throwing_AssertionError() throws Exception {
-        JumiBootstrap bootstrap = new JumiBootstrap().setOut(out);
+        JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out);
+        bootstrap.suite.setTestClasses(OneFailingTest.class.getName());
 
         thrown.expect(AssertionError.class);
         thrown.expectMessage("There were test failures");
-        bootstrap.runTestClasses(OneFailingTest.class);
+        bootstrap.runSuite();
     }
 
     @Test(timeout = Timeouts.END_TO_END_TEST)
     public void can_debug_the_daemons_actor_messages() throws Exception {
         ByteArrayOutputStream daemonOutput = new ByteArrayOutputStream();
-        JumiBootstrap bootstrap = new JumiBootstrap().setOut(out).enableDebugMode(daemonOutput);
+        JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out).enableDebugMode(daemonOutput);
+        bootstrap.suite.setTestClasses(OnePassingTest.class.getName());
 
-        bootstrap.runTestClasses(OnePassingTest.class);
+        bootstrap.runSuite();
 
         assertThat(daemonOutput.toString(), containsString("[jumi-actor-1]"));
     }
@@ -73,20 +76,22 @@ public class JumiBootstrapTest {
     public void output_defaults_to_stdout() {
         JumiBootstrap bootstrap = new JumiBootstrap();
 
-        assertThat(getFieldValue(bootstrap, "out"), is((Object) System.out));
+        assertThat(getFieldValue(bootstrap, "textUiOutput"), is((Object) System.out));
     }
 
     @Test
     public void debug_output_is_disabled_by_default() {
         JumiBootstrap bootstrap = new JumiBootstrap();
 
-        assertThat(getFieldValue(bootstrap, "debugOutput"), is((Object) null));
+        assertThat(getFieldValue(bootstrap, "daemonOutput").getClass().getSimpleName(), is("NullOutputStream"));
+        assertThat(bootstrap.daemon.getLogActorMessages(), is(false));
     }
 
     @Test
     public void debug_output_defaults_to_stderr_when_enabled() {
         JumiBootstrap bootstrap = new JumiBootstrap().enableDebugMode();
 
-        assertThat(getFieldValue(bootstrap, "debugOutput"), is((Object) System.err));
+        assertThat(getFieldValue(bootstrap, "daemonOutput"), is((Object) System.err));
+        assertThat(bootstrap.daemon.getLogActorMessages(), is(true));
     }
 }

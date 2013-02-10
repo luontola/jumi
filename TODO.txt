@@ -14,13 +14,15 @@
 	- promote widely
 
 !! - JumiBootstrap usability improvements
-	!! - make it easy to set the class path with one setter call
+	OK - make it easy to set the class path with one setter call
 		OK - SuiteConfiguration: setClassPath(List<URI>)
 		OK - same for jvm options
-		!! - refactor Dimdwarf's bootstrap code
+		OK - refactor Dimdwarf's bootstrap code
+	OK - make it easy to change any individual suite/daemon configuration parameters; make them public fields (non-final)
+	OK - make it easy to show daemon output without enabling actor message logging
+	!! - add SuiteConfigurationBuilder#setTestClasses for Class args
+		- update usages of old method
 	- look for more more reusable things, make public in JumiBootstrap
-	- make it easy to show daemon output without enabling actor message logging
-	- make it easy to change any individual suite/daemon configuration parameters; make them public fields (non-final)
 
 - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
 

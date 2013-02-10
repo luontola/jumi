@@ -4,7 +4,7 @@ Release Notes
 
 ### Upcoming Changes
 
-- TBD
+- Made `JumiBootstrap` more configurable
 
 ### Jumi 0.4.313 (2013-02-09)
 

@@ -6,6 +6,7 @@ package fi.jumi.launcher;
 
 import fi.jumi.core.config.*;
 import fi.jumi.launcher.ui.*;
+import org.apache.commons.io.output.NullOutputStream;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
@@ -18,29 +19,35 @@ public class JumiBootstrap {
 
     public static void main(String[] args) throws Exception {
         try {
-            new JumiBootstrap().runTestClasses(args);
+            JumiBootstrap bootstrap = new JumiBootstrap();
+            bootstrap.suite
+                    .addJvmOptions("-ea")
+                    .setTestClasses(args);
+            bootstrap.runSuite();
         } catch (AssertionError e) {
             System.exit(1);
         }
     }
 
-    private int testThreadsCount = 0;
-    private boolean passingTestsVisible = false;
-    private Appendable out = System.out;
-    private OutputStream debugOutput = null;
+    public SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder().setClassPath(currentClasspath());
+    public DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
-    public JumiBootstrap setTestThreadsCount(int testThreadsCount) {
-        this.testThreadsCount = testThreadsCount;
-        return this;
-    }
+    private boolean passingTestsVisible = false;
+    private Appendable textUiOutput = System.out;
+    private OutputStream daemonOutput = new NullOutputStream();
 
     public JumiBootstrap setPassingTestsVisible(boolean passingTestsVisible) {
         this.passingTestsVisible = passingTestsVisible;
         return this;
     }
 
-    public JumiBootstrap setOut(Appendable out) {
-        this.out = out;
+    public JumiBootstrap setTextUiOutput(Appendable textUiOutput) {
+        this.textUiOutput = textUiOutput;
+        return this;
+    }
+
+    public JumiBootstrap setDaemonOutput(OutputStream daemonOutput) {
+        this.daemonOutput = daemonOutput;
         return this;
     }
 
@@ -48,47 +55,10 @@ public class JumiBootstrap {
         return enableDebugMode(System.err);
     }
 
-    public JumiBootstrap enableDebugMode(OutputStream debugOutput) {
-        this.debugOutput = debugOutput;
+    public JumiBootstrap enableDebugMode(OutputStream daemonOutput) {
+        setDaemonOutput(daemonOutput);
+        this.daemon.setLogActorMessages(true);
         return this;
-    }
-
-    public void runTestsMatchingDefaultPattern() throws IOException, InterruptedException {
-        runSuite(commonConfiguration()
-                .freeze());
-    }
-
-    /**
-     * @param syntaxAndPattern Same format as in {@link java.nio.file.FileSystem#getPathMatcher(String)}
-     */
-    public void runTestsMatching(String syntaxAndPattern) throws IOException, InterruptedException {
-        runSuite(commonConfiguration()
-                .setIncludedTestsPattern(syntaxAndPattern)
-                .freeze());
-    }
-
-    public void runTestClasses(Class<?>... testClasses) throws IOException, InterruptedException {
-        runTestClasses(toClassNames(testClasses));
-    }
-
-    private static String[] toClassNames(Class<?>[] classes) {
-        String[] names = new String[classes.length];
-        for (int i = 0; i < classes.length; i++) {
-            names[i] = classes[i].getName();
-        }
-        return names;
-    }
-
-    public void runTestClasses(String... testClasses) throws IOException, InterruptedException {
-        runSuite(commonConfiguration()
-                .setTestClasses(testClasses)
-                .freeze());
-    }
-
-    private static SuiteConfigurationBuilder commonConfiguration() {
-        return new SuiteConfigurationBuilder()
-                .addJvmOptions("-ea")
-                .setClassPath(currentClasspath());
     }
 
     public static Path[] currentClasspath() {
@@ -105,16 +75,15 @@ public class JumiBootstrap {
         return classpath.toArray(new Path[classpath.size()]);
     }
 
-    public void runSuite(SuiteConfiguration suite) throws IOException, InterruptedException {
-        DaemonConfiguration daemon = new DaemonConfigurationBuilder()
-                .setTestThreadsCount(testThreadsCount)
-                .setLogActorMessages(debugOutput != null)
-                .freeze();
+    public void runSuite() throws IOException, InterruptedException {
+        runSuite(suite.freeze(), daemon.freeze());
+    }
 
+    public void runSuite(SuiteConfiguration suite, DaemonConfiguration daemon) throws IOException, InterruptedException {
         try (JumiLauncher launcher = createLauncher()) {
             launcher.start(suite, daemon);
 
-            TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(out));
+            TextUI ui = new TextUI(launcher.getEventStream(), new PlainTextPrinter(textUiOutput));
             ui.setPassingTestsVisible(passingTestsVisible);
             ui.updateUntilFinished();
 
@@ -129,11 +98,7 @@ public class JumiBootstrap {
         class MyJumiLauncherBuilder extends JumiLauncherBuilder {
             @Override
             protected OutputStream createDaemonOutputListener() {
-                if (debugOutput != null) {
-                    return debugOutput;
-                } else {
-                    return super.createDaemonOutputListener();
-                }
+                return daemonOutput;
             }
         }
         return new MyJumiLauncherBuilder().build();
