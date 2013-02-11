@@ -5,13 +5,17 @@
 	OK - release
 	OK - web site: feature list on front page, project goals/principles/values maybe moved to wiki
 	OK - web site: update javadocs
-	!! - create a performance comparison (e.g. with Dimdwarf's tests)
+	OK - create a performance comparison (e.g. with Dimdwarf's tests)
 		OK - modify code to make the optimization estimates
 		OK - reword the commits, push to a branch
 		OK - run measurements 11x, take median
 		OK - estimate the proportion of class loading overhead, and how parallelizable it is, by running on one thread
-		!! - write an article
-	- promote widely
+		OK - repeate measurements for cold starts; find out whether the variation is random or not
+			-> within error margin
+		OK - run measurements also with 2 and 3 threads to find out whether the tests use more than 1 thread in average, limiting scalability to less than 4 threads
+			-> maxes out around 3 threads
+		OK - write an article
+	!! - promote widely
 
 OK - JumiBootstrap usability improvements
 	OK - make it easy to set the class path with one setter call
