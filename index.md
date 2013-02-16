@@ -17,8 +17,6 @@ Jumi is not only open source, but also open development. The process of how Jumi
 Main Features
 -------------
 
-Motivation and benefits of the Jumi test runner are explained in its announcement video, [Announcing the First Release of the Jumi Test Runner for the JVM](http://www.youtube.com/watch?v=Ggi6yutRZ9Y). It also explains how testing framework, build tool and IDE developers can get started on implementing Jumi support.
-
 - **Runs Tests in Parallel** - Faster feedback by distributing the load over all your CPU cores. A testing framework that runs on Jumi can easily run even each test method in its own thread.
 
 - **Accurate Test Output** - When a test prints something to System.out/err, Jumi will show the output exactly inside that test in the results (unlike JUnit and many IDEs). Also when multiple tests are run in parallel, the output from each of them is isolated from each other.
@@ -28,6 +26,16 @@ Motivation and benefits of the Jumi test runner are explained in its announcemen
 - **Expressive Execution Model** - Supports better all testing frameworks. Unlike with JUnit, with Jumi it's not necessary for a testing framework to know what tests exist before it executes the tests. Also tests may consist of multiple steps ("nested tests"), instead of just a flat JUnit-like organization.
 
 [Continue to the documentation](https://github.com/orfjackal/jumi/wiki) to find out how to run your tests on Jumi.
+
+
+Articles
+--------
+
+[Faster JUnit Tests with Jumi Test Runner and Class Loader Caching](http://blog.orfjackal.net/2013/02/faster-junit-tests-with-jumi-test.html) (2013-02-12)  
+*Benchmarks of Jumi's performance, especially after some optimizations have been implemented.*
+
+[Announcing the First Release of the Jumi Test Runner for the JVM](http://www.youtube.com/watch?v=Ggi6yutRZ9Y) (2012-09-19)  
+*Motivation and benefits of the Jumi test runner, and how testing framework, build tool and IDE developers can get started on implementing Jumi support.*
 
 
 What's compatible with Jumi?
