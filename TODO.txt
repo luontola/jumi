@@ -1,40 +1,32 @@
 
-!! - release 0.4
-	OK - tidy up release notes
-	OK - bump version
-	OK - release
-	OK - web site: feature list on front page, project goals/principles/values maybe moved to wiki
-	OK - web site: update javadocs
-	OK - create a performance comparison (e.g. with Dimdwarf's tests)
-		OK - modify code to make the optimization estimates
-		OK - reword the commits, push to a branch
-		OK - run measurements 11x, take median
-		OK - estimate the proportion of class loading overhead, and how parallelizable it is, by running on one thread
-		OK - repeate measurements for cold starts; find out whether the variation is random or not
-			-> within error margin
-		OK - run measurements also with 2 and 3 threads to find out whether the tests use more than 1 thread in average, limiting scalability to less than 4 threads
-			-> maxes out around 3 threads
-		OK - write an article
-	!! - promote widely
-
-OK - JumiBootstrap usability improvements
-	OK - make it easy to set the class path with one setter call
-		OK - SuiteConfiguration: setClassPath(List<URI>)
-		OK - same for jvm options
-		OK - refactor Dimdwarf's bootstrap code
-	OK - make it easy to change any individual suite/daemon configuration parameters; make them public fields (non-final)
-	OK - make it easy to show daemon output without enabling actor message logging
-	OK - add SuiteConfigurationBuilder#setTestClasses for Class args
-		OK - update usages of old method
-	OK - look for more more reusable things, make public in JumiBootstrap
-
-OK - minor release 0.4
-
-OK - create example class: JumiSuite
-
 - create toString for better logging: "-> 0x6403b70c fi.jumi.core.suite.InternalErrorReportingExecutor$InternalErrorReportingCommand@2fe6a820"
 
 - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
+
+- bullet proofing the public API
+	- testId in onTestFinished must be correspond last onTestStarted, correctly nested
+	- testId in onFailure must equal the currently running test
+	- disallow TestNotifier.fireFailure and fireTestFinished after test is finished
+	- throw exception if test is marked finished in a different (parallel) thread than it was started in (probably already covered by previous checks)
+		- reproducable with specs2 v1.12.3 hello world example and SpecificationWithJUnit, "specs2 v1.12.3 hello world via JUnit exception.txt"
+		- consider other cases where fi.jumi.core.runs.CurrentRun#currentRun is null
+	- log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions)
+	- cross-references from public API's javadocs to tests (a new xref tag?)
+
+- unit tests for fi.jumi.core.results
+
+- DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
+
+- progress bar
+	- create SuiteProgressMeter
+	- SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
+	- TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
+
+- release
+	- tidy up release notes
+	- bump version
+	- release
+	- promote
 
 - plugin system for custom DriverFinders (keep it minimal, nearly walking skeleton level, until we have more plugins)
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
@@ -59,7 +51,7 @@ OK - create example class: JumiSuite
 		- update the test in fi.jumi.test.JUnitCompatibilityTest
 		- implement fi.jumi.core.junit.JUnitRunListenerAdapter#testAssumptionFailure (JUnitCompatibilityDriverTest)
 
-- release 0.5
+- release
 	- tidy up release notes
 	- bump version
 	- release
@@ -95,21 +87,13 @@ OK - create example class: JumiSuite
 		http://stackoverflow.com/questions/10102818/custom-values-in-maven-pom-properties-file
 		<archive> element: http://maven.apache.org/plugins/maven-jar-plugin/jar-mojo.html
 		<pomPropertiesFile> element: http://maven.apache.org/shared/maven-archiver/index.html
-	- unit tests for fi.jumi.core.results
 	- combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
-	- DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
 	- there might be unnecessary eventizers in fi.jumi.daemon.Main and /jumi-core/pom.xml
 		- create EventizerUsageStatistics (extends EventizerProvider), print usage statistics when program exits
 	- organize the project so that it's possible to run unit tests separate from end-to-end tests
 		- put end-to-end tests in their own package, test.fi.jumi?
 		- or use JUnit categories, maybe with a custom runner?
 		- or use ClasspathSuite?
-	- bullet proofing the public api, cross-references from javadocs to tests (a new xref tag?)
-		- testId in onTestFinished must be correspond last onTestStarted, correctly nested
-		- testId in onFailure must equal the currently running test
-		- disallow TestNotifier.fireFailure and fireTestFinished after test is finished
-		- log all incorrect usages to some internal log and make the suite fail?
-		- TestClassListener: consider eliminating redundant parameters
 	- evaluate JarJar or ProGuard, maybe it could minimize the jars better than the shade plugin by removing also unused methods
 		http://sonatype.github.com/jarjar-maven-plugin/
 		http://pyx4me.com/pyx4me-maven-plugins/proguard-maven-plugin/
@@ -136,7 +120,7 @@ OK - create example class: JumiSuite
 		- show the path to the daemon log file in the error message
 		- consider showing the log file path for all internal errors? or leave it for later, for another mechanism to tell stats about the process?
 
-- minor release 0.5
+- minor release
 	- tidy up release notes
 	- release
 	- promote
@@ -176,11 +160,11 @@ OK - create example class: JumiSuite
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
 
 - run tests in a loop on a weakly ordered, multi-core CPU, to look for cache coherency issues
-	- where to find a multi-core ARM for a test drive?
+	- where to find a multi-core ARM for a test drive? and are the newer ARMs anyhow cache coherent?
 		http://www.calxeda.com/trystack/
 		http://trystack.org/
 
-- release 0.6
+- release
 	- tidy up release notes
 	- bump version
 	- release

@@ -1,15 +1,24 @@
 
+This file lists the planned features for the Jumi test runner. Those
+features which are marked with "!!" have currently the highest priority.
+
+Most of these features can be implemented in any order, so to get your
+needs satisfied sooner, come to the Jumi test runner mailing list at
+https://groups.google.com/d/forum/jumi-test-runner and be vocal about your
+use cases and which features are most important to you.
+
+
 	EXPRESSIVENESS
 
 - Support tests in any kinds files, not just .class files
 
 - Before & after suite events (probably as methods on a runner; somebody can even make a runner which doesn't run tests, but only those hooks, in case a testing framework doesn't itself support them)
 
-- Before & after test file events: onTestFileFound, onAllTestFilesFound, onTestFileFinished (can be used to implement a progress bar)
+!! - Before & after test file events: onTestFileFound, onAllTestFilesFound, onTestFileFinished (can be used to implement a progress bar)
 
 - Thread & timestamp metadata for each event ("Spacetime"), in the future maybe also process ID/hostname
 
-- Pending/ignored tests
+!! - Pending/ignored tests
 	- Must support marking a test pending both before and after starting to execute it (e.g. @Ignore vs. assumeThat())
 	- Should the pending status be per suite, or per run? (i.e. when a test is run multiple times, can some of them be pending and not others?)
 	- What use cases are there? Need to investigate current solutions
@@ -27,7 +36,7 @@
 
 	PERFORMANCE
 
-- Cache library JARs (implies a persistent daemon process)
+!! - Cache library JARs (implies a persistent daemon process)
 	- May need to allow excluding some dependencies from caching, in case some mocking or testing frameworks don't work well from a parent class loader
 	- May need to be able to detect class loader leaks
 
@@ -57,15 +66,17 @@
 
 	USABILITY
 
-- Debug tray GUI, shows only individual test runs (list of run IDs on left, run log on right; maybe also the test names in a tree, leftmost; print all test run data in log, but no colors or styles)
+!! - Debug tray GUI, shows only individual test runs (list of run IDs on left, run log on right; maybe also the test names in a tree, leftmost; print all test run data in log, but no colors or styles)
 
-- Progress bar (may require before/after test class events)
+!! - Progress bar (may require before/after test class events)
 
 - Timeline of all events, to see what tests were run concurrently, and which tests were slow (requires thread and timestamp for each event)
 
 - Well designed UI
 
 - Per-module working directory (requires a separate JVM for each module)
+
+- Get a thread dump of tests that appear to be frozen
 
 
 	TEST COMPATIBILITY
