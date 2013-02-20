@@ -4,14 +4,23 @@
 - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
 
 - bullet proofing the public API
-	- testId in onTestFinished must be correspond last onTestStarted, correctly nested
-	- testId in onFailure must equal the currently running test
+	- testId in onTestFinished must be correspond last onTestStarted, correctly nested; i.e. must finish the innermost active TestNotifier
+	- testId in onFailure must equal the currently running test; i.e. must be called on the innermost active TestNotifier
 	- disallow TestNotifier.fireFailure and fireTestFinished after test is finished
 	- throw exception if test is marked finished in a different (parallel) thread than it was started in (probably already covered by previous checks)
 		- reproducable with specs2 v1.12.3 hello world example and SpecificationWithJUnit, "specs2 v1.12.3 hello world via JUnit exception.txt"
 		- consider other cases where fi.jumi.core.runs.CurrentRun#currentRun is null
+	- make SuiteNotifier less sensitive to the thread from which it is called
+		- each TestNotifier must be tied to a single RunId
+			- move non-run-specific stuff (fireTestFound, fireInternalError) from CurrentRun to DefaultSuiteNotifier
+			- move thread-local stuff from CurrentRun to DefaultSuiteNotifier
+			- make currentRun.fireTestStarted() return TestNotifier
+			- don't use RunContext.testNestingLevel, create RunContext.activeChild (rename RunContext to ActiveTest?)
+			- consider inlining CurrentRun into DefaultSuiteNotifier
+		- consider making the start and end of a run explicit; though probably not, because it could make it easier to use the API incorrectly (not ending the run, or having multiple top-level tests per run)
 	- log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions)
 	- cross-references from public API's javadocs to tests (a new xref tag?)
+	- try running specs2 tests again
 
 - unit tests for fi.jumi.core.results
 
@@ -26,6 +35,7 @@
 	- tidy up release notes
 	- bump version
 	- release
+	- web: FAQ "why create a new test runner", document the three main reasons
 	- promote
 
 - plugin system for custom DriverFinders (keep it minimal, nearly walking skeleton level, until we have more plugins)
