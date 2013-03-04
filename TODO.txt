@@ -26,6 +26,10 @@
 
 - DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
 
+- minor release
+
+- have a look at implementing a Jumi driver for specs2
+
 - progress bar
 	- create SuiteProgressMeter
 	- SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
