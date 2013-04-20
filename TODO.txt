@@ -1,4 +1,7 @@
 
+- use org.junit.rules.Timeout instead of @Test(timeout=...)
+	http://lets-code.orfjackal.net/2013/04/lets-code-jumi-229-monitoredexecutor.html
+
 - create toString for better logging: "-> 0x6403b70c fi.jumi.core.suite.InternalErrorReportingExecutor$InternalErrorReportingCommand@2fe6a820"
 
 - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
