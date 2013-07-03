@@ -10,6 +10,7 @@ import fi.jumi.core.config.*;
 import fi.jumi.core.output.OutputCapturer;
 import org.apache.commons.io.output.NullOutputStream;
 import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.PrintStream;
 import java.util.concurrent.*;
@@ -19,7 +20,8 @@ import static org.hamcrest.Matchers.*;
 
 public class SuiteFactoryTest {
 
-    private static final long TIMEOUT = 1000;
+    @Rule
+    public final Timeout timeout = new Timeout(1000);
 
     private DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
     private SuiteFactory factory;
@@ -36,7 +38,7 @@ public class SuiteFactoryTest {
         }
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void sets_the_context_class_loader_for_test_threads() throws InterruptedException {
         createSuiteFactory();
 
@@ -54,7 +56,7 @@ public class SuiteFactoryTest {
         assertThat(contextClassLoader, is(factory.testClassLoader));
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void reports_uncaught_exceptions_from_actors_as_internal_errors() throws InterruptedException {
         createSuiteFactory();
 
@@ -78,7 +80,7 @@ public class SuiteFactoryTest {
         assertThat(spy.take(), startsWith("Uncaught exception in thread jumi-actor-"));
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void test_thread_pool_uses_the_specified_number_of_threads() {
         daemon.setTestThreadsCount(3);
         createSuiteFactory();

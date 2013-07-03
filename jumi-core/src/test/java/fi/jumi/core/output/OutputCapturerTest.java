@@ -7,7 +7,8 @@ package fi.jumi.core.output;
 import com.google.common.base.Throwables;
 import fi.jumi.core.util.ConcurrencyUtil;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -21,7 +22,10 @@ import static org.hamcrest.Matchers.*;
 
 public class OutputCapturerTest {
 
-    private static final long TIMEOUT = 1000;
+    private static final int TIMEOUT = 1000;
+
+    @Rule
+    public final Timeout timeout = new Timeout(TIMEOUT);
 
     private final StringWriter printedToOut = new StringWriter();
     private final StringWriter printedToErr = new StringWriter();
@@ -109,7 +113,7 @@ public class OutputCapturerTest {
 
     // concurrency
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void concurrent_captures_are_isolated_from_each_other() throws InterruptedException {
         final CountDownLatch barrier = new CountDownLatch(2);
         final OutputListenerSpy listener1 = new OutputListenerSpy();
@@ -138,7 +142,7 @@ public class OutputCapturerTest {
         assertThat(listener2.out).containsExactly("from thread 2");
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void captures_what_is_printed_in_spawned_threads() throws InterruptedException {
         OutputListenerSpy listener = new OutputListenerSpy();
 
@@ -153,7 +157,7 @@ public class OutputCapturerTest {
         assertThat(listener.out).containsExactly("from spawned thread");
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void when_spawned_threads_print_something_after_the_capture_ends_they_are_still_include_in_the_original_capture() throws InterruptedException {
         final CountDownLatch beforeFinished = new CountDownLatch(2);
         final CountDownLatch afterFinished = new CountDownLatch(2);
@@ -184,7 +188,7 @@ public class OutputCapturerTest {
      * calls to the underlying {@link OutputStream} (or if the printed text is longer than all the internal buffers),
      * it's possible for stdout and stderr to get interleaved.
      */
-    @Test(timeout = TIMEOUT)
+    @Test
     public void printing_to_stdout_and_stderr_concurrently() throws InterruptedException {
         final int ITERATIONS = 30;
         CombinedOutput combinedOutput = new CombinedOutput();
@@ -217,7 +221,7 @@ public class OutputCapturerTest {
      * only in one direction; the output from {@code Throwable.printStackTrace(System.out)} may still interleave with
      * printing to {@code System.err}.
      */
-    @Test(timeout = TIMEOUT)
+    @Test
     public void printing_a_stack_trace_to_stderr_and_normally_to_stdout_concurrently() throws InterruptedException {
         final CountDownLatch isPrintingToOut = new CountDownLatch(1);
         final CountDownLatch hasPrintedStackTrace = new CountDownLatch(1);

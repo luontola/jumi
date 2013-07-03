@@ -5,7 +5,7 @@
 package fi.jumi.test;
 
 import org.junit.*;
-import org.junit.rules.TemporaryFolder;
+import org.junit.rules.*;
 import sample.*;
 
 import java.io.File;
@@ -21,15 +21,18 @@ public class RunningTestsTest {
     @Rule
     public final AppRunner app = new AppRunner();
 
+    @Rule
+    public final Timeout timeout = new Timeout(Timeouts.END_TO_END_TEST);
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+
+    @Test
     public void suite_with_zero_tests() throws Exception {
         app.runTestsMatching("glob:sample/NoSuchTest.class");
 
         app.checkEmptyPassingSuite();
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void suite_with_one_passing_test() throws Exception {
         app.runTests(OnePassingTest.class);
 
@@ -38,7 +41,7 @@ public class RunningTestsTest {
         app.checkContainsRun("OnePassingTest", "testPassing", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void suite_with_one_failing_test() throws Exception {
         app.runTests(OneFailingTest.class);
 
@@ -47,7 +50,7 @@ public class RunningTestsTest {
         app.checkContainsRun("OneFailingTest", "testFailing", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void suite_with_many_test_classes() throws Exception {
         app.runTests(OnePassingTest.class, OneFailingTest.class);
 
@@ -57,7 +60,7 @@ public class RunningTestsTest {
         app.checkContainsRun("OneFailingTest", "testFailing", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void test_classes_can_be_found_using_file_name_patterns() throws Exception {
         app.runTestsMatching("glob:sample/One{Passing,Failing}Test.class");
 
@@ -67,7 +70,7 @@ public class RunningTestsTest {
         app.checkContainsRun("OneFailingTest", "testFailing", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void reports_failure_stack_traces() throws Exception {
         app.runTests(OneFailingTest.class);
 
@@ -76,7 +79,7 @@ public class RunningTestsTest {
                 "at sample.OneFailingTest.testFailing");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void reports_exceptions_that_are_not_on_the_classpath_of_the_launcher() throws Exception {
         assertNotOnClasspath("sample.extra.CustomException");
 
@@ -96,7 +99,7 @@ public class RunningTestsTest {
         }
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void tests_are_run_in_parallel() throws Exception {
         app.daemon.setTestThreadsCount(2);
 
@@ -108,7 +111,7 @@ public class RunningTestsTest {
         app.checkContainsRun("ParallelismTest", "testTwo", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void tests_are_run_in_the_specified_working_directory() throws Exception {
         File workingDir = tempDir.newFolder();
 

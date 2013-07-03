@@ -6,7 +6,7 @@ package fi.jumi.test;
 
 import fi.jumi.launcher.JumiBootstrap;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
+import org.junit.rules.*;
 import sample.*;
 
 import java.io.ByteArrayOutputStream;
@@ -20,9 +20,13 @@ public class JumiBootstrapTest {
     @Rule
     public final ExpectedException thrown = ExpectedException.none().handleAssertionErrors();
 
+    @Rule
+    public final Timeout timeout = new Timeout(Timeouts.END_TO_END_TEST);
+
+
     private final StringBuilder out = new StringBuilder();
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void runs_tests_with_current_classpath() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out);
         bootstrap.suite.setTestClasses(OnePassingTest.class);
@@ -34,7 +38,7 @@ public class JumiBootstrapTest {
         assertThat("should hide passing tests by default", out, not(containsString("OnePassingTest")));
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void reports_failures_by_throwing_AssertionError() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out);
         bootstrap.suite.setTestClasses(OneFailingTest.class);
@@ -44,7 +48,7 @@ public class JumiBootstrapTest {
         bootstrap.runSuite();
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void can_debug_the_daemons_actor_messages() throws Exception {
         ByteArrayOutputStream daemonOutput = new ByteArrayOutputStream();
         JumiBootstrap bootstrap = new JumiBootstrap().setTextUiOutput(out).enableDebugMode(daemonOutput);

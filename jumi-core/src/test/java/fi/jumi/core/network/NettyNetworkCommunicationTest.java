@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -6,6 +6,7 @@ package fi.jumi.core.network;
 
 import fi.jumi.actors.queue.MessageSender;
 import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.util.Collections;
 import java.util.concurrent.*;
@@ -16,9 +17,11 @@ import static org.junit.Assert.*;
 
 public class NettyNetworkCommunicationTest {
 
-    private static final long TIMEOUT = 1000;
     private static final long ASSERT_TIMEOUT = 500;
     private static final boolean LOGGING = false;
+
+    @Rule
+    public final Timeout timeout = new Timeout(1000);
 
     private final ExecutorService clientExecutor = Executors.newCachedThreadPool();
     private final ExecutorService serverExecutor = Executors.newCachedThreadPool();
@@ -36,7 +39,7 @@ public class NettyNetworkCommunicationTest {
     }
 
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void client_can_send_messages_to_server() throws Exception {
         connectClientToServer();
 
@@ -45,7 +48,7 @@ public class NettyNetworkCommunicationTest {
         assertThat(serverEndpoint.messagesReceived.take(), is(123));
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void server_can_send_messages_to_client() throws Exception {
         connectClientToServer();
 
@@ -54,7 +57,7 @@ public class NettyNetworkCommunicationTest {
         assertThat(clientEndpoint.messagesReceived.take(), is("hello"));
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void multiple_clients_can_connect_to_the_server_independently() throws Exception {
         ServerNetworkEndpoint serverEndpoint1 = new ServerNetworkEndpoint();
         ServerNetworkEndpoint serverEndpoint2 = new ServerNetworkEndpoint();
@@ -76,7 +79,7 @@ public class NettyNetworkCommunicationTest {
         assertThat(serverEndpoint2.messagesReceived.take(), is(200));
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void client_can_disconnect() throws Exception {
         connectClientToServer();
 
@@ -86,7 +89,7 @@ public class NettyNetworkCommunicationTest {
         assertEventHappens("client should get disconnected event", clientEndpoint.disconnected);
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void server_can_disconnect() throws Exception {
         connectClientToServer();
 
@@ -96,7 +99,7 @@ public class NettyNetworkCommunicationTest {
         assertEventHappens("client should get disconnected event", clientEndpoint.disconnected);
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_the_client_disconnects_all_connections() throws Exception {
         connectClientToServer();
 
@@ -105,7 +108,7 @@ public class NettyNetworkCommunicationTest {
         assertEventHappens("client should get disconnected event", clientEndpoint.disconnected);
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_the_server_disconnects_all_connections() throws Exception {
         connectClientToServer();
         serverEndpoint.connection.get();
@@ -115,7 +118,7 @@ public class NettyNetworkCommunicationTest {
         assertEventHappens("server should get disconnected event", serverEndpoint.disconnected);
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_the_client_terminates_its_executors() {
         connectClientToServer();
 
@@ -124,7 +127,7 @@ public class NettyNetworkCommunicationTest {
         assertThat("client executor terminated", clientExecutor.isTerminated(), is(true));
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_the_server_terminates_its_executors() {
         connectClientToServer();
 

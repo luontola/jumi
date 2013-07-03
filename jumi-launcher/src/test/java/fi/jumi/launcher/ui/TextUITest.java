@@ -11,7 +11,8 @@ import fi.jumi.core.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.suiteListener.SuiteListenerToEvent;
 import fi.jumi.core.runs.RunId;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Timeout;
 
 import static fi.jumi.core.util.Asserts.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +21,9 @@ import static org.hamcrest.Matchers.is;
 public class TextUITest {
 
     private static final String SUMMARY_LINE = "Pass";
+
+    @Rule
+    public final Timeout timeout = new Timeout(1000);
 
     private final MessageQueue<Event<SuiteListener>> stream = new MessageQueue<>();
     private final SuiteListener listener = new SuiteListenerToEvent(stream);
@@ -50,14 +54,14 @@ public class TextUITest {
 
     // updating
 
-    @Test(timeout = 1000L)
+    @Test
     public void can_update_non_blockingly() {
         ui.update(); // given no events in stream, should exit quickly
 
         assertNotInOutput(SUMMARY_LINE);
     }
 
-    @Test(timeout = 1000L)
+    @Test
     public void can_update_blockingly() throws InterruptedException {
         Thread t = new Thread(new Runnable() {
             @Override

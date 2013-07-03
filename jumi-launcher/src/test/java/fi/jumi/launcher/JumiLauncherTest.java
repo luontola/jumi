@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -6,7 +6,8 @@ package fi.jumi.launcher;
 
 import fi.jumi.actors.*;
 import fi.jumi.core.network.NetworkServer;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -16,11 +17,12 @@ import static org.mockito.Mockito.*;
 
 public class JumiLauncherTest {
 
-    private static final long TIMEOUT = 1000;
+    @Rule
+    public final Timeout timeout = new Timeout(1000);
 
     private ExecutorService actorsThreadPool;
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_stops_the_actor_thread() throws IOException {
         final ActorThread actorThread = spy(new FakeActorThread());
         JumiLauncherBuilder builder = new JumiLauncherBuilder() {
@@ -36,7 +38,7 @@ public class JumiLauncherTest {
         verify(actorThread).stop();
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_terminates_the_actor_thread_pool() throws IOException {
         JumiLauncherBuilder builder = new JumiLauncherBuilder() {
             @Override
@@ -52,7 +54,7 @@ public class JumiLauncherTest {
         assertTrue("should have terminated the actors thread pool", actorsThreadPool.isTerminated());
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void on_close_closes_network_sockets() throws IOException {
         final NetworkServer networkServer = mock(NetworkServer.class);
         JumiLauncherBuilder builder = new JumiLauncherBuilder() {
@@ -68,7 +70,7 @@ public class JumiLauncherTest {
         verify(networkServer).close();
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void closing_more_than_once_has_no_effect() throws IOException {
         JumiLauncherBuilder builder = new JumiLauncherBuilder();
         JumiLauncher launcher = builder.build();

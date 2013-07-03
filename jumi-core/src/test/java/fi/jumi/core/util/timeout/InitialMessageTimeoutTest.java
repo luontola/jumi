@@ -8,7 +8,7 @@ import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.eventizers.dynamic.*;
 import fi.jumi.actors.queue.*;
 import fi.jumi.core.util.SpyListener;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.concurrent.*;
 
@@ -20,6 +20,9 @@ public class InitialMessageTimeoutTest {
 
     private static final long NEVER = 10 * 1000;
     private static final DynamicEventizer<DummyListener> EVENTIZER = new DynamicEventizer<>(DummyListener.class);
+
+    @Rule
+    public final org.junit.rules.Timeout testTimeout = new org.junit.rules.Timeout(1000);
 
     private final SpyListener<DummyListener> spy = new SpyListener<>(DummyListener.class);
     private final DummyListener expect = spy.getListener();
@@ -58,7 +61,7 @@ public class InitialMessageTimeoutTest {
         verifyExpected(target);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void the_timeout_happens_after_the_specified_time() throws InterruptedException {
         MessageQueue<Event<DummyListener>> target = new MessageQueue<>();
         MessageReceiver<Event<DummyListener>> timeoutMessages = onBar123();
@@ -68,7 +71,7 @@ public class InitialMessageTimeoutTest {
         assertNotNull(target.take());
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void is_thread_safe() throws InterruptedException {
         final int ITERATIONS = 10;
         for (int i = 0; i < ITERATIONS; i++) {

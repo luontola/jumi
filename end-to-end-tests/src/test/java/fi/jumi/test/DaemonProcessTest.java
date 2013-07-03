@@ -8,6 +8,7 @@ import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.network.*;
 import fi.jumi.launcher.JumiLauncher;
 import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -23,17 +24,20 @@ public class DaemonProcessTest {
     @Rule
     public final AppRunner app = new AppRunner();
 
+    @Rule
+    public final Timeout timeout = new Timeout(Timeouts.END_TO_END_TEST);
+
     private JumiLauncher launcher;
     private Process daemonProcess;
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void daemon_process_prints_the_program_name_and_version_number_on_startup() throws Exception {
         startDaemonProcess();
 
         assertThat(firstLine(app.getCurrentDaemonOutput())).matches("Jumi " + BuildTest.VERSION_PATTERN + " starting up");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void daemon_process_can_be_closed_by_sending_it_a_shutdown_command() throws Exception {
         // Use a high enough idle timeout to avoid the daemon shutting down automatically
         app.daemon.setIdleTimeout(Timeouts.END_TO_END_TEST * 2);
@@ -45,7 +49,7 @@ public class DaemonProcessTest {
         assertThat(app.getFinishedDaemonOutput(), containsString("The system will now exit: ordered to shut down"));
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void daemon_process_will_exit_after_a_timeout_after_all_clients_disconnect() throws Exception {
         app.daemon.setIdleTimeout(0);
 
@@ -56,7 +60,7 @@ public class DaemonProcessTest {
         assertThat(app.getFinishedDaemonOutput(), containsString("The system will now exit: timed out after everybody disconnected"));
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void daemon_process_will_exit_if_it_cannot_connect_to_the_launcher_on_startup() throws Exception {
         app.setMockNetworkServer(new NonFunctionalNetworkServer());
         app.daemon.setStartupTimeout(0);

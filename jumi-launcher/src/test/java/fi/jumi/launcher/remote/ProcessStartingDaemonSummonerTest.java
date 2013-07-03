@@ -18,7 +18,8 @@ import fi.jumi.launcher.FakeProcess;
 import fi.jumi.launcher.daemon.Steward;
 import fi.jumi.launcher.process.*;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -31,6 +32,9 @@ import static org.mockito.Mockito.*;
 public class ProcessStartingDaemonSummonerTest {
 
     private static final int TIMEOUT = 1000;
+
+    @Rule
+    public final Timeout timeout = new Timeout(TIMEOUT);
 
     private final Steward steward = mock(Steward.class);
     private final SpyProcessStarter processStarter = new SpyProcessStarter();
@@ -78,7 +82,7 @@ public class ProcessStartingDaemonSummonerTest {
         verify(daemonListener).onMessage(anyMessage);
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void reports_an_internal_error_if_the_daemon_fails_to_connect_within_a_timeout() throws InterruptedException {
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         SuiteListener expect = spy.getListener();

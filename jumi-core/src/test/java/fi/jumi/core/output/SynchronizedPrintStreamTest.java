@@ -6,7 +6,8 @@ package fi.jumi.core.output;
 
 import net.sf.cglib.proxy.Factory;
 import org.apache.commons.io.output.NullOutputStream;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -17,7 +18,8 @@ import static org.hamcrest.Matchers.*;
 
 public class SynchronizedPrintStreamTest {
 
-    private static final long TIMEOUT = 1000;
+    @Rule
+    public final Timeout timeout = new Timeout(1000);
 
     private final Object lock = new Object();
 
@@ -36,7 +38,7 @@ public class SynchronizedPrintStreamTest {
      * For example {@link Throwable#printStackTrace} does this, we must be careful to always acquire a lock on the
      * monitor of the PrintStream first, before all other locks.
      */
-    @Test(timeout = TIMEOUT)
+    @Test
     public void does_not_deadlock_if_somebody_locks_in_the_PrintStream_externally() throws InterruptedException {
         final int ITERATIONS = 10;
         final PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);

@@ -5,6 +5,7 @@
 package fi.jumi.test;
 
 import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.io.IOException;
 
@@ -13,12 +14,16 @@ public class JUnitCompatibilityTest {
     @Rule
     public final AppRunner app = new AppRunner();
 
+    @Rule
+    public final Timeout timeout = new Timeout(Timeouts.END_TO_END_TEST);
+
+
     @Before
     public void addJUnitToPath() throws IOException {
         app.addToClasspath(TestEnvironment.getProjectJar("junit"));
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void runs_JUnit_3_tests() throws Exception {
         app.runTestsMatching("glob:sample/JUnit3Test.class");
 
@@ -27,7 +32,7 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit3Test", "testSomething", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void runs_JUnit_4_tests() throws Exception {
         app.runTestsMatching("glob:sample/JUnit4Test.class");
 
@@ -36,7 +41,7 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit4Test", "something", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void runs_RunWith_annotated_JUnit_4_tests() throws Exception {
         // We are using org.junit.runners.Suite to test deep test hierarchies at the same time
         app.runTestsMatching("glob:sample/JUnit4AnnotatedTest.class");
@@ -47,7 +52,7 @@ public class JUnitCompatibilityTest {
         app.checkContainsRun("JUnit4AnnotatedTest", "JUnit3Test", "testSomething", "/", "/", "/");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void reports_test_failures() throws Exception {
         app.runTestsMatching("glob:sample/JUnitFailingTest.class");
 
@@ -59,14 +64,14 @@ public class JUnitCompatibilityTest {
                 "at sample.JUnitFailingTest.failing");
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void ignored_tests_are_not_run() throws Exception { // TODO: implement support for ignored tests
         app.runTestsMatching("glob:sample/JUnitIgnoredTest.class");
 
         app.checkEmptyPassingSuite();
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void failing_assumptions_do_not_make_the_test_fail_but_report_the_stack_trace() throws Exception { // TODO: implement support for ignored tests
         app.runTestsMatching("glob:sample/JUnitAssumptionsTest.class");
 

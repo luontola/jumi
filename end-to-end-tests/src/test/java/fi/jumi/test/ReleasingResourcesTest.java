@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,6 +8,7 @@ import fi.jumi.launcher.JumiLauncher;
 import fi.jumi.test.util.Threads;
 import org.hamcrest.Matcher;
 import org.junit.*;
+import org.junit.rules.Timeout;
 
 import java.lang.reflect.*;
 import java.net.*;
@@ -22,7 +23,11 @@ public class ReleasingResourcesTest {
     @Rule
     public final AppRunner app = new AppRunner();
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Rule
+    public final Timeout timeout = new Timeout(Timeouts.END_TO_END_TEST);
+
+
+    @Test
     public void launcher_stops_the_threads_it_started() throws Exception {
         ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
         List<Thread> threadsBefore = Threads.getActiveThreads(threadGroup);
@@ -71,7 +76,7 @@ public class ReleasingResourcesTest {
         return results;
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void launcher_closes_all_server_sockets_it_opened() throws Exception {
         List<SocketImpl> serverSockets = Collections.synchronizedList(new ArrayList<SocketImpl>());
         ServerSocket.setSocketFactory(new SpySocketImplFactory(serverSockets));
@@ -88,7 +93,7 @@ public class ReleasingResourcesTest {
      * Even though the launcher does not directly open client connections, when somebody (i.e. the daemon) connects to a
      * server socket, the server socket creates a client socket is to handle that connection.
      */
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void launcher_closes_all_client_sockets_it_opened() throws Exception {
         List<SocketImpl> clientSockets = Collections.synchronizedList(new ArrayList<SocketImpl>());
         Socket.setSocketImplFactory(new SpySocketImplFactory(clientSockets));

@@ -5,6 +5,7 @@
 package fi.jumi.test;
 
 import org.junit.*;
+import org.junit.rules.Timeout;
 import sample.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,7 +16,10 @@ public class ClassLoadingTest {
     @Rule
     public final AppRunner app = new AppRunner();
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Rule
+    public final Timeout timeout = new Timeout(Timeouts.END_TO_END_TEST);
+
+    @Test
     public void test_thread_context_class_loader_and_current_class_loader_are_the_same() throws Exception {
         Class<?> testClass = ContextClassLoaderTest.class;
 
@@ -25,7 +29,7 @@ public class ClassLoadingTest {
         app.checkSuitePasses();
     }
 
-    @Test(timeout = Timeouts.END_TO_END_TEST)
+    @Test
     public void driver_thread_context_class_loader_and_current_class_loader_are_the_same() throws Exception {
         Class<?> testClass = ContextClassLoaderOfDriverTest.class;
 
