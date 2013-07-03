@@ -9,16 +9,23 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 import java.io.PrintStream;
 import java.util.concurrent.*;
 
+import static org.fest.assertions.Fail.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 public class DefaultSuiteNotifierTest {
 
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     private final RunListener listener = mock(RunListener.class);
     private final OutputCapturer outputCapturer = new OutputCapturer();
@@ -76,7 +83,26 @@ public class DefaultSuiteNotifierTest {
     }
 
 
-    // bullet-proofing the public API
+    // bulletproofing the public API
+
+    @Test
+    public void fireTestFinished_must_be_called_first_on_the_innermost_TestNotifier() {
+        TestNotifier notInnermostTN = notifier.fireTestStarted(TestId.ROOT);
+        notifier.fireTestStarted(TestId.of(0));
+
+        try {
+            notInnermostTN.fireTestFinished();
+
+            fail("should have thrown an exception");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), is("must be called on the innermost non-finished TestNotifier; expected TestId(0) but was TestId()"));
+        }
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        verifyNoMoreInteractions(listener);
+    }
 
     /**
      * Reproduces an issue with the specs2 testing framework's JUnit integration, which starts each test in their own

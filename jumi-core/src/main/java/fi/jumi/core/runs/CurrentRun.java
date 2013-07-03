@@ -9,7 +9,8 @@ import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.output.*;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @ThreadSafe
 class CurrentRun {
@@ -41,7 +42,7 @@ class CurrentRun {
         }
 
         // notify test started
-        currentRun.countTestStarted();
+        currentRun.countTestStarted(testId);
         listener.tell().onTestStarted(currentRun.runId, testId);
     }
 
@@ -49,7 +50,7 @@ class CurrentRun {
         RunContext currentRun = this.currentRun.get();
 
         // notify test finished
-        currentRun.countTestFinished();
+        currentRun.countTestFinished(testId);
         listener.tell().onTestFinished(currentRun.runId, testId);
 
         // notify run finished?
@@ -82,23 +83,27 @@ class CurrentRun {
     @ThreadSafe
     private static class RunContext {
         public final RunId runId;
-        private final AtomicInteger testNestingLevel = new AtomicInteger(0);
+        private final Deque<TestId> activeTestsStack = new ConcurrentLinkedDeque<>();
 
         public RunContext(RunId runId) {
             this.runId = runId;
         }
 
-        public void countTestStarted() {
-            testNestingLevel.incrementAndGet();
+        public void countTestStarted(TestId testId) {
+            activeTestsStack.push(testId);
         }
 
-        public void countTestFinished() {
-            int level = testNestingLevel.decrementAndGet();
-            assert level >= 0;
+        public void countTestFinished(TestId testId) {
+            TestId innermost = activeTestsStack.peek();
+            if (!innermost.equals(testId)) {
+                throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                        "expected " + innermost + " but was " + testId);
+            }
+            activeTestsStack.pop();
         }
 
         public boolean isRunFinished() {
-            return testNestingLevel.get() == 0;
+            return activeTestsStack.isEmpty();
         }
     }
 
