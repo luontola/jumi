@@ -8,10 +8,11 @@ package fi.jumi.core.runs;
 import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.output.OutputCapturer;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.InOrder;
 
 import java.io.PrintStream;
+import java.util.concurrent.*;
 
 import static org.mockito.Mockito.*;
 
@@ -72,5 +73,39 @@ public class DefaultSuiteNotifierTest {
         notifier.fireInternalError("the message", cause);
 
         verify(listener).onInternalError("the message", cause);
+    }
+
+
+    // bullet-proofing the public API
+
+    /**
+     * Reproduces an issue with the specs2 testing framework's JUnit integration, which starts each test in their own
+     * threads but sends all test finished events from a common thread.
+     */
+    @Ignore // TODO: enable this test once the more common cases are covered; this should then pass
+    @Test
+    public void fireTestFinished_may_be_called_from_a_different_thread_than_in_which_the_test_run_was_started() throws Exception {
+        TestNotifier tn = inNewThread(new Callable<TestNotifier>() {
+            @Override
+            public TestNotifier call() throws Exception {
+                return notifier.fireTestStarted(TestId.ROOT);
+            }
+        });
+        tn.fireTestFinished();
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onRunFinished(FIRST_RUN_ID);
+    }
+
+    private static <T> T inNewThread(Callable<T> callable) throws Exception {
+        ExecutorService executor = Executors.newCachedThreadPool();
+        try {
+            return executor.submit(callable).get();
+        } finally {
+            executor.shutdownNow();
+        }
     }
 }

@@ -6,11 +6,13 @@ OK - create toString for better logging: "-> 0x6403b70c fi.jumi.core.suite.Inter
 
 OK - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
 
-- bullet proofing the public API
-	- testId in onTestFinished must be correspond last onTestStarted, correctly nested; i.e. must finish the innermost active TestNotifier
+!! - bullet proofing the public API
+	OK - reproduce the specs2 issue as unit test
+	!! - testId in onTestFinished must be correspond last onTestStarted, correctly nested; i.e. must finish the innermost active TestNotifier
 	- testId in onFailure must equal the currently running test; i.e. must be called on the innermost active TestNotifier
 	- disallow TestNotifier.fireFailure and fireTestFinished after test is finished
-	- throw exception if test is marked finished in a different (parallel) thread than it was started in (probably already covered by previous checks)
+	- allow it if test is marked finished in a different (parallel) thread than it was started in (probably already covered by previous checks)
+		- enable the test written earlier
 		- reproducable with specs2 v1.12.3 hello world example and SpecificationWithJUnit, "specs2 v1.12.3 hello world via JUnit exception.txt"
 		- consider other cases where fi.jumi.core.runs.CurrentRun#currentRun is null
 	- make SuiteNotifier less sensitive to the thread from which it is called
