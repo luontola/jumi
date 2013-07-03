@@ -16,96 +16,50 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 class CurrentRun {
 
     private final ActorRef<RunListener> listener;
-    private final RunIdSequence runIdSequence;
     private final OutputCapturer outputCapturer;
 
-    private final InheritableThreadLocal<RunContext> currentRun = new InheritableThreadLocal<>();
+    private final RunId runId;
+    private final Deque<TestId> activeTestsStack = new ConcurrentLinkedDeque<>();
 
-    public CurrentRun(ActorRef<RunListener> listener, RunIdSequence runIdSequence, OutputCapturer outputCapturer) {
+    public CurrentRun(ActorRef<RunListener> listener, OutputCapturer outputCapturer, RunId runId) {
         this.listener = listener;
-        this.runIdSequence = runIdSequence;
         this.outputCapturer = outputCapturer;
+        this.runId = runId;
     }
 
-    public void fireTestFound(TestId testId, String name) {
-        listener.tell().onTestFound(testId, name);
+    public boolean isRunFinished() {
+        return activeTestsStack.isEmpty();
+    }
+
+    public void fireRunStarted() {
+        listener.tell().onRunStarted(runId);
+        outputCapturer.captureTo(new OutputListenerAdapter(listener, runId));
+    }
+
+    public void fireRunFinished() {
+        outputCapturer.captureTo(new NullOutputListener());
+        listener.tell().onRunFinished(runId);
     }
 
     public void fireTestStarted(TestId testId) {
-        RunContext currentRun = this.currentRun.get();
-
-        // notify run started?
-        if (currentRun == null) {
-            currentRun = new RunContext(runIdSequence.nextRunId());
-            this.currentRun.set(currentRun);
-            fireRunStarted(currentRun);
-        }
-
-        // notify test started
-        currentRun.countTestStarted(testId);
-        listener.tell().onTestStarted(currentRun.runId, testId);
+        activeTestsStack.push(testId);
+        listener.tell().onTestStarted(runId, testId);
     }
 
     public void fireTestFinished(TestId testId) {
-        RunContext currentRun = this.currentRun.get();
-
-        // notify test finished
-        currentRun.countTestFinished(testId);
-        listener.tell().onTestFinished(currentRun.runId, testId);
-
-        // notify run finished?
-        if (currentRun.isRunFinished()) {
-            this.currentRun.remove();
-            fireRunFinished(currentRun);
+        TestId innermost = activeTestsStack.peek();
+        if (!innermost.equals(testId)) {
+            throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                    "expected " + innermost + " but was " + testId);
         }
-    }
-
-    private void fireRunStarted(RunContext currentRun) {
-        listener.tell().onRunStarted(currentRun.runId);
-        outputCapturer.captureTo(new OutputListenerAdapter(listener, currentRun.runId));
-    }
-
-    private void fireRunFinished(RunContext currentRun) {
-        outputCapturer.captureTo(new NullOutputListener());
-        listener.tell().onRunFinished(currentRun.runId);
+        activeTestsStack.pop();
+        listener.tell().onTestFinished(runId, testId);
     }
 
     public void fireFailure(TestId testId, Throwable cause) {
-        RunContext currentRun = this.currentRun.get();
-        listener.tell().onFailure(currentRun.runId, testId, cause);
+        listener.tell().onFailure(runId, testId, cause);
     }
 
-    public void fireInternalError(String message, Throwable cause) {
-        listener.tell().onInternalError(message, cause);
-    }
-
-
-    @ThreadSafe
-    private static class RunContext {
-        public final RunId runId;
-        private final Deque<TestId> activeTestsStack = new ConcurrentLinkedDeque<>();
-
-        public RunContext(RunId runId) {
-            this.runId = runId;
-        }
-
-        public void countTestStarted(TestId testId) {
-            activeTestsStack.push(testId);
-        }
-
-        public void countTestFinished(TestId testId) {
-            TestId innermost = activeTestsStack.peek();
-            if (!innermost.equals(testId)) {
-                throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
-                        "expected " + innermost + " but was " + testId);
-            }
-            activeTestsStack.pop();
-        }
-
-        public boolean isRunFinished() {
-            return activeTestsStack.isEmpty();
-        }
-    }
 
     @ThreadSafe
     private static class OutputListenerAdapter implements OutputListener {

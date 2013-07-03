@@ -13,25 +13,39 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class DefaultSuiteNotifier implements SuiteNotifier {
 
-    private final CurrentRun currentRun;
+    private final InheritableThreadLocal<CurrentRun> currentRun = new InheritableThreadLocal<>();
+
+    private final ActorRef<RunListener> listener;
+    private final RunIdSequence runIdSequence;
+    private final OutputCapturer outputCapturer;
 
     public DefaultSuiteNotifier(ActorRef<RunListener> listener, RunIdSequence runIdSequence, OutputCapturer outputCapturer) {
-        this.currentRun = new CurrentRun(listener, runIdSequence, outputCapturer);
+        this.listener = listener;
+        this.runIdSequence = runIdSequence;
+        this.outputCapturer = outputCapturer;
     }
 
     @Override
     public void fireTestFound(TestId testId, String name) {
-        currentRun.fireTestFound(testId, name);
+        listener.tell().onTestFound(testId, name);
     }
 
     @Override
     public TestNotifier fireTestStarted(TestId testId) {
+        CurrentRun currentRun = this.currentRun.get();
+
+        if (currentRun == null || currentRun.isRunFinished()) {
+            currentRun = new CurrentRun(listener, outputCapturer, runIdSequence.nextRunId());
+            currentRun.fireRunStarted();
+            this.currentRun.set(currentRun);
+        }
+
         currentRun.fireTestStarted(testId);
         return new DefaultTestNotifier(currentRun, testId);
     }
 
     @Override
     public void fireInternalError(String message, Throwable cause) {
-        currentRun.fireInternalError(message, cause);
+        listener.tell().onInternalError(message, cause);
     }
 }
