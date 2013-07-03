@@ -22,15 +22,15 @@ class InternalErrorReportingExecutor extends InternalErrorReporter implements Ex
 
     @Override
     public void execute(Runnable command) {
-        backingExecutor.execute(new InternalErrorReportingCommand(command));
+        backingExecutor.execute(new InternalErrorReporter(command));
     }
 
 
     @ThreadSafe
-    private class InternalErrorReportingCommand implements Runnable {
+    private class InternalErrorReporter implements Runnable {
         private final Runnable command;
 
-        public InternalErrorReportingCommand(Runnable command) {
+        public InternalErrorReporter(Runnable command) {
             this.command = command;
         }
 
@@ -41,6 +41,11 @@ class InternalErrorReportingExecutor extends InternalErrorReporter implements Ex
             } catch (Throwable t) {
                 reportInternalError("Uncaught exception in thread " + Thread.currentThread().getName(), t);
             }
+        }
+
+        @Override
+        public String toString() {
+            return "InternalErrorReporter(" + command + ")";
         }
     }
 }
