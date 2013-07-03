@@ -28,11 +28,7 @@ public class DaemonConfigurationBuilder {
     DaemonConfigurationBuilder(DaemonConfiguration src) {
         jumiHome = src.getJumiHome();
         launcherPort = src.getLauncherPort();
-        if (src.isTestThreadsCountAutomatic()) {
-            testThreadsCount = 0;
-        } else {
-            testThreadsCount = src.getTestThreadsCount();
-        }
+        testThreadsCount = src.getTestThreadsCount();
         logActorMessages = src.getLogActorMessages();
         startupTimeout = src.getStartupTimeout();
         idleTimeout = src.getIdleTimeout();

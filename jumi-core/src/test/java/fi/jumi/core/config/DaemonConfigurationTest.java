@@ -98,15 +98,29 @@ public class DaemonConfigurationTest {
         builder.setTestThreadsCount(10);
 
         DaemonConfiguration config = configuration();
-        assertThat("count", config.getTestThreadsCount(), is(10));
-        assertThat("is automatic", config.isTestThreadsCountAutomatic(), is(false));
+        assertThat(config.getTestThreadsCountCalculated(), is(10));
     }
 
     @Test
     public void test_threads_count_defaults_to_the_number_of_CPUs() {
         DaemonConfiguration config = configuration();
-        assertThat("count", config.getTestThreadsCount(), is(Runtime.getRuntime().availableProcessors()));
-        assertThat("is automatic", config.isTestThreadsCountAutomatic(), is(true));
+        assertThat(config.getTestThreadsCountCalculated(), is(Runtime.getRuntime().availableProcessors()));
+    }
+
+    @Test
+    public void test_thread_count_parameter_does_not_exist_when_at_default_value() {
+        Properties properties = builder.freeze().toSystemProperties();
+
+        assertThat("system properties", properties.entrySet(), is(empty()));
+    }
+
+    @Test
+    public void test_thread_count_parameter_exists_when_manually_set_to_same_as_default() {
+        builder.setTestThreadsCount(DaemonConfiguration.DEFAULTS.getTestThreadsCountCalculated());
+
+        Properties properties = builder.freeze().toSystemProperties();
+
+        assertThat("system properties", properties.entrySet(), is(not(empty())));
     }
 
 

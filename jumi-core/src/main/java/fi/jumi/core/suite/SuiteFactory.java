@@ -54,7 +54,7 @@ public class SuiteFactory implements AutoCloseable {
 
         // thread pool configuration
         actorThreadPool = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-actor-"));
-        testThreadPool = Executors.newFixedThreadPool(config.getTestThreadsCount(),
+        testThreadPool = Executors.newFixedThreadPool(config.getTestThreadsCountCalculated(),
                 new ContextClassLoaderThreadFactory(testClassLoader, new PrefixedThreadFactory("jumi-test-")));
     }
 

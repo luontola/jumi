@@ -86,16 +86,17 @@ public class DaemonConfiguration {
         return launcherPort;
     }
 
-    public int getTestThreadsCount() {
-        if (isTestThreadsCountAutomatic()) {
+    public int getTestThreadsCountCalculated() {
+        int threads = getTestThreadsCount();
+        if (threads < 1) {
             return Runtime.getRuntime().availableProcessors();
         } else {
-            return testThreadsCount;
+            return threads;
         }
     }
 
-    public boolean isTestThreadsCountAutomatic() {
-        return testThreadsCount < 1;
+    public int getTestThreadsCount() {
+        return testThreadsCount;
     }
 
     public boolean getLogActorMessages() {
