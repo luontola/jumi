@@ -47,7 +47,7 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 
 - minor release
 
-- have a look at implementing a Jumi driver for specs2
+- have a look at implementing a Jumi driver for specs2 (or is JUnit compatibility enough?)
 
 - progress bar
 	- create SuiteProgressMeter
@@ -166,7 +166,7 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 	- if daemon dies unexpectedly (System.exit/halt, JVM crash etc.), report it and restart next time
 		http://vanillajava.blogspot.com/2011/12/test-complete-failure-of-jvm.html
 	- how to show unfinished test runs in the TextUI? (both JVM crash unfinishing all tests, and buggy testing framework unfinishing some tests)
-	- if daemon disconnects due to network problem, reconnect and resume where we were left?
+	- if daemon disconnects due to network problem, reconnect and resume where we were left? (should not happen with MMFs?)
 		- should not exit the JVM (due to idle timeout) while tests are running
 	- make it reliable
 
@@ -196,6 +196,8 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 	- where to find a multi-core ARM for a test drive? and are the newer ARMs anyhow cache coherent?
 		http://www.calxeda.com/trystack/
 		http://trystack.org/
+	- are there Itaniums (IA64) on any cloud for rent?
+	- Azul's Vega should have a relaxed memory model; ask for co-operation, also to ensure scalability?
 
 - release
 	- tidy up release notes
