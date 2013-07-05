@@ -26,10 +26,6 @@ class Run {
         this.runId = runId;
     }
 
-    public boolean isRunFinished() {
-        return currentTest == null;
-    }
-
     public void fireRunStarted() {
         listener.tell().onRunStarted(runId);
         outputCapturer.captureTo(new OutputListenerAdapter(listener, runId));
@@ -38,6 +34,10 @@ class Run {
     private void fireRunFinished() {
         outputCapturer.captureTo(new NullOutputListener());
         listener.tell().onRunFinished(runId);
+    }
+
+    public boolean isRunFinished() {
+        return currentTest == null;
     }
 
     public TestNotifier fireTestStarted(TestId testId) {
@@ -54,7 +54,6 @@ class Run {
 
         private final TestId testId;
         private final Test parent;
-        private volatile boolean testFinished = false;
 
         public Test(TestId testId, Test parent) {
             this.testId = testId;
@@ -63,16 +62,15 @@ class Run {
 
         @Override
         public void fireFailure(Throwable cause) {
-            checkInnermostNonFinishedTest();
+            checkInnermostNonFinishedTest(); // FIXME: don't lose the cause
             listener.tell().onFailure(runId, testId, cause);
         }
 
         @Override
         public void fireTestFinished() {
             checkInnermostNonFinishedTest();
-            testFinished = true; // TODO: remove me?
-            currentTest = parent;
             listener.tell().onTestFinished(runId, testId);
+            currentTest = parent;
 
             if (isRunFinished()) {
                 fireRunFinished();
@@ -83,8 +81,17 @@ class Run {
             if (currentTest != this) {
                 throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                         "expected " + currentTest + " but was " + this + " " +
-                        "which " + (testFinished ? "is finished" : "is not innermost"));
+                        "which " + (isTestFinished() ? "is finished" : "is not innermost"));
             }
+        }
+
+        private boolean isTestFinished() {
+            for (Test activeTest = currentTest; activeTest != null; activeTest = activeTest.parent) {
+                if (this == activeTest) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
