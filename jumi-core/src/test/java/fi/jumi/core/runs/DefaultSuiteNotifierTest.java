@@ -86,11 +86,13 @@ public class DefaultSuiteNotifierTest {
     // bulletproofing the public API
 
     @Test
-    public void fireFailure_must_be_called_on_the_innermost_non_finished_TestNotifier() {
+    public void fireFailure_must_be_called_on_the_current_test() {
         final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
-        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId(0) but was TestId()", new Runnable() {
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                "expected TestNotifier(RunId(1), [TestId(), TestId(0)]) " +
+                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", new Runnable() {
             @Override
             public void run() {
                 tn1.fireFailure(new Exception("dummy"));
@@ -110,7 +112,9 @@ public class DefaultSuiteNotifierTest {
         final TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
         tn2.fireTestFinished();
 
-        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId() but was TestId(0)", new Runnable() {
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                "expected TestNotifier(RunId(1), [TestId()]) " +
+                "but was TestNotifier(RunId(1), [TestId(), TestId(0)]) which is finished", new Runnable() {
             @Override
             public void run() {
                 tn2.fireFailure(new Exception("dummy"));
@@ -126,11 +130,13 @@ public class DefaultSuiteNotifierTest {
     }
 
     @Test
-    public void fireTestFinished_must_be_called_on_the_innermost_non_finished_TestNotifier() {
+    public void fireTestFinished_must_be_called_on_the_current_test() {
         final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
-        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId(0) but was TestId()", new Runnable() {
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                "expected TestNotifier(RunId(1), [TestId(), TestId(0)]) " +
+                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", new Runnable() {
             @Override
             public void run() {
                 tn1.fireTestFinished();
@@ -150,7 +156,9 @@ public class DefaultSuiteNotifierTest {
         final TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
         tn2.fireTestFinished();
 
-        expectIllegalStateException("cannot be called multiple times; TestId(0) is already finished", new Runnable() {
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                "expected TestNotifier(RunId(1), [TestId()]) " +
+                "but was TestNotifier(RunId(1), [TestId(), TestId(0)]) which is finished", new Runnable() {
             @Override
             public void run() {
                 tn2.fireTestFinished();
@@ -191,11 +199,13 @@ public class DefaultSuiteNotifierTest {
      * checking must use the TestNotifier instance and not just check the TestId.
      */
     @Test
-    public void error_checking_is_bound_to_TestNotifier_instances_and_not_TestId() {
+    public void error_checking_is_based_on_TestNotifier_instances_instead_of_TestId_values() {
         final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.ROOT);
 
-        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId() but was TestId()", new Runnable() {
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                "expected TestNotifier(RunId(1), [TestId(), TestId()]) " +
+                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", new Runnable() {
             @Override
             public void run() {
                 tn1.fireTestFinished();

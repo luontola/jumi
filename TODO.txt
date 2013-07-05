@@ -25,8 +25,9 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 			OK - make currentRun.fireTestStarted() return TestNotifier
 			OK - don't use RunContext.testNestingLevel, create RunContext.activeChild (rename RunContext to ActiveTest?)
 			SKIP - consider inlining CurrentRun into DefaultSuiteNotifier
-			!! - customize fi.jumi.core.runs.CurrentRun.Test#toString
+			OK - customize fi.jumi.core.runs.CurrentRun.Test#toString
 			- rename CurrentRun and DefaultSuiteNotifier
+			- remove fi.jumi.core.runs.CurrentRun.Test#testFinished?
 		- consider making the start and end of a run explicit; though probably not, because it could make it easier to use the API incorrectly (not ending the run, or having multiple top-level tests per run)
 	- log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions?)
 		- principle: never lose a test failure stack trace (i.e. at least fireFailure must report a chained internal error)

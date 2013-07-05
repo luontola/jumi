@@ -9,6 +9,7 @@ import fi.jumi.api.drivers.*;
 import fi.jumi.core.output.*;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.*;
 
 @ThreadSafe
 class CurrentRun {
@@ -17,7 +18,7 @@ class CurrentRun {
     private final OutputCapturer outputCapturer;
 
     private final RunId runId;
-    private volatile Test innermostNonFinishedTest = null;
+    private volatile Test currentTest = null;
 
     public CurrentRun(ActorRef<RunListener> listener, OutputCapturer outputCapturer, RunId runId) {
         this.listener = listener;
@@ -26,7 +27,7 @@ class CurrentRun {
     }
 
     public boolean isRunFinished() {
-        return innermostNonFinishedTest == null;
+        return currentTest == null;
     }
 
     public void fireRunStarted() {
@@ -42,8 +43,8 @@ class CurrentRun {
     public TestNotifier fireTestStarted(TestId testId) {
         listener.tell().onTestStarted(runId, testId);
 
-        Test test = new Test(testId, innermostNonFinishedTest);
-        innermostNonFinishedTest = test;
+        Test test = new Test(testId, currentTest);
+        currentTest = test;
         return test;
     }
 
@@ -52,12 +53,12 @@ class CurrentRun {
     private class Test implements TestNotifier {
 
         private final TestId testId;
-        private final Test enclosingTest;
+        private final Test parent;
         private volatile boolean testFinished = false;
 
-        public Test(TestId testId, Test enclosingTest) {
+        public Test(TestId testId, Test parent) {
             this.testId = testId;
-            this.enclosingTest = enclosingTest;
+            this.parent = parent;
         }
 
         @Override
@@ -68,13 +69,9 @@ class CurrentRun {
 
         @Override
         public void fireTestFinished() {
-            if (testFinished) {
-                throw new IllegalStateException("cannot be called multiple times; " + testId + " is already finished");
-            }
-
             checkInnermostNonFinishedTest();
             testFinished = true; // TODO: remove me?
-            innermostNonFinishedTest = enclosingTest;
+            currentTest = parent;
             listener.tell().onTestFinished(runId, testId);
 
             if (isRunFinished()) {
@@ -83,15 +80,20 @@ class CurrentRun {
         }
 
         private void checkInnermostNonFinishedTest() {
-            if (innermostNonFinishedTest != this) {
+            if (currentTest != this) {
                 throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
-                        "expected " + innermostNonFinishedTest + " but was " + this);
+                        "expected " + currentTest + " but was " + this + " " +
+                        "which " + (testFinished ? "is finished" : "is not innermost"));
             }
         }
 
         @Override
         public String toString() {
-            return testId.toString(); // TODO: our own toString
+            Deque<TestId> activeTestsStack = new ArrayDeque<>();
+            for (Test t = this; t != null; t = t.parent) {
+                activeTestsStack.push(t.testId);
+            }
+            return "TestNotifier(" + runId + ", " + activeTestsStack + ")";
         }
     }
 
