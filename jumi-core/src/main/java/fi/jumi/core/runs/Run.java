@@ -18,6 +18,12 @@ class Run {
     private final OutputCapturer outputCapturer;
 
     private final RunId runId;
+    /**
+     * There is a race condition if {@link #fireTestStarted} or {@link Test#fireTestFinished()} is called concurrently
+     * within a single {@code Run}, but it shouldn't be dangerous. A testing framework must not call those methods
+     * concurrently, but if somebody anyways calls them, our error checking should notice it over 90% of the time, which
+     * should be adequate for the testing framework developer to notice his mistake and fix it.
+     */
     private volatile Test currentTest = null;
 
     public Run(ActorRef<RunListener> listener, OutputCapturer outputCapturer, RunId runId) {
