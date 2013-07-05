@@ -9,7 +9,7 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 !! - bullet proofing the public API
 	OK - reproduce the specs2 issue as unit test
 	OK - testId in onTestFinished must be correspond last onTestStarted, correctly nested; i.e. must finish the innermost active TestNotifier
-	!! - disallow TestNotifier.fireTestFinished after test is finished
+	OK - disallow TestNotifier.fireTestFinished after test is finished
 	- extract test helper: expectIllegalStateException(String expectedMessage, Runnable r)
 	- testId in onFailure must equal the currently running test; i.e. must be called on the innermost active TestNotifier
 	- disallow TestNotifier.fireFailure after test is finished

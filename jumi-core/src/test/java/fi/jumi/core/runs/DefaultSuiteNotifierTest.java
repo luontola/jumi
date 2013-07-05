@@ -87,11 +87,11 @@ public class DefaultSuiteNotifierTest {
 
     @Test
     public void fireTestFinished_must_be_called_first_on_the_innermost_TestNotifier() {
-        TestNotifier notInnermostTN = notifier.fireTestStarted(TestId.ROOT);
-        notifier.fireTestStarted(TestId.of(0));
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
         try {
-            notInnermostTN.fireTestFinished();
+            tn1.fireTestFinished();
 
             fail("should have thrown an exception");
         } catch (IllegalStateException e) {
@@ -101,6 +101,27 @@ public class DefaultSuiteNotifierTest {
         inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void fireTestFinished_cannot_be_called_multiple_times() {
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
+        tn2.fireTestFinished();
+
+        try {
+            tn2.fireTestFinished();
+
+            fail("should have thrown an exception");
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), is("cannot call multiple times; TestId(0) is already finished"));
+        }
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.of(0));
         verifyNoMoreInteractions(listener);
     }
 

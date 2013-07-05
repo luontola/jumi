@@ -13,6 +13,7 @@ class DefaultTestNotifier implements TestNotifier {
 
     private final CurrentRun currentRun;
     private final TestId testId;
+    private volatile boolean testFinished = false;
 
     public DefaultTestNotifier(CurrentRun currentRun, TestId testId) {
         this.currentRun = currentRun;
@@ -26,7 +27,11 @@ class DefaultTestNotifier implements TestNotifier {
 
     @Override
     public void fireTestFinished() {
+        if (testFinished) {
+            throw new IllegalStateException("cannot call multiple times; " + testId + " is already finished");
+        }
         currentRun.fireTestFinished(testId);
+        testFinished = true;
         if (currentRun.isRunFinished()) {
             currentRun.fireRunFinished();
         }
