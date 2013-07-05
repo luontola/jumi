@@ -23,7 +23,7 @@ public class AssigningRunIdsTest {
     private final RunListener listener = mock(RunListener.class);
     private final RunIdSequence runIdSequence = new RunIdSequence();
     private final OutputCapturer outputCapturer = new OutputCapturer();
-    private final SuiteNotifier notifier = new DefaultSuiteNotifier(ActorRef.wrap(listener), runIdSequence, outputCapturer);
+    private final SuiteNotifier notifier = new ThreadBoundSuiteNotifier(ActorRef.wrap(listener), runIdSequence, outputCapturer);
 
     @Test
     public void RunId_is_assigned_when_a_test_is_started() {

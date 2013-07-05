@@ -17,7 +17,7 @@ public class JUnitRunListenerAdapterTest {
     private final SpyListener<RunListener> spy = new SpyListener<>(RunListener.class);
     private final RunListener expect = spy.getListener();
 
-    private final JUnitRunListenerAdapter adapter = new JUnitRunListenerAdapter(new DefaultSuiteNotifier(ActorRef.wrap(expect), new RunIdSequence(), new OutputCapturer()));
+    private final JUnitRunListenerAdapter adapter = new JUnitRunListenerAdapter(new ThreadBoundSuiteNotifier(ActorRef.wrap(expect), new RunIdSequence(), new OutputCapturer()));
 
     @Test
     public void tests_discovered_after_starting_a_run_when_root_description_is_updated() throws Exception {

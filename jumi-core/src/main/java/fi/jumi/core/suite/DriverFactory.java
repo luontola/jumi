@@ -37,7 +37,7 @@ public class DriverFactory {
         Class<?> testClass = loadTestClass(testClassLoader, testFile);
         Driver driver = driverFinder.findTestClassDriver(testClass);
 
-        SuiteNotifier suiteNotifier = new DefaultSuiteNotifier(
+        SuiteNotifier suiteNotifier = new ThreadBoundSuiteNotifier(
                 actorThread.bindActor(RunListener.class,
                         new DuplicateOnTestFoundEventFilter(
                                 new SuiteListenerAdapter(suiteListener, testFile))),

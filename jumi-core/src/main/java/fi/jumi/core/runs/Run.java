@@ -12,7 +12,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 
 @ThreadSafe
-class CurrentRun {
+class Run {
 
     private final ActorRef<RunListener> listener;
     private final OutputCapturer outputCapturer;
@@ -20,7 +20,7 @@ class CurrentRun {
     private final RunId runId;
     private volatile Test currentTest = null;
 
-    public CurrentRun(ActorRef<RunListener> listener, OutputCapturer outputCapturer, RunId runId) {
+    public Run(ActorRef<RunListener> listener, OutputCapturer outputCapturer, RunId runId) {
         this.listener = listener;
         this.outputCapturer = outputCapturer;
         this.runId = runId;

@@ -20,7 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
-public class DefaultSuiteNotifierTest {
+public class ThreadBoundSuiteNotifierTest {
 
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
 
@@ -31,7 +31,7 @@ public class DefaultSuiteNotifierTest {
     private final OutputCapturer outputCapturer = new OutputCapturer();
     private final PrintStream stdout = outputCapturer.out();
 
-    private final SuiteNotifier notifier = new DefaultSuiteNotifier(ActorRef.wrap(listener), new RunIdSequence(), outputCapturer);
+    private final SuiteNotifier notifier = new ThreadBoundSuiteNotifier(ActorRef.wrap(listener), new RunIdSequence(), outputCapturer);
 
     @Test
     public void notifies_about_the_beginning_and_end_of_a_run() {

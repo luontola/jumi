@@ -160,7 +160,7 @@ public class SimpleUnitTest {
         RunListener runListener = mock(RunListener.class);
         Executor executor = mock(Executor.class);
         Class<AnnotatedWithRunInDriverThreadTest> testClass = AnnotatedWithRunInDriverThreadTest.class;
-        SuiteNotifier notifier = new DefaultSuiteNotifier(ActorRef.wrap(runListener), new RunIdSequence(), new OutputCapturer());
+        SuiteNotifier notifier = new ThreadBoundSuiteNotifier(ActorRef.wrap(runListener), new RunIdSequence(), new OutputCapturer());
         DriverRunner driverRunner = new DriverRunner(new SimpleUnit(), testClass, notifier, executor);
 
         driverRunner.run();

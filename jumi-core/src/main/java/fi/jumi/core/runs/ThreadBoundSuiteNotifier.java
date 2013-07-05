@@ -11,15 +11,15 @@ import fi.jumi.core.output.OutputCapturer;
 import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
-public class DefaultSuiteNotifier implements SuiteNotifier {
+public class ThreadBoundSuiteNotifier implements SuiteNotifier {
 
-    private final InheritableThreadLocal<CurrentRun> currentRun = new InheritableThreadLocal<>();
+    private final InheritableThreadLocal<Run> currentRun = new InheritableThreadLocal<>();
 
     private final ActorRef<RunListener> listener;
     private final RunIdSequence runIdSequence;
     private final OutputCapturer outputCapturer;
 
-    public DefaultSuiteNotifier(ActorRef<RunListener> listener, RunIdSequence runIdSequence, OutputCapturer outputCapturer) {
+    public ThreadBoundSuiteNotifier(ActorRef<RunListener> listener, RunIdSequence runIdSequence, OutputCapturer outputCapturer) {
         this.listener = listener;
         this.runIdSequence = runIdSequence;
         this.outputCapturer = outputCapturer;
@@ -32,15 +32,15 @@ public class DefaultSuiteNotifier implements SuiteNotifier {
 
     @Override
     public TestNotifier fireTestStarted(TestId testId) {
-        CurrentRun currentRun = this.currentRun.get();
+        Run run = this.currentRun.get();
 
-        if (currentRun == null || currentRun.isRunFinished()) {
-            currentRun = new CurrentRun(listener, outputCapturer, runIdSequence.nextRunId());
-            currentRun.fireRunStarted();
-            this.currentRun.set(currentRun);
+        if (run == null || run.isRunFinished()) {
+            run = new Run(listener, outputCapturer, runIdSequence.nextRunId());
+            run.fireRunStarted();
+            this.currentRun.set(run);
         }
 
-        return currentRun.fireTestStarted(testId);
+        return run.fireTestStarted(testId);
     }
 
     @Override
