@@ -186,6 +186,28 @@ public class DefaultSuiteNotifierTest {
         inOrder.verify(listener).onRunFinished(FIRST_RUN_ID);
     }
 
+    /**
+     * Although unlikely, it's allowed for a TestId invocation to nest invocations of the same TestId. Thus any error
+     * checking must use the TestNotifier instance and not just check the TestId.
+     */
+    @Test
+    public void error_checking_is_bound_to_TestNotifier_instances_and_not_TestId() {
+        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.ROOT);
+
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId() but was TestId()", new Runnable() {
+            @Override
+            public void run() {
+                tn1.fireTestFinished();
+            }
+        });
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
+        inOrder.verify(listener, times(2)).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        verifyNoMoreInteractions(listener);
+    }
+
 
     // helpers
 

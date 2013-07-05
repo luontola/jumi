@@ -40,8 +40,7 @@ public class DefaultSuiteNotifier implements SuiteNotifier {
             this.currentRun.set(currentRun);
         }
 
-        currentRun.fireTestStarted(testId);
-        return new DefaultTestNotifier(currentRun, testId);
+        return currentRun.fireTestStarted(testId);
     }
 
     @Override

@@ -5,12 +5,10 @@
 package fi.jumi.core.runs;
 
 import fi.jumi.actors.ActorRef;
-import fi.jumi.api.drivers.TestId;
+import fi.jumi.api.drivers.*;
 import fi.jumi.core.output.*;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 @ThreadSafe
 class CurrentRun {
@@ -19,7 +17,7 @@ class CurrentRun {
     private final OutputCapturer outputCapturer;
 
     private final RunId runId;
-    private final Deque<TestId> activeTestsStack = new ConcurrentLinkedDeque<>();
+    private volatile Test innermostNonFinishedTest = null;
 
     public CurrentRun(ActorRef<RunListener> listener, OutputCapturer outputCapturer, RunId runId) {
         this.listener = listener;
@@ -28,7 +26,7 @@ class CurrentRun {
     }
 
     public boolean isRunFinished() {
-        return activeTestsStack.isEmpty();
+        return innermostNonFinishedTest == null;
     }
 
     public void fireRunStarted() {
@@ -36,35 +34,66 @@ class CurrentRun {
         outputCapturer.captureTo(new OutputListenerAdapter(listener, runId));
     }
 
-    public void fireRunFinished() {
+    private void fireRunFinished() {
         outputCapturer.captureTo(new NullOutputListener());
         listener.tell().onRunFinished(runId);
     }
 
-    public void fireTestStarted(TestId testId) {
-        activeTestsStack.push(testId);
+    public TestNotifier fireTestStarted(TestId testId) {
         listener.tell().onTestStarted(runId, testId);
+
+        Test test = new Test(testId, innermostNonFinishedTest);
+        innermostNonFinishedTest = test;
+        return test;
     }
 
-    public void fireTestFinished(TestId testId) {
-        checkInnermostNonFinishedTest(testId);
-        activeTestsStack.pop();
-        listener.tell().onTestFinished(runId, testId);
-    }
 
-    public void fireFailure(TestId testId, Throwable cause) {
-        checkInnermostNonFinishedTest(testId);
-        listener.tell().onFailure(runId, testId, cause);
-    }
+    @ThreadSafe
+    private class Test implements TestNotifier {
 
-    private void checkInnermostNonFinishedTest(TestId testId) {
-        TestId innermost = activeTestsStack.peek();
-        if (!innermost.equals(testId)) {
-            throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
-                    "expected " + innermost + " but was " + testId);
+        private final TestId testId;
+        private final Test enclosingTest;
+        private volatile boolean testFinished = false;
+
+        public Test(TestId testId, Test enclosingTest) {
+            this.testId = testId;
+            this.enclosingTest = enclosingTest;
+        }
+
+        @Override
+        public void fireFailure(Throwable cause) {
+            checkInnermostNonFinishedTest();
+            listener.tell().onFailure(runId, testId, cause);
+        }
+
+        @Override
+        public void fireTestFinished() {
+            if (testFinished) {
+                throw new IllegalStateException("cannot be called multiple times; " + testId + " is already finished");
+            }
+
+            checkInnermostNonFinishedTest();
+            testFinished = true; // TODO: remove me?
+            innermostNonFinishedTest = enclosingTest;
+            listener.tell().onTestFinished(runId, testId);
+
+            if (isRunFinished()) {
+                fireRunFinished();
+            }
+        }
+
+        private void checkInnermostNonFinishedTest() {
+            if (innermostNonFinishedTest != this) {
+                throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                        "expected " + innermostNonFinishedTest + " but was " + this);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return testId.toString(); // TODO: our own toString
         }
     }
-
 
     @ThreadSafe
     private static class OutputListenerAdapter implements OutputListener {
