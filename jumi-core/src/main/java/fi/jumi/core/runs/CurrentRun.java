@@ -47,17 +47,22 @@ class CurrentRun {
     }
 
     public void fireTestFinished(TestId testId) {
-        TestId innermost = activeTestsStack.peek();
-        if (!innermost.equals(testId)) {
-            throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
-                    "expected " + innermost + " but was " + testId);
-        }
+        checkInnermostNonFinishedTest(testId);
         activeTestsStack.pop();
         listener.tell().onTestFinished(runId, testId);
     }
 
     public void fireFailure(TestId testId, Throwable cause) {
+        checkInnermostNonFinishedTest(testId);
         listener.tell().onFailure(runId, testId, cause);
+    }
+
+    private void checkInnermostNonFinishedTest(TestId testId) {
+        TestId innermost = activeTestsStack.peek();
+        if (!innermost.equals(testId)) {
+            throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                    "expected " + innermost + " but was " + testId);
+        }
     }
 
 

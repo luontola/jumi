@@ -86,6 +86,25 @@ public class DefaultSuiteNotifierTest {
     // bulletproofing the public API
 
     @Test
+    public void fireFailure_must_be_called_on_the_innermost_non_finished_TestNotifier() {
+        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
+
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId(0) but was TestId()", new Runnable() {
+            @Override
+            public void run() {
+                tn1.fireFailure(new Exception("dummy"));
+            }
+        });
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
     public void fireTestFinished_must_be_called_on_the_innermost_non_finished_TestNotifier() {
         final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));

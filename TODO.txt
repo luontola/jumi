@@ -15,7 +15,7 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		OK - reproducable with specs2 v1.12.3 hello world example and SpecificationWithJUnit, "specs2 v1.12.3 hello world via JUnit exception.txt"
 		OK - consider other cases where fi.jumi.core.runs.CurrentRun#currentRun is null
 	OK - extract test helper: expectIllegalStateException(String expectedMessage, Runnable r)
-	- testId in onFailure must equal the currently running test; i.e. must be called on the innermost active TestNotifier
+	OK - testId in onFailure must equal the currently running test; i.e. must be called on the innermost active TestNotifier
 	- disallow TestNotifier.fireFailure after test is finished
 	!! - make SuiteNotifier less sensitive to the thread from which it is called
 		!! - each TestNotifier must be tied to a single RunId
