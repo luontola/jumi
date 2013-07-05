@@ -28,7 +28,7 @@ class DefaultTestNotifier implements TestNotifier {
     @Override
     public void fireTestFinished() {
         if (testFinished) {
-            throw new IllegalStateException("cannot call multiple times; " + testId + " is already finished");
+            throw new IllegalStateException("cannot be called multiple times; " + testId + " is already finished");
         }
         currentRun.fireTestFinished(testId);
         testFinished = true;
