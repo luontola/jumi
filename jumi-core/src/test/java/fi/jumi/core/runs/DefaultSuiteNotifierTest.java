@@ -105,6 +105,27 @@ public class DefaultSuiteNotifierTest {
     }
 
     @Test
+    public void fireFailure_cannot_be_called_after_the_test_is_finished() {
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        final TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
+        tn2.fireTestFinished();
+
+        expectIllegalStateException("must be called on the innermost non-finished TestNotifier; expected TestId() but was TestId(0)", new Runnable() {
+            @Override
+            public void run() {
+                tn2.fireFailure(new Exception("dummy"));
+            }
+        });
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.of(0));
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
     public void fireTestFinished_must_be_called_on_the_innermost_non_finished_TestNotifier() {
         final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
@@ -124,7 +145,7 @@ public class DefaultSuiteNotifierTest {
     }
 
     @Test
-    public void fireTestFinished_cannot_be_called_multiple_times() {
+    public void fireTestFinished_cannot_be_called_after_the_test_is_finished() {
         TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         final TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
         tn2.fireTestFinished();

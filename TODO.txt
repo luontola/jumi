@@ -16,7 +16,8 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		OK - consider other cases where fi.jumi.core.runs.CurrentRun#currentRun is null
 	OK - extract test helper: expectIllegalStateException(String expectedMessage, Runnable r)
 	OK - testId in onFailure must equal the currently running test; i.e. must be called on the innermost active TestNotifier
-	- disallow TestNotifier.fireFailure after test is finished
+	OK - disallow TestNotifier.fireFailure after test is finished
+	!! - error messages should work also when a test is nested within itself
 	!! - make SuiteNotifier less sensitive to the thread from which it is called
 		!! - each TestNotifier must be tied to a single RunId
 			OK - move non-run-specific stuff (fireTestFound, fireInternalError) from CurrentRun to DefaultSuiteNotifier
