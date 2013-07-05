@@ -129,7 +129,6 @@ public class DefaultSuiteNotifierTest {
      * Reproduces an issue with the specs2 testing framework's JUnit integration, which starts each test in their own
      * threads but sends all test finished events from a common thread.
      */
-    @Ignore // TODO: enable this test once the more common cases are covered; this should then pass
     @Test
     public void fireTestFinished_may_be_called_from_a_different_thread_than_in_which_the_test_run_was_started() throws Exception {
         TestNotifier tn = inNewThread(new Callable<TestNotifier>() {
