@@ -31,13 +31,9 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		SKIP - consider making the start and end of a run explicit; though probably not, because it could make it easier to use the API incorrectly (not ending the run, or having multiple top-level tests per run)
 	!! - chain the cause from fi.jumi.core.runs.Run.Test#fireFailure
 	- log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions?)
-		- principle: never lose a test failure stack trace (i.e. at least fireFailure must report a chained internal error)
-	- cross-references from public API's javadocs to tests (a new xref tag?)
+		principle: never lose a test failure stack trace (i.e. at least fireFailure must report a chained internal error)
+	- cross-references from public API's javadocs to tests (at first as hard-coded html)
 	- try running specs2 tests again
-
-- unit tests for fi.jumi.core.results
-
-- DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
 
 - upgrade to nexus-staging-maven-plugin 1.4.3, now required by OSSRH
 	https://github.com/sonatype/nexus-maven-plugins/tree/master/staging/maven-plugin
@@ -48,6 +44,8 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 - minor release
 
 - have a look at implementing a Jumi driver for specs2 (or is JUnit compatibility enough?)
+
+- unit tests for fi.jumi.core.results (before we start adding more events)
 
 - progress bar
 	- create SuiteProgressMeter
@@ -66,7 +64,9 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 	- move JUnit compatibility into its own module
 		- create jumi-junit.jar
 		- extract it automatically to ~/.jumi/plugins, the same way as the daemon jar
-		- load it (and other plugins) in the test classloader
+		- tell to daemon as system property what plugins to load: e.g. -Djumi.plugin.path=C:/plugin.jar;C:/another.jar (separated by path.separator)
+		- load each plugin in a separete plugin classloader, with access to test classloader and to jumi-core
+			- at first make the test classloader the parent of the plugin classloader (it'll work as long as we don't hide jumi-core from the test classloader, after which the plugin classloader might need two parents or use context classloader)
 	- refactor JUnitCompatibilityDriverFinder et al to avoid reflection
 	- refactor tests that use JUnitCompatibilityDriver.class.getName() instead of instanceOf checks (in DriverFinderFactoryTest)
 	- investigate maven-shade-plugin; can we now turn on minimizing? it used to remove the JUnitCompatibilityDriver from jumi-daemon.jar
@@ -96,6 +96,12 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 	>	(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
 
 - misc refactoring (choose some, defer others)
+	- create a custom taglet (as independent project) for cross-references from public API's javadocs to tests: e.g. {@ref com.example.FooTest#someTestName}
+		http://docs.oracle.com/javase/6/docs/technotes/guides/javadoc/taglet/overview.html
+		http://docs.oracle.com/javase/6/docs/jdk/api/javadoc/taglet/com/sun/tools/doclets/Taglet.html
+		http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet/com/sun/javadoc/Tag.html
+		http://www.oracle.com/technetwork/java/javase/documentation/index-137483.html
+		http://maven.apache.org/plugins/maven-javadoc-plugin/examples/taglet-configuration.html
 	- DaemonConfiguration: refactor the code for parsing command line parameters
 		fi.jumi.core.config.DaemonConfigurationBuilder#parseProgramArgs
 		fi.jumi.core.config.DaemonConfiguration#toProgramArgs
@@ -121,6 +127,7 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		<archive> element: http://maven.apache.org/plugins/maven-jar-plugin/jar-mojo.html
 		<pomPropertiesFile> element: http://maven.apache.org/shared/maven-archiver/index.html
 	- combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
+		- DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
 	- there might be unnecessary eventizers in fi.jumi.daemon.Main and /jumi-core/pom.xml
 		- create EventizerUsageStatistics (extends EventizerProvider), print usage statistics when program exits
 	- organize the project so that it's possible to run unit tests separate from end-to-end tests
