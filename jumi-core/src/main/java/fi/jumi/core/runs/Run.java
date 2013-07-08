@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * Checks that the notifier API is used correctly. Those checks that are not convenient to do here, are done in {@link
- * fi.jumi.core.suite.RunEventNormalizer}.
+ * RunEventNormalizer}.
  */
 @ThreadSafe
 class Run {

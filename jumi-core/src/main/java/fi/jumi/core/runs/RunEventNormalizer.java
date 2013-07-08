@@ -2,11 +2,10 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.suite;
+package fi.jumi.core.runs;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import fi.jumi.core.runs.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
@@ -17,7 +16,7 @@ import java.util.*;
  * (e.g. due to requiring mutable state).
  */
 @NotThreadSafe
-class RunEventNormalizer implements RunListener {
+public class RunEventNormalizer implements RunListener {
 
     private final SuiteListener listener;
     private final TestFile testFile;
