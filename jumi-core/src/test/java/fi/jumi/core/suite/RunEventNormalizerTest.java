@@ -44,7 +44,7 @@ public class RunEventNormalizerTest {
         normalizer.onPrintedOut(new RunId(7), "stdout");
         normalizer.onPrintedErr(new RunId(8), "stderr");
         normalizer.onFailure(new RunId(9), TestId.of(1), new Exception("dummy exception"));
-        normalizer.onTestStarted(new RunId(10), TestId.of(2));
+        normalizer.onTestStarted(new RunId(10), TestId.ROOT);
         normalizer.onTestFinished(new RunId(11), TestId.of(3));
         normalizer.onRunStarted(new RunId(20));
         normalizer.onRunFinished(new RunId(21));
@@ -54,7 +54,7 @@ public class RunEventNormalizerTest {
         verify(target).onPrintedOut(new RunId(7), "stdout");
         verify(target).onPrintedErr(new RunId(8), "stderr");
         verify(target).onFailure(eq(new RunId(9)), notNull(StackTrace.class));
-        verify(target).onTestStarted(new RunId(10), TestId.of(2));
+        verify(target).onTestStarted(new RunId(10), TestId.ROOT);
         verify(target).onTestFinished(new RunId(11));
         verify(target).onRunStarted(new RunId(20), testFile);
         verify(target).onRunFinished(new RunId(21));
@@ -100,6 +100,13 @@ public class RunEventNormalizerTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("parent of TestId(0) must be found first");
         normalizer.onTestFound(TestId.of(0), "child");
+    }
+
+    @Test
+    public void onTestFound_must_be_called_before_onTestStarted() {
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("the test TestId() must be found first");
+        normalizer.onTestStarted(new RunId(1), TestId.ROOT);
     }
 
 

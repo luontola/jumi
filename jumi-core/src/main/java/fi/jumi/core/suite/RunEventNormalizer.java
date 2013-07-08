@@ -11,6 +11,11 @@ import fi.jumi.core.runs.*;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
+/**
+ * Filters unnecessary events and checks some notifier API usage. Most of the notifier API usage checks are the
+ * responsibility of {@link fi.jumi.core.runs.Run} - this class does only checks that are not convenient to do there
+ * (e.g. due to requiring mutable state).
+ */
 @NotThreadSafe
 class RunEventNormalizer implements RunListener {
 
@@ -55,8 +60,6 @@ class RunEventNormalizer implements RunListener {
         }
     }
 
-    // events which are delegated as-is
-
     @Override
     public void onInternalError(String message, Throwable cause) {
         listener.onInternalError(message, StackTrace.copyOf(cause));
@@ -69,7 +72,14 @@ class RunEventNormalizer implements RunListener {
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
+        checkHasBeenFound(testId);
         listener.onTestStarted(runId, testId);
+    }
+
+    private void checkHasBeenFound(TestId testId) {
+        if (hasNotBeenFoundBefore(testId)) {
+            throw new IllegalStateException("the test " + testId + " must be found first");
+        }
     }
 
     @Override
