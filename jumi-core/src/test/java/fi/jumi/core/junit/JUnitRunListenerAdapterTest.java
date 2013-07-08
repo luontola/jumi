@@ -6,6 +6,7 @@ package fi.jumi.core.junit;
 
 import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.api.RunId;
 import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.*;
 import fi.jumi.core.util.SpyListener;

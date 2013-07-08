@@ -6,7 +6,6 @@ package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import fi.jumi.core.runs.RunId;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;

@@ -10,7 +10,6 @@ import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.suiteListener.SuiteListenerToEvent;
-import fi.jumi.core.runs.RunId;
 import org.junit.*;
 import org.junit.rules.Timeout;
 

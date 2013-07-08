@@ -8,7 +8,6 @@ import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import fi.jumi.core.runs.RunId;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;

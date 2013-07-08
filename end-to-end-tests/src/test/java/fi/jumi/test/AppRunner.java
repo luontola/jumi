@@ -4,9 +4,9 @@
 
 package fi.jumi.test;
 
+import fi.jumi.core.api.RunId;
 import fi.jumi.core.config.*;
 import fi.jumi.core.network.*;
-import fi.jumi.core.runs.RunId;
 import fi.jumi.launcher.*;
 import fi.jumi.launcher.process.*;
 import fi.jumi.launcher.ui.*;

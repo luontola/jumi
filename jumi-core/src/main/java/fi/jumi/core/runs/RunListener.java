@@ -5,6 +5,7 @@
 package fi.jumi.core.runs;
 
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.api.RunId;
 
 public interface RunListener {
 

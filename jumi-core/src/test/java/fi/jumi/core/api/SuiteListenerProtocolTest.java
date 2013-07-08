@@ -5,7 +5,6 @@
 package fi.jumi.core.api;
 
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.runs.RunId;
 import fi.jumi.core.suite.SuiteRunnerIntegrationHelper;
 import org.junit.Test;
 

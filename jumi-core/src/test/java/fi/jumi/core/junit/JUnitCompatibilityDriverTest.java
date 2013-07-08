@@ -7,7 +7,6 @@ package fi.jumi.core.junit;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.results.*;
-import fi.jumi.core.runs.RunId;
 import fi.jumi.core.testbench.TestBench;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;

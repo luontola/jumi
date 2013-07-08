@@ -5,9 +5,8 @@
 package fi.jumi.core.testbench;
 
 import fi.jumi.api.drivers.*;
-import fi.jumi.core.api.TestFile;
+import fi.jumi.core.api.*;
 import fi.jumi.core.results.*;
-import fi.jumi.core.runs.RunId;
 import org.junit.Test;
 
 import java.util.concurrent.Executor;

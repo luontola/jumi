@@ -4,7 +4,7 @@
 
 package fi.jumi.test;
 
-import fi.jumi.core.runs.RunId;
+import fi.jumi.core.api.RunId;
 
 import java.util.*;
 import java.util.regex.*;

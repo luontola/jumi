@@ -6,6 +6,7 @@ package fi.jumi.core.runs;
 
 import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
+import fi.jumi.core.api.RunId;
 import fi.jumi.core.output.*;
 
 import javax.annotation.concurrent.ThreadSafe;
