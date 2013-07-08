@@ -68,13 +68,13 @@ class Run {
 
         @Override
         public void fireFailure(Throwable cause) {
-            checkInnermostNonFinishedTest(); // FIXME: don't lose the cause
+            checkInnermostNonFinishedTest(cause);
             listener.tell().onFailure(runId, testId, cause);
         }
 
         @Override
         public void fireTestFinished() {
-            checkInnermostNonFinishedTest();
+            checkInnermostNonFinishedTest(null);
             listener.tell().onTestFinished(runId, testId);
             currentTest = parent;
 
@@ -83,11 +83,11 @@ class Run {
             }
         }
 
-        private void checkInnermostNonFinishedTest() {
+        private void checkInnermostNonFinishedTest(Throwable testFailureBeingReported) {
             if (currentTest != this) {
                 throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                         "expected " + currentTest + " but was " + this + " " +
-                        "which " + (isTestFinished() ? "is finished" : "is not innermost"));
+                        "which " + (isTestFinished() ? "is finished" : "is not innermost"), testFailureBeingReported);
             }
         }
 

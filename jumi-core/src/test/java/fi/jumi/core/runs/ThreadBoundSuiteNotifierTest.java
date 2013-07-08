@@ -20,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ThreadBoundSuiteNotifierTest {
 
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
@@ -127,6 +128,20 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
         inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.of(0));
         verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void error_in_fireFailure_will_not_lose_the_original_test_failure_being_reported() {
+        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
+
+        Throwable originalTestFailure = new Exception("original test failure");
+        try {
+            tn1.fireFailure(originalTestFailure);
+            fail("should have thrown an exception");
+        } catch (IllegalStateException e) {
+            assertThat("chained exception", e.getCause(), is(originalTestFailure));
+        }
     }
 
     @Test

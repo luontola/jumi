@@ -29,8 +29,8 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 			OK - rename CurrentRun and DefaultSuiteNotifier
 			OK - remove fi.jumi.core.runs.CurrentRun.Test#testFinished?
 		SKIP - consider making the start and end of a run explicit; though probably not, because it could make it easier to use the API incorrectly (not ending the run, or having multiple top-level tests per run)
-	!! - chain the cause from fi.jumi.core.runs.Run.Test#fireFailure
-	- log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions?)
+	OK - chain the cause from fi.jumi.core.runs.Run.Test#fireFailure
+	!! - log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions?)
 		principle: never lose a test failure stack trace (i.e. at least fireFailure must report a chained internal error)
 	- cross-references from public API's javadocs to tests (at first as hard-coded html)
 	- try running specs2 tests again
