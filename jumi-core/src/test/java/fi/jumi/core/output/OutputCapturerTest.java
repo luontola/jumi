@@ -87,7 +87,7 @@ public class OutputCapturerTest {
     }
 
     @Test
-    public void after_starting_a_new_capture_all_new_events_to_to_the_new_output_listener() {
+    public void after_starting_a_new_capture_all_new_events_go_to_the_new_output_listener() {
         OutputListenerSpy listener1 = new OutputListenerSpy();
         OutputListenerSpy listener2 = new OutputListenerSpy();
 
