@@ -6,7 +6,7 @@ OK - create toString for better logging: "-> 0x6403b70c fi.jumi.core.suite.Inter
 
 OK - DaemonConfiguration: if thread count is set to the same number as automatic, then should create the system property; but not when truly on automatic
 
-!! - bullet proofing the public API
+OK - bullet proofing the public API
 	OK - reproduce the specs2 issue as unit test
 	OK - testId in onTestFinished must be correspond last onTestStarted, correctly nested; i.e. must finish the innermost active TestNotifier
 	OK - disallow TestNotifier.fireTestFinished after test is finished
@@ -40,9 +40,9 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		OK - add TestFile and RunId to all error messages
 		OK - add cross reference to SuiteNotifier
 	OK - cross-references from public API's javadocs to tests (at first as hard-coded html)
-	- try running specs2 tests again
+	OK - try running specs2 tests again
 
-- upgrade to nexus-staging-maven-plugin 1.4.3, now required by OSSRH
+!! - upgrade to nexus-staging-maven-plugin 1.4.3, now required by OSSRH
 	https://github.com/sonatype/nexus-maven-plugins/tree/master/staging/maven-plugin
 	https://github.com/simpligility/progressive-company-super-pom
 	- close the repo using it
