@@ -6,20 +6,66 @@ package fi.jumi.core.suite;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import fi.jumi.core.runs.RunId;
+import fi.jumi.core.events.suiteListener.*;
+import fi.jumi.core.runs.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.lang.reflect.*;
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
 
 public class RunEventNormalizerTest {
 
-    private final SuiteListener target = mock(SuiteListener.class);
-    private final TestFile testFile = TestFile.fromClassName("com.example.SomeTest");
+    private final Map<Method, Object[]> targetInvocations = new HashMap<>();
+    private final SuiteListener target = spy(new SuiteListenerToEvent(new EventToSuiteListener(
+            (SuiteListener) Proxy.newProxyInstance(
+                    getClass().getClassLoader(),
+                    new Class[]{SuiteListener.class},
+                    new InvocationHandler() {
+                        @Override
+                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                            targetInvocations.put(method, args);
+                            return null;
+                        }
+                    }))));
+    private final TestFile testFile = TestFile.fromClassName("com.example.DummyTest");
     private final RunEventNormalizer normalizer = new RunEventNormalizer(target, testFile);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void forwards_all_events() {
+        normalizer.onTestFound(TestId.ROOT, "test name");
+        normalizer.onPrintedOut(new RunId(7), "stdout");
+        normalizer.onPrintedErr(new RunId(8), "stderr");
+        normalizer.onFailure(new RunId(9), TestId.of(1), new Exception("dummy exception"));
+        normalizer.onTestStarted(new RunId(10), TestId.of(2));
+        normalizer.onTestFinished(new RunId(11), TestId.of(3));
+        normalizer.onRunStarted(new RunId(20));
+        normalizer.onRunFinished(new RunId(21));
+        normalizer.onInternalError("the message", new Exception("dummy exception"));
+
+        verify(target).onTestFound(testFile, TestId.ROOT, "test name");
+        verify(target).onPrintedOut(new RunId(7), "stdout");
+        verify(target).onPrintedErr(new RunId(8), "stderr");
+        verify(target).onFailure(eq(new RunId(9)), notNull(StackTrace.class));
+        verify(target).onTestStarted(new RunId(10), TestId.of(2));
+        verify(target).onTestFinished(new RunId(11));
+        verify(target).onRunStarted(new RunId(20), testFile);
+        verify(target).onRunFinished(new RunId(21));
+        verify(target).onInternalError(eq("the message"), notNull(StackTrace.class));
+        verifyNoMoreInteractions(target);
+
+        for (Method sourceMethod : RunListener.class.getMethods()) {
+            Method targetMethod = getMethod(sourceMethod.getName(), SuiteListener.class);
+            assertThat("this test failed to check all event types", targetInvocations.keySet(), hasItem(targetMethod));
+        }
+    }
 
     @Test
     public void forwards_unique_onTestFound_events() {
@@ -28,27 +74,6 @@ public class RunEventNormalizerTest {
 
         verify(target).onTestFound(testFile, TestId.ROOT, "root");
         verify(target).onTestFound(testFile, TestId.of(1), "testOne");
-        verifyNoMoreInteractions(target);
-    }
-
-    @Test
-    public void forwards_all_other_events() {
-        // TODO: create a generic test which calls all methods except onTestFound
-        normalizer.onPrintedOut(new RunId(7), "stdout");
-        normalizer.onPrintedErr(new RunId(8), "stderr");
-        normalizer.onFailure(new RunId(9), TestId.of(1), new Exception("dummy exception"));
-        normalizer.onTestStarted(new RunId(10), TestId.of(2));
-        normalizer.onTestFinished(new RunId(11), TestId.of(3));
-        normalizer.onRunStarted(new RunId(20));
-        normalizer.onRunFinished(new RunId(21));
-
-        verify(target).onPrintedOut(new RunId(7), "stdout");
-        verify(target).onPrintedErr(new RunId(8), "stderr");
-        verify(target).onFailure(eq(new RunId(9)), notNull(StackTrace.class));
-        verify(target).onTestStarted(new RunId(10), TestId.of(2));
-        verify(target).onTestFinished(new RunId(11));
-        verify(target).onRunStarted(new RunId(20), testFile);
-        verify(target).onRunFinished(new RunId(21));
         verifyNoMoreInteractions(target);
     }
 
@@ -75,5 +100,17 @@ public class RunEventNormalizerTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("parent of TestId(0) must be found first");
         normalizer.onTestFound(TestId.of(0), "child");
+    }
+
+
+    // helpers
+
+    private static Method getMethod(String name, Class<SuiteListener> type) {
+        for (Method m : type.getMethods()) {
+            if (m.getName().equals(name)) {
+                return m;
+            }
+        }
+        throw new IllegalArgumentException("No method named " + name + " in " + type);
     }
 }
