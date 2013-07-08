@@ -50,11 +50,8 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
         verify(driverForAllClasses).findTests(eq(testClass), any(SuiteNotifier.class), any(Executor.class));
     }
 
-    /**
-     * Responsibility delegated to {@link fi.jumi.core.suite.DuplicateOnTestFoundEventFilter}
-     */
     @Test
-    public void filters_duplicate_onTestFound_events() {
+    public void removes_duplicate_onTestFound_events() {
         expect.onSuiteStarted();
         expect.onTestFound(TestFile.fromClass(CLASS_1), TestId.ROOT, "fireTestFound called twice");
         expect.onSuiteFinished();

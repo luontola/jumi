@@ -5,19 +5,22 @@
 package fi.jumi.core.suite;
 
 import fi.jumi.api.drivers.TestId;
+import fi.jumi.core.api.*;
 import fi.jumi.core.runs.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 
 @NotThreadSafe
-class DuplicateOnTestFoundEventFilter implements RunListener {
+class RunEventNormalizer implements RunListener {
 
-    private final RunListener target;
-    private final Map<TestId, String> tests = new HashMap<>();
+    private final SuiteListener listener;
+    private final TestFile testFile;
+    private final Map<TestId, String> testNamesById = new HashMap<>();
 
-    public DuplicateOnTestFoundEventFilter(RunListener target) {
-        this.target = target;
+    public RunEventNormalizer(SuiteListener listener, TestFile testFile) {
+        this.listener = listener;
+        this.testFile = testFile;
     }
 
     @Override
@@ -25,18 +28,18 @@ class DuplicateOnTestFoundEventFilter implements RunListener {
         if (hasNotBeenFoundBefore(testId)) {
             checkParentWasFoundFirst(testId);
             rememberFoundTest(testId, name);
-            target.onTestFound(testId, name);
+            listener.onTestFound(testFile, testId, name);
         } else {
             checkNameIsSameAsBefore(testId, name);
         }
     }
 
     private void rememberFoundTest(TestId testId, String name) {
-        tests.put(testId, name);
+        testNamesById.put(testId, name);
     }
 
     private boolean hasNotBeenFoundBefore(TestId testId) {
-        return !tests.containsKey(testId);
+        return !testNamesById.containsKey(testId);
     }
 
     private void checkParentWasFoundFirst(TestId testId) {
@@ -46,7 +49,7 @@ class DuplicateOnTestFoundEventFilter implements RunListener {
     }
 
     private void checkNameIsSameAsBefore(TestId testId, String newName) {
-        String oldName = tests.get(testId);
+        String oldName = testNamesById.get(testId);
         if (oldName != null && !oldName.equals(newName)) {
             throw new IllegalArgumentException("test " + testId + " was already found with another name: " + oldName);
         }
@@ -56,41 +59,41 @@ class DuplicateOnTestFoundEventFilter implements RunListener {
 
     @Override
     public void onInternalError(String message, Throwable cause) {
-        target.onInternalError(message, cause);
+        listener.onInternalError(message, StackTrace.copyOf(cause));
     }
 
     @Override
     public void onRunStarted(RunId runId) {
-        target.onRunStarted(runId);
+        listener.onRunStarted(runId, testFile);
     }
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
-        target.onTestStarted(runId, testId);
+        listener.onTestStarted(runId, testId);
     }
 
     @Override
     public void onPrintedOut(RunId runId, String text) {
-        target.onPrintedOut(runId, text);
+        listener.onPrintedOut(runId, text);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
-        target.onPrintedErr(runId, text);
+        listener.onPrintedErr(runId, text);
     }
 
     @Override
     public void onFailure(RunId runId, TestId testId, Throwable cause) {
-        target.onFailure(runId, testId, cause);
+        listener.onFailure(runId, StackTrace.copyOf(cause));
     }
 
     @Override
     public void onTestFinished(RunId runId, TestId testId) {
-        target.onTestFinished(runId, testId);
+        listener.onTestFinished(runId);
     }
 
     @Override
     public void onRunFinished(RunId runId) {
-        target.onRunFinished(runId);
+        listener.onRunFinished(runId);
     }
 }

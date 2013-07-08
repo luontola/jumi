@@ -32,7 +32,12 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 	OK - chain the cause from fi.jumi.core.runs.Run.Test#fireFailure
 	OK - log all incorrect usages to some internal log and make the suite fail (already covered if we throw exceptions?)
 		principle: never lose a test failure stack trace (i.e. at least fireFailure must report a chained internal error)
-	!! - cross-references from public API's javadocs to tests (at first as hard-coded html)
+	!! - bulletproof fireTestFound
+		OK - combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
+		!! - DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
+		- must be called before starting the test
+		- add cross reference to SuiteNotifier
+	- cross-references from public API's javadocs to tests (at first as hard-coded html)
 	- try running specs2 tests again
 
 - upgrade to nexus-staging-maven-plugin 1.4.3, now required by OSSRH
@@ -126,8 +131,6 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		http://stackoverflow.com/questions/10102818/custom-values-in-maven-pom-properties-file
 		<archive> element: http://maven.apache.org/plugins/maven-jar-plugin/jar-mojo.html
 		<pomPropertiesFile> element: http://maven.apache.org/shared/maven-archiver/index.html
-	- combine DuplicateOnTestFoundEventFilter and SuiteListenerAdapter, rename to SuiteEventNormalizer/RunEventNormalizer
-		- DuplicateOnTestFoundEventFilterTest: generic test for all events that are forwarded as-is
 	- there might be unnecessary eventizers in fi.jumi.daemon.Main and /jumi-core/pom.xml
 		- create EventizerUsageStatistics (extends EventizerProvider), print usage statistics when program exits
 	- organize the project so that it's possible to run unit tests separate from end-to-end tests
