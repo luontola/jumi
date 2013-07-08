@@ -37,8 +37,8 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 		OK - generic test for all events that are forwarded as-is
 		OK - must be called before starting the test
 		OK - move RunEventNormalizer and Run to same package; they both check the notifer API usage
-		!! - add TestFile and RunId to all error messages
-		- add cross reference to SuiteNotifier
+		OK - add TestFile and RunId to all error messages
+		!! - add cross reference to SuiteNotifier
 	- cross-references from public API's javadocs to tests (at first as hard-coded html)
 	- try running specs2 tests again
 
@@ -103,6 +103,7 @@ OK - DaemonConfiguration: if thread count is set to the same number as automatic
 	>	(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
 
 - misc refactoring (choose some, defer others)
+	- prepend TestFile as context information to the message in fi.jumi.core.runs.RunEventNormalizer#onInternalError?
 	- create a custom taglet (as independent project) for cross-references from public API's javadocs to tests: e.g. {@ref com.example.FooTest#someTestName}
 		http://docs.oracle.com/javase/6/docs/technotes/guides/javadoc/taglet/overview.html
 		http://docs.oracle.com/javase/6/docs/jdk/api/javadoc/taglet/com/sun/tools/doclets/Taglet.html

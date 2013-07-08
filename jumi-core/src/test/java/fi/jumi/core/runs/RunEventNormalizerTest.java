@@ -31,6 +31,8 @@ public class RunEventNormalizerTest {
                             return null;
                         }
                     }))));
+
+    private static final String INFORMATION_ABOUT_THE_CURRENT_CONTEXT = "Incorrect notifier API usage in com.example.DummyTest: ";
     private final TestFile testFile = TestFile.fromClassName("com.example.DummyTest");
     private final RunEventNormalizer normalizer = new RunEventNormalizer(target, testFile);
 
@@ -90,6 +92,7 @@ public class RunEventNormalizerTest {
         normalizer.onTestFound(TestId.ROOT, "first name");
 
         thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(INFORMATION_ABOUT_THE_CURRENT_CONTEXT);
         thrown.expectMessage("test TestId() was already found with another name: first name");
         normalizer.onTestFound(TestId.ROOT, "second name");
     }
@@ -97,6 +100,7 @@ public class RunEventNormalizerTest {
     @Test
     public void parents_must_be_found_before_their_children() {
         thrown.expect(IllegalStateException.class);
+        thrown.expectMessage(INFORMATION_ABOUT_THE_CURRENT_CONTEXT);
         thrown.expectMessage("parent of TestId(0) must be found first");
         normalizer.onTestFound(TestId.of(0), "child");
     }
@@ -104,6 +108,7 @@ public class RunEventNormalizerTest {
     @Test
     public void onTestFound_must_be_called_before_onTestStarted() {
         thrown.expect(IllegalStateException.class);
+        thrown.expectMessage(INFORMATION_ABOUT_THE_CURRENT_CONTEXT);
         thrown.expectMessage("the test TestId() must be found first");
         normalizer.onTestStarted(new RunId(1), TestId.ROOT);
     }

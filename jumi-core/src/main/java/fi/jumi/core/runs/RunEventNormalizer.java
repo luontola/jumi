@@ -27,6 +27,10 @@ public class RunEventNormalizer implements RunListener {
         this.testFile = testFile;
     }
 
+    private String withContext(String message) {
+        return "Incorrect notifier API usage in " + testFile + ": " + message;
+    }
+
     @Override
     public void onTestFound(TestId testId, String name) {
         if (hasNotBeenFoundBefore(testId)) {
@@ -48,19 +52,20 @@ public class RunEventNormalizer implements RunListener {
 
     private void checkParentWasFoundFirst(TestId testId) {
         if (!testId.isRoot() && hasNotBeenFoundBefore(testId.getParent())) {
-            throw new IllegalStateException("parent of " + testId + " must be found first");
+            throw new IllegalStateException(withContext("parent of " + testId + " must be found first"));
         }
     }
 
     private void checkNameIsSameAsBefore(TestId testId, String newName) {
         String oldName = testNamesById.get(testId);
         if (oldName != null && !oldName.equals(newName)) {
-            throw new IllegalArgumentException("test " + testId + " was already found with another name: " + oldName);
+            throw new IllegalArgumentException(withContext("test " + testId + " was already found with another name: " + oldName));
         }
     }
 
     @Override
     public void onInternalError(String message, Throwable cause) {
+        // TODO: should we prepend the testFile as context information to the message?
         listener.onInternalError(message, StackTrace.copyOf(cause));
     }
 
@@ -77,7 +82,7 @@ public class RunEventNormalizer implements RunListener {
 
     private void checkHasBeenFound(TestId testId) {
         if (hasNotBeenFoundBefore(testId)) {
-            throw new IllegalStateException("the test " + testId + " must be found first");
+            throw new IllegalStateException(withContext("the test " + testId + " must be found first"));
         }
     }
 
