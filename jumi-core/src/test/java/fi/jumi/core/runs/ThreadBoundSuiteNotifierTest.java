@@ -31,6 +31,7 @@ public class ThreadBoundSuiteNotifierTest {
     private final RunListener listener = mock(RunListener.class);
     private final OutputCapturer outputCapturer = new OutputCapturer();
     private final PrintStream stdout = outputCapturer.out();
+    private Throwable lastError;
 
     private final SuiteNotifier notifier = new ThreadBoundSuiteNotifier(ActorRef.wrap(listener), new RunIdSequence(), outputCapturer);
 
@@ -48,6 +49,7 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.of(0));
         inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onRunFinished(FIRST_RUN_ID);
+        verifyNoMoreInteractions(listener);
     }
 
     @Test
@@ -104,6 +106,7 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        inOrder.verify(listener).onInternalError("Incorrect notifier API usage", lastError);
         verifyNoMoreInteractions(listener);
     }
 
@@ -127,6 +130,7 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
         inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.of(0));
+        inOrder.verify(listener).onInternalError("Incorrect notifier API usage", lastError);
         verifyNoMoreInteractions(listener);
     }
 
@@ -162,6 +166,7 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
+        inOrder.verify(listener).onInternalError("Incorrect notifier API usage", lastError);
         verifyNoMoreInteractions(listener);
     }
 
@@ -185,6 +190,7 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
         inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.of(0));
+        inOrder.verify(listener).onInternalError("Incorrect notifier API usage", lastError);
         verifyNoMoreInteractions(listener);
     }
 
@@ -207,6 +213,7 @@ public class ThreadBoundSuiteNotifierTest {
         inOrder.verify(listener).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onTestFinished(FIRST_RUN_ID, TestId.ROOT);
         inOrder.verify(listener).onRunFinished(FIRST_RUN_ID);
+        verifyNoMoreInteractions(listener);
     }
 
     /**
@@ -230,17 +237,19 @@ public class ThreadBoundSuiteNotifierTest {
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener).onRunStarted(FIRST_RUN_ID);
         inOrder.verify(listener, times(2)).onTestStarted(FIRST_RUN_ID, TestId.ROOT);
+        inOrder.verify(listener).onInternalError("Incorrect notifier API usage", lastError);
         verifyNoMoreInteractions(listener);
     }
 
 
     // helpers
 
-    private static void expectIllegalStateException(String expectedMessage, Runnable command) {
+    private void expectIllegalStateException(String expectedMessage, Runnable command) {
         try {
             command.run();
             fail("should have thrown an IllegalStateException");
         } catch (IllegalStateException e) {
+            lastError = e;
             assertThat("assertion message", e.getMessage(), is(expectedMessage));
         }
     }

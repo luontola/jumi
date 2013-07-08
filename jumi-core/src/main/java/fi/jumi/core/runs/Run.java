@@ -85,9 +85,12 @@ class Run {
 
         private void checkInnermostNonFinishedTest(Throwable testFailureBeingReported) {
             if (currentTest != this) {
-                throw new IllegalStateException("must be called on the innermost non-finished TestNotifier; " +
+                String message = "must be called on the innermost non-finished TestNotifier; " +
                         "expected " + currentTest + " but was " + this + " " +
-                        "which " + (isTestFinished() ? "is finished" : "is not innermost"), testFailureBeingReported);
+                        "which " + (isTestFinished() ? "is finished" : "is not innermost");
+                IllegalStateException e = new IllegalStateException(message, testFailureBeingReported);
+                listener.tell().onInternalError("Incorrect notifier API usage", e);
+                throw e;
             }
         }
 
