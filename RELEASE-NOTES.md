@@ -2,7 +2,7 @@
 Release Notes
 =============
 
-### Upcoming Changes
+### Jumi 0.4.345 (2013-07-09)
 
 - Bulletproofed `SuiteNotifier` and `TestNotifier` to detect incorrect notifier API usage
 - `TestNotifier.fireTestFinished()` may now be called from a different thread than where the test was started. Fixes an incompatibility with the [specs2](http://specs2.org/) testing framework
