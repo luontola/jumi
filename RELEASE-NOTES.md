@@ -2,6 +2,10 @@
 Release Notes
 =============
 
+### Upcoming Changes
+
+- TBD
+
 ### Jumi 0.4.345 (2013-07-09)
 
 - Bulletproofed `SuiteNotifier` and `TestNotifier` to detect incorrect notifier API usage
