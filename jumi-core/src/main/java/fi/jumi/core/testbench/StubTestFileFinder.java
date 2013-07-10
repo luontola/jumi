@@ -8,7 +8,10 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.core.api.TestFile;
 import fi.jumi.core.discovery.*;
 
-public class StubTestFileFinder implements TestFileFinder {
+import javax.annotation.concurrent.NotThreadSafe;
+
+@NotThreadSafe
+class StubTestFileFinder implements TestFileFinder {
 
     private final Class<?>[] testClasses;
 

@@ -17,9 +17,11 @@ import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.suite.*;
 import org.apache.commons.io.output.NullOutputStream;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.PrintStream;
 import java.util.concurrent.Executor;
 
+@NotThreadSafe
 public class TestBench {
 
     /**

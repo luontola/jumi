@@ -4,7 +4,7 @@ Release Notes
 
 ### Upcoming Changes
 
-- TBD
+- Moved `TestBench` out of jumi-core's test-jar, into the main jumi-core.jar, so that declaring a dependency to it would be easier ([Issue #5](https://github.com/orfjackal/jumi/issues/5))
 
 ### Jumi 0.4.345 (2013-07-09)
 
