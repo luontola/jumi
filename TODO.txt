@@ -1,4 +1,10 @@
 
+!! - ClassNotFoundException: org.apache.commons.io.output.NullOutputStream in TestBench
+	!! - jumi-core tests jar is not shaded; look for a workaround
+		-> shade plugin doesn't seem to allow shading secondary artifacts
+		-> move TestBench out of the tests jar, into main jar, and do not publish the tests jar
+	- verify with Specsy, close https://github.com/orfjackal/jumi/issues/5
+
 - unit tests for fi.jumi.core.results (before we start adding more events)
 	- TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
 
