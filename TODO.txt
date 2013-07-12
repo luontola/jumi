@@ -4,8 +4,8 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 	OK - test SuiteResultsSummary
 	OK - TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
 
-- progress bar
-	- create SuiteProgressMeter
+!! - progress bar
+	!! - create SuiteProgressMeter
 	- SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
 	- TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
 
