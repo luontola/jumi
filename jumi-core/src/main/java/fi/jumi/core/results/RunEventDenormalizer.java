@@ -82,7 +82,6 @@ public class RunEventDenormalizer implements SuiteListener {
     @Override
     public void onRunFinished(RunId runId) {
         visitor.onRunFinished(runId, testFile);
-        this.testFile = null;
     }
 
     @Override

@@ -1,5 +1,7 @@
 
-- unit tests for fi.jumi.core.results (before we start adding more events)
+!! - unit tests for fi.jumi.core.results (before we start adding more events)
+	OK - test SuiteEventDemuxer
+	!! - test SuiteResultsSummary
 	- TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
 
 - progress bar
