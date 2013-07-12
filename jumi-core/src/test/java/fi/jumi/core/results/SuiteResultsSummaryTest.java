@@ -49,6 +49,18 @@ public class SuiteResultsSummaryTest {
     }
 
     @Test
+    public void multiple_tests_with_failures_counts_as_multiple_failing_tests() {
+        summary.onTestStarted(unimportant, TEST_FILE, TestId.of(1));
+        summary.onFailure(unimportant, TEST_FILE, TestId.of(1), StackTrace.copyOf(new Throwable("failure 1")));
+        summary.onTestStarted(unimportant, TEST_FILE, TestId.of(2));
+        summary.onFailure(unimportant, TEST_FILE, TestId.of(2), StackTrace.copyOf(new Throwable("failure 2")));
+
+        assertThat("passing tests", summary.getPassingTests(), is(0));
+        assertThat("failing tests", summary.getFailingTests(), is(2));
+        assertThat("total tests", summary.getTotalTests(), is(2));
+    }
+
+    @Test
     public void multiple_executions_of_the_same_test_counts_as_just_one_test() {
         summary.onTestStarted(new RunId(1), TEST_FILE, TestId.ROOT);
         summary.onTestStarted(new RunId(2), TEST_FILE, TestId.ROOT);
