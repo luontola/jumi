@@ -83,12 +83,14 @@ public class SuiteProgressMeter extends NullSuiteListener {
     }
 
 
+    @NotThreadSafe
     public enum Status {
         UNDETERMINED,
         IN_PROGRESS,
         FINISHED
     }
 
+    @NotThreadSafe
     private static class RunState {
         private final Deque<TestId> activeTests = new ArrayDeque<>();
         private final TestFile testFile;
@@ -110,6 +112,7 @@ public class SuiteProgressMeter extends NullSuiteListener {
         }
     }
 
+    @NotThreadSafe
     private static class FileState {
         private Set<TestId> allTests = new HashSet<>();
         private Set<TestId> finishedTests = new HashSet<>();
