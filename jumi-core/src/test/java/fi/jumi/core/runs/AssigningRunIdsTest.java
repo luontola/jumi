@@ -8,7 +8,7 @@ package fi.jumi.core.runs;
 import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.api.RunId;
-import fi.jumi.core.output.OutputCapturer;
+import fi.jumi.core.stdout.OutputCapturer;
 import org.junit.Test;
 
 import java.util.*;

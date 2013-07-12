@@ -2,7 +2,7 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.output;
+package fi.jumi.core.stdout;
 
 import net.sf.cglib.proxy.Factory;
 import org.apache.commons.io.output.NullOutputStream;

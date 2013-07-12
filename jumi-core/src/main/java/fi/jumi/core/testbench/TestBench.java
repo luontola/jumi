@@ -11,9 +11,9 @@ import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.discovery.*;
 import fi.jumi.core.drivers.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
-import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.results.SuiteEventDemuxer;
 import fi.jumi.core.runs.RunIdSequence;
+import fi.jumi.core.stdout.OutputCapturer;
 import fi.jumi.core.suite.*;
 import org.apache.commons.io.output.NullOutputStream;
 

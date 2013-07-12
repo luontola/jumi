@@ -12,8 +12,8 @@ import fi.jumi.core.config.*;
 import fi.jumi.core.discovery.*;
 import fi.jumi.core.drivers.*;
 import fi.jumi.core.events.*;
-import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.RunIdSequence;
+import fi.jumi.core.stdout.OutputCapturer;
 import fi.jumi.core.util.*;
 
 import javax.annotation.concurrent.NotThreadSafe;

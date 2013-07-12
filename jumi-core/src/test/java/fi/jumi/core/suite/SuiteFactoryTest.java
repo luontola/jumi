@@ -7,7 +7,7 @@ package fi.jumi.core.suite;
 import fi.jumi.actors.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
-import fi.jumi.core.output.OutputCapturer;
+import fi.jumi.core.stdout.OutputCapturer;
 import org.apache.commons.io.output.NullOutputStream;
 import org.junit.*;
 import org.junit.rules.Timeout;

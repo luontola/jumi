@@ -8,8 +8,8 @@ import fi.jumi.actors.ActorThread;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.drivers.*;
-import fi.jumi.core.output.OutputCapturer;
 import fi.jumi.core.runs.*;
+import fi.jumi.core.stdout.OutputCapturer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.Executor;

@@ -6,7 +6,7 @@ package fi.jumi.daemon;
 
 import fi.jumi.core.config.*;
 import fi.jumi.core.network.*;
-import fi.jumi.core.output.*;
+import fi.jumi.core.stdout.*;
 import fi.jumi.core.suite.SuiteFactory;
 import fi.jumi.core.util.timeout.*;
 
