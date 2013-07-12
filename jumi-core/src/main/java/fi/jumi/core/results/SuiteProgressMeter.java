@@ -14,28 +14,20 @@ import java.util.*;
 public class SuiteProgressMeter extends NullSuiteListener {
 
     private Status status = Status.UNDETERMINED;
-    private int totalFiles = 0;
-    private int finishedFiles = 0;
 
-    private Set<GlobalTestId> allTests = new HashSet<>();
-    private Set<GlobalTestId> finishedTests = new HashSet<>();
-    private Map<RunId, RunState> activeRuns = new HashMap<>();
+    private Map<RunId, RunState> runs = new HashMap<>();
+    private Map<TestFile, FileState> files = new HashMap<>();
 
     public double getCompletion() {
         if (status == Status.UNDETERMINED) {
             return 0;
         }
-        if (totalFiles == 0) {
-            return 1;
+        double sum = 0;
+        for (FileState file : files.values()) {
+            sum += file.getCompletion();
         }
-        double files = (double) finishedFiles / (double) totalFiles;
-
-        double tests = (double) finishedTests.size() / (double) allTests.size();
-        if (allTests.size() == 0) {
-            tests = 0;
-        }
-
-        return Math.max(files, tests);
+        return files.size() == 0 ? 1 :
+                sum / files.size();
     }
 
     public Status getStatus() {
@@ -46,33 +38,36 @@ public class SuiteProgressMeter extends NullSuiteListener {
     // suite events
 
     public void onTestFileFound(TestFile testFile) { // TODO: add this method to SuiteListener
-        totalFiles++;
+        files.put(testFile, new FileState());
     }
 
     public void onTestFileFinished(TestFile testFile) { // TODO: add this method to SuiteListener
-        finishedFiles++;
+        FileState file = files.get(testFile);
+        file.onTestFileFinished();
     }
 
     @Override
     public void onTestFound(TestFile testFile, TestId testId, String name) {
-        allTests.add(new GlobalTestId(testFile, testId));
+        FileState file = files.get(testFile);
+        file.allTests.add(testId);
     }
 
     @Override
     public void onRunStarted(RunId runId, TestFile testFile) {
-        activeRuns.put(runId, new RunState(testFile));
+        runs.put(runId, new RunState(testFile));
     }
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
-        RunState run = activeRuns.get(runId);
+        RunState run = runs.get(runId);
         run.onTestStarted(testId);
     }
 
     @Override
     public void onTestFinished(RunId runId) {
-        RunState run = activeRuns.get(runId);
-        finishedTests.add(run.currentTest());
+        RunState run = runs.get(runId);
+        FileState file = files.get(run.testFile);
+        file.finishedTests.add(run.currentTest());
         run.onTestFinished();
     }
 
@@ -94,7 +89,7 @@ public class SuiteProgressMeter extends NullSuiteListener {
         FINISHED
     }
 
-    private class RunState {
+    private static class RunState {
         private final Deque<TestId> activeTests = new ArrayDeque<>();
         private final TestFile testFile;
 
@@ -102,8 +97,8 @@ public class SuiteProgressMeter extends NullSuiteListener {
             this.testFile = testFile;
         }
 
-        public GlobalTestId currentTest() {
-            return new GlobalTestId(testFile, activeTests.getFirst());
+        public TestId currentTest() {
+            return activeTests.getFirst();
         }
 
         public void onTestStarted(TestId testId) {
@@ -112,6 +107,22 @@ public class SuiteProgressMeter extends NullSuiteListener {
 
         public void onTestFinished() {
             activeTests.pop();
+        }
+    }
+
+    private static class FileState {
+        private Set<TestId> allTests = new HashSet<>();
+        private Set<TestId> finishedTests = new HashSet<>();
+        private double fileFinished = 0;
+
+        public double getCompletion() {
+            double tests = allTests.size() == 0 ? 0 :
+                    (double) finishedTests.size() / (double) allTests.size();
+            return Math.max(tests, fileFinished);
+        }
+
+        public void onTestFileFinished() {
+            fileFinished = 1;
         }
     }
 }

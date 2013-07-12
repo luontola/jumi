@@ -6,11 +6,11 @@ package fi.jumi.core.results;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import org.junit.*;
+import org.junit.Test;
 
 import static fi.jumi.core.results.SuiteProgressMeter.Status.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class SuiteProgressMeterTest {
 
@@ -122,7 +122,6 @@ public class SuiteProgressMeterTest {
         assertThat("after test file finished (but only 1/2 tests finished)", progressMeter.getCompletion(), is(1.0));
     }
 
-    @Ignore
     @Test
     public void multiple_test_files_with_multiple_tests() {
         TestFile file1 = testFile(1);
@@ -141,10 +140,17 @@ public class SuiteProgressMeterTest {
         runTest(file1, TestId.ROOT);
         assertThat("after 1/2 + 0/3 tests finished", progressMeter.getCompletion(), is(0.25));
 
-//        runTest(file2, TestId.ROOT);
-//        assertThat("after 1/2 + 1/3 tests finished", progressMeter.getCompletion(), is(closeTo(0.415, 0.001)));
+        runTest(file2, TestId.ROOT);
+        assertThat("after 1/2 + 1/3 tests finished", progressMeter.getCompletion(), is(closeTo(0.416, 0.001)));
 
-        //  TODO
+        runTest(file2, TestId.of(0));
+        assertThat("after 1/2 + 2/3 tests finished", progressMeter.getCompletion(), is(closeTo(0.583, 0.001)));
+
+        runTest(file2, TestId.of(1));
+        assertThat("after 1/2 + 3/3 tests finished", progressMeter.getCompletion(), is(0.75));
+
+        runTest(file1, TestId.of(0));
+        assertThat("after 2/2 + 3/3 tests finished", progressMeter.getCompletion(), is(1.0));
     }
 
 
