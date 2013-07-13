@@ -7,10 +7,10 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 !! - progress bar
 	OK - create SuiteProgressMeter
 	!! - refactor SuiteProgressMeter:
-		- move FileState manipulation from SuiteProgressMeter#onTestFinished into RunState#onTestFinished and remove RunState#currentTest
-		- create FileState#onTestFound
-		- free memory in onRunFinished and onTestFileFinished
-		- make more fields final
+		OK - move FileState manipulation from SuiteProgressMeter#onTestFinished into RunState#onTestFinished and remove RunState#currentTest
+		OK - create FileState#onTestFound
+		OK - make more fields final
+		!! - free memory in onRunFinished and onTestFileFinished
 	- SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
 	- TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
 

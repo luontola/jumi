@@ -13,10 +13,9 @@ import java.util.*;
 @NotThreadSafe
 public class SuiteProgressMeter extends NullSuiteListener {
 
+    private final Map<TestFile, FileState> files = new HashMap<>();
+    private final Map<RunId, RunState> runs = new HashMap<>();
     private Status status = Status.UNDETERMINED;
-
-    private Map<RunId, RunState> runs = new HashMap<>();
-    private Map<TestFile, FileState> files = new HashMap<>();
 
     public double getCompletion() {
         if (status == Status.UNDETERMINED) {
@@ -42,33 +41,27 @@ public class SuiteProgressMeter extends NullSuiteListener {
     }
 
     public void onTestFileFinished(TestFile testFile) { // TODO: add this method to SuiteListener
-        FileState file = files.get(testFile);
-        file.onTestFileFinished();
+        files.get(testFile).onTestFileFinished();
     }
 
     @Override
     public void onTestFound(TestFile testFile, TestId testId, String name) {
-        FileState file = files.get(testFile);
-        file.allTests.add(testId);
+        files.get(testFile).onTestFound(testId);
     }
 
     @Override
     public void onRunStarted(RunId runId, TestFile testFile) {
-        runs.put(runId, new RunState(testFile));
+        runs.put(runId, new RunState(files.get(testFile)));
     }
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
-        RunState run = runs.get(runId);
-        run.onTestStarted(testId);
+        runs.get(runId).onTestStarted(testId);
     }
 
     @Override
     public void onTestFinished(RunId runId) {
-        RunState run = runs.get(runId);
-        FileState file = files.get(run.testFile);
-        file.finishedTests.add(run.currentTest());
-        run.onTestFinished();
+        runs.get(runId).onTestFinished();
     }
 
     public void onAllTestFilesFound() { // TODO: add this method to SuiteListener
@@ -93,14 +86,10 @@ public class SuiteProgressMeter extends NullSuiteListener {
     @NotThreadSafe
     private static class RunState {
         private final Deque<TestId> activeTests = new ArrayDeque<>();
-        private final TestFile testFile;
+        private final FileState file;
 
-        public RunState(TestFile testFile) {
-            this.testFile = testFile;
-        }
-
-        public TestId currentTest() {
-            return activeTests.getFirst();
+        public RunState(FileState file) {
+            this.file = file;
         }
 
         public void onTestStarted(TestId testId) {
@@ -108,7 +97,8 @@ public class SuiteProgressMeter extends NullSuiteListener {
         }
 
         public void onTestFinished() {
-            activeTests.pop();
+            TestId finishedTest = activeTests.pop();
+            file.onTestFinished(finishedTest);
         }
     }
 
@@ -122,6 +112,14 @@ public class SuiteProgressMeter extends NullSuiteListener {
             double tests = allTests.size() == 0 ? 0 :
                     (double) finishedTests.size() / (double) allTests.size();
             return Math.max(tests, fileFinished);
+        }
+
+        public void onTestFound(TestId testId) {
+            allTests.add(testId);
+        }
+
+        private void onTestFinished(TestId testId) {
+            finishedTests.add(testId);
         }
 
         public void onTestFileFinished() {
