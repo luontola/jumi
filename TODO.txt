@@ -15,8 +15,11 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 		OK - add methods to interface
 		OK - hook onAllTestFilesFound
 		OK - hook onTestFileFound
-		!! - hook onTestFileFinished
+		OK - hook onTestFileFinished
+		!! - update SuiteMother
 	- TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
+		- create TextProgressBar
+		- use it in TextUI
 
 - release
 	- tidy up release notes

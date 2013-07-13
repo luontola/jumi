@@ -35,6 +35,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
+        expect.onTestFileFinished(TEST_FILE_1);
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new ZeroTestsDriver(), TEST_CLASS_1);
@@ -50,6 +51,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onTestStarted(RUN_1, TestId.ROOT);
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
+        expect.onTestFileFinished(TEST_FILE_1);
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new OneTestDriver(), TEST_CLASS_1);
@@ -67,6 +69,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onPrintedErr(RUN_1, "printed to stderr");
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
+        expect.onTestFileFinished(TEST_FILE_1);
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new OnePrintingTestDriver(), TEST_CLASS_1);
@@ -83,6 +86,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onFailure(RUN_1, StackTrace.copyOf(new Exception("dummy failure")));
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
+        expect.onTestFileFinished(TEST_FILE_1);
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new OneFailingTestDriver(), TEST_CLASS_1);
@@ -106,6 +110,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
 
+        expect.onTestFileFinished(TEST_FILE_1);
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new NestedTestsDriver(), TEST_CLASS_1);
@@ -130,6 +135,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onTestFinished(RUN_2);
         expect.onRunFinished(RUN_2);
 
+        expect.onTestFileFinished(TEST_FILE_1);
         expect.onSuiteFinished();
 
         runAndCheckExpectations(new ManyTestRunsDriver(), TEST_CLASS_1);
@@ -149,11 +155,13 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onTestStarted(new RunId(1), TestId.ROOT);
         expect.onTestFinished(new RunId(1));
         expect.onRunFinished(new RunId(1));
+        expect.onTestFileFinished(TEST_FILE_1);
 
         expect.onRunStarted(new RunId(2), TEST_FILE_2);
         expect.onTestStarted(new RunId(2), TestId.ROOT);
         expect.onTestFinished(new RunId(2));
         expect.onRunFinished(new RunId(2));
+        expect.onTestFileFinished(TEST_FILE_2);
 
         expect.onSuiteFinished();
 

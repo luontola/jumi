@@ -20,8 +20,7 @@ public class SuiteRunner implements TestFileFinderListener {
 
     private final SuiteListener suiteListener;
     private final ActorThread actorThread;
-    private final WorkerCounter workerCounter;
-    private InternalErrorReportingExecutor testExecutor;
+    private final WorkerCounter suiteCompletionMonitor;
 
     // XXX: too many constructor parameters, could we group some of them together?
     public SuiteRunner(DriverFactory driverFactory,
@@ -32,15 +31,24 @@ public class SuiteRunner implements TestFileFinderListener {
         this.driverFactory = driverFactory;
         this.suiteListener = suiteListener;
         this.actorThread = actorThread;
-        this.workerCounter = new WorkerCounter(testExecutor);
-        this.testExecutor = new InternalErrorReportingExecutor(workerCounter, suiteListener, logOutput);
+        this.suiteCompletionMonitor = new WorkerCounter(new InternalErrorReportingExecutor(testExecutor, suiteListener, logOutput));
     }
 
     @Override
-    public void onTestFileFound(TestFile testFile) {
+    public void onTestFileFound(final TestFile testFile) {
         suiteListener.onTestFileFound(testFile);
 
-        testExecutor.execute(driverFactory.createDriverRunner(testFile, testExecutor));
+        @NotThreadSafe
+        class FireTestFileFinished implements WorkerListener {
+            @Override
+            public void onAllWorkersFinished() {
+                suiteListener.onTestFileFinished(testFile);
+            }
+        }
+
+        WorkerCounter testFileCompletionMonitor = new WorkerCounter(suiteCompletionMonitor);
+        testFileCompletionMonitor.execute(driverFactory.createDriverRunner(testFile, testFileCompletionMonitor));
+        testFileCompletionMonitor.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireTestFileFinished()));
     }
 
     @Override
@@ -55,7 +63,7 @@ public class SuiteRunner implements TestFileFinderListener {
             }
         }
 
-        workerCounter.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireSuiteFinished()));
+        suiteCompletionMonitor.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireSuiteFinished()));
     }
 
     // TODO: If we need events about individual test files finishing, consider the design that this class had in revision 8d3526b29f378
