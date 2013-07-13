@@ -64,6 +64,11 @@ public class SuiteProgressMeter extends NullSuiteListener {
         runs.get(runId).onTestFinished();
     }
 
+    @Override
+    public void onRunFinished(RunId runId) {
+        runs.remove(runId); // let memory be garbage collected
+    }
+
     public void onAllTestFilesFound() { // TODO: add this method to SuiteListener
         assert status == Status.UNDETERMINED : "status was " + status;
         status = Status.IN_PROGRESS;
@@ -106,12 +111,14 @@ public class SuiteProgressMeter extends NullSuiteListener {
     private static class FileState {
         private Set<TestId> allTests = new HashSet<>();
         private Set<TestId> finishedTests = new HashSet<>();
-        private double fileFinished = 0;
+        private boolean fileFinished = false;
 
         public double getCompletion() {
-            double tests = allTests.size() == 0 ? 0 :
+            if (fileFinished) {
+                return 1;
+            }
+            return allTests.size() == 0 ? 0 :
                     (double) finishedTests.size() / (double) allTests.size();
-            return Math.max(tests, fileFinished);
         }
 
         public void onTestFound(TestId testId) {
@@ -123,7 +130,11 @@ public class SuiteProgressMeter extends NullSuiteListener {
         }
 
         public void onTestFileFinished() {
-            fileFinished = 1;
+            fileFinished = true;
+
+            // let memory be garbage collected
+            allTests = null;
+            finishedTests = null;
         }
     }
 }
