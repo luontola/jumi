@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -57,5 +57,22 @@ public class PlainTextPrinterTest {
         printer.printlnMeta("meta");
 
         assertThat(output.toString(), is("out\r\nmeta\n"));
+    }
+
+    @Test
+    public void printing_meta_incrementally() {
+        printer.printMeta("a");
+        printer.printMeta("b");
+        printer.printMeta("c");
+
+        assertThat(output.toString(), is("abc"));
+    }
+
+    @Test
+    public void printing_meta_incrementally_prints_a_newline_if_previous_stdout_did_not_end_with_newline() {
+        printer.printOut("out");
+        printer.printMeta("meta");
+
+        assertThat(output.toString(), is("out\nmeta"));
     }
 }

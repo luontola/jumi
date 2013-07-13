@@ -18,8 +18,11 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 		OK - hook onTestFileFinished
 		OK - update SuiteMother
 	!! - TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
+		OK - add fi.jumi.launcher.ui.Printer#printMeta
 		!! - create TextProgressBar
 		- use it in TextUI
+			- print in updateWithMessage right before printing anything else?
+			- reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
 
 - release
 	- tidy up release notes

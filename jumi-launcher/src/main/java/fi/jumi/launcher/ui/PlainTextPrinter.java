@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 public class PlainTextPrinter implements Printer {
 
     private final Appendable out;
-    private boolean beginningOfLine = true;
+    private boolean beginningOfLineOrInsideMeta = true;
 
     public PlainTextPrinter(Appendable out) {
         this.out = out;
@@ -20,20 +20,31 @@ public class PlainTextPrinter implements Printer {
     @Override
     public void printOut(String text) {
         printTo(out, text);
+        printedNonMeta(text);
     }
 
     @Override
     public void printErr(String text) {
         printTo(out, text);
+        printedNonMeta(text);
+    }
+
+    @Override
+    public void printMeta(String text) {
+        if (!beginningOfLineOrInsideMeta) {
+            printOut("\n");
+        }
+        printTo(out, text);
     }
 
     @Override
     public void printlnMeta(String line) {
-        if (!beginningOfLine) {
-            printTo(out, "\n");
-        }
-        printTo(out, line);
-        printTo(out, "\n");
+        printMeta(line);
+        printMeta("\n");
+    }
+
+    private void printedNonMeta(String text) {
+        beginningOfLineOrInsideMeta = text.endsWith("\n"); // matches both "\r\n" and "\n"
     }
 
     private void printTo(Appendable target, String text) {
@@ -42,6 +53,5 @@ public class PlainTextPrinter implements Printer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        beginningOfLine = text.endsWith("\n"); // matches both "\r\n" and "\n"
     }
 }
