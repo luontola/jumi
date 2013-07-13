@@ -17,9 +17,9 @@ import java.util.concurrent.Executor;
 public class SuiteRunner implements TestFileFinderListener {
 
     private final DriverFactory driverFactory;
-
     private final SuiteListener suiteListener;
     private final ActorThread actorThread;
+    private final PrintStream logOutput;
     private final WorkerCounter suiteCompletionMonitor;
 
     // XXX: too many constructor parameters, could we group some of them together?
@@ -31,7 +31,8 @@ public class SuiteRunner implements TestFileFinderListener {
         this.driverFactory = driverFactory;
         this.suiteListener = suiteListener;
         this.actorThread = actorThread;
-        this.suiteCompletionMonitor = new WorkerCounter(new InternalErrorReportingExecutor(testExecutor, suiteListener, logOutput));
+        this.logOutput = logOutput;
+        this.suiteCompletionMonitor = new WorkerCounter(testExecutor);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class SuiteRunner implements TestFileFinderListener {
             }
         }
 
-        WorkerCounter testFileCompletionMonitor = new WorkerCounter(suiteCompletionMonitor);
+        WorkerCounter testFileCompletionMonitor = new WorkerCounter(new InternalErrorReportingExecutor(suiteCompletionMonitor, suiteListener, logOutput));
         testFileCompletionMonitor.execute(driverFactory.createDriverRunner(testFile, testFileCompletionMonitor));
         testFileCompletionMonitor.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireTestFileFinished()));
     }
