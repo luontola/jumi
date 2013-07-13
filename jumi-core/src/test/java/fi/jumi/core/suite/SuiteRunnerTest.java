@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.util.*;
 import java.util.concurrent.Executor;
 
+import static fi.jumi.core.util.JumiMatchers.stackTrace;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
@@ -52,11 +53,17 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
 
     @Test
     public void removes_duplicate_onTestFound_events() {
-        expect.onSuiteStarted();
-        expect.onTestFound(TestFile.fromClass(CLASS_1), TestId.ROOT, "fireTestFound called twice");
-        expect.onSuiteFinished();
+        SuiteListener listener = mock(SuiteListener.class);
 
-        runAndCheckExpectations(new DuplicateFireTestFoundDriver(), CLASS_1);
+        run(listener, new Driver() {
+            @Override
+            public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
+                notifier.fireTestFound(TestId.ROOT, "test name");
+                notifier.fireTestFound(TestId.ROOT, "test name");
+            }
+        }, CLASS_1);
+
+        verify(listener, times(1)).onTestFound(TestFile.fromClass(CLASS_1), TestId.ROOT, "test name");
     }
 
     @Test
@@ -72,22 +79,39 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
 
     @Test
     public void reports_uncaught_exceptions_from_driver_threads_as_internal_errors() {
-        expect.onSuiteStarted();
-        expect.onInternalError("Uncaught exception in thread " + Thread.currentThread().getName(),
-                StackTrace.copyOf(new RuntimeException("dummy exception from driver thread")));
-        expect.onSuiteFinished();
+        SuiteListener listener = mock(SuiteListener.class);
 
-        runAndCheckExpectations(new ThrowsExceptionFromDriverThread(), CLASS_1);
+        run(listener, new Driver() {
+            @Override
+            public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
+                throw new RuntimeException("dummy exception from driver thread");
+            }
+        }, CLASS_1);
+
+        verify(listener).onInternalError(
+                eq("Uncaught exception in thread " + Thread.currentThread().getName()),
+                stackTrace("java.lang.RuntimeException: dummy exception from driver thread"));
     }
 
     @Test
     public void reports_uncaught_exceptions_from_test_threads_as_internal_errors() {
-        expect.onSuiteStarted();
-        expect.onInternalError("Uncaught exception in thread " + Thread.currentThread().getName(),
-                StackTrace.copyOf(new RuntimeException("dummy exception from test thread")));
-        expect.onSuiteFinished();
+        SuiteListener listener = mock(SuiteListener.class);
 
-        runAndCheckExpectations(new ThrowsExceptionFromTestThread(), CLASS_1);
+        run(listener, new Driver() {
+            @Override
+            public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        throw new RuntimeException("dummy exception from test thread");
+                    }
+                });
+            }
+        }, CLASS_1);
+
+        verify(listener).onInternalError(
+                eq("Uncaught exception in thread " + Thread.currentThread().getName()),
+                stackTrace("java.lang.RuntimeException: dummy exception from test thread"));
     }
 
 
@@ -99,39 +123,12 @@ public class SuiteRunnerTest extends SuiteRunnerIntegrationHelper {
     private static class SecondDummyTest {
     }
 
-    public static class DuplicateFireTestFoundDriver extends Driver {
-        @Override
-        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
-            notifier.fireTestFound(TestId.ROOT, "fireTestFound called twice");
-            notifier.fireTestFound(TestId.ROOT, "fireTestFound called twice");
-        }
-    }
-
     public static class FakeTestClassDriver extends Driver {
         @Override
         public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
             notifier.fireTestStarted(TestId.ROOT)
                     .fireTestFinished();
-        }
-    }
-
-    public static class ThrowsExceptionFromDriverThread extends Driver {
-        @Override
-        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
-            throw new RuntimeException("dummy exception from driver thread");
-        }
-    }
-
-    public static class ThrowsExceptionFromTestThread extends Driver {
-        @Override
-        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    throw new RuntimeException("dummy exception from test thread");
-                }
-            });
         }
     }
 

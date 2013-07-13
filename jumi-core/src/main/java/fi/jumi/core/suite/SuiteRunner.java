@@ -43,6 +43,8 @@ public class SuiteRunner implements TestFileFinderListener {
 
     @Override
     public void onAllTestFilesFound() {
+        suiteListener.onAllTestFilesFound();
+
         @NotThreadSafe
         class FireSuiteFinished implements WorkerListener {
             @Override
