@@ -12,6 +12,10 @@ public interface SuiteListener {
 
     void onInternalError(String message, StackTrace cause);
 
+    void onTestFileFound(TestFile testFile);
+
+    void onAllTestFilesFound();
+
     void onTestFound(TestFile testFile, TestId testId, String name);
 
     void onRunStarted(RunId runId, TestFile testFile);
@@ -27,6 +31,8 @@ public interface SuiteListener {
     void onTestFinished(RunId runId);
 
     void onRunFinished(RunId runId);
+
+    void onTestFileFinished(TestFile testFile);
 
     void onSuiteFinished();
 }

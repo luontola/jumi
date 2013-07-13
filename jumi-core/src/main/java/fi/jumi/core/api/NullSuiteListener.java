@@ -20,6 +20,14 @@ public class NullSuiteListener implements SuiteListener {
     }
 
     @Override
+    public void onTestFileFound(TestFile testFile) {
+    }
+
+    @Override
+    public void onAllTestFilesFound() {
+    }
+
+    @Override
     public void onTestFound(TestFile testFile, TestId testId, String name) {
     }
 
@@ -49,6 +57,10 @@ public class NullSuiteListener implements SuiteListener {
 
     @Override
     public void onRunFinished(RunId runId) {
+    }
+
+    @Override
+    public void onTestFileFinished(TestFile testFile) {
     }
 
     @Override

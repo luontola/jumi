@@ -84,11 +84,7 @@ public class SuiteEventDemuxer implements MessageSender<Event<SuiteListener>> {
     }
 
     @NotThreadSafe
-    private class InternalDemuxer implements SuiteListener {
-
-        @Override
-        public void onSuiteStarted() {
-        }
+    private class InternalDemuxer extends NullSuiteListener {
 
         @Override
         public void onInternalError(String message, StackTrace cause) {

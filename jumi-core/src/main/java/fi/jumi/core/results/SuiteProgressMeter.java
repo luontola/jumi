@@ -36,11 +36,13 @@ public class SuiteProgressMeter extends NullSuiteListener {
 
     // suite events
 
-    public void onTestFileFound(TestFile testFile) { // TODO: add this method to SuiteListener
+    @Override
+    public void onTestFileFound(TestFile testFile) {
         files.put(testFile, new FileState());
     }
 
-    public void onTestFileFinished(TestFile testFile) { // TODO: add this method to SuiteListener
+    @Override
+    public void onTestFileFinished(TestFile testFile) {
         files.get(testFile).onTestFileFinished();
     }
 
@@ -69,7 +71,8 @@ public class SuiteProgressMeter extends NullSuiteListener {
         runs.remove(runId); // let memory be garbage collected
     }
 
-    public void onAllTestFilesFound() { // TODO: add this method to SuiteListener
+    @Override
+    public void onAllTestFilesFound() {
         assert status == Status.UNDETERMINED : "status was " + status;
         status = Status.IN_PROGRESS;
     }

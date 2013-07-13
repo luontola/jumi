@@ -42,6 +42,16 @@ public class RunEventDenormalizer implements SuiteListener {
     }
 
     @Override
+    public void onTestFileFound(TestFile testFile) {
+        assertShouldNotBeCalled();
+    }
+
+    @Override
+    public void onAllTestFilesFound() {
+        assertShouldNotBeCalled();
+    }
+
+    @Override
     public final void onTestFound(TestFile testFile, TestId testId, String name) {
         assertShouldNotBeCalled();
     }
@@ -82,6 +92,11 @@ public class RunEventDenormalizer implements SuiteListener {
     @Override
     public void onRunFinished(RunId runId) {
         visitor.onRunFinished(runId, testFile);
+    }
+
+    @Override
+    public void onTestFileFinished(TestFile testFile) {
+        assertShouldNotBeCalled();
     }
 
     @Override

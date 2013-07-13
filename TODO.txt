@@ -12,6 +12,10 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 		OK - make more fields final
 		OK - free memory in onRunFinished and onTestFileFinished
 	!! - SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
+		OK - add methods to interface
+		!! - hook onTestFileFound
+		- hook onAllTestFilesFound
+		- hook onTestFileFinished
 	- TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
 
 - release
