@@ -38,6 +38,8 @@ public class SuiteRunner implements TestFileFinderListener {
 
     @Override
     public void onTestFileFound(TestFile testFile) {
+        suiteListener.onTestFileFound(testFile);
+
         testExecutor.execute(driverFactory.createDriverRunner(testFile, testExecutor));
     }
 

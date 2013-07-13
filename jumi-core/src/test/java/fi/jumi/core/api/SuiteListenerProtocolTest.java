@@ -5,6 +5,7 @@
 package fi.jumi.core.api;
 
 import fi.jumi.api.drivers.*;
+import fi.jumi.core.drivers.DriverFinder;
 import fi.jumi.core.suite.SuiteRunnerIntegrationHelper;
 import org.junit.Test;
 
@@ -25,12 +26,13 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onAllTestFilesFound();
         expect.onSuiteFinished();
 
-        runAndCheckExpectations(null);
+        runAndCheckExpectations(DriverFinder.DRIVER_NOT_FOUND);
     }
 
     @Test
     public void suite_with_one_test_class_with_zero_tests() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
         expect.onSuiteFinished();
@@ -41,6 +43,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_one_test_class_with_tests() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
         expect.onRunStarted(RUN_1, TEST_FILE_1);
@@ -55,6 +58,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_printing_tests() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
         expect.onRunStarted(RUN_1, TEST_FILE_1);
@@ -71,6 +75,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_failing_tests() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
         expect.onRunStarted(RUN_1, TEST_FILE_1);
@@ -86,6 +91,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_nested_tests() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
 
@@ -108,6 +114,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_many_runs() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
         expect.onAllTestFilesFound();
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
 
@@ -131,6 +138,8 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
     @Test
     public void suite_with_many_test_classes() {
         expect.onSuiteStarted();
+        expect.onTestFileFound(TEST_FILE_1);
+        expect.onTestFileFound(TEST_FILE_2);
         expect.onAllTestFilesFound();
 
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
