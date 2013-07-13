@@ -11,14 +11,14 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 		OK - create FileState#onTestFound
 		OK - make more fields final
 		OK - free memory in onRunFinished and onTestFileFinished
-	!! - SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
+	OK - SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
 		OK - add methods to interface
 		OK - hook onAllTestFilesFound
 		OK - hook onTestFileFound
 		OK - hook onTestFileFinished
-		!! - update SuiteMother
-	- TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
-		- create TextProgressBar
+		OK - update SuiteMother
+	!! - TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
+		!! - create TextProgressBar
 		- use it in TextUI
 
 - release

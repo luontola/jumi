@@ -33,6 +33,11 @@ public class EventBuilder {
     }
 
     public void end() {
+        // XXX: We are not firing the onTestFileFound et al. events naturally, but this should still be valid according to the protocol.
+        for (TestFile testFile : testFilesByRunId.values()) {
+            listener.onTestFileFinished(testFile);
+        }
+        listener.onAllTestFilesFound();
         listener.onSuiteFinished();
     }
 
@@ -41,6 +46,10 @@ public class EventBuilder {
     }
 
     public void runStarted(RunId runId, TestFile testFile) {
+        // XXX: We are not firing the onTestFileFound et al. events naturally, but this should still be valid according to the protocol.
+        if (!testFilesByRunId.values().contains(testFile)) {
+            listener.onTestFileFound(testFile);
+        }
         testFilesByRunId.put(runId, testFile);
         listener.onRunStarted(runId, testFile);
     }
