@@ -19,8 +19,8 @@ public class SuiteProgressMeterTest {
     @Test
     public void is_undetermined_until_all_test_files_have_been_found() {
         progressMeter.onSuiteStarted();
-        assertThat("after suite started", progressMeter.getStatus(), is(UNDETERMINED));
-        assertThat("after suite started", progressMeter.getCompletion(), is(0.0));
+        assertThat("after suite started", progressMeter.getStatus(), is(INDETERMINATE));
+        assertThat("after suite started", progressMeter.getProgress(), is(0.0));
 
         progressMeter.onAllTestFilesFound();
         assertThat("after all files found", progressMeter.getStatus(), is(IN_PROGRESS));
@@ -33,14 +33,14 @@ public class SuiteProgressMeterTest {
         assertThat("after all files found", progressMeter.getStatus(), is(IN_PROGRESS));
 
         progressMeter.onSuiteFinished();
-        assertThat("after suite finished", progressMeter.getStatus(), is(FINISHED));
+        assertThat("after suite finished", progressMeter.getStatus(), is(COMPLETE));
     }
 
     @Test
     public void empty_suite() {
         progressMeter.onSuiteStarted();
         progressMeter.onAllTestFilesFound();
-        assertThat("after all files found", progressMeter.getCompletion(), is(1.0));
+        assertThat("after all files found", progressMeter.getProgress(), is(1.0));
     }
 
     @Test
@@ -48,10 +48,10 @@ public class SuiteProgressMeterTest {
         progressMeter.onSuiteStarted();
         progressMeter.onTestFileFound(testFile(1));
         progressMeter.onAllTestFilesFound();
-        assertThat("after all files found", progressMeter.getCompletion(), is(0.0));
+        assertThat("after all files found", progressMeter.getProgress(), is(0.0));
 
         progressMeter.onTestFileFinished(testFile(1));
-        assertThat("after file finished", progressMeter.getCompletion(), is(1.0));
+        assertThat("after file finished", progressMeter.getProgress(), is(1.0));
     }
 
     @Test
@@ -60,13 +60,13 @@ public class SuiteProgressMeterTest {
         progressMeter.onTestFileFound(testFile(1));
         progressMeter.onTestFileFound(testFile(2));
         progressMeter.onAllTestFilesFound();
-        assertThat("after all files found", progressMeter.getCompletion(), is(0.0));
+        assertThat("after all files found", progressMeter.getProgress(), is(0.0));
 
         progressMeter.onTestFileFinished(testFile(1));
-        assertThat("after 1/2 files finished", progressMeter.getCompletion(), is(0.5));
+        assertThat("after 1/2 files finished", progressMeter.getProgress(), is(0.5));
 
         progressMeter.onTestFileFinished(testFile(2));
-        assertThat("after 2/2 files finished", progressMeter.getCompletion(), is(1.0));
+        assertThat("after 2/2 files finished", progressMeter.getProgress(), is(1.0));
     }
 
     @Test
@@ -81,14 +81,14 @@ public class SuiteProgressMeterTest {
 
         progressMeter.onRunStarted(runId, file);
         progressMeter.onTestStarted(runId, TestId.ROOT);
-        assertThat("before any tests finished", progressMeter.getCompletion(), is(0.0));
+        assertThat("before any tests finished", progressMeter.getProgress(), is(0.0));
 
         progressMeter.onTestStarted(runId, TestId.of(0));
         progressMeter.onTestFinished(runId);
-        assertThat("after 1/2 tests finished", progressMeter.getCompletion(), is(0.5));
+        assertThat("after 1/2 tests finished", progressMeter.getProgress(), is(0.5));
 
         progressMeter.onTestFinished(runId);
-        assertThat("after 2/2 tests finished", progressMeter.getCompletion(), is(1.0));
+        assertThat("after 2/2 tests finished", progressMeter.getProgress(), is(1.0));
     }
 
     @Test
@@ -100,10 +100,10 @@ public class SuiteProgressMeterTest {
         progressMeter.onTestFound(file, TestId.ROOT, "foo");
 
         runTest(file, TestId.ROOT);
-        assertThat("after first run", progressMeter.getCompletion(), is(1.0));
+        assertThat("after first run", progressMeter.getProgress(), is(1.0));
 
         runTest(file, TestId.ROOT);
-        assertThat("after repeat run", progressMeter.getCompletion(), is(1.0));
+        assertThat("after repeat run", progressMeter.getProgress(), is(1.0));
     }
 
     @Test
@@ -116,10 +116,10 @@ public class SuiteProgressMeterTest {
         progressMeter.onTestFound(file, TestId.of(0), "bar");
 
         runTest(file, TestId.ROOT);
-        assertThat("after 1/2 tests finished", progressMeter.getCompletion(), is(0.5));
+        assertThat("after 1/2 tests finished", progressMeter.getProgress(), is(0.5));
 
         progressMeter.onTestFileFinished(file);
-        assertThat("after test file finished (but only 1/2 tests finished)", progressMeter.getCompletion(), is(1.0));
+        assertThat("after test file finished (but only 1/2 tests finished)", progressMeter.getProgress(), is(1.0));
     }
 
     @Test
@@ -135,22 +135,22 @@ public class SuiteProgressMeterTest {
         progressMeter.onTestFound(file2, TestId.ROOT, "test 2.1");
         progressMeter.onTestFound(file2, TestId.of(0), "test 2.2");
         progressMeter.onTestFound(file2, TestId.of(1), "test 2.3");
-        assertThat("before any tests finished", progressMeter.getCompletion(), is(0.0));
+        assertThat("before any tests finished", progressMeter.getProgress(), is(0.0));
 
         runTest(file1, TestId.ROOT);
-        assertThat("after 1/2 + 0/3 tests finished", progressMeter.getCompletion(), is(0.25));
+        assertThat("after 1/2 + 0/3 tests finished", progressMeter.getProgress(), is(0.25));
 
         runTest(file2, TestId.ROOT);
-        assertThat("after 1/2 + 1/3 tests finished", progressMeter.getCompletion(), is(closeTo(0.416, 0.001)));
+        assertThat("after 1/2 + 1/3 tests finished", progressMeter.getProgress(), is(closeTo(0.416, 0.001)));
 
         runTest(file2, TestId.of(0));
-        assertThat("after 1/2 + 2/3 tests finished", progressMeter.getCompletion(), is(closeTo(0.583, 0.001)));
+        assertThat("after 1/2 + 2/3 tests finished", progressMeter.getProgress(), is(closeTo(0.583, 0.001)));
 
         runTest(file2, TestId.of(1));
-        assertThat("after 1/2 + 3/3 tests finished", progressMeter.getCompletion(), is(0.75));
+        assertThat("after 1/2 + 3/3 tests finished", progressMeter.getProgress(), is(0.75));
 
         runTest(file1, TestId.of(0));
-        assertThat("after 2/2 + 3/3 tests finished", progressMeter.getCompletion(), is(1.0));
+        assertThat("after 2/2 + 3/3 tests finished", progressMeter.getProgress(), is(1.0));
     }
 
 

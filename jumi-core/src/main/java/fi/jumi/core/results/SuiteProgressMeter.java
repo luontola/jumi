@@ -15,15 +15,18 @@ public class SuiteProgressMeter extends NullSuiteListener {
 
     private final Map<TestFile, FileState> files = new HashMap<>();
     private final Map<RunId, RunState> runs = new HashMap<>();
-    private Status status = Status.UNDETERMINED;
+    private Status status = Status.INDETERMINATE;
 
-    public double getCompletion() {
-        if (status == Status.UNDETERMINED) {
+    /**
+     * @return value between {@code 0.0} and {@code 1.0}
+     */
+    public double getProgress() {
+        if (status == Status.INDETERMINATE) {
             return 0;
         }
         double sum = 0;
         for (FileState file : files.values()) {
-            sum += file.getCompletion();
+            sum += file.getProgress();
         }
         return files.size() == 0 ? 1 :
                 sum / files.size();
@@ -73,22 +76,22 @@ public class SuiteProgressMeter extends NullSuiteListener {
 
     @Override
     public void onAllTestFilesFound() {
-        assert status == Status.UNDETERMINED : "status was " + status;
+        assert status == Status.INDETERMINATE : "status was " + status;
         status = Status.IN_PROGRESS;
     }
 
     @Override
     public void onSuiteFinished() {
         assert status == Status.IN_PROGRESS : "status was " + status;
-        status = Status.FINISHED;
+        status = Status.COMPLETE;
     }
 
 
     @NotThreadSafe
     public enum Status {
-        UNDETERMINED,
+        INDETERMINATE,
         IN_PROGRESS,
-        FINISHED
+        COMPLETE
     }
 
     @NotThreadSafe
@@ -116,7 +119,7 @@ public class SuiteProgressMeter extends NullSuiteListener {
         private Set<TestId> finishedTests = new HashSet<>();
         private boolean fileFinished = false;
 
-        public double getCompletion() {
+        public double getProgress() {
             if (fileFinished) {
                 return 1;
             }
