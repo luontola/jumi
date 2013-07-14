@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 public class JumiLauncherTest {
 
     @Rule
-    public final Timeout timeout = new Timeout(1000);
+    public final Timeout timeout = new Timeout(5000);
 
     private ExecutorService actorsThreadPool;
 
