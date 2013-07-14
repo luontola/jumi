@@ -4,7 +4,7 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 	OK - test SuiteResultsSummary
 	OK - TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
 
-OK - progress bar
+!! - progress bar
 	OK - create SuiteProgressMeter
 	OK - refactor SuiteProgressMeter:
 		OK - move FileState manipulation from SuiteProgressMeter#onTestFinished into RunState#onTestFinished and remove RunState#currentTest
@@ -24,8 +24,15 @@ OK - progress bar
 			OK - print in updateWithMessage right before printing anything else?
 			OK - reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
 			OK - check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
+	!! - SuiteProgressMeterTest: explicit test that suite may finish before reaching 100%
+	- TextProgressBar: start in indeterminate mode?, also set other defaults on field initialization (allow method chaining for easy initialization)
+	- tweak progress bar visuals
+		- use hard-coded ASCII art for the progress bar's middle part
+		- use rounding; 99% should mean full middle part (without end part)
+		- on abrupt suite completion, show empty space: "[=======   ]"
+		- change TextUI to produce "[-----=====-----=====-----=====-----=====-----=====]" to allow visualizing with 2% precision
 
-!! - release
+- release
 	OK - tidy up release notes
 	OK - bump version
 	- release

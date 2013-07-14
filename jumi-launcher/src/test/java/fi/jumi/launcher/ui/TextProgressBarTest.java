@@ -111,6 +111,4 @@ public class TextProgressBarTest {
         assertThat("20% but complete", progressBar.toString(), is("[=="));
         // TODO: instead print "[==        ]"
     }
-
-    // TODO: "|" spacers every 25%
 }
