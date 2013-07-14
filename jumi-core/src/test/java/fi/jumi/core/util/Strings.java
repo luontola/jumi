@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -27,5 +27,17 @@ public class Strings {
             sb.append(s);
         }
         return sb.toString();
+    }
+
+    public static int countOccurrences(String haystack, String needle) {
+        int occurrences = 0;
+        int pos = -1;
+        do {
+            pos = haystack.indexOf(needle, pos + 1);
+            if (pos >= 0) {
+                occurrences++;
+            }
+        } while (pos >= 0);
+        return occurrences;
     }
 }

@@ -14,6 +14,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
 
+import static fi.jumi.core.results.SuiteProgressMeter.Status.*;
+
 @NotThreadSafe
 public class TextUI {
 
@@ -23,7 +25,10 @@ public class TextUI {
 
     private final SuiteEventDemuxer demuxer = new SuiteEventDemuxer();
     private final SuitePrinter suitePrinter = new SuitePrinter();
+    private final SuiteProgressMeter progressMeter = new SuiteProgressMeter();
+    private final TextProgressBar progressBar = new TextProgressBar("[", "=", "]", 50);
     private boolean passingTestsVisible = true;
+    private boolean progressBarVisible = true;
     private boolean hasInternalErrors = false;
     private boolean hasFailures = false;
 
@@ -34,6 +39,10 @@ public class TextUI {
 
     public void setPassingTestsVisible(boolean passingTestsVisible) {
         this.passingTestsVisible = passingTestsVisible;
+    }
+
+    public void setProgressBarVisible(boolean progressBarVisible) {
+        this.progressBarVisible = progressBarVisible;
     }
 
     public boolean hasFailures() {
@@ -58,6 +67,13 @@ public class TextUI {
     }
 
     private void updateWithMessage(Event<SuiteListener> message) {
+        if (progressBarVisible) {
+            message.fireOn(progressMeter);
+            progressBar.setProgress(progressMeter.getProgress());
+            progressBar.setIndeterminate(progressMeter.getStatus() == INDETERMINATE);
+            progressBar.setComplete(progressMeter.getStatus() == COMPLETE);
+            printer.printMetaIncrement(progressBar.toStringIncremental());
+        }
         demuxer.send(message);
         message.fireOn(suitePrinter);
     }
@@ -70,8 +86,8 @@ public class TextUI {
 
         @Override
         public void onInternalError(String message, StackTrace cause) {
-            printer.printlnMeta(" > Internal Error");
-            printer.printlnMeta(" > " + message);
+            printer.printMetaLine(" > Internal Error");
+            printer.printMetaLine(" > " + message);
             printer.printErr(getStackTraceAsString(cause));
             printer.printErr("\n");
             hasInternalErrors = true;
@@ -86,6 +102,7 @@ public class TextUI {
         public void onRunFinished(RunId runId) {
             if (passingTestsVisible || hasFailures(runId)) {
                 demuxer.visitRun(runId, new RunPrinter());
+                progressBar.resetIncrementalPrinting();
             }
         }
 
@@ -107,12 +124,12 @@ public class TextUI {
         private void printSuiteFooter(SuiteResultsSummary summary) {
             int pass = summary.getPassingTests();
             int fail = summary.getFailingTests();
-            printer.printlnMeta(String.format("Pass: %d, Fail: %d", pass, fail));
+            printer.printMetaLine(String.format("Pass: %d, Fail: %d", pass, fail));
             if (hasFailures) {
-                printer.printlnMeta("There were test failures");
+                printer.printMetaLine("There were test failures");
             }
             if (hasInternalErrors) {
-                printer.printlnMeta("There were internal errors");
+                printer.printMetaLine("There were internal errors");
             }
         }
     }
@@ -162,15 +179,15 @@ public class TextUI {
         // visual style
 
         private void printRunHeader(TestFile testFile, RunId runId) {
-            printer.printlnMeta(" > Run #" + runId.toInt() + " in " + testFile);
+            printer.printMetaLine(" > Run #" + runId.toInt() + " in " + testFile);
         }
 
         private void printTestName(String bullet, TestFile testFile, TestId testId) {
-            printer.printlnMeta(" > " + testNameIndent() + bullet + " " + demuxer.getTestName(testFile, testId));
+            printer.printMetaLine(" > " + testNameIndent() + bullet + " " + demuxer.getTestName(testFile, testId));
         }
 
         private void printRunFooter() {
-            printer.printlnMeta("");
+            printer.printMetaLine("");
         }
 
         private String testNameIndent() {

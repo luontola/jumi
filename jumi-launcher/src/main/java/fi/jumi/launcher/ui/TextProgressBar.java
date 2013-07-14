@@ -47,7 +47,7 @@ public class TextProgressBar {
         this.complete = complete;
     }
 
-    public void resetIncremental() {
+    public void resetIncrementalPrinting() {
         incrementallyPrinted = 0;
     }
 

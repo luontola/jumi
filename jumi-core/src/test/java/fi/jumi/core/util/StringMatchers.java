@@ -21,4 +21,30 @@ public class StringMatchers {
             }
         };
     }
+
+    public static Matcher<String> hasOccurrences(final int expectedOccurrences, final String needle) {
+        return new TypeSafeMatcher<String>() {
+            @Override
+            protected boolean matchesSafely(String haystack) {
+                return Strings.countOccurrences(haystack, needle) == expectedOccurrences;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has ")
+                        .appendValue(expectedOccurrences)
+                        .appendText(" occurrences of ")
+                        .appendValue(needle);
+            }
+
+            @Override
+            protected void describeMismatchSafely(String haystack, Description mismatchDescription) {
+                int occurrences = Strings.countOccurrences(haystack, needle);
+                mismatchDescription.appendText("was ")
+                        .appendValue(occurrences)
+                        .appendText(" occurrences in:\n")
+                        .appendText(haystack);
+            }
+        };
+    }
 }

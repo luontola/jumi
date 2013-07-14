@@ -25,6 +25,7 @@ public class SuiteMother {
     public static void onePassingTest(SuiteListener listener) {
         EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -37,6 +38,7 @@ public class SuiteMother {
     public static void oneFailingTest(SuiteListener listener) {
         EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -51,6 +53,7 @@ public class SuiteMother {
     public static void nestedFailingAndPassingTests(SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -74,6 +77,7 @@ public class SuiteMother {
     public static void twoPassingRuns(SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -101,6 +105,7 @@ public class SuiteMother {
     public static void twoInterleavedRuns(final SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         final RunId run2 = suite.nextRunId();
@@ -124,6 +129,7 @@ public class SuiteMother {
     public static void printsToStdout(SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -141,6 +147,7 @@ public class SuiteMother {
     public static void printsToStderr(SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -158,6 +165,7 @@ public class SuiteMother {
     public static void printsToStdoutWithoutNewlineAtEnd(SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
@@ -175,6 +183,7 @@ public class SuiteMother {
     public static void printsAfterTestRunFinished(SuiteListener listener) {
         final EventBuilder suite = new EventBuilder(listener);
         suite.begin();
+        suite.findAllTestFiles(TEST_FILE);
 
         final RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);

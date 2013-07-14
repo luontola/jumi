@@ -10,7 +10,7 @@ public interface Printer {
 
     void printErr(String text);
 
-    void printMeta(String text);
+    void printMetaIncrement(String text);
 
-    void printlnMeta(String line);
+    void printMetaLine(String line);
 }

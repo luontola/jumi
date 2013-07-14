@@ -82,7 +82,8 @@ public class SuiteProgressMeter extends NullSuiteListener {
 
     @Override
     public void onSuiteFinished() {
-        assert status == Status.IN_PROGRESS : "status was " + status;
+        // The status can be INDETERMINATE if the JVM terminated unexpectedly,
+        // so we should NOT assert here that the status is IN_PROGRESS
         status = Status.COMPLETE;
     }
 

@@ -17,28 +17,31 @@ public class PlainTextPrinterTest {
     @Test
     public void prints_stdout() {
         printer.printOut("foo");
+        printer.printOut("bar");
 
-        assertThat(output.toString(), is("foo"));
+        assertThat(output.toString(), is("foobar"));
     }
 
     @Test
     public void prints_stderr() {
         printer.printErr("foo");
+        printer.printErr("bar");
 
-        assertThat(output.toString(), is("foo"));
+        assertThat(output.toString(), is("foobar"));
     }
 
     @Test
     public void prints_meta_lines() {
-        printer.printlnMeta("foo");
+        printer.printMetaLine("foo");
+        printer.printMetaLine("bar");
 
-        assertThat(output.toString(), is("foo\n"));
+        assertThat(output.toString(), is("foo\nbar\n"));
     }
 
     @Test
     public void if_previous_stdout_did_not_end_with_newline_then_meta_goes_on_a_new_line() {
         printer.printOut("out");
-        printer.printlnMeta("meta");
+        printer.printMetaLine("meta");
 
         assertThat(output.toString(), is("out\nmeta\n"));
     }
@@ -46,7 +49,7 @@ public class PlainTextPrinterTest {
     @Test
     public void if_previous_stdout_ended_with_Unix_newline_then_meta_is_printed_right_after_it() {
         printer.printOut("out\n");
-        printer.printlnMeta("meta");
+        printer.printMetaLine("meta");
 
         assertThat(output.toString(), is("out\nmeta\n"));
     }
@@ -54,16 +57,16 @@ public class PlainTextPrinterTest {
     @Test
     public void if_previous_stdout_ended_with_DOS_newline_then_meta_is_printed_right_after_it() {
         printer.printOut("out\r\n");
-        printer.printlnMeta("meta");
+        printer.printMetaLine("meta");
 
         assertThat(output.toString(), is("out\r\nmeta\n"));
     }
 
     @Test
     public void printing_meta_incrementally() {
-        printer.printMeta("a");
-        printer.printMeta("b");
-        printer.printMeta("c");
+        printer.printMetaIncrement("a");
+        printer.printMetaIncrement("b");
+        printer.printMetaIncrement("c");
 
         assertThat(output.toString(), is("abc"));
     }
@@ -71,8 +74,24 @@ public class PlainTextPrinterTest {
     @Test
     public void printing_meta_incrementally_prints_a_newline_if_previous_stdout_did_not_end_with_newline() {
         printer.printOut("out");
-        printer.printMeta("meta");
+        printer.printMetaIncrement("meta");
 
         assertThat(output.toString(), is("out\nmeta"));
+    }
+
+    @Test
+    public void meta_line_starts_a_new_line_after_meta_increment() {
+        printer.printMetaIncrement("inc");
+        printer.printMetaLine("line");
+
+        assertThat(output.toString(), is("inc\nline\n"));
+    }
+
+    @Test
+    public void stdout_starts_a_new_line_after_meta_increment() {
+        printer.printMetaIncrement("inc");
+        printer.printOut("out");
+
+        assertThat(output.toString(), is("inc\nout"));
     }
 }

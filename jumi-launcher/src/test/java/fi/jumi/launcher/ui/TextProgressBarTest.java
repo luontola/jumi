@@ -72,7 +72,7 @@ public class TextProgressBarTest {
         progressBar.setProgress(0.5);
         assertThat("50% before reset", progressBar.toStringIncremental(), is("[====="));
 
-        progressBar.resetIncremental();
+        progressBar.resetIncrementalPrinting();
 
         assertThat("50% after reset", progressBar.toStringIncremental(), is("[====="));
     }

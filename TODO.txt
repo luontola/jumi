@@ -4,7 +4,7 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 	OK - test SuiteResultsSummary
 	OK - TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
 
-!! - progress bar
+OK - progress bar
 	OK - create SuiteProgressMeter
 	OK - refactor SuiteProgressMeter:
 		OK - move FileState manipulation from SuiteProgressMeter#onTestFinished into RunState#onTestFinished and remove RunState#currentTest
@@ -17,13 +17,13 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 		OK - hook onTestFileFound
 		OK - hook onTestFileFinished
 		OK - update SuiteMother
-	!! - TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
+	OK - TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
 		OK - add fi.jumi.launcher.ui.Printer#printMeta
 		OK - create TextProgressBar
-		!! - use it in TextUI
-			- print in updateWithMessage right before printing anything else?
-			- reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
-			- check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
+		OK - use it in TextUI
+			OK - print in updateWithMessage right before printing anything else?
+			OK - reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
+			OK - check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
 
 - release
 	- tidy up release notes

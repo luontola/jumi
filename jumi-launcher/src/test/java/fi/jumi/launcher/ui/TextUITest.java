@@ -14,6 +14,7 @@ import org.junit.*;
 import org.junit.rules.Timeout;
 
 import static fi.jumi.core.util.Asserts.*;
+import static fi.jumi.core.util.StringMatchers.hasOccurrences;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -228,6 +229,8 @@ public class TextUITest {
 
     @Test
     public void there_is_a_spacer_between_test_runs() {
+        ui.setProgressBarVisible(false); // the progress bar interferes with this test
+
         SuiteMother.twoPassingRuns(listener);
 
         assertInOutput("" +
@@ -316,6 +319,7 @@ public class TextUITest {
         {
             {
                 RunId run1 = suite.nextRunId();
+                listener.onTestFileFound(SuiteMother.TEST_FILE);
                 listener.onTestFound(SuiteMother.TEST_FILE, TestId.ROOT, SuiteMother.TEST_CLASS_NAME);
                 listener.onRunStarted(run1, SuiteMother.TEST_FILE);
                 listener.onTestStarted(run1, TestId.ROOT);
@@ -462,5 +466,29 @@ public class TextUITest {
         runAndGetOutput();
 
         assertThat("has failures", ui.hasFailures(), is(true));
+    }
+
+
+    // progress bar
+
+    @Test
+    public void shows_a_progress_bar() {
+        SuiteMother.emptySuite(listener);
+
+        // We don't want to be too specific about how long the progress bar is,
+        // so we only check that it starts and ends.
+        assertInOutput("[=========");
+        assertInOutput("=========]");
+    }
+
+    @Test
+    public void restarts_printing_the_progress_bar_after_printing_a_run() {
+        SuiteMother.onePassingTest(listener);
+
+        String output = runAndGetOutput();
+
+        assertThat("should start printing multiple times", output, hasOccurrences(2, "[=========="));
+        assertThat("should print one or more incomplete progress bars", output, hasOccurrences(1, "==========\n"));
+        assertThat("should print exactly one complete progress bar", output, hasOccurrences(1, "==========]\n"));
     }
 }

@@ -13,8 +13,10 @@ public class EventBuilder {
 
     private final SuiteListener listener;
 
+    private final Set<TestFile> foundTestFiles = new HashSet<>();
     private final Map<RunId, TestFile> testFilesByRunId = new HashMap<>();
     private int nextRunId = RunId.FIRST_ID;
+    private boolean allTestFilesFound = false;
 
     public EventBuilder(SuiteListener listener) {
         this.listener = listener;
@@ -32,12 +34,34 @@ public class EventBuilder {
         listener.onSuiteStarted();
     }
 
-    public void end() {
-        // XXX: We are not firing the onTestFileFound et al. events naturally, but this should still be valid according to the protocol.
-        for (TestFile testFile : testFilesByRunId.values()) {
-            listener.onTestFileFinished(testFile);
+    public void findAllTestFiles(TestFile... testFiles) {
+        for (TestFile testFile : testFiles) {
+            findTestFile(testFile);
         }
         listener.onAllTestFilesFound();
+        allTestFilesFound = true;
+    }
+
+    private void findTestFile(TestFile testFile) {
+        if (foundTestFiles.contains(testFile)) {
+            return;
+        }
+        if (allTestFilesFound) {
+            throw new IllegalStateException("Already called onAllTestFilesFound()");
+        }
+        listener.onTestFileFound(testFile);
+        foundTestFiles.add(testFile);
+    }
+
+
+    public void end() {
+        // XXX: We are not firing the onTestFileFound et al. events naturally, but this should still be valid according to the protocol.
+        for (TestFile testFile : foundTestFiles) {
+            listener.onTestFileFinished(testFile);
+        }
+        if (!allTestFilesFound) {
+            listener.onAllTestFilesFound();
+        }
         listener.onSuiteFinished();
     }
 
@@ -46,10 +70,7 @@ public class EventBuilder {
     }
 
     public void runStarted(RunId runId, TestFile testFile) {
-        // XXX: We are not firing the onTestFileFound et al. events naturally, but this should still be valid according to the protocol.
-        if (!testFilesByRunId.values().contains(testFile)) {
-            listener.onTestFileFound(testFile);
-        }
+        findTestFile(testFile);
         testFilesByRunId.put(runId, testFile);
         listener.onRunStarted(runId, testFile);
     }
