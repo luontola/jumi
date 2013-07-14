@@ -66,6 +66,4 @@ public class SuiteRunner implements TestFileFinderListener {
 
         suiteCompletionMonitor.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireSuiteFinished()));
     }
-
-    // TODO: If we need events about individual test files finishing, consider the design that this class had in revision 8d3526b29f378
 }

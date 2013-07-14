@@ -23,6 +23,7 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 		- use it in TextUI
 			- print in updateWithMessage right before printing anything else?
 			- reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
+			- check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
 
 - release
 	- tidy up release notes

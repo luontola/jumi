@@ -45,7 +45,9 @@ use cases and which features are most important to you.
 	- IDEA
 	- Eclipse
 	- NetBeans
-	- sbt (find out whether sbt does class loader caching also for tests and not just the compiler)
+	- sbt
+		- runs tests in parallel http://www.scala-sbt.org/release/docs/Detailed-Topics/Testing.html#disable-parallel-execution-of-tests
+		- runs tests in the same JVM (by default no forking), not sure whether does classloader caching http://www.scala-sbt.org/release/docs/Detailed-Topics/Testing.html#forking-tests
 	- Jumi (1-thread, cold-start)
 	- Jumi (1-thread, warm-start)
 	- Jumi (4-thread, cold-start)
@@ -97,7 +99,10 @@ use cases and which features are most important to you.
 
 	TOOL COMPATIBILITY
 
-- Build tool, IDE and CI integration (Maven has the highest priority)
+- Build tool, IDE and CI integration
+	- Maven (to gain traction in Java community), sbt (to gain traction in Scala community), Leiningen (also reloading Clojure namespaces might require additional support inside Jumi)
+	- IntelliJ IDEA, Eclipse, NetBeans; will probably need help from the community because of the amount of work involved in developing them
+	- JUnit compatible reports, then later native reporting support: Jenkins, ThoughtWorks Go, JetBrains TeamCity, Atlassian Bamboo, Cruise Control
 
 - Maven integration
 	- Run tests as part of a Maven build
