@@ -25,9 +25,9 @@ OK - progress bar
 			OK - reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
 			OK - check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
 
-- release
-	- tidy up release notes
-	- bump version
+!! - release
+	OK - tidy up release notes
+	OK - bump version
 	- release
 	- web: FAQ "why create a new test runner", document the three main reasons
 	- promote
