@@ -153,6 +153,22 @@ public class SuiteProgressMeterTest {
         assertThat("after 2/2 + 3/3 tests finished", progressMeter.getProgress(), is(1.0));
     }
 
+    /**
+     * This can happen for example if the JVM crashes during a test run or there is some other severe problem.
+     */
+    @Test
+    public void may_finish_before_reaching_100_percent() {
+        progressMeter.onSuiteStarted();
+        progressMeter.onTestFileFound(testFile(1));
+        progressMeter.onTestFileFound(testFile(2));
+        progressMeter.onAllTestFilesFound();
+        progressMeter.onTestFileFinished(testFile(1));
+        progressMeter.onSuiteFinished();
+
+        assertThat("progress", progressMeter.getProgress(), is(0.5));
+        assertThat("status", progressMeter.getStatus(), is(COMPLETE));
+    }
+
 
     // helpers
 
