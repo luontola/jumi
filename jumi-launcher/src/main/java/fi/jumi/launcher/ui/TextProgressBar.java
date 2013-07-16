@@ -15,10 +15,10 @@ public class TextProgressBar {
     private final int middleRepeats;
     private final String completeProgressBar;
 
-    private double progress;
-    private boolean indeterminate;
+    private double progress = 0;
+    private boolean indeterminate = true;
+    private boolean complete = false;
     private int incrementallyPrinted = 0;
-    private boolean complete;
 
     public TextProgressBar(String start, String middle, String end, int middleRepeats) {
         this.start = start;
@@ -35,16 +35,19 @@ public class TextProgressBar {
         completeProgressBar = sb.toString();
     }
 
-    public void setProgress(double progress) {
+    public TextProgressBar setProgress(double progress) {
         this.progress = progress;
+        return this;
     }
 
-    public void setIndeterminate(boolean indeterminate) {
+    public TextProgressBar setIndeterminate(boolean indeterminate) {
         this.indeterminate = indeterminate;
+        return this;
     }
 
-    public void setComplete(boolean complete) {
+    public TextProgressBar setComplete(boolean complete) {
         this.complete = complete;
+        return this;
     }
 
     public void resetIncrementalPrinting() {

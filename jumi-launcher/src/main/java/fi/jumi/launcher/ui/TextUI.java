@@ -69,9 +69,10 @@ public class TextUI {
     private void updateWithMessage(Event<SuiteListener> message) {
         if (progressBarVisible) {
             message.fireOn(progressMeter);
-            progressBar.setProgress(progressMeter.getProgress());
-            progressBar.setIndeterminate(progressMeter.getStatus() == INDETERMINATE);
-            progressBar.setComplete(progressMeter.getStatus() == COMPLETE);
+            progressBar
+                    .setProgress(progressMeter.getProgress())
+                    .setIndeterminate(progressMeter.getStatus() == INDETERMINATE)
+                    .setComplete(progressMeter.getStatus() == COMPLETE);
             printer.printMetaIncrement(progressBar.toStringIncremental());
         }
         demuxer.send(message);
