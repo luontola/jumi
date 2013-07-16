@@ -106,12 +106,11 @@ public class TextProgressBarTest {
     }
 
     @Test
-    public void does_not_print_the_end_if_marked_complete_before_100_percent() {
-        progressBar.setProgress(0.2);
+    public void leaves_empty_space_in_the_progress_bar_if_marked_complete_before_100_percent() {
+        progressBar.setProgress(0.8);
         progressBar.setComplete(true);
 
         // this might happen if the JVM crashes or there is some other problem
-        assertThat("20% but complete", progressBar.toString(), is("[=="));
-        // TODO: instead print "[==        ]"
+        assertThat("80% but complete", progressBar.toString(), is("[========  ]"));
     }
 }

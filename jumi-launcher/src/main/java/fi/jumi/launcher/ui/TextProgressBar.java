@@ -13,6 +13,8 @@ public class TextProgressBar {
     private final String middle;
     private final String end;
     private final String completeProgressBar;
+    private final String foreground;
+    private final String background;
 
     private double progress = 0;
     private boolean indeterminate = true;
@@ -23,7 +25,17 @@ public class TextProgressBar {
         this.start = start;
         this.middle = middle;
         this.end = end;
+        foreground = start + middle;
+        background = start + repeat(' ', middle.length()) + end;
         completeProgressBar = start + middle + end;
+    }
+
+    private static String repeat(char c, int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     public TextProgressBar setProgress(double progress) {
@@ -52,10 +64,11 @@ public class TextProgressBar {
         }
 
         int len = start.length() + (int) Math.round(middle.length() * progress);
-        if (complete && progress == 1) {
-            len += end.length();
+        String s = foreground.substring(0, len);
+        if (complete) {
+            s += background.substring(len, background.length());
         }
-        return completeProgressBar.substring(0, len);
+        return s;
     }
 
     public String toStringIncremental() {

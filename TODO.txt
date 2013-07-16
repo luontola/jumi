@@ -4,7 +4,7 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 	OK - test SuiteResultsSummary
 	OK - TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
 
-!! - progress bar
+OK - progress bar
 	OK - create SuiteProgressMeter
 	OK - refactor SuiteProgressMeter:
 		OK - move FileState manipulation from SuiteProgressMeter#onTestFinished into RunState#onTestFinished and remove RunState#currentTest
@@ -26,11 +26,11 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 			OK - check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
 	OK - SuiteProgressMeterTest: explicit test that suite may finish before reaching 100%
 	OK - TextProgressBar: start in indeterminate mode?, also set other defaults on field initialization (allow method chaining for easy initialization)
-	!! - tweak progress bar visuals
+	OK - tweak progress bar visuals
 		OK - change TextUI to produce "[-----=====-----=====-----=====-----=====-----=====]" to allow visualizing with 2% precision
 		OK - use hard-coded ASCII art for the progress bar's middle part
 		OK - use rounding; 99% should mean full middle part (without end part)
-		!! - on abrupt suite completion, show empty space: "[=======   ]"
+		OK - on abrupt suite completion, show empty space: "[=======   ]"
 
 - better toStrings for actor logging
 	- write a generic test for daemon log: ThreadPoolExecutor should be the only class that has "@hashcode" showing in the logs (/@[0-9a-f]{6-8}/), all others should have custom toString methods
