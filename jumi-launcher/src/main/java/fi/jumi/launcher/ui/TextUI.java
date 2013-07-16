@@ -26,7 +26,7 @@ public class TextUI {
     private final SuiteEventDemuxer demuxer = new SuiteEventDemuxer();
     private final SuitePrinter suitePrinter = new SuitePrinter();
     private final SuiteProgressMeter progressMeter = new SuiteProgressMeter();
-    private final TextProgressBar progressBar = new TextProgressBar("[", "=", "]", 50);
+    private final TextProgressBar progressBar = new TextProgressBar("[", "-----=====-----=====-----=====-----=====-----=====", "]");
     private boolean passingTestsVisible = true;
     private boolean progressBarVisible = true;
     private boolean hasInternalErrors = false;

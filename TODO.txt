@@ -27,10 +27,10 @@ OK - unit tests for fi.jumi.core.results (before we start adding more events)
 	OK - SuiteProgressMeterTest: explicit test that suite may finish before reaching 100%
 	OK - TextProgressBar: start in indeterminate mode?, also set other defaults on field initialization (allow method chaining for easy initialization)
 	!! - tweak progress bar visuals
-		- use hard-coded ASCII art for the progress bar's middle part
-		- use rounding; 99% should mean full middle part (without end part)
+		OK - change TextUI to produce "[-----=====-----=====-----=====-----=====-----=====]" to allow visualizing with 2% precision
+		OK - use hard-coded ASCII art for the progress bar's middle part
+		!! - use rounding; 99% should mean full middle part (without end part)
 		- on abrupt suite completion, show empty space: "[=======   ]"
-		- change TextUI to produce "[-----=====-----=====-----=====-----=====-----=====]" to allow visualizing with 2% precision
 
 - better toStrings for actor logging
 	- write a generic test for daemon log: ThreadPoolExecutor should be the only class that has "@hashcode" showing in the logs (/@[0-9a-f]{6-8}/), all others should have custom toString methods

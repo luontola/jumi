@@ -477,8 +477,8 @@ public class TextUITest {
 
         // We don't want to be too specific about how long the progress bar is,
         // so we only check that it starts and ends.
-        assertInOutput("[=========");
-        assertInOutput("=========]");
+        assertInOutput("[---");
+        assertInOutput("===]");
     }
 
     @Test
@@ -487,8 +487,8 @@ public class TextUITest {
 
         String output = runAndGetOutput();
 
-        assertThat("should start printing multiple times", output, hasOccurrences(2, "[=========="));
-        assertThat("should print one or more incomplete progress bars", output, hasOccurrences(1, "==========\n"));
-        assertThat("should print exactly one complete progress bar", output, hasOccurrences(1, "==========]\n"));
+        assertThat("should start printing multiple times", output, hasOccurrences(2, "[---"));
+        assertThat("should print one or more incomplete progress bars", output, hasOccurrences(1, "===\n"));
+        assertThat("should print exactly one complete progress bar", output, hasOccurrences(1, "===]\n"));
     }
 }

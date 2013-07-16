@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 
 public class TextProgressBarTest {
 
-    private final TextProgressBar progressBar = new TextProgressBar("[", "=", "]", 10).setIndeterminate(false);
+    private final TextProgressBar progressBar = new TextProgressBar("[", "==========", "]").setIndeterminate(false);
 
     @Test
     public void no_progress() {

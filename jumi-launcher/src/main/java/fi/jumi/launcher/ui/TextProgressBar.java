@@ -12,7 +12,6 @@ public class TextProgressBar {
     private final String start;
     private final String middle;
     private final String end;
-    private final int middleRepeats;
     private final String completeProgressBar;
 
     private double progress = 0;
@@ -20,19 +19,11 @@ public class TextProgressBar {
     private boolean complete = false;
     private int incrementallyPrinted = 0;
 
-    public TextProgressBar(String start, String middle, String end, int middleRepeats) {
+    public TextProgressBar(String start, String middle, String end) {
         this.start = start;
         this.middle = middle;
         this.end = end;
-        this.middleRepeats = middleRepeats;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(start);
-        for (int i = 0; i < middleRepeats; i++) {
-            sb.append(middle);
-        }
-        sb.append(end);
-        completeProgressBar = sb.toString();
+        completeProgressBar = start + middle + end;
     }
 
     public TextProgressBar setProgress(double progress) {
@@ -60,7 +51,7 @@ public class TextProgressBar {
             return "";
         }
 
-        int len = start.length() + (int) (middle.length() * middleRepeats * progress);
+        int len = start.length() + (int) (middle.length() * progress);
         if (complete && progress == 1) {
             len += end.length();
         }
