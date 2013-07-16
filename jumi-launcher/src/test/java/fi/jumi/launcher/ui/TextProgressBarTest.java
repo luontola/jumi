@@ -38,6 +38,9 @@ public class TextProgressBarTest {
 
         progressBar.setProgress(0.90);
         assertThat("90%", progressBar.toString(), is("[========="));
+
+        progressBar.setProgress(0.99);
+        assertThat("99% rounded to look same as 100%", progressBar.toString(), is("[=========="));
     }
 
 

@@ -51,7 +51,7 @@ public class TextProgressBar {
             return "";
         }
 
-        int len = start.length() + (int) (middle.length() * progress);
+        int len = start.length() + (int) Math.round(middle.length() * progress);
         if (complete && progress == 1) {
             len += end.length();
         }
