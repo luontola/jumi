@@ -151,7 +151,7 @@ OK - better toStrings for actor logging
 	- promote
 
 - end-to-end tests: persistent daemon process
-	- spike communicating over memory-mapped files (see below)
+	OK - spike communicating over memory-mapped files (see below)
 	- should drive better design on launcher side
 	- connect to existing process
 		- cancel idleTimeout if somebody connects again (unit test only?)
