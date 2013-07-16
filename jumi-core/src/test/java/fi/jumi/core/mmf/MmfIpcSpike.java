@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 
 public class MmfIpcSpike {
 
-    private static final int MESSAGES = 1 * 1000 * 1000;
+    private static final int MESSAGES = 10 * 1000 * 1000;
 
     private static final byte CAN_WRITE = 0;
     private static final byte CAN_READ = 1;
@@ -22,6 +22,8 @@ public class MmfIpcSpike {
     private static final int TAG_INDEX = 0;
     private static final int DATA_INDEX = FILE_SIZE - 4;
 
+    public static volatile boolean memoryBarrier;
+
     private static MappedByteBuffer openMemoryMappedFile() throws IOException {
         RandomAccessFile file = new RandomAccessFile("/tmp/MmfIpcSpike", "rw");
 
@@ -29,9 +31,12 @@ public class MmfIpcSpike {
     }
 
     private static void loopWait() throws Exception {
-//        Thread.sleep(1);
-        Thread.yield();
-//        LockSupport.parkNanos(1);
+        // Measured on Intel Core 2 Quad Q6600 (Kentsfield), 2.4GHz @ 3.0GHz
+        memoryBarrier = true;       // 125.55 ns IPC latency (two cache lines), 99.9 ns IPC latency (one cache line)
+//        Thread.yield();           // 208.25 ns IPC latency
+//        LockSupport.parkNanos(1); // 695000.0 ns IPC latency
+//        Thread.sleep(1);          // 704000.0 ns IPC latency
+//        ;                         // deadlocks, maybe because of a compiler optimization?
     }
 
     public static class Writer {
