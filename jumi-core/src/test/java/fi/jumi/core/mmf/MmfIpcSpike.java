@@ -25,7 +25,7 @@ public class MmfIpcSpike {
     public static volatile boolean memoryBarrier;
 
     private static MappedByteBuffer openMemoryMappedFile() throws IOException {
-        RandomAccessFile file = new RandomAccessFile("/tmp/MmfIpcSpike", "rw");
+        RandomAccessFile file = new RandomAccessFile("MmfIpcSpike.tmp", "rw");
 
         return file.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, FILE_SIZE);
     }
