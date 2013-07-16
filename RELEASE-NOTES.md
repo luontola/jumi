@@ -2,6 +2,10 @@
 Release Notes
 =============
 
+### Upcoming Changes
+
+- TBD
+
 ### Jumi 0.5.365 (2013-07-16)
 
 - Added a progress bar to TextUI
