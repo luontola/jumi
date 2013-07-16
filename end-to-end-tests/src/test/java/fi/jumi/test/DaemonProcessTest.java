@@ -9,9 +9,11 @@ import fi.jumi.core.network.*;
 import fi.jumi.launcher.JumiLauncher;
 import org.junit.*;
 import org.junit.rules.Timeout;
+import sample.*;
 
 import java.io.IOException;
-import java.util.Scanner;
+import java.util.*;
+import java.util.regex.*;
 
 import static fi.jumi.core.util.AsyncAssert.assertEventually;
 import static fi.jumi.test.util.ProcessMatchers.*;
@@ -71,11 +73,45 @@ public class DaemonProcessTest {
         assertThat(app.getFinishedDaemonOutput(), containsString("The system will now exit: timed out before anybody connected"));
     }
 
+    @Test
+    public void classes_showing_up_in_actor_logs_have_custom_toString_methods() throws Exception {
+        List<String> irrelevantClasses = Arrays.asList(
+                "sample.BuggyDriver",
+                "sample.BuggyDriver$1",
+                "fi.jumi.simpleunit.SimpleUnit",
+                "fi.jumi.simpleunit.SimpleUnit$RunTestMethod",
+                "java.util.concurrent.ThreadPoolExecutor",
+                "fi.jumi.core.suite.SuiteRunner" // TODO: remove me, if SuiteRunner starts containing interesting information
+        );
+        app.daemon.setLogActorMessages(true);
+
+        // sample test classes to produce all possible events
+        startDaemonProcess(
+                OnePassingTest.class, // the most common events
+                OneFailingTest.class, // onFailure
+                BuggyDriverTest.class // onInternalError
+        );
+        launcher.close();
+
+        Set<String> classes = findClassesWithDefaultToString(app.getFinishedDaemonOutput());
+        classes.removeAll(irrelevantClasses);
+        assertThat("did not expect the following classes to have default toString() method", classes, is(empty()));
+    }
+
+    private static Set<String> findClassesWithDefaultToString(String subject) {
+        Set<String> classNames = new HashSet<>();
+        Matcher m = Pattern.compile("([\\w\\.\\$]+)@[0-9a-f]{6,8}").matcher(subject);
+        while (m.find()) {
+            classNames.add(m.group(1));
+        }
+        return classNames;
+    }
+
 
     // helpers
 
-    private void startDaemonProcess() throws Exception {
-        app.runTests();
+    private void startDaemonProcess(Class<?>... testClasses) throws Exception {
+        app.runTests(testClasses);
         initTestHelpers();
     }
 

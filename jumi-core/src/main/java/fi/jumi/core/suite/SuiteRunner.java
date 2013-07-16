@@ -16,6 +16,7 @@ import java.util.concurrent.Executor;
 @NotThreadSafe
 public class SuiteRunner implements TestFileFinderListener {
 
+    // TODO: if SuiteRunner starts containing interesting state, update DaemonProcessTest to require a custom toString() from it
     private final DriverFactory driverFactory;
     private final SuiteListener suiteListener;
     private final ActorThread actorThread;
