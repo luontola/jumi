@@ -27,6 +27,11 @@ public class RunEventNormalizer implements RunListener {
         this.testFile = testFile;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + testFile + ")";
+    }
+
     private String withContext(String message) {
         return "Incorrect notifier API usage in " + testFile + ": " + message;
     }

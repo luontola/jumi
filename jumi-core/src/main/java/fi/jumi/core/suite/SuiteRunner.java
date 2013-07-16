@@ -46,6 +46,11 @@ public class SuiteRunner implements TestFileFinderListener {
             public void onAllWorkersFinished() {
                 suiteListener.onTestFileFinished(testFile);
             }
+
+            @Override
+            public String toString() {
+                return getClass().getName() + "(" + testFile + ")";
+            }
         }
 
         WorkerCounter testFileCompletionMonitor = new WorkerCounter(new InternalErrorReportingExecutor(suiteCompletionMonitor, suiteListener, logOutput));

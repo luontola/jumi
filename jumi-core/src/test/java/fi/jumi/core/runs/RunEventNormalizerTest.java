@@ -14,7 +14,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
 public class RunEventNormalizerTest {
@@ -111,6 +111,11 @@ public class RunEventNormalizerTest {
         thrown.expectMessage(INFORMATION_ABOUT_THE_CURRENT_CONTEXT);
         thrown.expectMessage("the test TestId() must be found first");
         normalizer.onTestStarted(new RunId(1), TestId.ROOT);
+    }
+
+    @Test
+    public void has_custom_toString() {
+        assertThat(normalizer.toString(), is("RunEventNormalizer(com.example.DummyTest)"));
     }
 
 

@@ -32,11 +32,11 @@ OK - progress bar
 		OK - use rounding; 99% should mean full middle part (without end part)
 		OK - on abrupt suite completion, show empty space: "[=======   ]"
 
-!! - better toStrings for actor logging
+OK - better toStrings for actor logging
 	OK - write a generic test for daemon log: ThreadPoolExecutor should be the only class that has "@hashcode" showing in the logs (/@[0-9a-f]{6-8}/), all others should have custom toString methods
-	- fi.jumi.core.runs.RunEventNormalizer (show testFile)
-	- fi.jumi.core.suite.SuiteRunner$1FireTestFileFinished et al?
-	- org.specsy.core.SpecRun(spec, pathToExecute), org.specsy.bootstrap.ClassSpec(testClass)
+	OK - fi.jumi.core.runs.RunEventNormalizer (show testFile)
+	OK - fi.jumi.core.suite.SuiteRunner$1FireTestFileFinished et al?
+	OK - org.specsy.core.SpecRun(spec, pathToExecute), org.specsy.bootstrap.ClassSpec(testClass)
 
 - release
 	OK - tidy up release notes

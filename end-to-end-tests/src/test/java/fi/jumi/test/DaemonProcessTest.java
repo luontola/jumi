@@ -76,12 +76,17 @@ public class DaemonProcessTest {
     @Test
     public void classes_showing_up_in_actor_logs_have_custom_toString_methods() throws Exception {
         List<String> irrelevantClasses = Arrays.asList(
+                // JDK classes
+                "java.util.concurrent.ThreadPoolExecutor",
+                // dummies
                 "sample.BuggyDriver",
                 "sample.BuggyDriver$1",
                 "fi.jumi.simpleunit.SimpleUnit",
                 "fi.jumi.simpleunit.SimpleUnit$RunTestMethod",
-                "java.util.concurrent.ThreadPoolExecutor",
-                "fi.jumi.core.suite.SuiteRunner" // TODO: remove me, if SuiteRunner starts containing interesting information
+                // Jumi classes which don't contain interesting state
+                // TODO: remove me, if SuiteRunner starts containing interesting information
+                "fi.jumi.core.suite.SuiteRunner",
+                "fi.jumi.core.suite.SuiteRunner$1FireSuiteFinished"
         );
         app.daemon.setLogActorMessages(true);
 
