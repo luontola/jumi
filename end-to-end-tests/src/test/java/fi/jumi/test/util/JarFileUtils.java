@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -28,8 +28,8 @@ public class JarFileUtils {
         };
     }
 
-    public static void walkZipFile(Path jarFile, SimpleFileVisitor<Path> visitor) throws IOException {
-        URI uri = URI.create("jar:" + jarFile.toUri());
+    public static void walkZipFile(Path jarFile, SimpleFileVisitor<Path> visitor) throws Exception {
+        URI uri = new URI("jar", jarFile.toUri().toString(), null);
         HashMap<String, String> env = new HashMap<>();
         try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
             Files.walkFileTree(fs.getPath("/"), visitor);

@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -252,7 +252,7 @@ public class BuildTest {
         }
     }
 
-    private static void assertJarContainsOnly(final Path jarFile, final List<String> whitelist) throws IOException {
+    private static void assertJarContainsOnly(final Path jarFile, final List<String> whitelist) throws Exception {
         JarFileUtils.walkZipFile(jarFile, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
