@@ -1,49 +1,101 @@
 
-OK - unit tests for fi.jumi.core.results (before we start adding more events)
-	OK - test SuiteEventDemuxer
-	OK - test SuiteResultsSummary
-	OK - TestNotifier#fireFailure: add citations about when tests are considered to be passing and failing (based on SuiteResultsSummary's tests?)
+- create SBT integration?
 
-OK - progress bar
-	OK - create SuiteProgressMeter
-	OK - refactor SuiteProgressMeter:
-		OK - move FileState manipulation from SuiteProgressMeter#onTestFinished into RunState#onTestFinished and remove RunState#currentTest
-		OK - create FileState#onTestFound
-		OK - make more fields final
-		OK - free memory in onRunFinished and onTestFileFinished
-	OK - SuiteListener: add events onTestFileFound, onAllTestFilesFound, onTestFileFinished
-		OK - add methods to interface
-		OK - hook onAllTestFilesFound
-		OK - hook onTestFileFound
-		OK - hook onTestFileFinished
-		OK - update SuiteMother
-	OK - TextUI: show percentages of how much is completed, about once per second (on each event check the time since last status printing)
-		OK - add fi.jumi.launcher.ui.Printer#printMeta
-		OK - create TextProgressBar
-		OK - use it in TextUI
-			OK - print in updateWithMessage right before printing anything else?
-			OK - reprint after visiting a run in TextUI.SuitePrinter#onRunFinished
-			OK - check output visually; may need more newlines in PlainTextPrinter (e.g. printMetaIncremental followed by printMetaLine or printOut)
-	OK - SuiteProgressMeterTest: explicit test that suite may finish before reaching 100%
-	OK - TextProgressBar: start in indeterminate mode?, also set other defaults on field initialization (allow method chaining for easy initialization)
-	OK - tweak progress bar visuals
-		OK - change TextUI to produce "[-----=====-----=====-----=====-----=====-----=====]" to allow visualizing with 2% precision
-		OK - use hard-coded ASCII art for the progress bar's middle part
-		OK - use rounding; 99% should mean full middle part (without end part)
-		OK - on abrupt suite completion, show empty space: "[=======   ]"
+- communicate using memory-mapped files
+	http://en.wikipedia.org/wiki/Memory-mapped_file
+	http://javarevisited.blogspot.fi/2012/01/memorymapped-file-and-io-in-java.html
+	http://stackoverflow.com/questions/5943365/java-tcp-ip-socket-latency-stuck-at-50-s-microseconds-used-for-java-ipc
+	http://stackoverflow.com/questions/6096485/how-to-dynamically-expand-a-memory-mapped-file
+	https://github.com/peter-lawrey/Java-Chronicle (see how IPC is done here)
+	* benefits:
+		- more secure than sockets (uses file system permissions)
+		- should be faster (benchmark latency and throughput)
+		- automatically saved to file for later use
+		- no need to close socket connections
+		- no need for a networking library
+	* disadvantages:
+		- how to manage multiple writers? one file per writer?
+		- probably requires polling to get informed about updates
+	* need to find out how to do synchronization
+		http://stackoverflow.com/questions/4743380/controlling-read-writes-to-memory-mapped-files-windows
+	OK - spike communicating over memory-mapped files (see below)
+	- create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
+		Mina 3:
+			+ lookup using singly linked list -> let's use a doubly linked list with O(1) in both directions, and field "current" instead of "head & tail"
+			- accesses primitives using 1-byte operations
+			+ only 1 public and 2 private classes
+			- class is final, cannot customize easily
+			- has bugs and low coverage (just reported https://issues.apache.org/jira/browse/DIRMINA-949 and https://issues.apache.org/jira/browse/DIRMINA-950)
+			- no putString
+			- doesn't add ByteBuffers automatically
+		Netty 4:
+			- lookup using binary search
+			+ accesses primitives using smart divide-and-conquer
+			- tons of classes, do many more things than is necessary (e.g. detects Unsafe and Java version; see PlatformDependent) and increase class loader overhead
+			- has low coverage
+			- no putString
+			- doesn't add ByteBuffers automatically
+		- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
+		- test well the splitting of data between buffers
+			- generic tests with initial buffer size varying from 0 to 4 bytes
+			- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
+	- hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
+		protocol draft:
+			header: "Jumi" (4 bytes), protocol-version (int), interface (byte), events...
+			events: status (byte), event-type (byte), body
+			status: empty (0), exists (1), end-of-file (2)
+		- save v1 events to file for testing compatibility
+	- communicate over the buffer instead of socket
+	- after implementing, consider refactoring the following places:
+		fi.jumi.core.TestRunCoordinator#addSuiteListener
+		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
+		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
 
-OK - better toStrings for actor logging
-	OK - write a generic test for daemon log: ThreadPoolExecutor should be the only class that has "@hashcode" showing in the logs (/@[0-9a-f]{6-8}/), all others should have custom toString methods
-	OK - fi.jumi.core.runs.RunEventNormalizer (show testFile)
-	OK - fi.jumi.core.suite.SuiteRunner$1FireTestFileFinished et al?
-	OK - org.specsy.core.SpecRun(spec, pathToExecute), org.specsy.bootstrap.ClassSpec(testClass)
+- write daemon output to log file
+	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
+		- write log to JUMI_HOME/run/*/console.log
+		- default JUMI_HOME to ~/.jumi
+	- update e2e tests to read the output from the log file
+	- get rid of fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#copyInBackground
+		- don't create background threads in the launcher automatically (the tests should create them explicitly, if any)
+		- also remove the hack in fi.jumi.test.ReleasingResourcesTest#launcher_stops_the_threads_it_started
+	- update ErrorHandlingTest#gives_an_error_if_starting_the_daemon_process_failed
+		- show the path to the daemon log file in the error message
+		- consider showing the log file path for all internal errors? or leave it for later, for another mechanism to tell stats about the process?
+
+- end-to-end tests: persistent daemon process
+	* should drive better design on launcher side
+	- connect to existing process
+		- cancel idleTimeout if somebody connects again (unit test only?)
+	- if daemon dies unexpectedly (System.exit/halt, JVM crash etc.), report it and restart next time
+		http://vanillajava.blogspot.com/2011/12/test-complete-failure-of-jvm.html
+	- how to show unfinished test runs in the TextUI? (both JVM crash unfinishing all tests, and buggy testing framework unfinishing some tests)
+	- if daemon disconnects due to network problem, reconnect and resume where we were left? (should not happen with MMFs?)
+		- should not exit the JVM (due to idle timeout) while tests are running
+	- have a second look at whether the launcher-side design improved
+	- make it reliable
 
 - release
-	OK - tidy up release notes
-	OK - bump version
+	- tidy up release notes
+	- bump version
 	- release
-	- web: FAQ "why create a new test runner", document the three main reasons
-	- promote
+	- measure speedup, but don't yet publish (wait for class loader caching before doing a full comparison)
+
+- run tests in a loop on a weakly ordered, multi-core CPU, to look for cache coherency issues
+	- where to find a multi-core ARM for a test drive? and are the newer ARMs anyhow cache coherent?
+		http://www.calxeda.com/trystack/
+		http://trystack.org/
+	- are there Itaniums (IA64) on any cloud for rent?
+	- Azul's Vega should have a relaxed memory model; ask for co-operation, also to ensure scalability?
+
+- class loader caching
+
+- release
+	- tidy up release notes
+	- bump version
+	- release
+	- create a performance comparison (e.g. with Dimdwarf's tests, or some publicly known open source project with fast tests; Joda-Time?)
+	- promote widely
 
 - plugin system for custom DriverFinders (keep it minimal, nearly walking skeleton level, until we have more plugins)
 	- hook into fi.jumi.core.drivers.DriverFinderFactory
@@ -133,70 +185,10 @@ OK - better toStrings for actor logging
 		- create logger specific implementation of AbstractMessageLogger
 		- customize MinLog's output to use microsecond accuracy, similar to PrintStreamMessageLogger
 
-- write daemon output to log file
-	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
-		- write log to JUMI_HOME/run/*/console.log
-		- default JUMI_HOME to ~/.jumi
-	- update e2e tests to read the output from the log file
-	- get rid of fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#copyInBackground
-		- don't create background threads in the launcher automatically (the tests should create them explicitly, if any)
-		- also remove the hack in fi.jumi.test.ReleasingResourcesTest#launcher_stops_the_threads_it_started
-	- update ErrorHandlingTest#gives_an_error_if_starting_the_daemon_process_failed
-		- show the path to the daemon log file in the error message
-		- consider showing the log file path for all internal errors? or leave it for later, for another mechanism to tell stats about the process?
-
 - minor release
 	- tidy up release notes
 	- release
 	- promote
-
-- end-to-end tests: persistent daemon process
-	OK - spike communicating over memory-mapped files (see below)
-	- should drive better design on launcher side
-	- connect to existing process
-		- cancel idleTimeout if somebody connects again (unit test only?)
-	- if daemon dies unexpectedly (System.exit/halt, JVM crash etc.), report it and restart next time
-		http://vanillajava.blogspot.com/2011/12/test-complete-failure-of-jvm.html
-	- how to show unfinished test runs in the TextUI? (both JVM crash unfinishing all tests, and buggy testing framework unfinishing some tests)
-	- if daemon disconnects due to network problem, reconnect and resume where we were left? (should not happen with MMFs?)
-		- should not exit the JVM (due to idle timeout) while tests are running
-	- make it reliable
-
-- communicate using memory-mapped files?
-	http://en.wikipedia.org/wiki/Memory-mapped_file
-	http://javarevisited.blogspot.fi/2012/01/memorymapped-file-and-io-in-java.html
-	http://stackoverflow.com/questions/5943365/java-tcp-ip-socket-latency-stuck-at-50-s-microseconds-used-for-java-ipc
-	http://stackoverflow.com/questions/6096485/how-to-dynamically-expand-a-memory-mapped-file
-	https://github.com/peter-lawrey/Java-Chronicle (see how IPC is done here)
-	- benefits:
-		- more secure than sockets (uses file system permissions)
-		- should be faster (benchmark latency and throughput)
-		- automatically saved to file for later use
-		- no need to close socket connections
-		- no need for a networking library
-	- disadvantages:
-		- how to manage multiple writers? one file per writer?
-		- probably requires polling to get informed about updates
-	- need to find out how to do synchronization
-		http://stackoverflow.com/questions/4743380/controlling-read-writes-to-memory-mapped-files-windows
-	- after implementing, consider refactoring the following places:
-		fi.jumi.core.TestRunCoordinator#addSuiteListener
-		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
-		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
-
-- run tests in a loop on a weakly ordered, multi-core CPU, to look for cache coherency issues
-	- where to find a multi-core ARM for a test drive? and are the newer ARMs anyhow cache coherent?
-		http://www.calxeda.com/trystack/
-		http://trystack.org/
-	- are there Itaniums (IA64) on any cloud for rent?
-	- Azul's Vega should have a relaxed memory model; ask for co-operation, also to ensure scalability?
-
-- release
-	- tidy up release notes
-	- bump version
-	- release
-	- create a performance comparison (e.g. with Dimdwarf's tests)
-	- promote widely
 
 - deployment pipeline
 	jumi:
