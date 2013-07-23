@@ -111,10 +111,6 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <includes>
-                        <include>**/*Test.class</include>
-                    </includes>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <systemProperties>
                         <property>
                             <name>jumi.useThreadSafetyAgent</name>

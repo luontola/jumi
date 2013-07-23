@@ -4,9 +4,11 @@
       <root url="jar://$MAVEN_REPOSITORY$/fi/jumi/jumi-core/0.5-SNAPSHOT/jumi-core-0.5-SNAPSHOT-tests.jar!/" />
     </CLASSES>
     <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/jumi-core/jumi-core-0.5-SNAPSHOT-test-javadoc.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/fi/jumi/jumi-core/0.5-SNAPSHOT/jumi-core-0.5-SNAPSHOT-test-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
+      <root url="jar://$PROJECT_DIR$/jumi-core/jumi-core-0.5-SNAPSHOT-test-sources.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/fi/jumi/jumi-core/0.5-SNAPSHOT/jumi-core-0.5-SNAPSHOT-test-sources.jar!/" />
     </SOURCES>
   </library>
