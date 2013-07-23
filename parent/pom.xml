@@ -220,6 +220,12 @@
                 <version>0.5-rc1</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.orfjackal.retrolambda</groupId>
+                <artifactId>retrolambda</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -229,8 +235,10 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <fork>true</fork>
+                    <executable>${env.JAVA8_HOME}/bin/javac</executable>
                 </configuration>
             </plugin>
 
@@ -241,6 +249,7 @@
                         <include>**/*Test.class</include>
                     </includes>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <jvm>${env.JAVA7_HOME}/bin/java</jvm>
                 </configuration>
             </plugin>
 
@@ -251,6 +260,7 @@
                         <include>**/*Test.class</include>
                     </includes>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <jvm>${env.JAVA7_HOME}/bin/java</jvm>
                 </configuration>
             </plugin>
 
@@ -281,6 +291,22 @@
                                 <requireMavenVersion>
                                     <version>[${minimumMavenVersion},)</version>
                                 </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-multiple-java-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireEnvironmentVariable>
+                                    <variableName>JAVA7_HOME</variableName>
+                                </requireEnvironmentVariable>
+                                <requireEnvironmentVariable>
+                                    <variableName>JAVA8_HOME</variableName>
+                                </requireEnvironmentVariable>
                             </rules>
                         </configuration>
                     </execution>
@@ -319,8 +345,73 @@
             </plugin>
 
             <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-retrolambda</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.orfjackal.retrolambda</groupId>
+                                    <artifactId>retrolambda</artifactId>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <destFileName>retrolambda.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+
+                    <!-- Process our byte codes to make them run on Java 7 -->
+
+                    <execution>
+                        <id>process-classes</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                                <exec executable="${env.JAVA8_HOME}/bin/java" failonerror="true">
+                                    <arg value="-Dretrolambda.inputDir=${project.build.outputDirectory}"/>
+                                    <arg value="-Dretrolambda.classpath=${compile_classpath}"/>
+                                    <arg value="-javaagent:${project.build.directory}/retrolambda.jar"/>
+                                    <arg value="-jar"/>
+                                    <arg value="${project.build.directory}/retrolambda.jar"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>process-test-classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <exec executable="${env.JAVA8_HOME}/bin/java" failonerror="true">
+                                    <arg value="-Dretrolambda.inputDir=${project.build.testOutputDirectory}"/>
+                                    <arg value="-Dretrolambda.classpath=${test_classpath}"/>
+                                    <arg value="-javaagent:${project.build.directory}/retrolambda.jar"/>
+                                    <arg value="-jar"/>
+                                    <arg value="${project.build.directory}/retrolambda.jar"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
 
                     <!-- XXX: workaround for an issue with maven-shade-plugin
                          There appears to be some stale state from previous executions of the Shade plugin,
