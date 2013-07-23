@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -38,22 +38,16 @@ public class NettyNetworkClient implements NetworkClient {
     }
 
     @Override
-    public <In, Out> void connect(String hostname, int port, final NetworkEndpoint<In, Out> endpoint) {
+    public <In, Out> void connect(String hostname, int port, NetworkEndpoint<In, Out> endpoint) {
         ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
 
-        @ThreadSafe
-        class MyChannelPipelineFactory implements ChannelPipelineFactory {
-            @Override
-            public ChannelPipeline getPipeline() {
-                return Channels.pipeline(
+        bootstrap.setPipelineFactory(
+                () -> Channels.pipeline(
                         new ObjectEncoder(),
                         new ObjectDecoder(ClassResolvers.softCachingResolver(getClass().getClassLoader())),
                         new LoggingHandler(NettyNetworkClient.class, logLevel),
                         new NettyNetworkEndpointAdapter<>(endpoint),
-                        new AddToChannelGroupHandler(allChannels));
-            }
-        }
-        bootstrap.setPipelineFactory(new MyChannelPipelineFactory());
+                        new AddToChannelGroupHandler(allChannels)));
 
         bootstrap.setOption("tcpNoDelay", true);
         bootstrap.setOption("keepAlive", true);

@@ -27,7 +27,7 @@ public class InitialMessageTimeout<T> implements MessageSender<T> {
     public InitialMessageTimeout(MessageSender<T> target, MessageReceiver<T> timeoutMessages, long timeout, TimeUnit unit) {
         this.target = target;
         this.timeoutMessages = timeoutMessages;
-        this.timeoutTimer = new CommandExecutingTimeout(new TimedOut(), timeout, unit);
+        this.timeoutTimer = new CommandExecutingTimeout(this::timedOut, timeout, unit);
         this.timeoutTimer.start();
     }
 
@@ -63,15 +63,6 @@ public class InitialMessageTimeout<T> implements MessageSender<T> {
         T message;
         while ((message = source.poll()) != null) {
             target.send(message);
-        }
-    }
-
-
-    @ThreadSafe
-    private class TimedOut implements Runnable {
-        @Override
-        public void run() {
-            timedOut();
         }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.serialization.*;
 import org.jboss.netty.handler.logging.LoggingHandler;
 import org.jboss.netty.logging.InternalLogLevel;
 
-import javax.annotation.concurrent.*;
+import javax.annotation.concurrent.Immutable;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
@@ -44,23 +44,16 @@ public class NettyNetworkServer implements NetworkServer {
         return addr.getPort();
     }
 
-    private <In, Out> Channel listen(int port, final NetworkEndpointFactory<In, Out> endpointFactory) {
+    private <In, Out> Channel listen(int port, NetworkEndpointFactory<In, Out> endpointFactory) {
         ServerBootstrap bootstrap = new ServerBootstrap(channelFactory);
 
-        @ThreadSafe
-        class MyChannelPipelineFactory implements ChannelPipelineFactory {
-            @Override
-            public ChannelPipeline getPipeline() {
-                NetworkEndpoint<In, Out> endpoint = endpointFactory.createEndpoint();
-                return Channels.pipeline(
+        bootstrap.setPipelineFactory(
+                () -> Channels.pipeline(
                         new ObjectEncoder(),
                         new ObjectDecoder(ClassResolvers.softCachingResolver(getClass().getClassLoader())),
                         new LoggingHandler(NettyNetworkServer.class, logLevel),
-                        new NettyNetworkEndpointAdapter<>(endpoint),
-                        new AddToChannelGroupHandler(allChannels));
-            }
-        }
-        bootstrap.setPipelineFactory(new MyChannelPipelineFactory());
+                        new NettyNetworkEndpointAdapter<>(endpointFactory.createEndpoint()),
+                        new AddToChannelGroupHandler(allChannels)));
 
         bootstrap.setOption("child.tcpNoDelay", true);
         bootstrap.setOption("child.keepAlive", true);

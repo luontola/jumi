@@ -15,7 +15,7 @@ import fi.jumi.launcher.remote.*;
 import org.apache.commons.io.output.NullOutputStream;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.*;
+import java.io.OutputStream;
 import java.util.concurrent.*;
 
 @NotThreadSafe
@@ -24,9 +24,9 @@ public class JumiLauncherBuilder {
     private boolean debugLogging = false;
 
     public JumiLauncher build() {
-        final ExecutorService actorsThreadPool = createActorsThreadPool();
+        ExecutorService actorsThreadPool = createActorsThreadPool();
         ProcessStarter processStarter = createProcessStarter();
-        final NetworkServer networkServer = createNetworkServer();
+        NetworkServer networkServer = createNetworkServer();
         OutputStream daemonOutputListener = createDaemonOutputListener();
 
         Actors actors = new MultiThreadedActors(
@@ -35,7 +35,7 @@ public class JumiLauncherBuilder {
                 new PrintStreamFailureLogger(System.out),
                 new NullMessageListener()
         );
-        final ActorThread actorThread = startActorThread(actors);
+        ActorThread actorThread = startActorThread(actors);
 
         ActorRef<DaemonSummoner> daemonSummoner = actorThread.bindActor(DaemonSummoner.class, new ProcessStartingDaemonSummoner(
                 new DirBasedSteward(new EmbeddedDaemonJar()),
@@ -43,23 +43,18 @@ public class JumiLauncherBuilder {
                 networkServer,
                 daemonOutputListener
         ));
-        final ActorRef<SuiteLauncher> suiteLauncher = actorThread.bindActor(SuiteLauncher.class, new RemoteSuiteLauncher(actorThread, daemonSummoner));
+        ActorRef<SuiteLauncher> suiteLauncher = actorThread.bindActor(SuiteLauncher.class, new RemoteSuiteLauncher(actorThread, daemonSummoner));
 
-        @NotThreadSafe
-        class ExternalResources implements Closeable {
-            @Override
-            public void close() throws IOException {
-                networkServer.close();
-                actorThread.stop();
-                actorsThreadPool.shutdown();
-                try {
-                    actorsThreadPool.awaitTermination(1, TimeUnit.MINUTES);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+        return new JumiLauncher(suiteLauncher, () -> {
+            networkServer.close();
+            actorThread.stop();
+            actorsThreadPool.shutdown();
+            try {
+                actorsThreadPool.awaitTermination(1, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        }
-        return new JumiLauncher(suiteLauncher, new ExternalResources());
+        });
     }
 
     // configuration parameters

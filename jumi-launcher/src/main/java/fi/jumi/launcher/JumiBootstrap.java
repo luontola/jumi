@@ -94,13 +94,11 @@ public class JumiBootstrap {
     }
 
     private JumiLauncher createLauncher() {
-        @NotThreadSafe
-        class MyJumiLauncherBuilder extends JumiLauncherBuilder {
+        return new JumiLauncherBuilder() {
             @Override
             protected OutputStream createDaemonOutputListener() {
                 return daemonOutput;
             }
-        }
-        return new MyJumiLauncherBuilder().build();
+        }.build();
     }
 }

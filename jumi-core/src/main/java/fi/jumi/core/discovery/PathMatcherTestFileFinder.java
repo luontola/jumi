@@ -23,22 +23,15 @@ public class PathMatcherTestFileFinder implements TestFileFinder {
     }
 
     @Override
-    public void findTestFiles(final ActorRef<TestFileFinderListener> listener) {
-        @NotThreadSafe
-        class ListenerNotifyingFileVisitor extends RelativePathMatchingFileVisitor {
-            public ListenerNotifyingFileVisitor(PathMatcher matcher, Path baseDir) {
-                super(matcher, baseDir);
-            }
-
-            @Override
-            protected void fileFound(Path relativePath) {
-                // XXX: This class must not call onAllTestFilesFound, but only CompositeTestFileFinder does, to avoid duplicate calls
-                listener.tell().onTestFileFound(TestFile.fromPath(relativePath));
-            }
-        }
-
+    public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
         try {
-            Files.walkFileTree(baseDir, new ListenerNotifyingFileVisitor(matcher, baseDir));
+            Files.walkFileTree(baseDir, new RelativePathMatchingFileVisitor(matcher, baseDir) {
+                @Override
+                protected void fileFound(Path relativePath) {
+                    // XXX: This class must not call onAllTestFilesFound, but only CompositeTestFileFinder does, to avoid duplicate calls
+                    listener.tell().onTestFileFound(TestFile.fromPath(relativePath));
+                }
+            });
         } catch (IOException e) {
             throw new RuntimeException("Failed to traverse " + baseDir, e);
         } finally {
