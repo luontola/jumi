@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -34,6 +34,20 @@ public class AsmMatchers {
             @Override
             public void describeTo(Description description) {
                 description.appendText("synthetic class");
+            }
+        };
+    }
+
+    public static Matcher<ClassNode> anonymousClass() {
+        return new ClassNodeMatcher() {
+            @Override
+            protected boolean matchesSafely(ClassNode item) {
+                return item.name.matches("^.*\\$\\d+$");
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("anonymous class");
             }
         };
     }
