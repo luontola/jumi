@@ -14,8 +14,6 @@ use cases and which features are most important to you.
 
 - Before & after suite events (probably as methods on a runner; somebody can even make a runner which doesn't run tests, but only those hooks, in case a testing framework doesn't itself support them)
 
-!! - Before & after test file events: onTestFileFound, onAllTestFilesFound, onTestFileFinished (can be used to implement a progress bar)
-
 - Thread & timestamp metadata for each event ("Spacetime"), in the future maybe also process ID/hostname
 
 !! - Pending/ignored tests
@@ -69,8 +67,6 @@ use cases and which features are most important to you.
 	USABILITY
 
 !! - Debug tray GUI, shows only individual test runs (list of run IDs on left, run log on right; maybe also the test names in a tree, leftmost; print all test run data in log, but no colors or styles)
-
-!! - Progress bar (may require before/after test class events)
 
 - Timeline of all events, to see what tests were run concurrently, and which tests were slow (requires thread and timestamp for each event)
 
