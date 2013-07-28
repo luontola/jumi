@@ -1,5 +1,13 @@
 
-- create SBT integration?
+!! - create SBT integration
+	OK - walking skeleton: run tests
+	!! - the system seems to freeze if there is no classes directory
+	- parameterize the test patterns, jvm options etc.
+	- publish
+		- find out into which maven repo to publish
+		- create a release script
+		- publish
+		- ask for feedback from Scala developers
 
 - communicate using memory-mapped files
 	http://en.wikipedia.org/wiki/Memory-mapped_file
@@ -18,7 +26,7 @@
 		- probably requires polling to get informed about updates
 	* need to find out how to do synchronization
 		http://stackoverflow.com/questions/4743380/controlling-read-writes-to-memory-mapped-files-windows
-	OK - spike communicating over memory-mapped files (see below)
+	OK - spike communicating over memory-mapped files
 	- create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
 		Mina 3:
 			+ lookup using singly linked list -> let's use a doubly linked list with O(1) in both directions, and field "current" instead of "head & tail"
