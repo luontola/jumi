@@ -2,7 +2,7 @@
 Release Notes
 =============
 
-### Upcoming Changes
+### Jumi 0.5.376 (2013-07-30)
 
 - Fixed a deadlock when the test classpath contains no directories
 
