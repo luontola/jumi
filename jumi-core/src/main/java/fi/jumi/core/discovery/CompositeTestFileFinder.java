@@ -21,9 +21,14 @@ public class CompositeTestFileFinder implements TestFileFinder {
 
     @Override
     public void findTestFiles(ActorRef<TestFileFinderListener> listener) {
-        TestFileFinderListener filter = new DuplicateOnAllTestFilesFoundEventFilter(finders.size(), listener);
-        for (TestFileFinder finder : finders) {
-            finder.findTestFiles(ActorRef.wrap(filter));
+        try {
+            ActorRef<TestFileFinderListener> filteredListener = ActorRef.<TestFileFinderListener>wrap(
+                    new OnAllTestFilesFoundEventSuppressingFilter(listener));
+            for (TestFileFinder finder : finders) {
+                finder.findTestFiles(filteredListener);
+            }
+        } finally {
+            listener.tell().onAllTestFilesFound();
         }
     }
 
@@ -34,13 +39,11 @@ public class CompositeTestFileFinder implements TestFileFinder {
 
 
     @NotThreadSafe
-    private static class DuplicateOnAllTestFilesFoundEventFilter implements TestFileFinderListener {
+    private static class OnAllTestFilesFoundEventSuppressingFilter implements TestFileFinderListener {
 
-        private int count;
         private final ActorRef<TestFileFinderListener> listener;
 
-        public DuplicateOnAllTestFilesFoundEventFilter(int count, ActorRef<TestFileFinderListener> listener) {
-            this.count = count;
+        public OnAllTestFilesFoundEventSuppressingFilter(ActorRef<TestFileFinderListener> listener) {
             this.listener = listener;
         }
 
@@ -51,10 +54,6 @@ public class CompositeTestFileFinder implements TestFileFinder {
 
         @Override
         public void onAllTestFilesFound() {
-            count--;
-            if (count == 0) {
-                listener.tell().onAllTestFilesFound();
-            }
         }
     }
 }

@@ -1,13 +1,20 @@
 
 !! - create SBT integration
 	OK - walking skeleton: run tests
-	!! - the system seems to freeze if there is no classes directory
-	- parameterize the test patterns, jvm options etc.
+	OK - the system seems to freeze if there is no classes directory
+	!! - parameterize the test patterns, jvm options etc.
 	- publish
 		- find out into which maven repo to publish
 		- create a release script
 		- publish
 		- ask for feedback from Scala developers
+
+- use Retrolambda
+	OK - use JDK 8 as default Java on desktop
+	- install JDK 8 on CI
+	- configure env vars on CI: JAVA_HOME, JAVA7_HOME, JAVA8_HOME
+	- merge wip-lambda
+	- update build instructions
 
 - communicate using memory-mapped files
 	http://en.wikipedia.org/wiki/Memory-mapped_file

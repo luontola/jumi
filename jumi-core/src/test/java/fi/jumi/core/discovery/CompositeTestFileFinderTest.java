@@ -8,8 +8,13 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.core.api.TestFile;
 import fi.jumi.core.util.SpyListener;
 import org.junit.Test;
+import org.mockito.Matchers;
 
-import java.util.Arrays;
+import java.util.*;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class CompositeTestFileFinderTest {
 
@@ -29,6 +34,35 @@ public class CompositeTestFileFinderTest {
 
         spy.replay();
         composite.findTestFiles(ActorRef.wrap(expect));
+        spy.verify();
+    }
+
+    @Test
+    public void zero_finders() {
+        CompositeTestFileFinder composite = new CompositeTestFileFinder(new ArrayList<TestFileFinder>());
+
+        expect.onAllTestFilesFound();
+
+        spy.replay();
+        composite.findTestFiles(ActorRef.wrap(expect));
+        spy.verify();
+    }
+
+    @Test
+    public void buggy_finders() {
+        TestFileFinder buggyFinder = mock(TestFileFinder.class);
+        doThrow(new RuntimeException("dummy exception")).when(buggyFinder).findTestFiles(Matchers.<ActorRef<TestFileFinderListener>>any());
+        CompositeTestFileFinder composite = new CompositeTestFileFinder(Arrays.asList(buggyFinder));
+
+        expect.onAllTestFilesFound();
+
+        spy.replay();
+        try {
+            composite.findTestFiles(ActorRef.wrap(expect));
+            fail("expected the exception to be rethrown");
+        } catch (RuntimeException e) {
+            assertThat(e.getMessage(), is("dummy exception"));
+        }
         spy.verify();
     }
 
