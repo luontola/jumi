@@ -11,7 +11,9 @@ To get started, read [the user guide](https://github.com/orfjackal/jumi-actors/w
 
 - Documentation: <https://github.com/orfjackal/jumi-actors/wiki>
 - Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md))
-- Source code: <https://github.com/orfjackal/jumi-actors>
+- Source code:
+    - <https://github.com/orfjackal/jumi-actors>
+    - <https://github.com/orfjackal/jumi-scripts>
 - License: [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - Developer: [Esko Luontola](https://github.com/orfjackal) ([@orfjackal](http://twitter.com/orfjackal))
 
