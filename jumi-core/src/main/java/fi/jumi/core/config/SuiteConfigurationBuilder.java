@@ -14,7 +14,7 @@ import java.util.*;
 @NotThreadSafe
 public class SuiteConfigurationBuilder {
 
-    private final List<URI> classPath;
+    private final List<URI> classPath; // TODO: rename to "classpath" on next breaking change to this class
     private final List<String> jvmOptions;
     private URI workingDirectory;
     private String includedTestsPattern;

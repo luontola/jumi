@@ -18,7 +18,7 @@ public class SuiteConfiguration implements Serializable {
     public static final SuiteConfiguration DEFAULTS = new SuiteConfiguration();
 
     // TODO: support for main and test class paths
-    private final List<URI> classPath;
+    private final List<URI> classPath; // TODO: rename to "classpath" on next breaking change to this class
     private final List<String> jvmOptions;
     private final URI workingDirectory;
     private final String includedTestsPattern;

@@ -2,12 +2,25 @@
 !! - create SBT integration
 	OK - walking skeleton: run tests
 	OK - the system seems to freeze if there is no classes directory
-	!! - parameterize the test patterns, jvm options etc.
-	- publish
-		- find out into which maven repo to publish
+	OK - upgrade to the latest sbt 0.13.x and Scala 2.10.2 to make it work with JDK 8
+		https://groups.google.com/forum/#!topic/scala-user/Nzc2zUTyays
+	OK - parameterize the test patterns, jvm options etc.
+		OK - create fields
+		OK - set default values
+		OK - start using the fields
+	!! - publish
+		!! - find out into which maven repo to publish
 		- create a release script
 		- publish
+		- write user guide
 		- ask for feedback from Scala developers
+
+- refactor: try using https://code.google.com/p/catch-exception/
+
+- refactor: rename SuiteConfiguration.classPath to classpath
+	- deprecate current methods
+	- create new methods
+	- create a process for removing the deprecated methods after a particular number of days or releases; create a reminder using annotations and BuildTest?
 
 - use Retrolambda
 	OK - use JDK 8 as default Java on desktop
@@ -33,6 +46,7 @@
 		- probably requires polling to get informed about updates
 	* need to find out how to do synchronization
 		http://stackoverflow.com/questions/4743380/controlling-read-writes-to-memory-mapped-files-windows
+		create a util like Fences? http://hg.openjdk.java.net/lambda/lambda/jdk/rev/6482b24ddd4c
 	OK - spike communicating over memory-mapped files
 	- create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
 		Mina 3:
