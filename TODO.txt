@@ -31,11 +31,11 @@
 
 !! - use Retrolambda
 	OK - use JDK 8 as default Java on desktop
-	!! - install JDK 8 on CI
-	- configure env vars on CI: JAVA_HOME, JAVA7_HOME, JAVA8_HOME
-	- merge wip-lambda
-	- update build instructions
-	- jumi-actors: test using Java 6
+	OK - install JDK 8 on CI
+	OK - configure env vars on CI: JAVA_HOME, JAVA7_HOME, JAVA8_HOME
+	OK - merge wip-lambda
+	OK - update build instructions
+	!! - jumi-actors: test using Java 6
 		- set env vars on CI
 		- configure Maven
 
