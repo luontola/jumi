@@ -17,7 +17,7 @@ public abstract class Driver {
 
     /**
      * Starts the execution of the tests in {@code testClass}.
-     * <p/>
+     * <p>
      * The provided {@link Executor} should be used to run the tests, so that they can be executed in parallel, each
      * test in a different thread.<sup>[1]</sup> If the {@link Runnable}s passed to {@code executor} are {@link
      * Serializable}, then each of the tests in one class could potentially be executed on different machine in a server

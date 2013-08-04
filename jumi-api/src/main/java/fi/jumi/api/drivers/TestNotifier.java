@@ -8,10 +8,10 @@ public interface TestNotifier {
 
     /**
      * Notifies about a test failure.
-     * <p/>
+     * <p>
      * The test will fail if this method is called at least once,<sup>[1]</sup> otherwise the test will
      * pass.<sup>[2]</sup>
-     * <p/>
+     * <p>
      * May be called multiple times.<sup>[3]</sup> Must be called on the current test,<sup>[4][5]</sup> i.e. the latest
      * {@code TestNotifier} which is not yet finished.
      *
@@ -30,7 +30,7 @@ public interface TestNotifier {
 
     /**
      * Notifies about the end of a test execution.
-     * <p/>
+     * <p>
      * Must be called last, exactly once.<sup>[1]</sup> Must be called on the current test,<sup>[2]</sup> i.e. the
      * latest {@code TestNotifier} which is not yet finished.
      *

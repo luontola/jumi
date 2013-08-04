@@ -10,7 +10,7 @@ public interface SuiteNotifier {
 
     /**
      * Notifies about the existence of a test.
-     * <p/>
+     * <p>
      * Must be called before starting the test.<sup>[1]</sup> Must be called with parent {@code testId} before any of
      * its children.<sup>[2]</sup> Idempotent,<sup>[3]</sup> but the {@code name} must always be the same if called
      * multiple times.<sup>[4]</sup>
@@ -31,11 +31,11 @@ public interface SuiteNotifier {
 
     /**
      * Notifies about the beginning of a test execution.
-     * <p/>
+     * <p>
      * May be called multiple times, before a test is {@linkplain TestNotifier#fireTestFinished() finished}, to produce
      * nested tests.<sup>[1]</sup> The only limitation is that a nested test must be finished before the surrounding
      * tests.<sup>[2]</sup>
-     * <p/>
+     * <p>
      * Everything printed to {@link System#out}<sup>[3]</sup> and {@link System#err}<sup>[4]</sup> after the call to
      * this method<sup>[5]</sup> will be recorded from the current thread<sup>[6]</sup> and threads which are started by
      * it<sup>[7]</sup> (possibly together with timestamps and name of the thread which printed it).
