@@ -576,6 +576,12 @@
                             <targetTests>
                                 <pattern>fi.jumi.*Test</pattern>
                             </targetTests>
+                            <excludedClasses>
+                                <!-- Exclude generated classes -->
+                                <pattern>fi.jumi.core.events.*</pattern>
+                                <!-- Lambdas don't have debug information so PIT can't mutate them (and anyways they are generated) -->
+                                <pattern>*$$Lambda$*</pattern>
+                            </excludedClasses>
                             <failWhenNoMutations>false</failWhenNoMutations>
                             <timestampedReports>false</timestampedReports>
                             <mutators>
