@@ -29,15 +29,15 @@
 	- create a process for removing the deprecated methods after a particular number of days or releases
 		- BuildTest: maintain a list of all deprecated APIs and a date/version when they were deprecated, and when to remove them
 
-!! - use Retrolambda
+OK - use Retrolambda
 	OK - use JDK 8 as default Java on desktop
 	OK - install JDK 8 on CI
 	OK - configure env vars on CI: JAVA_HOME, JAVA7_HOME, JAVA8_HOME
 	OK - merge wip-lambda
 	OK - update build instructions
-	!! - jumi-actors: test using Java 6
-		- set env vars on CI
-		- configure Maven
+	OK - jumi-actors: test using Java 6
+		OK - set env vars on CI
+		OK - configure Maven
 
 - communicate using memory-mapped files
 	http://en.wikipedia.org/wiki/Memory-mapped_file
