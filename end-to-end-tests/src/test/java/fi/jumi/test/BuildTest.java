@@ -191,9 +191,10 @@ public class BuildTest {
     @Test
     public void all_classes_must_be_annotated_with_JSR305_concurrent_annotations() throws Exception {
         CompositeMatcher<ClassNode> matcher = newClassNodeCompositeMatcher()
+                .excludeIf(nameStartsWithOneOf(DOES_NOT_NEED_JSR305_ANNOTATIONS))
                 .excludeIf(is(anInterface()))
                 .excludeIf(is(syntheticClass()))
-                .excludeIf(nameStartsWithOneOf(DOES_NOT_NEED_JSR305_ANNOTATIONS))
+                .excludeIf(is(anonymousClass()))
                 .assertThatIt(is(annotatedWithOneOf(Immutable.class, NotThreadSafe.class, ThreadSafe.class)));
 
         checkAllClasses(matcher, TestEnvironment.getProjectJar(artifactId));

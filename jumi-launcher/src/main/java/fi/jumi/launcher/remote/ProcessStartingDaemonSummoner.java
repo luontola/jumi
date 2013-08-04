@@ -89,23 +89,18 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
         return timeoutMessages;
     }
 
-    private static void copyInBackground(final InputStream src, final OutputStream dest) {
+    private static void copyInBackground(InputStream src, OutputStream dest) {
         // TODO: after removing me, update also ReleasingResourcesTest
-        @NotThreadSafe
-        class Copier implements Runnable {
-            @Override
-            public void run() {
-                try {
-                    IOUtils.copy(src, dest);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    IOUtils.closeQuietly(src);
-                    IOUtils.closeQuietly(dest);
-                }
+        Thread t = new Thread(() -> {
+            try {
+                IOUtils.copy(src, dest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                IOUtils.closeQuietly(src);
+                IOUtils.closeQuietly(dest);
             }
-        }
-        Thread t = new Thread(new Copier(), "Daemon Output Copier");
+        }, "Daemon Output Copier");
         t.setDaemon(true);
         t.start();
     }

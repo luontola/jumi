@@ -4,7 +4,7 @@
 
 package fi.jumi.core.suite;
 
-import fi.jumi.actors.ActorThread;
+import fi.jumi.actors.*;
 import fi.jumi.actors.workers.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.discovery.TestFileFinderListener;
@@ -37,11 +37,12 @@ public class SuiteRunner implements TestFileFinderListener {
     }
 
     @Override
-    public void onTestFileFound(final TestFile testFile) {
+    public void onTestFileFound(TestFile testFile) {
         suiteListener.onTestFileFound(testFile);
 
         @NotThreadSafe
         class FireTestFileFinished implements WorkerListener {
+            // not lambda to show up better in actor logs
             @Override
             public void onAllWorkersFinished() {
                 suiteListener.onTestFileFinished(testFile);
@@ -55,7 +56,7 @@ public class SuiteRunner implements TestFileFinderListener {
 
         WorkerCounter testFileCompletionMonitor = new WorkerCounter(new InternalErrorReportingExecutor(suiteCompletionMonitor, suiteListener, logOutput));
         testFileCompletionMonitor.execute(driverFactory.createDriverRunner(testFile, testFileCompletionMonitor));
-        testFileCompletionMonitor.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireTestFileFinished()));
+        testFileCompletionMonitor.afterPreviousWorkersFinished(asActor(new FireTestFileFinished()));
     }
 
     @Override
@@ -64,12 +65,17 @@ public class SuiteRunner implements TestFileFinderListener {
 
         @NotThreadSafe
         class FireSuiteFinished implements WorkerListener {
+            // not lambda to show up better in actor logs
             @Override
             public void onAllWorkersFinished() {
                 suiteListener.onSuiteFinished();
             }
         }
 
-        suiteCompletionMonitor.afterPreviousWorkersFinished(actorThread.bindActor(WorkerListener.class, new FireSuiteFinished()));
+        suiteCompletionMonitor.afterPreviousWorkersFinished(asActor(new FireSuiteFinished()));
+    }
+
+    private ActorRef<WorkerListener> asActor(WorkerListener rawActor) {
+        return actorThread.bindActor(WorkerListener.class, rawActor);
     }
 }
