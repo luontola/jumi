@@ -96,14 +96,14 @@ use cases and which features are most important to you.
 	TOOL COMPATIBILITY
 
 - Build tool, IDE and CI integration
-	- Maven (to gain traction in Java community), sbt (to gain traction in Scala community), Leiningen (also reloading Clojure namespaces might require additional support inside Jumi)
+	- Maven (to gain traction in Java community)
+		- Run tests as part of a Maven build
+		- Produce test reports in same format as Surefire (for CI integration)
+		- Generate bootsrap classes for running tests within an IDE with the same settings as Maven (to compensate for lack of IDE integration)
+	OK - sbt (to gain traction in Scala community)
+	- Leiningen (also reloading Clojure namespaces might require additional support inside Jumi)
 	- IntelliJ IDEA, Eclipse, NetBeans; will probably need help from the community because of the amount of work involved in developing them
 	- JUnit compatible reports, then later native reporting support: Jenkins, ThoughtWorks Go, JetBrains TeamCity, Atlassian Bamboo, Cruise Control
-
-- Maven integration
-	- Run tests as part of a Maven build
-	- Produce test reports in same format as Surefire
-	- Generate bootsrap classes for running tests within an IDE with the same settings as Maven
 
 - Integration test project
 	- Infrastructure for running tests against specified Jumi version
