@@ -47,6 +47,7 @@ What's compatible with Jumi?
 Jumi has just recently been released and it's missing some important features, but it's already at a stage where early adopters can start using it and testing framework developers can implement support for it. Here is a list of frameworks and tools that already have Jumi support:
 
 - [JUnit](http://www.junit.org/) and **any testing frameworks that run on JUnit**, through Jumi's JUnit backward compatibility (parallelism is limited to test class level)
+- [sbt](http://www.scala-sbt.org/) build tool, through the [sbt-jumi](https://github.com/orfjackal/sbt-jumi) plugin
 - [Specsy](http://specsy.org/), a testing framework for Scala, Groovy, Java and easily any other JVM-based language
 
 
