@@ -1,5 +1,5 @@
 
-!! - create SBT integration
+OK - create SBT integration
 	OK - walking skeleton: run tests
 	OK - the system seems to freeze if there is no classes directory
 	OK - upgrade to the latest sbt 0.13.x and Scala 2.10.2 to make it work with JDK 8
@@ -8,18 +8,20 @@
 		OK - create fields
 		OK - set default values
 		OK - start using the fields
-	!! - publish
+	OK - publish
 		OK - find out the naming conventions; should the plugin class be JumiPlugin? (though the project name has "sbt" prefix)
 			-> no strict convention; remove the prefix as redundant information
 		OK - find out into which maven repo to publish
 			http://scalasbt.artifactoryonline.com/
 			http://www.scala-sbt.org/0.13.0/docs/Community/Community-Plugins.html
-		!! - get publish access from http://groups.google.com/group/sbt-repo-admins
-		- test using snapshot publishing
-		- create a release script
-		- publish
-		- write user guide
-		- ask for feedback from Scala developers
+		OK - get publish access from http://groups.google.com/group/sbt-repo-admins
+		OK - choose the groupId; would fi.jumi.sbt be best for future proofing? (e.g. fi.jumi.maven is expected)
+		OK - test using snapshot publishing
+		OK - sign using PGP
+		OK - create a release script
+		OK - publish
+		OK - write user guide
+		OK - ask for feedback from Scala developers
 
 - refactor: try using https://code.google.com/p/catch-exception/
 
