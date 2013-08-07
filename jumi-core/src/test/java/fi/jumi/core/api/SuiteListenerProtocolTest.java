@@ -186,88 +186,70 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
 
     public static class OneTestDriver extends Driver {
         @Override
-        public void findTests(Class<?> testClass, final SuiteNotifier notifier, Executor executor) {
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
-                    tn.fireTestFinished();
-                }
+            executor.execute(() -> {
+                TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
+                tn.fireTestFinished();
             });
         }
     }
 
     public class OnePrintingTestDriver extends Driver {
         @Override
-        public void findTests(Class<?> testClass, final SuiteNotifier notifier, Executor executor) {
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
-                    stdout.print("printed to stdout");
-                    stderr.print("printed to stderr");
-                    tn.fireTestFinished();
-                }
+            executor.execute(() -> {
+                TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
+                stdout.print("printed to stdout");
+                stderr.print("printed to stderr");
+                tn.fireTestFinished();
             });
         }
     }
 
     public static class OneFailingTestDriver extends Driver {
         @Override
-        public void findTests(Class<?> testClass, final SuiteNotifier notifier, Executor executor) {
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
-                    tn.fireFailure(new Exception("dummy failure"));
-                    tn.fireTestFinished();
-                }
+            executor.execute(() -> {
+                TestNotifier tn = notifier.fireTestStarted(TestId.ROOT);
+                tn.fireFailure(new Exception("dummy failure"));
+                tn.fireTestFinished();
             });
         }
     }
 
     public static class NestedTestsDriver extends Driver {
         @Override
-        public void findTests(final Class<?> testClass, final SuiteNotifier notifier, Executor executor) {
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    notifier.fireTestFound(TestId.of(0), "parent test");
-                    TestNotifier parent = notifier.fireTestStarted(TestId.of(0));
+            executor.execute(() -> {
+                notifier.fireTestFound(TestId.of(0), "parent test");
+                TestNotifier parent = notifier.fireTestStarted(TestId.of(0));
 
-                    notifier.fireTestFound(TestId.of(0, 0), "child test");
-                    TestNotifier child = notifier.fireTestStarted(TestId.of(0, 0));
+                notifier.fireTestFound(TestId.of(0, 0), "child test");
+                TestNotifier child = notifier.fireTestStarted(TestId.of(0, 0));
 
-                    child.fireTestFinished();
-                    parent.fireTestFinished();
-                }
+                child.fireTestFinished();
+                parent.fireTestFinished();
             });
         }
     }
 
     public static class ManyTestRunsDriver extends Driver {
         @Override
-        public void findTests(final Class<?> testClass, final SuiteNotifier notifier, Executor executor) {
+        public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
             notifier.fireTestFound(TestId.ROOT, testClass.getSimpleName());
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    notifier.fireTestFound(TestId.of(0), "test one");
-                    notifier.fireTestStarted(TestId.of(0))
-                            .fireTestFinished();
-                }
+            executor.execute(() -> {
+                notifier.fireTestFound(TestId.of(0), "test one");
+                notifier.fireTestStarted(TestId.of(0))
+                        .fireTestFinished();
             });
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    notifier.fireTestFound(TestId.of(1), "test two");
-                    notifier.fireTestStarted(TestId.of(1))
-                            .fireTestFinished();
-                }
+            executor.execute(() -> {
+                notifier.fireTestFound(TestId.of(1), "test two");
+                notifier.fireTestStarted(TestId.of(1))
+                        .fireTestFinished();
             });
         }
     }

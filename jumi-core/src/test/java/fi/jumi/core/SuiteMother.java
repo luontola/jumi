@@ -7,6 +7,7 @@ package fi.jumi.core;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 
+@SuppressWarnings("CodeBlock2Expr")
 public class SuiteMother {
 
     public static final TestFile TEST_FILE = TestFile.fromClassName("com.example.DummyTest");
@@ -51,20 +52,15 @@ public class SuiteMother {
     }
 
     public static void nestedFailingAndPassingTests(SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
-        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.test(run1, TestId.of(0), "testOne");
-                suite.failingTest(run1, TestId.of(1), "testTwo",
-                        new Throwable("dummy exception")
-                );
-            }
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, () -> {
+            suite.test(run1, TestId.of(0), "testOne");
+            suite.failingTest(run1, TestId.of(1), "testTwo", new Throwable("dummy exception"));
         });
         suite.runFinished(run1);
 
@@ -75,40 +71,34 @@ public class SuiteMother {
     // multiple runs
 
     public static void twoPassingRuns(SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
-        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.test(run1, TestId.of(0), "testOne");
-            }
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, () -> {
+            suite.test(run1, TestId.of(0), "testOne");
         });
         suite.runFinished(run1);
 
-        final RunId run2 = suite.nextRunId();
+        RunId run2 = suite.nextRunId();
         suite.runStarted(run2, TEST_FILE);
-        suite.test(run2, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.test(run2, TestId.of(1), "testTwo");
-            }
+        suite.test(run2, TestId.ROOT, TEST_CLASS_NAME, () -> {
+            suite.test(run2, TestId.of(1), "testTwo");
         });
         suite.runFinished(run2);
 
         suite.end();
     }
 
-    public static void twoInterleavedRuns(final SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+    public static void twoInterleavedRuns(SuiteListener listener) {
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
-        final RunId run2 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
+        RunId run2 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
         suite.runStarted(run2, TEST_FILE);
         listener.onTestFound(TEST_FILE, TestId.of(0), "testOne");
@@ -127,17 +117,14 @@ public class SuiteMother {
     // standard output
 
     public static void printsToStdout(SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
-        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.printOut(run1, "printed to stdout\n");
-            }
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, () -> {
+            suite.printOut(run1, "printed to stdout\n");
         });
         suite.runFinished(run1);
 
@@ -145,17 +132,14 @@ public class SuiteMother {
     }
 
     public static void printsToStderr(SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
-        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.printErr(run1, "printed to stderr\n");
-            }
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, () -> {
+            suite.printErr(run1, "printed to stderr\n");
         });
         suite.runFinished(run1);
 
@@ -163,17 +147,14 @@ public class SuiteMother {
     }
 
     public static void printsToStdoutWithoutNewlineAtEnd(SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
-        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.printOut(run1, "this doesn't end with newline");
-            }
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, () -> {
+            suite.printOut(run1, "this doesn't end with newline");
         });
         suite.runFinished(run1);
 
@@ -181,16 +162,13 @@ public class SuiteMother {
     }
 
     public static void printsAfterTestRunFinished(SuiteListener listener) {
-        final EventBuilder suite = new EventBuilder(listener);
+        EventBuilder suite = new EventBuilder(listener);
         suite.begin();
         suite.findAllTestFiles(TEST_FILE);
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, TEST_FILE);
-        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-            }
+        suite.test(run1, TestId.ROOT, TEST_CLASS_NAME, () -> {
         });
         suite.runFinished(run1);
         suite.printOut(run1, "printed to stdout "); // any warnings should happen only once, even though printed many times

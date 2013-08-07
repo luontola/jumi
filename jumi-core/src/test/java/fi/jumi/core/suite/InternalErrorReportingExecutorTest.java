@@ -31,11 +31,8 @@ public class InternalErrorReportingExecutorTest {
 
     @Test
     public void reports_internal_errors() {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("the-exception-message");
-            }
+        executor.execute(() -> {
+            throw new RuntimeException("the-exception-message");
         });
         backingExecutor.processEventsUntilIdle();
 
@@ -45,11 +42,8 @@ public class InternalErrorReportingExecutorTest {
 
     @Test
     public void prints_internal_errors_to_standard_output() {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("the-exception-message");
-            }
+        executor.execute(() -> {
+            throw new RuntimeException("the-exception-message");
         });
         backingExecutor.processEventsUntilIdle();
 
@@ -62,10 +56,7 @@ public class InternalErrorReportingExecutorTest {
     public void the_toString_of_the_original_commands_should_not_be_hidden() {
         SpyExecutor backingExecutor = new SpyExecutor();
         InternalErrorReportingExecutor executor = new InternalErrorReportingExecutor(backingExecutor, suiteListener, new PrintStream(new NullOutputStream()));
-        Runnable originalCommand = new Runnable() {
-            @Override
-            public void run() {
-            }
+        Runnable originalCommand = () -> {
         };
 
         executor.execute(originalCommand);

@@ -16,6 +16,7 @@ import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 public class SynchronizedPrintStreamTest {
 
     @Rule
@@ -41,32 +42,24 @@ public class SynchronizedPrintStreamTest {
     @Test
     public void does_not_deadlock_if_somebody_locks_in_the_PrintStream_externally() throws InterruptedException {
         final int ITERATIONS = 10;
-        final PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);
+        PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);
 
         // will fail with a test timeout if a deadlock happens
-        runConcurrently(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        // what Thread.printStackTrace() would do
-                        synchronized (printStream) {
-                            for (int i = 0; i < ITERATIONS; i++) {
-                                Thread.yield();
-                                printStream.print("X");
-                            }
-                        }
-                    }
-                }, new Runnable() {
-                    @Override
-                    public void run() {
-                        // what a normal printer would do
-                        for (int i = 0; i < ITERATIONS; i++) {
-                            Thread.yield();
-                            printStream.print("X");
-                        }
-                    }
+        runConcurrently(() -> {
+            // what Thread.printStackTrace() would do
+            synchronized (printStream) {
+                for (int i = 0; i < ITERATIONS; i++) {
+                    Thread.yield();
+                    printStream.print("X");
                 }
-        );
+            }
+        }, () -> {
+            // what a normal printer would do
+            for (int i = 0; i < ITERATIONS; i++) {
+                Thread.yield();
+                printStream.print("X");
+            }
+        });
     }
 
     @Test

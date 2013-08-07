@@ -53,29 +53,19 @@ public class RunIdSequenceTest {
     }
 
     private static List<RunId> generateRunIdsInParallel(int count) throws Exception {
-        final RunIdSequence sequence = new RunIdSequence();
+        RunIdSequence sequence = new RunIdSequence();
         ExecutorService executor = Executors.newFixedThreadPool(10);
 
         List<Future<RunId>> futures = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            futures.add(executor.submit(new Callable<RunId>() {
-                @Override
-                public RunId call() throws Exception {
-                    return sequence.nextRunId();
-                }
-            }));
+            futures.add(executor.submit((Callable<RunId>) sequence::nextRunId));
         }
 
         List<RunId> results = new ArrayList<>();
         for (Future<RunId> future : futures) {
             results.add(future.get(1000, TimeUnit.MILLISECONDS));
         }
-        Collections.sort(results, new Comparator<RunId>() {
-            @Override
-            public int compare(RunId id1, RunId id2) {
-                return id1.toInt() - id2.toInt();
-            }
-        });
+        Collections.sort(results, (id1, id2) -> id1.toInt() - id2.toInt());
 
         executor.shutdown();
         return results;

@@ -90,19 +90,13 @@ public class EventBuilder {
     }
 
     public void test(RunId runId, TestId testId, String name) {
-        test(runId, testId, name, new Runnable() {
-            @Override
-            public void run() {
-            }
+        test(runId, testId, name, () -> {
         });
     }
 
-    public void failingTest(final RunId runId, final TestId testId, String name, final Throwable cause) {
-        test(runId, testId, name, new Runnable() {
-            @Override
-            public void run() {
-                listener.onFailure(runId, StackTrace.copyOf(cause));
-            }
+    public void failingTest(RunId runId, TestId testId, String name, Throwable cause) {
+        test(runId, testId, name, () -> {
+            listener.onFailure(runId, StackTrace.copyOf(cause));
         });
     }
 

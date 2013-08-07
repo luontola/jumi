@@ -18,6 +18,7 @@ import static fi.jumi.core.util.StringMatchers.hasOccurrences;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+@SuppressWarnings("CodeBlock2Expr")
 public class TextUITest {
 
     private static final String SUMMARY_LINE = "Pass";
@@ -63,11 +64,8 @@ public class TextUITest {
 
     @Test
     public void can_update_blockingly() throws InterruptedException {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SuiteMother.emptySuite(listener);
-            }
+        Thread t = new Thread(() -> {
+            SuiteMother.emptySuite(listener);
         });
         t.start();
 
@@ -141,29 +139,23 @@ public class TextUITest {
     public void each_TestClass_TestId_pair_is_counted_only_once_in_the_summary() {
         suite.begin();
 
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, SuiteMother.TEST_FILE);
-        suite.test(run1, TestId.ROOT, SuiteMother.TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.test(run1, TestId.of(0), "test one");
-            }
+        suite.test(run1, TestId.ROOT, SuiteMother.TEST_CLASS_NAME, () -> {
+            suite.test(run1, TestId.of(0), "test one");
         });
         suite.runFinished(run1);
 
         // same root test is executed twice, but should be counted only once in the total
-        final RunId run2 = suite.nextRunId();
+        RunId run2 = suite.nextRunId();
         suite.runStarted(run2, SuiteMother.TEST_FILE);
-        suite.test(run2, TestId.ROOT, SuiteMother.TEST_CLASS_NAME, new Runnable() {
-            @Override
-            public void run() {
-                suite.test(run2, TestId.of(1), "test two");
-            }
+        suite.test(run2, TestId.ROOT, SuiteMother.TEST_CLASS_NAME, () -> {
+            suite.test(run2, TestId.of(1), "test two");
         });
         suite.runFinished(run2);
 
         // a different test class, same TestId, should be counted separately
-        final RunId run3 = suite.nextRunId();
+        RunId run3 = suite.nextRunId();
         suite.runStarted(run3, TestFile.fromClassName("com.example.AnotherDummyTest"));
         suite.test(run3, TestId.ROOT, "AnotherDummyTest");
         suite.runFinished(run3);
@@ -207,18 +199,15 @@ public class TextUITest {
     @Test
     public void test_run_header_is_printed_only_once_per_test_run() {
         suite.begin();
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
 
         // First test of the test run - should print the class name
         suite.runStarted(run1, SuiteMother.TEST_FILE);
-        suite.test(run1, TestId.ROOT, "Human readable name of test class", new Runnable() {
-            @Override
-            public void run() {
+        suite.test(run1, TestId.ROOT, "Human readable name of test class", () -> {
 
-                // Second test of the test run - should NOT print the class name a second time,
-                // because a test run cannot span many classes
-                suite.test(run1, TestId.of(0), "test one");
-            }
+            // Second test of the test run - should NOT print the class name a second time,
+            // because a test run cannot span many classes
+            suite.test(run1, TestId.of(0), "test one");
         });
         suite.runFinished(run1);
         suite.end();
@@ -274,19 +263,13 @@ public class TextUITest {
     @Test
     public void prints_with_indentation_that_when_a_nested_test_starts_and_ends() {
         suite.begin();
-        final RunId run1 = suite.nextRunId();
+        RunId run1 = suite.nextRunId();
         suite.runStarted(run1, SuiteMother.TEST_FILE);
-        suite.test(run1, TestId.ROOT, "Dummy test", new Runnable() {
-            @Override
-            public void run() {
-                suite.test(run1, TestId.of(0), "test one");
-                suite.test(run1, TestId.of(1), "test two", new Runnable() {
-                    @Override
-                    public void run() {
-                        suite.test(run1, TestId.of(1, 0), "deeply nested test");
-                    }
-                });
-            }
+        suite.test(run1, TestId.ROOT, "Dummy test", () -> {
+            suite.test(run1, TestId.of(0), "test one");
+            suite.test(run1, TestId.of(1), "test two", () -> {
+                suite.test(run1, TestId.of(1, 0), "deeply nested test");
+            });
         });
         suite.runFinished(run1);
         suite.end();

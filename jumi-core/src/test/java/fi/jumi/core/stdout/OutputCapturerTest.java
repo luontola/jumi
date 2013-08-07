@@ -115,28 +115,19 @@ public class OutputCapturerTest {
 
     @Test
     public void concurrent_captures_are_isolated_from_each_other() throws InterruptedException {
-        final CountDownLatch barrier = new CountDownLatch(2);
-        final OutputListenerSpy listener1 = new OutputListenerSpy();
-        final OutputListenerSpy listener2 = new OutputListenerSpy();
+        CountDownLatch barrier = new CountDownLatch(2);
+        OutputListenerSpy listener1 = new OutputListenerSpy();
+        OutputListenerSpy listener2 = new OutputListenerSpy();
 
-        runConcurrently(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        capturer.captureTo(listener1);
-                        sync(barrier);
-                        capturer.out().print("from thread 1");
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        capturer.captureTo(listener2);
-                        sync(barrier);
-                        capturer.out().print("from thread 2");
-                    }
-                }
-        );
+        runConcurrently(() -> {
+            capturer.captureTo(listener1);
+            sync(barrier);
+            capturer.out().print("from thread 1");
+        }, () -> {
+            capturer.captureTo(listener2);
+            sync(barrier);
+            capturer.out().print("from thread 2");
+        });
 
         assertThat(listener1.out).containsExactly("from thread 1");
         assertThat(listener2.out).containsExactly("from thread 2");
@@ -147,11 +138,8 @@ public class OutputCapturerTest {
         OutputListenerSpy listener = new OutputListenerSpy();
 
         capturer.captureTo(listener);
-        runConcurrently(new Runnable() {
-            @Override
-            public void run() {
-                capturer.out().print("from spawned thread");
-            }
+        runConcurrently(() -> {
+            capturer.out().print("from spawned thread");
         });
 
         assertThat(listener.out).containsExactly("from spawned thread");
@@ -159,20 +147,17 @@ public class OutputCapturerTest {
 
     @Test
     public void when_spawned_threads_print_something_after_the_capture_ends_they_are_still_include_in_the_original_capture() throws InterruptedException {
-        final CountDownLatch beforeFinished = new CountDownLatch(2);
-        final CountDownLatch afterFinished = new CountDownLatch(2);
+        CountDownLatch beforeFinished = new CountDownLatch(2);
+        CountDownLatch afterFinished = new CountDownLatch(2);
         OutputListenerSpy capture1 = new OutputListenerSpy();
         OutputListenerSpy capture2 = new OutputListenerSpy();
 
         capturer.captureTo(capture1);
-        Thread t = startThread(new Runnable() {
-            @Override
-            public void run() {
-                capturer.out().print("before capture finished");
-                sync(beforeFinished);
-                sync(afterFinished);
-                capturer.out().print("after capture finished");
-            }
+        Thread t = startThread(() -> {
+            capturer.out().print("before capture finished");
+            sync(beforeFinished);
+            sync(afterFinished);
+            capturer.out().print("after capture finished");
         });
         sync(beforeFinished);
         capturer.captureTo(capture2);
@@ -194,23 +179,15 @@ public class OutputCapturerTest {
         CombinedOutput combinedOutput = new CombinedOutput();
         capturer.captureTo(combinedOutput);
 
-        runConcurrently(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < ITERATIONS; i++) {
-                            capturer.out().println("O");
-                        }
-                    }
-                }, new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < ITERATIONS; i++) {
-                            capturer.err().println("E");
-                        }
-                    }
-                }
-        );
+        runConcurrently(() -> {
+            for (int i = 0; i < ITERATIONS; i++) {
+                capturer.out().println("O");
+            }
+        }, () -> {
+            for (int i = 0; i < ITERATIONS; i++) {
+                capturer.err().println("E");
+            }
+        });
 
         assertThat(combinedOutput.toString()).matches("(O\\r?\\n|E\\r?\\n)+");
     }
@@ -223,30 +200,22 @@ public class OutputCapturerTest {
      */
     @Test
     public void printing_a_stack_trace_to_stderr_and_normally_to_stdout_concurrently() throws InterruptedException {
-        final CountDownLatch isPrintingToOut = new CountDownLatch(1);
-        final CountDownLatch hasPrintedStackTrace = new CountDownLatch(1);
-        final Exception exception = new Exception("dummy exception");
+        CountDownLatch isPrintingToOut = new CountDownLatch(1);
+        CountDownLatch hasPrintedStackTrace = new CountDownLatch(1);
+        Exception exception = new Exception("dummy exception");
         CombinedOutput combinedOutput = new CombinedOutput();
         capturer.captureTo(combinedOutput);
 
-        runConcurrently(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        await(isPrintingToOut);
-                        exception.printStackTrace(capturer.err());
-                        hasPrintedStackTrace.countDown();
-                    }
-                }, new Runnable() {
-                    @Override
-                    public void run() {
-                        while (hasPrintedStackTrace.getCount() > 0) {
-                            capturer.out().println("*garbage*");
-                            isPrintingToOut.countDown();
-                        }
-                    }
-                }
-        );
+        runConcurrently(() -> {
+            await(isPrintingToOut);
+            exception.printStackTrace(capturer.err());
+            hasPrintedStackTrace.countDown();
+        }, () -> {
+            while (hasPrintedStackTrace.getCount() > 0) {
+                capturer.out().println("*garbage*");
+                isPrintingToOut.countDown();
+            }
+        });
 
         assertThat(combinedOutput.toString(), containsString(Throwables.getStackTraceAsString(exception)));
     }

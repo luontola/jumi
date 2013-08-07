@@ -80,7 +80,7 @@ public class DaemonProcessTest {
                 "java.util.concurrent.ThreadPoolExecutor",
                 // dummies
                 "sample.BuggyDriver",
-                "sample.BuggyDriver$1",
+                "sample.BuggyDriver$$Lambda$1",
                 "fi.jumi.simpleunit.SimpleUnit",
                 "fi.jumi.simpleunit.SimpleUnit$RunTestMethod",
                 // Jumi classes which don't contain interesting state

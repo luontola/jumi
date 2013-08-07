@@ -13,9 +13,9 @@ import static org.junit.Assert.assertFalse;
 public class SuiteListenerTest {
 
     /**
-     * The {@link fi.jumi.core.api.SuiteListener} interface is used for events sent over the network
-     * from daemon to launcher. It must not contain any Class instances as parameters,
-     * because the receiver might not have those classes on its classpath.
+     * The {@link fi.jumi.core.api.SuiteListener} interface is used for events sent over the network from daemon to
+     * launcher. It must not contain any Class instances as parameters, because the receiver might not have those
+     * classes on its classpath.
      */
     @Test
     public void event_parameters_of_type_javaLangClass_are_not_allowed() {

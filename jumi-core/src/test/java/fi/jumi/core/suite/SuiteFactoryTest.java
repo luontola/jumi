@@ -43,13 +43,10 @@ public class SuiteFactoryTest {
         createSuiteFactory();
 
         factory.start(new NullSuiteListener());
-        final BlockingQueue<ClassLoader> spy = new LinkedBlockingQueue<>();
+        BlockingQueue<ClassLoader> spy = new LinkedBlockingQueue<>();
 
-        factory.testThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                spy.add(Thread.currentThread().getContextClassLoader());
-            }
+        factory.testThreadPool.execute(() -> {
+            spy.add(Thread.currentThread().getContextClassLoader());
         });
         ClassLoader contextClassLoader = spy.take();
 
@@ -60,7 +57,7 @@ public class SuiteFactoryTest {
     public void reports_uncaught_exceptions_from_actors_as_internal_errors() throws InterruptedException {
         createSuiteFactory();
 
-        final BlockingQueue<String> spy = new LinkedBlockingQueue<>();
+        BlockingQueue<String> spy = new LinkedBlockingQueue<>();
         factory.start(new NullSuiteListener() {
             @Override
             public void onInternalError(String message, StackTrace cause) {
@@ -69,11 +66,8 @@ public class SuiteFactoryTest {
         });
 
         ActorThread actorThread = factory.actors.startActorThread();
-        ActorRef<Runnable> dummyActor = actorThread.bindActor(Runnable.class, new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("dummy exception");
-            }
+        ActorRef<Runnable> dummyActor = actorThread.bindActor(Runnable.class, () -> {
+            throw new RuntimeException("dummy exception");
         });
         dummyActor.tell().run();
 

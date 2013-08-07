@@ -273,12 +273,7 @@ public class BuildTest {
     }
 
     private static InputSupplier<InputStream> asSupplier(final InputStream in) {
-        return new InputSupplier<InputStream>() {
-            @Override
-            public InputStream getInput() {
-                return in;
-            }
-        };
+        return () -> in;
     }
 
     private static List<String> getRuntimeDependencies(Document doc) throws XPathExpressionException {

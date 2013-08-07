@@ -57,11 +57,8 @@ public class AssigningRunIdsTest {
     public void nested_tests_in_child_threads_get_the_same_RunId() throws Exception {
         notifier.fireTestStarted(TestId.ROOT);
 
-        execute(new Runnable() {
-            @Override
-            public void run() {
-                notifier.fireTestStarted(TestId.of(0));
-            }
+        execute(() -> {
+            notifier.fireTestStarted(TestId.of(0));
         });
 
         verify(listener).onTestStarted(FIRST_RUN_ID, TestId.of(0));
@@ -79,25 +76,19 @@ public class AssigningRunIdsTest {
 
     @Test
     public void concurrent_runs_in_other_threads_get_a_different_RunId() throws Exception {
-        final CyclicBarrier barrier = new CyclicBarrier(2);
+        CyclicBarrier barrier = new CyclicBarrier(2);
 
-        Runnable test1 = new Runnable() {
-            @Override
-            public void run() {
-                TestNotifier tn1 = notifier.fireTestStarted(TestId.of(1));
-                syncOn(barrier); // test 1 is be started first
-                syncOn(barrier); // test 1 will be running when test 2 starts
-                tn1.fireTestFinished();
-            }
+        Runnable test1 = () -> {
+            TestNotifier tn1 = notifier.fireTestStarted(TestId.of(1));
+            syncOn(barrier); // test 1 is be started first
+            syncOn(barrier); // test 1 will be running when test 2 starts
+            tn1.fireTestFinished();
         };
-        Runnable test2 = new Runnable() {
-            @Override
-            public void run() {
-                syncOn(barrier);
-                TestNotifier tn2 = notifier.fireTestStarted(TestId.of(2));
-                syncOn(barrier);
-                tn2.fireTestFinished();
-            }
+        Runnable test2 = () -> {
+            syncOn(barrier);
+            TestNotifier tn2 = notifier.fireTestStarted(TestId.of(2));
+            syncOn(barrier);
+            tn2.fireTestFinished();
         };
 
         execute(test1, test2);

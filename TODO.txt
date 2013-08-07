@@ -27,9 +27,11 @@ OK - fix: ProcessStartingDaemonSummoner closes the OutputStream, but JumiBootstr
 	OK - test that JumiBootstrap does not close it
 	OK - add @WillClose to all methods
 
-!! - minor release: jumit & sbt-jumi
+OK - refactor: try using https://code.google.com/p/catch-exception/
 
-- refactor: try using https://code.google.com/p/catch-exception/
+OK - refactor: use lambda expressions in tests
+
+!! - minor release: jumit & sbt-jumi
 
 - refactor: rename SuiteConfiguration.classPath to classpath
 	- deprecate current methods

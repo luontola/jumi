@@ -118,15 +118,12 @@ public class ProcessStartingDaemonSummonerTest {
                 .freeze();
     }
 
-    private static SuiteListener countMessages(SuiteListener target, final CountDownLatch latch) {
+    private static SuiteListener countMessages(SuiteListener target, CountDownLatch latch) {
         SuiteListenerEventizer eventizer = new SuiteListenerEventizer();
-        final MessageSender<Event<SuiteListener>> backend = eventizer.newBackend(target);
-        MessageSender<Event<SuiteListener>> counter = new MessageSender<Event<SuiteListener>>() {
-            @Override
-            public void send(Event<SuiteListener> message) {
-                backend.send(message);
-                latch.countDown();
-            }
+        MessageSender<Event<SuiteListener>> backend = eventizer.newBackend(target);
+        MessageSender<Event<SuiteListener>> counter = message -> {
+            backend.send(message);
+            latch.countDown();
         };
         return eventizer.newFrontend(counter);
     }

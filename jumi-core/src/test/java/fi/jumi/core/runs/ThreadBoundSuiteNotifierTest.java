@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "Convert2MethodRef"})
 public class ThreadBoundSuiteNotifierTest {
 
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
@@ -94,16 +94,13 @@ public class ThreadBoundSuiteNotifierTest {
 
     @Test
     public void fireFailure_must_be_called_on_the_current_test() {
-        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
         expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                 "expected TestNotifier(RunId(1), [TestId(), TestId(0)]) " +
-                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", new Runnable() {
-            @Override
-            public void run() {
-                tn1.fireFailure(new Exception("dummy"));
-            }
+                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", () -> {
+            tn1.fireFailure(new Exception("dummy"));
         });
 
         InOrder inOrder = inOrder(listener);
@@ -117,16 +114,13 @@ public class ThreadBoundSuiteNotifierTest {
     @Test
     public void fireFailure_cannot_be_called_after_the_test_is_finished() {
         TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
-        final TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
         tn2.fireTestFinished();
 
         expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                 "expected TestNotifier(RunId(1), [TestId()]) " +
-                "but was TestNotifier(RunId(1), [TestId(), TestId(0)]) which is finished", new Runnable() {
-            @Override
-            public void run() {
-                tn2.fireFailure(new Exception("dummy"));
-            }
+                "but was TestNotifier(RunId(1), [TestId(), TestId(0)]) which is finished", () -> {
+            tn2.fireFailure(new Exception("dummy"));
         });
 
         InOrder inOrder = inOrder(listener);
@@ -140,7 +134,7 @@ public class ThreadBoundSuiteNotifierTest {
 
     @Test
     public void error_in_fireFailure_will_not_lose_the_original_test_failure_being_reported() {
-        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
         Throwable originalTestFailure = new Exception("original test failure");
@@ -153,16 +147,13 @@ public class ThreadBoundSuiteNotifierTest {
 
     @Test
     public void fireTestFinished_must_be_called_on_the_current_test() {
-        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
         expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                 "expected TestNotifier(RunId(1), [TestId(), TestId(0)]) " +
-                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", new Runnable() {
-            @Override
-            public void run() {
-                tn1.fireTestFinished();
-            }
+                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", () -> {
+            tn1.fireTestFinished();
         });
 
         InOrder inOrder = inOrder(listener);
@@ -176,16 +167,13 @@ public class ThreadBoundSuiteNotifierTest {
     @Test
     public void fireTestFinished_cannot_be_called_after_the_test_is_finished() {
         TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
-        final TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
+        TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
         tn2.fireTestFinished();
 
         expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                 "expected TestNotifier(RunId(1), [TestId()]) " +
-                "but was TestNotifier(RunId(1), [TestId(), TestId(0)]) which is finished", new Runnable() {
-            @Override
-            public void run() {
-                tn2.fireTestFinished();
-            }
+                "but was TestNotifier(RunId(1), [TestId(), TestId(0)]) which is finished", () -> {
+            tn2.fireTestFinished();
         });
 
         InOrder inOrder = inOrder(listener);
@@ -203,12 +191,7 @@ public class ThreadBoundSuiteNotifierTest {
      */
     @Test
     public void fireTestFinished_may_be_called_from_a_different_thread_than_in_which_the_test_run_was_started() throws Exception {
-        TestNotifier tn = inNewThread(new Callable<TestNotifier>() {
-            @Override
-            public TestNotifier call() throws Exception {
-                return notifier.fireTestStarted(TestId.ROOT);
-            }
-        });
+        TestNotifier tn = inNewThread(() -> notifier.fireTestStarted(TestId.ROOT));
         tn.fireTestFinished();
 
         InOrder inOrder = inOrder(listener);
@@ -225,16 +208,13 @@ public class ThreadBoundSuiteNotifierTest {
      */
     @Test
     public void error_checking_is_based_on_TestNotifier_instances_instead_of_TestId_values() {
-        final TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
+        TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.ROOT);
 
         expectIllegalStateException("must be called on the innermost non-finished TestNotifier; " +
                 "expected TestNotifier(RunId(1), [TestId(), TestId()]) " +
-                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", new Runnable() {
-            @Override
-            public void run() {
-                tn1.fireTestFinished();
-            }
+                "but was TestNotifier(RunId(1), [TestId()]) which is not innermost", () -> {
+            tn1.fireTestFinished();
         });
 
         InOrder inOrder = inOrder(listener);

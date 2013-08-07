@@ -24,12 +24,9 @@ public class RunEventNormalizerTest {
             (SuiteListener) Proxy.newProxyInstance(
                     getClass().getClassLoader(),
                     new Class[]{SuiteListener.class},
-                    new InvocationHandler() {
-                        @Override
-                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            targetInvocations.put(method, args);
-                            return null;
-                        }
+                    (proxy, method, args) -> {
+                        targetInvocations.put(method, args);
+                        return null;
                     }))));
 
     private static final String INFORMATION_ABOUT_THE_CURRENT_CONTEXT = "Incorrect notifier API usage in com.example.DummyTest: ";
