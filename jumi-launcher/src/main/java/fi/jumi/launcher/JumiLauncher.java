@@ -11,6 +11,7 @@ import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
 import fi.jumi.launcher.remote.SuiteLauncher;
 
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.*;
 
@@ -22,7 +23,7 @@ public class JumiLauncher implements Closeable {
     private final ActorRef<SuiteLauncher> suiteLauncher;
     private final Closeable externalResources;
 
-    public JumiLauncher(ActorRef<SuiteLauncher> suiteLauncher, Closeable externalResources) {
+    public JumiLauncher(ActorRef<SuiteLauncher> suiteLauncher, @WillCloseWhenClosed Closeable externalResources) {
         this.suiteLauncher = suiteLauncher;
         this.externalResources = externalResources;
     }
