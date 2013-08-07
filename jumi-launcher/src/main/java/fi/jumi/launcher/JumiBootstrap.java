@@ -6,7 +6,7 @@ package fi.jumi.launcher;
 
 import fi.jumi.core.config.*;
 import fi.jumi.launcher.ui.*;
-import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.io.output.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
@@ -52,7 +52,7 @@ public class JumiBootstrap {
     }
 
     public JumiBootstrap enableDebugMode() {
-        return enableDebugMode(System.err);
+        return enableDebugMode(new CloseShieldOutputStream(System.err));
     }
 
     public JumiBootstrap enableDebugMode(OutputStream daemonOutput) {

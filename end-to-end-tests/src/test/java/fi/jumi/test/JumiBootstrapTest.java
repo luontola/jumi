@@ -5,15 +5,18 @@
 package fi.jumi.test;
 
 import fi.jumi.launcher.JumiBootstrap;
+import org.apache.commons.io.output.NullWriter;
 import org.junit.*;
 import org.junit.rules.*;
 import sample.*;
 
-import java.io.ByteArrayOutputStream;
+import java.io.*;
+import java.lang.reflect.Field;
 
 import static fi.jumi.core.util.ReflectionUtil.getFieldValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
 
 public class JumiBootstrapTest {
 
@@ -59,6 +62,30 @@ public class JumiBootstrapTest {
         assertThat(daemonOutput.toString(), containsString("[jumi-actor-1]"));
     }
 
+    @Test
+    public void will_not_close_stderr_when_debug_output_is_enabled() throws Exception {
+        PrintStream originalErr = System.err;
+        try {
+            ByteArrayOutputStream printed = new ByteArrayOutputStream();
+            PrintStream spiedErr = spy(new PrintStream(printed));
+            System.setErr(spiedErr);
+
+            JumiBootstrap bootstrap = new JumiBootstrap();
+            bootstrap.suite.setTestClasses(OnePassingTest.class);
+            bootstrap.daemon.setIdleTimeout(0); // we want the daemon process to exit quickly
+            bootstrap.setTextUiOutput(new NullWriter());
+            bootstrap.enableDebugMode(); // <-- the thing we are testing
+            bootstrap.runSuite();
+
+            Thread.sleep(50); // wait for the daemon process to exit, and our printer thread to notice it
+            assertThat("this test has a problem; daemon printed nothing", printed.size(), is(not(0)));
+            verify(spiedErr, never()).close(); // <-- the thing we are testing
+
+        } finally {
+            System.setErr(originalErr);
+        }
+    }
+
 
     // configuration
 
@@ -92,10 +119,20 @@ public class JumiBootstrapTest {
     }
 
     @Test
-    public void debug_output_defaults_to_stderr_when_enabled() {
+    public void debug_output_defaults_to_stderr_when_enabled() throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap().enableDebugMode();
 
-        assertThat(getFieldValue(bootstrap, "daemonOutput"), is((Object) System.err));
+        assertThat(getDaemonOutput(bootstrap), is((Object) System.err));
         assertThat(bootstrap.daemon.getLogActorMessages(), is(true));
+    }
+
+    private static Object getDaemonOutput(JumiBootstrap bootstrap) throws Exception {
+        Object out = getFieldValue(bootstrap, "daemonOutput");
+
+        // JumiBootstrap wraps System.err into a CloseShieldOutputStream, so this code will unwrap it
+        FilterOutputStream wrapper = (FilterOutputStream) out;
+        Field f = FilterOutputStream.class.getDeclaredField("out");
+        f.setAccessible(true);
+        return f.get(wrapper);
     }
 }
