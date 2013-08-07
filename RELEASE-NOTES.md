@@ -4,6 +4,10 @@ Release Notes
 
 ### Upcoming Changes
 
+- TBD
+
+### Jumi 0.5.390 (2013-08-07)
+
 - Fixed `JumiBootstrap.enableDebugMode()` closing the launcher's `System.err` after the daemon process exits
 
 ### Jumi 0.5.376 (2013-07-30)
