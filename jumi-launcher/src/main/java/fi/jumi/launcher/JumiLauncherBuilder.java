@@ -21,7 +21,7 @@ import java.util.concurrent.*;
 @NotThreadSafe
 public class JumiLauncherBuilder {
 
-    private boolean debugLogging = false;
+    private boolean networkDebugLogging = false;
 
     public JumiLauncher build() {
         ExecutorService actorsThreadPool = createActorsThreadPool();
@@ -59,8 +59,8 @@ public class JumiLauncherBuilder {
 
     // configuration parameters
 
-    public JumiLauncherBuilder enableDebugLogging() {
-        debugLogging = true;
+    public JumiLauncherBuilder enableNetworkDebugLogging() {
+        networkDebugLogging = true;
         return this;
     }
 
@@ -80,7 +80,7 @@ public class JumiLauncherBuilder {
     }
 
     protected NetworkServer createNetworkServer() {
-        return new NettyNetworkServer(debugLogging);
+        return new NettyNetworkServer(networkDebugLogging);
     }
 
     protected OutputStream createDaemonOutputListener() {
