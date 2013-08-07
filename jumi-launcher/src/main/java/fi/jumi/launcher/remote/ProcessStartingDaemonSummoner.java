@@ -18,6 +18,7 @@ import fi.jumi.launcher.daemon.Steward;
 import fi.jumi.launcher.process.*;
 import org.apache.commons.io.IOUtils;
 
+import javax.annotation.WillClose;
 import javax.annotation.concurrent.*;
 import java.io.*;
 import java.nio.file.Paths;
@@ -37,7 +38,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
     public ProcessStartingDaemonSummoner(Steward steward,
                                          ProcessStarter processStarter,
                                          NetworkServer daemonConnector,
-                                         OutputStream outputListener) {
+                                         @WillClose OutputStream outputListener) {
         this.steward = steward;
         this.processStarter = processStarter;
         this.daemonConnector = daemonConnector;
@@ -89,7 +90,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
         return timeoutMessages;
     }
 
-    private static void copyInBackground(InputStream src, OutputStream dest) {
+    private static void copyInBackground(@WillClose InputStream src, @WillClose OutputStream dest) {
         // TODO: after removing me, update also ReleasingResourcesTest
         Thread t = new Thread(() -> {
             try {

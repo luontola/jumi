@@ -8,6 +8,7 @@ import fi.jumi.core.config.*;
 import fi.jumi.launcher.ui.*;
 import org.apache.commons.io.output.*;
 
+import javax.annotation.WillClose;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
 import java.nio.file.*;
@@ -46,7 +47,7 @@ public class JumiBootstrap {
         return this;
     }
 
-    public JumiBootstrap setDaemonOutput(OutputStream daemonOutput) {
+    public JumiBootstrap setDaemonOutput(@WillClose OutputStream daemonOutput) {
         this.daemonOutput = daemonOutput;
         return this;
     }
@@ -55,7 +56,7 @@ public class JumiBootstrap {
         return enableDebugMode(new CloseShieldOutputStream(System.err));
     }
 
-    public JumiBootstrap enableDebugMode(OutputStream daemonOutput) {
+    public JumiBootstrap enableDebugMode(@WillClose OutputStream daemonOutput) {
         setDaemonOutput(daemonOutput);
         this.daemon.setLogActorMessages(true);
         return this;

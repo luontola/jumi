@@ -23,11 +23,11 @@ OK - create SBT integration
 		OK - write user guide
 		OK - ask for feedback from Scala developers
 
-!! - fix: ProcessStartingDaemonSummoner closes the OutputStream, but JumiBootstrap.enableDebugMode does not wrap stdout to CloseShieldOutputStream; causes problems with sbt-jumi
+OK - fix: ProcessStartingDaemonSummoner closes the OutputStream, but JumiBootstrap.enableDebugMode does not wrap stdout to CloseShieldOutputStream; causes problems with sbt-jumi
 	OK - test that JumiBootstrap does not close it
-	!! - add @WillClose to all methods
-	- jumi minor release
-	- sbt-jumi minor release
+	OK - add @WillClose to all methods
+
+!! - minor release: jumit & sbt-jumi
 
 - refactor: try using https://code.google.com/p/catch-exception/
 
