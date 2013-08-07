@@ -9,16 +9,19 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.api.RunId;
 import fi.jumi.core.stdout.OutputCapturer;
+import org.hamcrest.Matcher;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import org.mockito.InOrder;
+import org.mockito.*;
 
 import java.io.PrintStream;
 import java.util.concurrent.*;
 
-import static org.fest.assertions.Fail.fail;
+import static com.googlecode.catchexception.CatchException.*;
+import static com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers.hasMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -75,7 +78,7 @@ public class ThreadBoundSuiteNotifierTest {
         tn1.fireTestFinished();
         stdout.print("after");
 
-        verify(listener, never()).onPrintedOut(any(RunId.class), anyString());
+        verify(listener, never()).onPrintedOut(Matchers.any(RunId.class), anyString());
     }
 
     @Test
@@ -141,12 +144,11 @@ public class ThreadBoundSuiteNotifierTest {
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
         Throwable originalTestFailure = new Exception("original test failure");
-        try {
-            tn1.fireFailure(originalTestFailure);
-            fail("should have thrown an exception");
-        } catch (IllegalStateException e) {
-            assertThat("chained exception", e.getCause(), is(originalTestFailure));
-        }
+
+        catchException(tn1).fireFailure(originalTestFailure);
+        assertThat("chained exception", caughtException(), (Matcher)
+                allOf(instanceOf(IllegalStateException.class),
+                        hasCause(equalTo(originalTestFailure))));
     }
 
     @Test
@@ -246,13 +248,10 @@ public class ThreadBoundSuiteNotifierTest {
     // helpers
 
     private void expectIllegalStateException(String expectedMessage, Runnable command) {
-        try {
-            command.run();
-            fail("should have thrown an IllegalStateException");
-        } catch (IllegalStateException e) {
-            lastError = e;
-            assertThat("assertion message", e.getMessage(), is(expectedMessage));
-        }
+        catchException(command).run();
+        Exception e = caughtException();
+        lastError = e;
+        assertThat(e, (Matcher) allOf(instanceOf(IllegalStateException.class), hasMessage(expectedMessage)));
     }
 
     private static <T> T inNewThread(Callable<T> callable) throws Exception {

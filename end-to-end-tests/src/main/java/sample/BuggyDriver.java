@@ -12,11 +12,8 @@ public class BuggyDriver extends Driver {
 
     @Override
     public void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("dummy exception from test thread");
-            }
+        executor.execute(() -> {
+            throw new RuntimeException("dummy exception from test thread");
         });
         throw new RuntimeException("dummy exception from driver thread");
     }

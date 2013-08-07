@@ -7,13 +7,15 @@ package fi.jumi.core.discovery;
 import fi.jumi.actors.ActorRef;
 import fi.jumi.core.api.TestFile;
 import fi.jumi.core.util.SpyListener;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.mockito.Matchers;
 
 import java.util.*;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static com.googlecode.catchexception.CatchException.*;
+import static com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers.hasMessage;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 public class CompositeTestFileFinderTest {
@@ -57,12 +59,8 @@ public class CompositeTestFileFinderTest {
         expect.onAllTestFilesFound();
 
         spy.replay();
-        try {
-            composite.findTestFiles(ActorRef.wrap(expect));
-            fail("expected the exception to be rethrown");
-        } catch (RuntimeException e) {
-            assertThat(e.getMessage(), is("dummy exception"));
-        }
+        catchException(composite).findTestFiles(ActorRef.wrap(expect));
+        assertThat(caughtException(), (Matcher) hasMessage("dummy exception"));
         spy.verify();
     }
 

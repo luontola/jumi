@@ -10,20 +10,17 @@ import org.objectweb.asm.tree.ClassNode;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
-import java.util.*;
+import java.util.HashMap;
 import java.util.jar.*;
 
 public class JarFileUtils {
 
     public static Iterable<ClassNode> classesIn(final Path jarFile) {
-        return new Iterable<ClassNode>() {
-            @Override
-            public Iterator<ClassNode> iterator() {
-                try {
-                    return new ClassNodeIterator(jarFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        return () -> {
+            try {
+                return new ClassNodeIterator(jarFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         };
     }
