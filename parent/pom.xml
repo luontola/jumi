@@ -383,7 +383,7 @@
                     <!-- Process our byte codes to make them run on Java 7 -->
 
                     <execution>
-                        <id>process-classes</id>
+                        <id>retrolambda-classes</id>
                         <phase>process-classes</phase>
                         <goals>
                             <goal>run</goal>
@@ -402,7 +402,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>process-test-classes</id>
+                        <id>retrolambda-test-classes</id>
                         <phase>process-test-classes</phase>
                         <goals>
                             <goal>run</goal>
