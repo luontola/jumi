@@ -1,11 +1,21 @@
 
-- refactor: rename SuiteConfiguration.classPath to classpath
-	- deprecate current methods
-	- create new methods
-	- create a process for removing the deprecated methods after a particular number of days or releases
-		- extract reusable components from BuildTest to an external library
-		- update the BuildTest in jumi and jumi-actors to use that library
-		- BuildTest: maintain a list of all deprecated APIs and a date/version when they were deprecated, and when to remove them
+- refactor BuildTest & SuiteConfiguration
+	- extract reusable components from BuildTest to an external library
+		- jumi: extract reusable components from BuildTest
+		- jumi: extract reusable components from TestEnvironment
+		- create new project, groupId: fi.luontola.buildtest
+		- create a stripped history of /end-to-end-tests/src/test/java/ that contains only:
+			- BuildTest, TestEnvironment (and any new classes extracted from them)
+			- AsmMatchers, AsmUtils, CompositeMatcher, JarFileUtils, XmlUtils
+		- merge the stripped history to the new project, reorder packages
+	- update the BuildTest in jumi and jumi-actors to use that library (at first in a feature branch, because Maven Central Sync will take time to activate)
+	- rename SuiteConfiguration.classPath to classpath
+		- deprecate current methods
+		- create new methods
+		- create a process for removing the deprecated methods after a particular number of days or releases
+			- BuildTest: maintain a list of all deprecated APIs and a date/version when they were deprecated, and when to remove them
+	- release the buildtest library
+	- merge feature branch, use the released buildtest library
 
 - communicate using memory-mapped files
 	http://en.wikipedia.org/wiki/Memory-mapped_file
@@ -24,7 +34,11 @@
 		- probably requires polling to get informed about updates
 	* need to find out how to do synchronization
 		http://stackoverflow.com/questions/4743380/controlling-read-writes-to-memory-mapped-files-windows
-		create a util like Fences? http://hg.openjdk.java.net/lambda/lambda/jdk/rev/6482b24ddd4c
+		- create a util like Fences? http://hg.openjdk.java.net/lambda/lambda/jdk/rev/6482b24ddd4c
+		- lazySet/StoreStore barrier good for throughput in single-writer scenarios (as long as doing writes continually): http://psy-lob-saw.blogspot.fi/2012/12/atomiclazyset-is-performance-win-for.html
+		- beware of word tearing, MMFs guarantee nothing: http://psy-lob-saw.blogspot.fi/2013/02/alignment-concurrency-and-torture-x86.html
+		- list of possible optimizations: http://psy-lob-saw.blogspot.fi/2013/07/single-producer-single-consumer-queue.html
+		- MappedByteBuffer slower than ByteBuffer: http://mentablog.soliveirajr.com/2012/12/asynchronous-logging-versus-memory-mapped-files/
 	OK - spike communicating over memory-mapped files
 	- create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
 		Mina 3:
