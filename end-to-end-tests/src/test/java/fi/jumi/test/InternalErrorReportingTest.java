@@ -52,7 +52,8 @@ public class InternalErrorReportingTest {
     public void reports_it_if_starting_the_daemon_process_failed() throws Exception {
         app.daemon.setStartupTimeout(500); // TODO: detect it if the daemon process dies before the timeout? (to avoid this long timeout slowing down this test)
 
-        app.suite.addJvmOptions("-Xmx1M"); // too small heap space for the JVM to start
+        //app.suite.addJvmOptions("-Xmx1M"); // too small heap space for the JVM to start
+        app.suite.addJvmOptions("-foo"); // small heap didn't prevent Java 8 from starting; let's try an invalid parameter
         app.runTests(OnePassingTest.class);
 
         app.checkHasStackTrace(
