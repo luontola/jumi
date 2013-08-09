@@ -9,10 +9,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public class TextProgressBar {
 
-    private final String start;
-    private final String middle;
-    private final String end;
-    private final String completeProgressBar;
+    private final int startLength;
+    private final int middleLength;
     private final String foreground;
     private final String background;
 
@@ -22,12 +20,10 @@ public class TextProgressBar {
     private int incrementallyPrinted = 0;
 
     public TextProgressBar(String start, String middle, String end) {
-        this.start = start;
-        this.middle = middle;
-        this.end = end;
+        startLength = start.length();
+        middleLength = middle.length();
         foreground = start + middle;
         background = start + repeat(' ', middle.length()) + end;
-        completeProgressBar = start + middle + end;
     }
 
     private static String repeat(char c, int length) {
@@ -63,7 +59,7 @@ public class TextProgressBar {
             return "";
         }
 
-        int len = start.length() + (int) Math.round(middle.length() * progress);
+        int len = startLength + (int) Math.round(middleLength * progress);
         String s = foreground.substring(0, len);
         if (complete) {
             s += background.substring(len, background.length());
