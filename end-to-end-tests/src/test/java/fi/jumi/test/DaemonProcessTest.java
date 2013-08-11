@@ -36,7 +36,8 @@ public class DaemonProcessTest {
     public void daemon_process_prints_the_program_name_and_version_number_on_startup() throws Exception {
         startDaemonProcess();
 
-        assertThat(firstLine(app.getCurrentDaemonOutput())).matches("Jumi " + BuildTest.VERSION_PATTERN + " starting up");
+        assertThat(firstLine(app.getCurrentDaemonOutput()))
+                .matches("Jumi " + TestEnvironment.VERSION_NUMBERING.getPattern() + " starting up");
     }
 
     @Test

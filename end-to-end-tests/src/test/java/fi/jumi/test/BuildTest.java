@@ -46,10 +46,6 @@ public class BuildTest {
             "fi/jumi/core/events/",
     };
 
-    public static final String RELEASE_VERSION_PATTERN = "\\d+\\.\\d+\\.\\d+";
-    public static final String SNAPSHOT_VERSION_PATTERN = "\\d+\\.\\d+-SNAPSHOT";
-    public static final String VERSION_PATTERN = "(" + RELEASE_VERSION_PATTERN + "|" + SNAPSHOT_VERSION_PATTERN + ")";
-
     private final String artifactId;
     private final Integer[] expectedClassVersion;
     private final List<String> expectedDependencies;
@@ -127,9 +123,7 @@ public class BuildTest {
         Properties p = getPomProperties();
         assertThat("groupId", p.getProperty("groupId"), is("fi.jumi"));
         assertThat("artifactId", p.getProperty("artifactId"), is(artifactId));
-
-        String version = p.getProperty("version");
-        assertTrue("should be either release or snapshot: " + version, isRelease(version) != isSnapshot(version));
+        assertThat("version", p.getProperty("version"), is(TestEnvironment.VERSION_NUMBERING));
     }
 
     @Test
@@ -204,7 +198,7 @@ public class BuildTest {
 
     private void assumeReleaseBuild() throws IOException {
         String version = getPomProperties().getProperty("version");
-        assumeTrue(isRelease(version));
+        assumeTrue(TestEnvironment.VERSION_NUMBERING.isRelease(version));
     }
 
     private Properties getBuildProperties() throws IOException {
@@ -213,14 +207,6 @@ public class BuildTest {
 
     private Properties getPomProperties() throws IOException {
         return getMavenArtifactProperties(getProjectJar(), "pom.properties");
-    }
-
-    private static boolean isRelease(String version) {
-        return version.matches(RELEASE_VERSION_PATTERN);
-    }
-
-    private static boolean isSnapshot(String version) {
-        return version.matches(SNAPSHOT_VERSION_PATTERN);
     }
 
     private Properties getMavenArtifactProperties(Path jarFile, String filename) throws IOException {

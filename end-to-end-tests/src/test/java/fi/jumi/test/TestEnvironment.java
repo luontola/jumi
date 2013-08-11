@@ -4,7 +4,7 @@
 
 package fi.jumi.test;
 
-import fi.jumi.test.util.ProjectArtifacts;
+import fi.jumi.test.util.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -12,6 +12,7 @@ import java.util.Properties;
 
 public class TestEnvironment {
 
+    public static final VersionNumbering VERSION_NUMBERING = new VersionNumbering();
     public static final ProjectArtifacts ARTIFACTS;
     private static final Path SANDBOX_DIR;
     private static final Path SAMPLE_CLASSES_DIR;
