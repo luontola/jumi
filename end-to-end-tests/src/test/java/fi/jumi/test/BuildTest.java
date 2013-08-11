@@ -58,8 +58,7 @@ public class BuildTest {
         this.expectedContents = expectedContents;
     }
 
-    @Parameters
-    @SuppressWarnings("unchecked")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         // TODO: upgrade shaded dependencies to Java 6/7 to benefit from their faster class loading
         return asList(new Object[][]{

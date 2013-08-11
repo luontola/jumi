@@ -3,12 +3,14 @@
 	!! - extract reusable components from BuildTest to an external library
 		OK - jumi: extract reusable components from TestEnvironment
 		OK - jumi: extract reusable components from BuildTest
-		!! - use improved parameterized runner; remove hack in fi.jumi.test.util.JarFileUtils#checkAllClasses
-		- create new project, groupId: fi.luontola.buildtest
+		OK - use improved parameterized runner; remove hack in fi.jumi.test.util.JarFileUtils#checkAllClasses
+		!! - create new project, groupId: fi.luontola.buildtest
 		- create a stripped history of /end-to-end-tests/src/test/java/ that contains only:
 			- BuildTest, TestEnvironment (and any new classes extracted from them)
 			- AsmMatchers, AsmUtils, CompositeMatcher, JarFileUtils, XmlUtils
 		- merge the stripped history to the new project, reorder packages
+		- tests for non-trivial helpers: JAR, Maven
+		- downgrade to Java 6
 	- update the BuildTest in jumi and jumi-actors to use that library (at first in a feature branch, because Maven Central Sync will take time to activate)
 	- rename SuiteConfiguration.classPath to classpath
 		- deprecate current methods
@@ -170,10 +172,6 @@
 	- thread-safety-checker: when an inner class is missing the annotation, use the annotation of the enclosing class or default to @NotThreadSafe when the enclosing class has any concurrency annotation
 	- replace SuiteRunnerIntegrationHelper with TestBench?
 	- consider implementing SynchronizedPrintStream using something else than CGLIB (ASM? Tapestry's Plastic?) to make the JAR smaller
-	- after upgrading to (presumably) JUnit 4.11, refactor BuildTest's parameterized descriptions
-		https://github.com/KentBeck/junit/pull/145
-		https://github.com/KentBeck/junit/pull/393
-		- also use junit:junit instead of junit:junit-dep, since it's now a proper Maven artifact
 	- check whether we still have many ASM versions we have on classpath (caliper depends on ASM 3), block "asm:*" artifacts with maven-enforcer-plugin?
 	- make JUnit print a thread dump when a test times out due to @Test(timeout)
 		- improve JUnit's test timeouts to show a stack trace of the timed out test, to help debugging sporadic timeouts in RunningTestsTest
