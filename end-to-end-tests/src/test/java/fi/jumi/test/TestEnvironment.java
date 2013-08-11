@@ -4,7 +4,7 @@
 
 package fi.jumi.test;
 
-import fi.jumi.test.util.*;
+import fi.luontola.buildtest.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -23,7 +23,7 @@ public class TestEnvironment {
             Properties testing = new Properties();
             testing.load(in);
 
-            ARTIFACTS = new ProjectArtifacts(getDirectory(testing, "test.projectArtifactsDir"));
+            ARTIFACTS = new ProjectArtifacts(getDirectory(testing, "test.projectArtifactsDir").toFile());
             SANDBOX_DIR = getDirectory(testing, "test.sandbox");
             SAMPLE_CLASSES_DIR = getDirectory(testing, "test.sampleClasses");
             EXTRA_CLASSPATH = getDirectory(testing, "test.extraClasspath");
@@ -60,14 +60,14 @@ public class TestEnvironment {
     }
 
     public static Path getThreadSafetyAgentJar() throws IOException {
-        return ARTIFACTS.getProjectJar("thread-safety-agent");
+        return ARTIFACTS.getProjectJar("thread-safety-agent").toPath();
     }
 
     public static Path getSimpleUnitJar() throws IOException {
-        return ARTIFACTS.getProjectJar("simpleunit");
+        return ARTIFACTS.getProjectJar("simpleunit").toPath();
     }
 
     public static Path getJUnitJar() throws IOException {
-        return ARTIFACTS.getProjectJar("junit");
+        return ARTIFACTS.getProjectJar("junit").toPath();
     }
 }

@@ -7,7 +7,7 @@ package fi.jumi.test;
 import com.google.common.io.*;
 import fi.jumi.launcher.daemon.EmbeddedDaemonJar;
 import fi.jumi.test.PartiallyParameterized.NonParameterized;
-import fi.jumi.test.util.*;
+import fi.luontola.buildtest.*;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.*;
 import java.util.*;
 
-import static fi.jumi.test.util.AsmMatchers.*;
-import static fi.jumi.test.util.AsmUtils.annotatedWithOneOf;
+import static fi.luontola.buildtest.AsmMatchers.*;
+import static fi.luontola.buildtest.AsmUtils.annotatedWithOneOf;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -114,7 +114,7 @@ public class BuildTest {
 
     @Test
     public void jar_contains_only_allowed_files() throws Exception {
-        JarFileUtils.assertContainsOnly(getProjectJar(), expectedContents);
+        JarUtils.assertContainsOnly(getProjectJar(), expectedContents);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class BuildTest {
     @NonParameterized
     public void embedded_daemon_jar_is_exactly_the_same_as_the_published_daemon_jar() throws IOException {
         EmbeddedDaemonJar embeddedJar = new EmbeddedDaemonJar();
-        Path publishedJar = TestEnvironment.ARTIFACTS.getProjectJar("jumi-daemon");
+        Path publishedJar = TestEnvironment.ARTIFACTS.getProjectJar("jumi-daemon").toPath();
 
         try (InputStream in1 = embeddedJar.getDaemonJarAsStream();
              InputStream in2 = Files.newInputStream(publishedJar)) {
@@ -169,7 +169,7 @@ public class BuildTest {
         CompositeMatcher<ClassNode> matcher = newClassNodeCompositeMatcher()
                 .assertThatIt(hasClassVersion(isOneOf(expectedClassVersion)));
 
-        JarFileUtils.checkAllClasses(getProjectJar(), matcher);
+        JarUtils.checkAllClasses(getProjectJar(), matcher);
     }
 
     @Test
@@ -181,17 +181,17 @@ public class BuildTest {
                 .excludeIf(is(anonymousClass()))
                 .assertThatIt(is(annotatedWithOneOf(Immutable.class, NotThreadSafe.class, ThreadSafe.class)));
 
-        JarFileUtils.checkAllClasses(getProjectJar(), matcher);
+        JarUtils.checkAllClasses(getProjectJar(), matcher);
     }
 
 
     // helper methods
 
-    private Path getProjectPom() throws IOException {
+    private File getProjectPom() throws IOException {
         return TestEnvironment.ARTIFACTS.getProjectPom(artifactId);
     }
 
-    private Path getProjectJar() throws IOException {
+    private File getProjectJar() throws IOException {
         return TestEnvironment.ARTIFACTS.getProjectJar(artifactId);
     }
 
@@ -208,8 +208,8 @@ public class BuildTest {
         return getMavenArtifactProperties(getProjectJar(), "pom.properties");
     }
 
-    private Properties getMavenArtifactProperties(Path jarFile, String filename) throws IOException {
-        return JarFileUtils.getProperties(jarFile, POM_FILES + artifactId + "/" + filename);
+    private Properties getMavenArtifactProperties(File jarFile, String filename) {
+        return JarUtils.getProperties(jarFile, POM_FILES + artifactId + "/" + filename);
     }
 
     private static InputSupplier<InputStream> asSupplier(final InputStream in) {

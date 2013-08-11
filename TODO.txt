@@ -1,18 +1,18 @@
 
 !!- refactor BuildTest & SuiteConfiguration
-	!! - extract reusable components from BuildTest to an external library
+	OK - extract reusable components from BuildTest to an external library
 		OK - jumi: extract reusable components from TestEnvironment
 		OK - jumi: extract reusable components from BuildTest
 		OK - use improved parameterized runner; remove hack in fi.jumi.test.util.JarFileUtils#checkAllClasses
-		!! - create new project, groupId: fi.luontola.buildtest
-		- create a stripped history of /end-to-end-tests/src/test/java/ that contains only:
+		OK - create new project, groupId: fi.luontola.buildtest
+		OK - create a stripped history of /end-to-end-tests/src/test/java/ that contains only:
 			- BuildTest, TestEnvironment (and any new classes extracted from them)
 			- AsmMatchers, AsmUtils, CompositeMatcher, JarFileUtils, XmlUtils
-		- merge the stripped history to the new project, reorder packages
-		- tests for non-trivial helpers: JAR, Maven
-		- downgrade to Java 6
-	- update the BuildTest in jumi and jumi-actors to use that library (at first in a feature branch, because Maven Central Sync will take time to activate)
-	- rename SuiteConfiguration.classPath to classpath
+		OK - merge the stripped history to the new project, reorder packages
+		OK - tests for non-trivial helpers: JAR, Maven
+		OK - downgrade to Java 6
+	OK - update the BuildTest in jumi and jumi-actors to use that library (at first in a feature branch, because Maven Central Sync will take time to activate)
+	!! - rename SuiteConfiguration.classPath to classpath
 		- deprecate current methods
 		- create new methods
 		- create a process for removing the deprecated methods after a particular number of days or releases
