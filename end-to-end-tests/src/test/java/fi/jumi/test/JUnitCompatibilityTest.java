@@ -20,7 +20,7 @@ public class JUnitCompatibilityTest {
 
     @Before
     public void addJUnitToPath() throws IOException {
-        app.addToClasspath(TestEnvironment.getProjectJar("junit"));
+        app.addToClasspath(TestEnvironment.getJUnitJar());
     }
 
     @Test

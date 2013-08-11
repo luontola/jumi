@@ -1,18 +1,18 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.test;
 
-import com.google.common.collect.Iterables;
+import fi.jumi.test.util.ProjectArtifacts;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Properties;
 
 public class TestEnvironment {
 
-    private static final Path PROJECT_ARTIFACTS_DIR;
+    public static final ProjectArtifacts ARTIFACTS;
     private static final Path SANDBOX_DIR;
     private static final Path SAMPLE_CLASSES_DIR;
     private static final Path EXTRA_CLASSPATH;
@@ -22,7 +22,7 @@ public class TestEnvironment {
             Properties testing = new Properties();
             testing.load(in);
 
-            PROJECT_ARTIFACTS_DIR = getDirectory(testing, "test.projectArtifactsDir");
+            ARTIFACTS = new ProjectArtifacts(getDirectory(testing, "test.projectArtifactsDir"));
             SANDBOX_DIR = getDirectory(testing, "test.sandbox");
             SAMPLE_CLASSES_DIR = getDirectory(testing, "test.sampleClasses");
             EXTRA_CLASSPATH = getDirectory(testing, "test.extraClasspath");
@@ -46,24 +46,6 @@ public class TestEnvironment {
         return value;
     }
 
-    public static Path getProjectJar(String artifactId) throws IOException {
-        return getProjectArtifact(artifactId + "-*.jar");
-    }
-
-    public static Path getProjectPom(String artifactId) throws IOException {
-        return getProjectArtifact(artifactId + "-*.pom");
-    }
-
-    private static Path getProjectArtifact(String glob) throws IOException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(PROJECT_ARTIFACTS_DIR, glob)) {
-            try {
-                return Iterables.getOnlyElement(stream);
-            } catch (NoSuchElementException | IllegalArgumentException e) {
-                throw new IllegalArgumentException("could not find the artifact " + glob, e);
-            }
-        }
-    }
-
     public static Path getSandboxDir() {
         return SANDBOX_DIR;
     }
@@ -74,5 +56,17 @@ public class TestEnvironment {
 
     public static Path getExtraClasspath() {
         return EXTRA_CLASSPATH;
+    }
+
+    public static Path getThreadSafetyAgentJar() throws IOException {
+        return ARTIFACTS.getProjectJar("thread-safety-agent");
+    }
+
+    public static Path getSimpleUnitJar() throws IOException {
+        return ARTIFACTS.getProjectJar("simpleunit");
+    }
+
+    public static Path getJUnitJar() throws IOException {
+        return ARTIFACTS.getProjectJar("junit");
     }
 }

@@ -48,8 +48,6 @@ public class BuildTest {
             "fi/jumi/launcher/INTERNAL/",
             // generated classes
             "fi/jumi/core/events/",
-            // ignore, because the ThreadSafetyAgent anyways won't check itself
-            "fi/jumi/threadsafetyagent/",
     };
 
     public static final String RELEASE_VERSION_PATTERN = "\\d+\\.\\d+\\.\\d+";
@@ -119,16 +117,14 @@ public class BuildTest {
 
     @Test
     public void pom_contains_only_allowed_dependencies() throws Exception {
-        Path pomFile = TestEnvironment.getProjectPom(artifactId);
-        Document pom = XmlUtils.parseXml(pomFile);
+        Document pom = XmlUtils.parseXml(getProjectPom());
         List<String> dependencies = getRuntimeDependencies(pom);
         assertThat("dependencies of " + artifactId, dependencies, is(expectedDependencies));
     }
 
     @Test
     public void jar_contains_only_allowed_files() throws Exception {
-        Path jarFile = TestEnvironment.getProjectJar(artifactId);
-        assertJarContainsOnly(jarFile, expectedContents);
+        assertJarContainsOnly(getProjectJar(), expectedContents);
     }
 
     @Test
@@ -153,7 +149,7 @@ public class BuildTest {
     @NonParameterized
     public void embedded_daemon_jar_is_exactly_the_same_as_the_published_daemon_jar() throws IOException {
         EmbeddedDaemonJar embeddedJar = new EmbeddedDaemonJar();
-        Path publishedJar = TestEnvironment.getProjectJar("jumi-daemon");
+        Path publishedJar = TestEnvironment.ARTIFACTS.getProjectJar("jumi-daemon");
 
         try (InputStream in1 = embeddedJar.getDaemonJarAsStream();
              InputStream in2 = Files.newInputStream(publishedJar)) {
@@ -185,7 +181,7 @@ public class BuildTest {
         CompositeMatcher<ClassNode> matcher = newClassNodeCompositeMatcher()
                 .assertThatIt(hasClassVersion(isOneOf(expectedClassVersion)));
 
-        checkAllClasses(matcher, TestEnvironment.getProjectJar(artifactId));
+        checkAllClasses(matcher, getProjectJar());
     }
 
     @Test
@@ -197,11 +193,19 @@ public class BuildTest {
                 .excludeIf(is(anonymousClass()))
                 .assertThatIt(is(annotatedWithOneOf(Immutable.class, NotThreadSafe.class, ThreadSafe.class)));
 
-        checkAllClasses(matcher, TestEnvironment.getProjectJar(artifactId));
+        checkAllClasses(matcher, getProjectJar());
     }
 
 
     // helper methods
+
+    private Path getProjectPom() throws IOException {
+        return TestEnvironment.ARTIFACTS.getProjectPom(artifactId);
+    }
+
+    private Path getProjectJar() throws IOException {
+        return TestEnvironment.ARTIFACTS.getProjectJar(artifactId);
+    }
 
     private void assumeReleaseBuild() throws IOException {
         String version = getPomProperties().getProperty("version");
@@ -225,8 +229,7 @@ public class BuildTest {
     }
 
     private Properties getMavenArtifactProperties(String filename) throws IOException {
-        Path jarFile = TestEnvironment.getProjectJar(artifactId);
-        return readPropertiesFromJar(jarFile, POM_FILES + artifactId + "/" + filename);
+        return readPropertiesFromJar(getProjectJar(), POM_FILES + artifactId + "/" + filename);
     }
 
     private static Properties readPropertiesFromJar(Path jarFile, String resource) throws IOException {
