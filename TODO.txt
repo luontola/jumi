@@ -3,6 +3,7 @@
 	!! - extract reusable components from BuildTest to an external library
 		OK - jumi: extract reusable components from TestEnvironment
 		!! - jumi: extract reusable components from BuildTest
+		- use improved parameterized runner; remove hack in fi.jumi.test.util.JarFileUtils#checkAllClasses
 		- create new project, groupId: fi.luontola.buildtest
 		- create a stripped history of /end-to-end-tests/src/test/java/ that contains only:
 			- BuildTest, TestEnvironment (and any new classes extracted from them)
