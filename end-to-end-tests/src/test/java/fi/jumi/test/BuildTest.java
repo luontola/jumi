@@ -4,6 +4,8 @@
 
 package fi.jumi.test;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.google.common.io.*;
 import fi.jumi.launcher.daemon.EmbeddedDaemonJar;
 import fi.jumi.test.PartiallyParameterized.NonParameterized;
@@ -50,12 +52,14 @@ public class BuildTest {
     private final Integer[] expectedClassVersion;
     private final List<String> expectedDependencies;
     private final List<String> expectedContents;
+    private final Deprecations expectedDeprecations;
 
-    public BuildTest(String artifactId, List<Integer> expectedClassVersion, List<String> expectedDependencies, List<String> expectedContents) {
+    public BuildTest(String artifactId, List<Integer> expectedClassVersion, List<String> expectedDependencies, List<String> expectedContents, Deprecations expectedDeprecations) {
         this.artifactId = artifactId;
         this.expectedClassVersion = expectedClassVersion.toArray(new Integer[expectedClassVersion.size()]);
         this.expectedDependencies = expectedDependencies;
         this.expectedContents = expectedContents;
+        this.expectedDeprecations = expectedDeprecations;
     }
 
     @Parameters(name = "{0}")
@@ -68,7 +72,8 @@ public class BuildTest {
                         asList(
                                 MANIFEST,
                                 POM_FILES,
-                                BASE_PACKAGE + "api/")
+                                BASE_PACKAGE + "api/"),
+                        new Deprecations()
                 },
 
                 {"jumi-core",
@@ -79,7 +84,14 @@ public class BuildTest {
                         asList(
                                 MANIFEST,
                                 POM_FILES,
-                                BASE_PACKAGE + "core/")
+                                BASE_PACKAGE + "core/"),
+                        new Deprecations()
+                                .add("fi.jumi.core.config.SuiteConfiguration#getClassPath()", "2013-08-13", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#getClassPath()", "2013-08-13", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.nio.file.Path[])", "2013-08-13", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.net.URI[])", "2013-08-13", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.nio.file.Path)", "2013-08-13", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.net.URI)", "2013-08-13", 180)
                 },
 
                 {"jumi-daemon",
@@ -91,7 +103,15 @@ public class BuildTest {
                                 BASE_PACKAGE + "actors/",
                                 BASE_PACKAGE + "api/",
                                 BASE_PACKAGE + "core/",
-                                BASE_PACKAGE + "daemon/")
+                                BASE_PACKAGE + "daemon/"),
+                        new Deprecations()
+                                // copied from jumi-core
+                                .add("fi.jumi.core.config.SuiteConfiguration#getClassPath()")
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#getClassPath()")
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.nio.file.Path[])")
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.net.URI[])")
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.nio.file.Path)")
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.net.URI)")
                 },
 
                 {"jumi-launcher",
@@ -101,7 +121,8 @@ public class BuildTest {
                         asList(
                                 MANIFEST,
                                 POM_FILES,
-                                BASE_PACKAGE + "launcher/")
+                                BASE_PACKAGE + "launcher/"),
+                        new Deprecations()
                 },
         });
     }
@@ -182,6 +203,14 @@ public class BuildTest {
                 .assertThatIt(is(annotatedWithOneOf(Immutable.class, NotThreadSafe.class, ThreadSafe.class)));
 
         JarUtils.checkAllClasses(getProjectJar(), matcher);
+    }
+
+    @Test
+    public void deprecated_methods_are_removed_after_the_transition_period() throws IOException {
+        // TODO: remove duplication between the "INTERNAL" here and in DOES_NOT_NEED_JSR305_ANNOTATIONS?
+        expectedDeprecations.verify(
+                FluentIterable.from(new ClassesInJarFile(getProjectJar()))
+                        .filter(Predicates.not(cn -> cn.name.contains("/INTERNAL/"))));
     }
 
 

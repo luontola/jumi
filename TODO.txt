@@ -12,12 +12,12 @@
 		OK - tests for non-trivial helpers: JAR, Maven
 		OK - downgrade to Java 6
 	OK - update the BuildTest in jumi and jumi-actors to use that library (at first in a feature branch, because Maven Central Sync will take time to activate)
-	!! - rename SuiteConfiguration.classPath to classpath
+	OK - rename SuiteConfiguration.classPath to classpath
 		OK - deprecate current methods
 		OK - create new methods
-		!! - create a process for removing the deprecated methods after a particular number of days or releases
-			- BuildTest: maintain a list of all deprecated APIs and a date/version when they were deprecated, and when to remove them
-	- release the buildtest library
+		OK - create a process for removing the deprecated methods after a particular number of days or releases
+			OK - BuildTest: maintain a list of all deprecated APIs and a date/version when they were deprecated, and when to remove them
+	!! - release the buildtest library
 	- merge feature branch, use the released buildtest library
 
 - communicate using memory-mapped files
