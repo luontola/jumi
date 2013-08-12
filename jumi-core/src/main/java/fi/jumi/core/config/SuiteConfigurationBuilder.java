@@ -14,7 +14,7 @@ import java.util.*;
 @NotThreadSafe
 public class SuiteConfigurationBuilder {
 
-    private final List<URI> classPath; // TODO: rename to "classpath" on next breaking change to this class
+    private final List<URI> classpath;
     private final List<String> jvmOptions;
     private URI workingDirectory;
     private String includedTestsPattern;
@@ -25,7 +25,7 @@ public class SuiteConfigurationBuilder {
     }
 
     SuiteConfigurationBuilder(SuiteConfiguration src) {
-        classPath = new ArrayList<>(src.getClassPath());
+        classpath = new ArrayList<>(src.getClasspath());
         jvmOptions = new ArrayList<>(src.getJvmOptions());
         workingDirectory = src.getWorkingDirectory();
         includedTestsPattern = src.getIncludedTestsPattern();
@@ -39,32 +39,72 @@ public class SuiteConfigurationBuilder {
 
     // getters and setters
 
+    /**
+     * @deprecated Use {@link #getClasspath()} instead.
+     */
+    @Deprecated
     public List<URI> getClassPath() {
-        return classPath;
+        return getClasspath();
     }
 
+    public List<URI> getClasspath() {
+        return classpath;
+    }
+
+    /**
+     * @deprecated Use {@link #setClasspath(Path...)} instead.
+     */
+    @Deprecated
     public SuiteConfigurationBuilder setClassPath(Path... files) {
-        classPath.clear();
+        return setClasspath(files);
+    }
+
+    public SuiteConfigurationBuilder setClasspath(Path... files) {
+        classpath.clear();
         for (Path file : files) {
-            addToClassPath(file);
+            addToClasspath(file);
         }
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #setClasspath(URI...)} instead.
+     */
+    @Deprecated
     public SuiteConfigurationBuilder setClassPath(URI... files) {
-        classPath.clear();
+        return setClasspath(files);
+    }
+
+    public SuiteConfigurationBuilder setClasspath(URI... files) {
+        classpath.clear();
         for (URI file : files) {
-            addToClassPath(file);
+            addToClasspath(file);
         }
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #addToClasspath(Path)} instead.
+     */
+    @Deprecated
     public SuiteConfigurationBuilder addToClassPath(Path file) {
-        return addToClassPath(file.toUri());
+        return addToClasspath(file.toUri());
     }
 
+    public SuiteConfigurationBuilder addToClasspath(Path file) {
+        return addToClasspath(file.toUri());
+    }
+
+    /**
+     * @deprecated Use {@link #addToClasspath(URI)} instead.
+     */
+    @Deprecated
     public SuiteConfigurationBuilder addToClassPath(URI file) {
-        classPath.add(file);
+        return addToClasspath(file);
+    }
+
+    public SuiteConfigurationBuilder addToClasspath(URI file) {
+        classpath.add(file);
         return this;
     }
 

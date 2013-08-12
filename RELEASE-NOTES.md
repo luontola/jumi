@@ -4,7 +4,7 @@ Release Notes
 
 ### Upcoming Changes
 
-- TBD
+- Deprecated the `SuiteConfiguration.classPath` property. Use `classpath` instead.
 
 ### Jumi 0.5.390 (2013-08-07)
 

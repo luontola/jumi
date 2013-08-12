@@ -29,9 +29,9 @@ public class TestFileDiscoveryTest {
 
         SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
                 .setIncludedTestsPattern("glob:the pattern")
-                .addToClassPath(libraryJar)
-                .addToClassPath(folder1)
-                .addToClassPath(folder2);
+                .addToClasspath(libraryJar)
+                .addToClasspath(folder1)
+                .addToClasspath(folder2);
 
         List<Path> classesDirectories = SuiteFactory.getClassDirectories(suite.freeze());
         assertThat(classesDirectories, contains(folder1, folder2));

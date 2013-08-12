@@ -30,7 +30,7 @@ public class JumiBootstrap {
         }
     }
 
-    public SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder().setClassPath(currentClasspath());
+    public SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder().setClasspath(currentClasspath());
     public DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
     private boolean passingTestsVisible = false;

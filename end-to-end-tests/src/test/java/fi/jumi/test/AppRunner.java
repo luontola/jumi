@@ -133,11 +133,11 @@ public class AppRunner implements TestRule {
             builder.addJvmOptions("-javaagent:" + TestEnvironment.getThreadSafetyAgentJar());
         }
 
-        builder.addToClassPath(TestEnvironment.getSimpleUnitJar());
-        builder.addToClassPath(TestEnvironment.getSampleClassesDir());
-        builder.addToClassPath(TestEnvironment.getExtraClasspath());
+        builder.addToClasspath(TestEnvironment.getSimpleUnitJar());
+        builder.addToClasspath(TestEnvironment.getSampleClassesDir());
+        builder.addToClasspath(TestEnvironment.getExtraClasspath());
         for (Path path : customClasspath) {
-            builder.addToClassPath(path);
+            builder.addToClasspath(path);
         }
 
         return builder.freeze();

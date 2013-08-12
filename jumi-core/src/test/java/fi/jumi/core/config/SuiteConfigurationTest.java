@@ -30,8 +30,9 @@ public class SuiteConfigurationTest {
     }
 
 
-    // classPath
+    // classPath (deprecated 2013-08-12; renamed the property from "classPath" to "classpath")
 
+    @Deprecated
     @Test
     public void class_path_can_be_changed__Path() {
         builder.setClassPath(Paths.get("old.jar"))
@@ -40,6 +41,7 @@ public class SuiteConfigurationTest {
         assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
     }
 
+    @Deprecated
     @Test
     public void class_path_can_be_changed__URI() {
         builder.setClassPath(Paths.get("old.jar").toUri())
@@ -48,6 +50,7 @@ public class SuiteConfigurationTest {
         assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
     }
 
+    @Deprecated
     @Test
     public void class_path_can_be_appended_to() {
         builder.addToClassPath(Paths.get("foo.jar"))
@@ -56,9 +59,42 @@ public class SuiteConfigurationTest {
         assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
     }
 
+    @Deprecated
     @Test
     public void class_path_defaults_to_empty() {
         assertThat(configuration().getClassPath(), is(empty()));
+    }
+
+
+    // classpath
+
+    @Test
+    public void classpath_can_be_changed__Path() {
+        builder.setClasspath(Paths.get("old.jar"))
+                .setClasspath(Paths.get("foo.jar"), Paths.get("bar.jar"));
+
+        assertThat(configuration().getClasspath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
+    }
+
+    @Test
+    public void classpath_can_be_changed__URI() {
+        builder.setClasspath(Paths.get("old.jar").toUri())
+                .setClasspath(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri());
+
+        assertThat(configuration().getClasspath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
+    }
+
+    @Test
+    public void classpath_can_be_appended_to() {
+        builder.addToClasspath(Paths.get("foo.jar"))
+                .addToClasspath(Paths.get("bar.jar"));
+
+        assertThat(configuration().getClasspath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
+    }
+
+    @Test
+    public void classpath_defaults_to_empty() {
+        assertThat(configuration().getClasspath(), is(empty()));
     }
 
 

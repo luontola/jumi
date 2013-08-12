@@ -47,7 +47,7 @@ public class SuiteFactory implements AutoCloseable {
     }
 
     public void configure(SuiteConfiguration suite) {
-        testClassLoader = createClassLoader(suite.getClassPath());
+        testClassLoader = createClassLoader(suite.getClasspath());
         testFileFinder = createTestFileFinder(suite);
         driverFinder = DriverFinderFactory.createDriverFinder(testClassLoader, logOutput);
         runIdSequence = new RunIdSequence();
@@ -139,7 +139,7 @@ public class SuiteFactory implements AutoCloseable {
 
     public static List<Path> getClassDirectories(SuiteConfiguration suite) {
         ArrayList<Path> dirs = new ArrayList<>();
-        for (URI uri : suite.getClassPath()) {
+        for (URI uri : suite.getClasspath()) {
             Path path = Paths.get(uri);
             if (Files.isDirectory(path)) {
                 dirs.add(path);

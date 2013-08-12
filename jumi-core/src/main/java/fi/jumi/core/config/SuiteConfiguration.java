@@ -18,14 +18,14 @@ public class SuiteConfiguration implements Serializable {
     public static final SuiteConfiguration DEFAULTS = new SuiteConfiguration();
 
     // TODO: support for main and test class paths
-    private final List<URI> classPath; // TODO: rename to "classpath" on next breaking change to this class
+    private final List<URI> classpath;
     private final List<String> jvmOptions;
     private final URI workingDirectory;
     private final String includedTestsPattern;
     private final String excludedTestsPattern;
 
     public SuiteConfiguration() {
-        classPath = Collections.emptyList();
+        classpath = Collections.emptyList();
         jvmOptions = Collections.emptyList();
         workingDirectory = Paths.get(".").normalize().toUri();
         includedTestsPattern = "glob:**Test.class";
@@ -33,7 +33,7 @@ public class SuiteConfiguration implements Serializable {
     }
 
     SuiteConfiguration(SuiteConfigurationBuilder src) {
-        classPath = Immutables.list(src.getClassPath());
+        classpath = Immutables.list(src.getClasspath());
         jvmOptions = Immutables.list(src.getJvmOptions());
         workingDirectory = src.getWorkingDirectory();
         includedTestsPattern = src.getIncludedTestsPattern();
@@ -54,8 +54,16 @@ public class SuiteConfiguration implements Serializable {
 
     // getters
 
+    /**
+     * @deprecated Use {@link #getClasspath()} instead.
+     */
+    @Deprecated
     public List<URI> getClassPath() {
-        return classPath;
+        return getClasspath();
+    }
+
+    public List<URI> getClasspath() {
+        return classpath;
     }
 
     public List<String> getJvmOptions() {
