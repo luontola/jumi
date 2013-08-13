@@ -31,6 +31,10 @@ public class IpcBuffer {
         return buffer.getChar(index);
     }
 
+    public int getInt(int index) {
+        return buffer.getInt(index);
+    }
+
     // absolute set
 
     public IpcBuffer setByte(int index, byte value) {
@@ -48,6 +52,11 @@ public class IpcBuffer {
         return this;
     }
 
+    public IpcBuffer setInt(int index, int value) {
+        buffer.putInt(index, value);
+        return this;
+    }
+
     // relative read
 
     public byte readByte() {
@@ -60,6 +69,10 @@ public class IpcBuffer {
 
     public char readChar() {
         return buffer.getChar();
+    }
+
+    public int readInt() {
+        return buffer.getInt();
     }
 
     // relative write
@@ -76,6 +89,11 @@ public class IpcBuffer {
 
     public IpcBuffer writeChar(char value) {
         buffer.putChar(value);
+        return this;
+    }
+
+    public IpcBuffer writeInt(int value) {
+        buffer.putInt(value);
         return this;
     }
 }

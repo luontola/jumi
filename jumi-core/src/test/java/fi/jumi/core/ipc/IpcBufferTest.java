@@ -43,6 +43,14 @@ public class IpcBufferTest {
         );
     }
 
+    @Test
+    public void absolute_int() {
+        testAbsolute(4,
+                (index) -> buffer.setInt(index, random.nextInt()),
+                (index) -> assertThat(buffer.getInt(index), is(random.nextInt()))
+        );
+    }
+
 
     // relative read/write
 
@@ -67,6 +75,14 @@ public class IpcBufferTest {
         testRelative(
                 () -> buffer.writeChar(random.nextChar()),
                 () -> assertThat(buffer.readChar(), is(random.nextChar()))
+        );
+    }
+
+    @Test
+    public void relative_int() {
+        testRelative(
+                () -> buffer.writeInt(random.nextInt()),
+                () -> assertThat(buffer.readInt(), is(random.nextInt()))
         );
     }
 

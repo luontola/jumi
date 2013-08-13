@@ -65,8 +65,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - generic scaffolding for random data; on failure show the seed that was used
 			OK - short (currently not needed by our listeners)
 			OK - char
-			!! - int
-			- long (currently not needed by our listeners)
+			OK - int
+			!! - long (currently not needed by our listeners)
 		- make it based on multiple ByteBuffers
 			- expand buffer automatically
 				- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
