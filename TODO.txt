@@ -60,11 +60,15 @@ OK - refactor BuildTest & SuiteConfiguration
 			- no putString
 			- doesn't add ByteBuffers automatically
 			+ naming: get/set for absolute, read/write for relative
-		!! - absolute get/set: byte, short, char, int, long (though short and long not yet needed by our listeners)
-		- relative read/write: byte, short, char, int, long
-		- generic scaffolding for random data; on failure show the seed that was used
+		!! - absolute get/set, relative read/write
+			OK - byte
+			- short (currently not needed by our listeners)
+			- char
+			- int
+			- long (currently not needed by our listeners)
 		- make it based on multiple ByteBuffers
-			- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
+			- expand buffer automatically
+				- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
 			- test well the splitting of data between buffers
 				- generic tests with initial buffer size varying from 0 to 4 bytes
 				- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
