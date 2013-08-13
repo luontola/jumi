@@ -25,18 +25,18 @@ public class IpcBufferTest {
     }
 
     @Test
-    public void relative_byte() {
-        testRelative(
-                () -> buffer.writeByte(random.nextByte()),
-                () -> assertThat(buffer.readByte(), is(random.nextByte()))
-        );
-    }
-
-    @Test
     public void absolute_short() {
         testAbsolute(2,
                 (index) -> buffer.setShort(index, random.nextShort()),
                 (index) -> assertThat(buffer.getShort(index), is(random.nextShort()))
+        );
+    }
+
+    @Test
+    public void relative_byte() {
+        testRelative(
+                () -> buffer.writeByte(random.nextByte()),
+                () -> assertThat(buffer.readByte(), is(random.nextByte()))
         );
     }
 

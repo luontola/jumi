@@ -17,43 +17,47 @@ public class IpcBuffer {
         return this;
     }
 
-    // byte
+    // absolute get
 
     public byte getByte(int index) {
         return buffer.get(index);
-    }
-
-    public IpcBuffer setByte(int index, byte value) {
-        buffer.put(index, value);
-        return this;
-    }
-
-    public byte readByte() {
-        return buffer.get();
-    }
-
-    public IpcBuffer writeByte(byte value) {
-        buffer.put(value);
-        return this;
-    }
-
-    // short
-
-    public IpcBuffer setShort(int index, short value) {
-        buffer.putShort(index, value);
-        return this;
     }
 
     public short getShort(int index) {
         return buffer.getShort(index);
     }
 
-    public IpcBuffer writeShort(short value) {
-        buffer.putShort(value);
+    // absolute set
+
+    public IpcBuffer setByte(int index, byte value) {
+        buffer.put(index, value);
         return this;
+    }
+
+    public IpcBuffer setShort(int index, short value) {
+        buffer.putShort(index, value);
+        return this;
+    }
+
+    // relative read
+
+    public byte readByte() {
+        return buffer.get();
     }
 
     public short readShort() {
         return buffer.getShort();
+    }
+
+    // relative write
+
+    public IpcBuffer writeByte(byte value) {
+        buffer.put(value);
+        return this;
+    }
+
+    public IpcBuffer writeShort(short value) {
+        buffer.putShort(value);
+        return this;
     }
 }
