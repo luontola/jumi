@@ -32,8 +32,16 @@ public class TestableRandom implements TestRule {
         return (byte) random.nextInt();
     }
 
+    public short nextShort() {
+        return (short) random.nextInt();
+    }
+
     public int nextInt() {
         return random.nextInt();
+    }
+
+    public int nextInt(int exclusiveMax) {
+        return random.nextInt(exclusiveMax);
     }
 
     @Override

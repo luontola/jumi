@@ -18,7 +18,7 @@ public class IpcBufferTest {
 
     @Test
     public void absolute_byte() {
-        testAbsolute(
+        testAbsolute(1,
                 (index) -> buffer.setByte(index, random.nextByte()),
                 (index) -> assertThat(buffer.getByte(index), is(random.nextByte()))
         );
@@ -32,19 +32,44 @@ public class IpcBufferTest {
         );
     }
 
+    @Test
+    public void absolute_short() {
+        testAbsolute(2,
+                (index) -> buffer.setShort(index, random.nextShort()),
+                (index) -> assertThat(buffer.getShort(index), is(random.nextShort()))
+        );
+    }
+
+    @Test
+    public void relative_short() {
+        testRelative(
+                () -> buffer.writeShort(random.nextShort()),
+                () -> assertThat(buffer.readShort(), is(random.nextShort()))
+        );
+    }
+
 
     // randomized testing
 
-    private void testAbsolute(AbsoluteWriter writer, AbsoluteReader reader) {
-        writer.run(0);
-        writer.run(1);
+    private void testAbsolute(int valueSize, AbsoluteWriter writer, AbsoluteReader reader) {
+        final int startIndex = random.nextInt(10);
+        int index;
+
         random.resetSeed();
-        reader.run(0);
-        reader.run(1);
+        index = startIndex;
+        assertReturnedItself(writer.run(index));
+        index += valueSize;
+        assertReturnedItself(writer.run(index));
+
+        random.resetSeed();
+        index = startIndex;
+        reader.run(index);
+        index += valueSize;
+        reader.run(index);
     }
 
     private interface AbsoluteWriter {
-        void run(int index);
+        IpcBuffer run(int index);
     }
 
     private interface AbsoluteReader {
@@ -52,8 +77,8 @@ public class IpcBufferTest {
     }
 
     private void testRelative(RelativeWriter writer, RelativeReader checker) {
-        writer.run();
-        writer.run();
+        assertReturnedItself(writer.run());
+        assertReturnedItself(writer.run());
         buffer.position(0);
         random.resetSeed();
         checker.run();
@@ -61,10 +86,14 @@ public class IpcBufferTest {
     }
 
     private interface RelativeWriter {
-        void run();
+        IpcBuffer run();
     }
 
     private interface RelativeReader {
         void run();
+    }
+
+    private void assertReturnedItself(IpcBuffer run) {
+        assertThat("write operations should return `this`", run, is(buffer));
     }
 }

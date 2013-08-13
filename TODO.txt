@@ -63,8 +63,8 @@ OK - refactor BuildTest & SuiteConfiguration
 		!! - absolute get/set, relative read/write
 			OK - byte
 			OK - generic scaffolding for random data; on failure show the seed that was used
-			!! - short (currently not needed by our listeners)
-			- char
+			OK - short (currently not needed by our listeners)
+			!! - char
 			- int
 			- long (currently not needed by our listeners)
 		- make it based on multiple ByteBuffers

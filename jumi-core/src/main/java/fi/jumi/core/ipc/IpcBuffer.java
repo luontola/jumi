@@ -12,12 +12,19 @@ public class IpcBuffer {
 
     private final ByteBuffer buffer = ByteBuffer.allocate(100);
 
+    public IpcBuffer position(int newPosition) {
+        buffer.position(newPosition);
+        return this;
+    }
+
+    // byte
+
     public byte getByte(int index) {
         return buffer.get(index);
     }
 
-    public IpcBuffer setByte(int index, byte b) {
-        buffer.put(index, b);
+    public IpcBuffer setByte(int index, byte value) {
+        buffer.put(index, value);
         return this;
     }
 
@@ -25,13 +32,28 @@ public class IpcBuffer {
         return buffer.get();
     }
 
-    public IpcBuffer writeByte(byte b) {
-        buffer.put(b);
+    public IpcBuffer writeByte(byte value) {
+        buffer.put(value);
         return this;
     }
 
-    public IpcBuffer position(int newPosition) {
-        buffer.position(newPosition);
+    // short
+
+    public IpcBuffer setShort(int index, short value) {
+        buffer.putShort(index, value);
         return this;
+    }
+
+    public short getShort(int index) {
+        return buffer.getShort(index);
+    }
+
+    public IpcBuffer writeShort(short value) {
+        buffer.putShort(value);
+        return this;
+    }
+
+    public short readShort() {
+        return buffer.getShort();
     }
 }
