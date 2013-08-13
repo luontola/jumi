@@ -20,7 +20,7 @@ OK - refactor BuildTest & SuiteConfiguration
 	OK - release the buildtest library
 	OK - merge feature branch, use the released buildtest library
 
-- communicate using memory-mapped files
+!! - communicate using memory-mapped files
 	http://en.wikipedia.org/wiki/Memory-mapped_file
 	http://javarevisited.blogspot.fi/2012/01/memorymapped-file-and-io-in-java.html
 	http://stackoverflow.com/questions/5943365/java-tcp-ip-socket-latency-stuck-at-50-s-microseconds-used-for-java-ipc
@@ -43,7 +43,7 @@ OK - refactor BuildTest & SuiteConfiguration
 		- list of possible optimizations: http://psy-lob-saw.blogspot.fi/2013/07/single-producer-single-consumer-queue.html
 		- MappedByteBuffer slower than ByteBuffer: http://mentablog.soliveirajr.com/2012/12/asynchronous-logging-versus-memory-mapped-files/
 	OK - spike communicating over memory-mapped files
-	- create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
+	!! - create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
 		Mina 3:
 			+ lookup using singly linked list -> let's use a doubly linked list with O(1) in both directions, and field "current" instead of "head & tail"
 			- accesses primitives using 1-byte operations
@@ -59,13 +59,19 @@ OK - refactor BuildTest & SuiteConfiguration
 			- has low coverage
 			- no putString
 			- doesn't add ByteBuffers automatically
-		- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
-		- test well the splitting of data between buffers
-			- generic tests with initial buffer size varying from 0 to 4 bytes
-			- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
+			+ naming: get/set for absolute, read/write for relative
+		!! - absolute get/set: byte, short, char, int, long (though short and long not yet needed by our listeners)
+		- relative read/write: byte, short, char, int, long
+		- generic scaffolding for random data; on failure show the seed that was used
+		- make it based on multiple ByteBuffers
+			- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
+			- test well the splitting of data between buffers
+				- generic tests with initial buffer size varying from 0 to 4 bytes
+				- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
+		- string operations
 	- hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
 		protocol draft:
-			header: "Jumi" (4 bytes), protocol-version (int), interface (byte), events...
+			header: "Jumi" (4 bytes), protocol-version (int), interface (byte or string?), events...
 			events: status (byte), event-type (byte), body
 			status: empty (0), exists (1), end-of-file (2)
 		- save v1 events to file for testing compatibility
