@@ -14,7 +14,30 @@ public class IpcBufferTest {
     @Rule
     public final TestableRandom random = new TestableRandom();
 
-    private final IpcBuffer buffer = new IpcBuffer();
+    private final IpcBuffer buffer = new IpcBuffer(30);
+
+
+    @Ignore // TODO
+    @Test
+    public void buffer_will_increase_capacity_automatically_when_writing_beyond_it() {
+        final int initialCapacity = 10;
+        final int overCapacity = 15;
+        final int increasedCapacity = 20;
+
+        IpcBuffer buffer = new IpcBuffer(initialCapacity);
+        assertThat("capacity before", buffer.capacity(), is(initialCapacity));
+
+        for (int i = 0; i < overCapacity; i++) {
+            buffer.writeByte(random.nextByte());
+        }
+
+        assertThat("capacity after", buffer.capacity(), is(increasedCapacity));
+        buffer.position(0);
+        random.resetSeed();
+        for (int i = 0; i < overCapacity; i++) {
+            assertThat("index " + i, buffer.readByte(), is(random.nextByte()));
+        }
+    }
 
 
     // absolute get/set

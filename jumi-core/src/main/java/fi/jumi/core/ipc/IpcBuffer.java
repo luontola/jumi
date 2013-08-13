@@ -10,11 +10,19 @@ import java.nio.ByteBuffer;
 @NotThreadSafe
 public class IpcBuffer {
 
-    private final ByteBuffer buffer = ByteBuffer.allocate(100);
+    private final ByteBuffer buffer;
+
+    public IpcBuffer(int initialCapacity) {
+        buffer = ByteBuffer.allocate(initialCapacity);
+    }
 
     public IpcBuffer position(int newPosition) {
         buffer.position(newPosition);
         return this;
+    }
+
+    public int capacity() {
+        return buffer.capacity();
     }
 
     // absolute get
