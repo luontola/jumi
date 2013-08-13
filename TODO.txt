@@ -62,6 +62,7 @@ OK - refactor BuildTest & SuiteConfiguration
 			+ naming: get/set for absolute, read/write for relative
 		!! - absolute get/set, relative read/write
 			OK - byte
+			!! - generic scaffolding for random data; on failure show the seed that was used
 			- short (currently not needed by our listeners)
 			- char
 			- int
