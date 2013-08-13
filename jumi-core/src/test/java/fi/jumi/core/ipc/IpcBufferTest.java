@@ -51,6 +51,14 @@ public class IpcBufferTest {
         );
     }
 
+    @Test
+    public void absolute_long() {
+        testAbsolute(8,
+                (index) -> buffer.setLong(index, random.nextLong()),
+                (index) -> assertThat(buffer.getLong(index), is(random.nextLong()))
+        );
+    }
+
 
     // relative read/write
 
@@ -83,6 +91,14 @@ public class IpcBufferTest {
         testRelative(
                 () -> buffer.writeInt(random.nextInt()),
                 () -> assertThat(buffer.readInt(), is(random.nextInt()))
+        );
+    }
+
+    @Test
+    public void relative_long() {
+        testRelative(
+                () -> buffer.writeLong(random.nextLong()),
+                () -> assertThat(buffer.readLong(), is(random.nextLong()))
         );
     }
 

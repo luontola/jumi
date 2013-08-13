@@ -62,6 +62,10 @@ public class TestableRandom implements TestRule {
         return random.nextInt(exclusiveMax);
     }
 
+    public long nextLong() {
+        return random.nextLong();
+    }
+
     private static class ExtraMessageAssertionError extends AssertionError {
         private final String extraMessage;
         private final Throwable realException;
