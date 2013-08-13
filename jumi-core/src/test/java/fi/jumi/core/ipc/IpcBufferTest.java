@@ -14,32 +14,57 @@ public class IpcBufferTest {
     @Rule
     public final TestableRandom random = new TestableRandom();
 
+    private final IpcBuffer buffer = new IpcBuffer();
+
     @Test
     public void absolute_byte() {
-        byte b1 = random.nextByte();
-        byte b2 = random.nextByte();
-
-        IpcBuffer buffer = new IpcBuffer()
-                .setByte(0, b1)
-                .setByte(1, b2);
-
-        assertThat(buffer.getByte(0), is(b1));
-        assertThat(buffer.getByte(1), is(b2));
+        testAbsolute(
+                (index) -> buffer.setByte(index, random.nextByte()),
+                (index) -> assertThat(buffer.getByte(index), is(random.nextByte()))
+        );
     }
 
     @Test
     public void relative_byte() {
-        byte b1 = random.nextByte();
-        byte b2 = random.nextByte();
-
-        IpcBuffer buffer = new IpcBuffer()
-                .writeByte(b1)
-                .writeByte(b2)
-                .position(0);
-
-        assertThat(buffer.readByte(), is(b1));
-        assertThat(buffer.readByte(), is(b2));
+        testRelative(
+                () -> buffer.writeByte(random.nextByte()),
+                () -> assertThat(buffer.readByte(), is(random.nextByte()))
+        );
     }
 
-    // TODO: generic scaffolding for random data; on failure show the seed that was used
+
+    // randomized testing
+
+    private void testAbsolute(AbsoluteWriter writer, AbsoluteReader reader) {
+        writer.run(0);
+        writer.run(1);
+        random.resetSeed();
+        reader.run(0);
+        reader.run(1);
+    }
+
+    private interface AbsoluteWriter {
+        void run(int index);
+    }
+
+    private interface AbsoluteReader {
+        void run(int index);
+    }
+
+    private void testRelative(RelativeWriter writer, RelativeReader checker) {
+        writer.run();
+        writer.run();
+        buffer.position(0);
+        random.resetSeed();
+        checker.run();
+        checker.run();
+    }
+
+    private interface RelativeWriter {
+        void run();
+    }
+
+    private interface RelativeReader {
+        void run();
+    }
 }

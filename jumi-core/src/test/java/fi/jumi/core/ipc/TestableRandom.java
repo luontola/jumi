@@ -24,6 +24,10 @@ public class TestableRandom implements TestRule {
         this.random = new Random(seed);
     }
 
+    public void resetSeed() {
+        random.setSeed(seed);
+    }
+
     public byte nextByte() {
         return (byte) random.nextInt();
     }
