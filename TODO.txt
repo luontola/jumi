@@ -1,5 +1,5 @@
 
-!!- refactor BuildTest & SuiteConfiguration
+OK - refactor BuildTest & SuiteConfiguration
 	OK - extract reusable components from BuildTest to an external library
 		OK - jumi: extract reusable components from TestEnvironment
 		OK - jumi: extract reusable components from BuildTest
@@ -17,8 +17,8 @@
 		OK - create new methods
 		OK - create a process for removing the deprecated methods after a particular number of days or releases
 			OK - BuildTest: maintain a list of all deprecated APIs and a date/version when they were deprecated, and when to remove them
-	!! - release the buildtest library
-	- merge feature branch, use the released buildtest library
+	OK - release the buildtest library
+	OK - merge feature branch, use the released buildtest library
 
 - communicate using memory-mapped files
 	http://en.wikipedia.org/wiki/Memory-mapped_file
