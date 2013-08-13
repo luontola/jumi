@@ -16,6 +16,9 @@ public class IpcBufferTest {
 
     private final IpcBuffer buffer = new IpcBuffer();
 
+
+    // absolute get/set
+
     @Test
     public void absolute_byte() {
         testAbsolute(1,
@@ -33,6 +36,17 @@ public class IpcBufferTest {
     }
 
     @Test
+    public void absolute_char() {
+        testAbsolute(2,
+                (index) -> buffer.setChar(index, random.nextChar()),
+                (index) -> assertThat(buffer.getChar(index), is(random.nextChar()))
+        );
+    }
+
+
+    // relative read/write
+
+    @Test
     public void relative_byte() {
         testRelative(
                 () -> buffer.writeByte(random.nextByte()),
@@ -45,6 +59,14 @@ public class IpcBufferTest {
         testRelative(
                 () -> buffer.writeShort(random.nextShort()),
                 () -> assertThat(buffer.readShort(), is(random.nextShort()))
+        );
+    }
+
+    @Test
+    public void relative_char() {
+        testRelative(
+                () -> buffer.writeChar(random.nextChar()),
+                () -> assertThat(buffer.readChar(), is(random.nextChar()))
         );
     }
 

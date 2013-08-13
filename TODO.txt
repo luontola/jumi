@@ -64,8 +64,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - byte
 			OK - generic scaffolding for random data; on failure show the seed that was used
 			OK - short (currently not needed by our listeners)
-			!! - char
-			- int
+			OK - char
+			!! - int
 			- long (currently not needed by our listeners)
 		- make it based on multiple ByteBuffers
 			- expand buffer automatically

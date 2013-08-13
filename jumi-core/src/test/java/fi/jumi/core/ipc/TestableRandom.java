@@ -24,26 +24,6 @@ public class TestableRandom implements TestRule {
         this.random = new Random(seed);
     }
 
-    public void resetSeed() {
-        random.setSeed(seed);
-    }
-
-    public byte nextByte() {
-        return (byte) random.nextInt();
-    }
-
-    public short nextShort() {
-        return (short) random.nextInt();
-    }
-
-    public int nextInt() {
-        return random.nextInt();
-    }
-
-    public int nextInt(int exclusiveMax) {
-        return random.nextInt(exclusiveMax);
-    }
-
     @Override
     public Statement apply(Statement base, Description description) {
         return new Statement() {
@@ -56,6 +36,30 @@ public class TestableRandom implements TestRule {
                 }
             }
         };
+    }
+
+    public void resetSeed() {
+        random.setSeed(seed);
+    }
+
+    public byte nextByte() {
+        return (byte) random.nextInt();
+    }
+
+    public short nextShort() {
+        return (short) random.nextInt();
+    }
+
+    public char nextChar() {
+        return (char) random.nextInt();
+    }
+
+    public int nextInt() {
+        return random.nextInt();
+    }
+
+    public int nextInt(int exclusiveMax) {
+        return random.nextInt(exclusiveMax);
     }
 
     private static class ExtraMessageAssertionError extends AssertionError {
