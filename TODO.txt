@@ -69,10 +69,20 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - long (currently not needed by our listeners)
 		!! - make it based on multiple ByteBuffers
 			!! - expand buffer automatically
-				- ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
+				- interface ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
+				- create AllocatedByteBufferSequence
+				- same index returns same backing data
+				- we can assume sequential access to new indeces; IpcBuffer's position depends on every preceding segment's size
 			- test well the splitting of data between buffers
 				- generic tests with initial buffer size varying from 0 to 4 bytes
 				- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
+		- create MMF based MappedByteBufferSequence
+			- extract contract test
+			- multiple instances/processes with same path should access same data
+				- doesn't need to cache the mapped buffers, but may re-map if called multiple times with same index
+			- new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
+			- when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
+			- IpcBuffer: avoid looking up adjacent buffers repeatedly (opening a MMF is relatively slow)
 		- string operations
 	- hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
 		protocol draft:
