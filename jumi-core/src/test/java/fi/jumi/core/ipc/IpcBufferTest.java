@@ -5,6 +5,7 @@
 package fi.jumi.core.ipc;
 
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -12,31 +13,47 @@ import static org.hamcrest.Matchers.is;
 public class IpcBufferTest {
 
     @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
+    @Rule
     public final TestableRandom random = new TestableRandom();
 
-    private final IpcBuffer buffer = new IpcBuffer(30);
+    private final IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(30));
 
 
-    @Ignore // TODO
     @Test
     public void buffer_will_increase_capacity_automatically_when_writing_beyond_it() {
         final int initialCapacity = 10;
-        final int overCapacity = 15;
-        final int increasedCapacity = 20;
+        final int toBeWritten = initialCapacity + 5;
+        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(initialCapacity));
 
-        IpcBuffer buffer = new IpcBuffer(initialCapacity);
-        assertThat("capacity before", buffer.capacity(), is(initialCapacity));
-
-        for (int i = 0; i < overCapacity; i++) {
+        for (int i = 0; i < toBeWritten; i++) {
             buffer.writeByte(random.nextByte());
         }
 
-        assertThat("capacity after", buffer.capacity(), is(increasedCapacity));
-        buffer.position(0);
         random.resetSeed();
-        for (int i = 0; i < overCapacity; i++) {
+        buffer.position(0);
+        for (int i = 0; i < toBeWritten; i++) {
             assertThat("index " + i, buffer.readByte(), is(random.nextByte()));
         }
+    }
+
+    @Test
+    public void cannot_make_position_negative() {
+        thrown.expect(IllegalArgumentException.class);
+        buffer.position(-1);
+    }
+
+    @Test
+    public void cannot_read_from_negative_positions() {
+        thrown.expect(IndexOutOfBoundsException.class);
+        buffer.getByte(-1);
+    }
+
+    @Test
+    public void cannot_write_to_negative_positions() {
+        thrown.expect(IndexOutOfBoundsException.class);
+        buffer.setByte(-1, (byte) 0);
     }
 
 
@@ -155,10 +172,15 @@ public class IpcBufferTest {
     }
 
     private void testRelative(RelativeWriter writer, RelativeReader checker) {
-        assertReturnedItself(writer.run());
-        assertReturnedItself(writer.run());
-        buffer.position(0);
+        final int startIndex = random.nextInt(10);
+
         random.resetSeed();
+        buffer.position(startIndex);
+        assertReturnedItself(writer.run());
+        assertReturnedItself(writer.run());
+
+        random.resetSeed();
+        buffer.position(startIndex);
         checker.run();
         checker.run();
     }
