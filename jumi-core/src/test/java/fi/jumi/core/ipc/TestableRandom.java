@@ -8,12 +8,14 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import java.util.Random;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class TestableRandom implements TestRule {
 
     private final long seed;
     private final Random random;
+    private final List<Object> log = new ArrayList<>();
 
     public TestableRandom() {
         this(System.currentTimeMillis());
@@ -32,38 +34,89 @@ public class TestableRandom implements TestRule {
                 try {
                     base.evaluate();
                 } catch (Throwable t) {
-                    throw new ExtraMessageAssertionError(TestableRandom.class.getSimpleName() + " seed was " + seed + "L", t);
+                    throw new ExtraMessageAssertionError(getDebugInformation(), t);
                 }
             }
         };
     }
 
     public void resetSeed() {
+        logMessage("reset seed");
         random.setSeed(seed);
     }
 
     public byte nextByte() {
-        return (byte) random.nextInt();
+        return log((byte) random.nextInt());
     }
 
     public short nextShort() {
-        return (short) random.nextInt();
+        return log((short) random.nextInt());
     }
 
     public char nextChar() {
-        return (char) random.nextInt();
+        return log((char) random.nextInt());
     }
 
     public int nextInt() {
-        return random.nextInt();
+        return log(random.nextInt());
     }
 
     public int nextInt(int exclusiveMax) {
-        return random.nextInt(exclusiveMax);
+        return log(random.nextInt(exclusiveMax));
     }
 
     public long nextLong() {
-        return random.nextLong();
+        return log(random.nextLong());
+    }
+
+
+    // debug information
+
+    private void logMessage(String message) {
+        log.add(new Message(message));
+    }
+
+    private <T> T log(T generatedValue) {
+        log.add(generatedValue);
+        return generatedValue;
+    }
+
+    private String getDebugInformation() {
+        String message = TestableRandom.class.getSimpleName() + " seed was " + seed + "L";
+        for (Object obj : log) {
+            if (obj instanceof Message) {
+                message += "\n- " + obj;
+            } else {
+                message += "\n- (" + formatType(obj) + ") " + obj;
+            }
+        }
+        return message;
+    }
+
+    private static String formatType(Object obj) {
+        try {
+            Field f = obj.getClass().getField("TYPE");
+            Class<?> primitiveType = (Class<?>) f.get(null);
+            return primitiveType.toString();
+        } catch (NoSuchFieldException e) {
+            return obj.getClass().getSimpleName();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private static class Message {
+        private final String message;
+
+        public Message(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String toString() {
+            return message;
+        }
     }
 
     private static class ExtraMessageAssertionError extends AssertionError {
