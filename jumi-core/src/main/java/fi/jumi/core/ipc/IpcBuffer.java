@@ -27,86 +27,48 @@ public class IpcBuffer {
         return this;
     }
 
-    private Segment segmentContaining(int index) {
-        if (index < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-        while (index < current.startInclusive) {
-            current = current.prev();
-        }
-        while (index >= current.endExclusive) {
-            current = current.next();
-        }
-        return current;
-    }
-
     // absolute get
 
     public byte getByte(int index) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.get(index);
+        return get(index, ByteBuffer::get);
     }
 
     public short getShort(int index) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getShort(index);
+        return get(index, ByteBuffer::getShort);
     }
 
     public char getChar(int index) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getChar(index);
+        return get(index, ByteBuffer::getChar);
     }
 
     public int getInt(int index) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getInt(index);
+        return get(index, ByteBuffer::getInt);
     }
 
     public long getLong(int index) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getLong(index);
+        return get(index, ByteBuffer::getLong);
     }
 
     // absolute set
 
     public IpcBuffer setByte(int index, byte value) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.put(index, value);
-        return this;
+        return set(index, value, ByteBuffer::put);
     }
 
     public IpcBuffer setShort(int index, short value) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putShort(index, value);
-        return this;
+        return set(index, value, ByteBuffer::putShort);
     }
 
     public IpcBuffer setChar(int index, char value) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putChar(index, value);
-        return this;
+        return set(index, value, ByteBuffer::putChar);
     }
 
     public IpcBuffer setInt(int index, int value) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putInt(index, value);
-        return this;
+        return set(index, value, ByteBuffer::putInt);
     }
 
     public IpcBuffer setLong(int index, long value) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putLong(index, value);
-        return this;
+        return set(index, value, ByteBuffer::putLong);
     }
 
     // relative read
@@ -173,6 +135,42 @@ public class IpcBuffer {
         return this;
     }
 
+
+    // accessing segments
+
+    private <T> T get(int absIndex, Getter<T> op) {
+        Segment segment = segmentContaining(absIndex);
+        int relIndex = segment.relativize(absIndex);
+        return op.get(segment.buffer, relIndex);
+    }
+
+    private <T> IpcBuffer set(int absIndex, T value, Setter<T> op) {
+        Segment segment = segmentContaining(absIndex);
+        int relIndex = segment.relativize(absIndex);
+        op.set(segment.buffer, relIndex, value);
+        return this;
+    }
+
+    private Segment segmentContaining(int index) {
+        if (index < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        while (index < current.startInclusive) {
+            current = current.prev();
+        }
+        while (index >= current.endExclusive) {
+            current = current.next();
+        }
+        return current;
+    }
+
+    private interface Getter<T> {
+        T get(ByteBuffer buffer, int index);
+    }
+
+    private interface Setter<T> {
+        void set(ByteBuffer buffer, int index, T value);
+    }
 
     @NotThreadSafe
     private class Segment {
