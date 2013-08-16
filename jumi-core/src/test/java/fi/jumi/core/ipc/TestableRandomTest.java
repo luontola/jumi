@@ -17,7 +17,7 @@ public class TestableRandomTest {
     public void on_failure_shows_the_original_exception_message() {
         TestableRandom random = new TestableRandom(123);
 
-        Throwable e = applyAndThrow(random, new Exception("original message"));
+        Throwable e = getExceptionThrownOnTestFailure(random);
 
         assertThat(e.toString(), containsString("original message"));
     }
@@ -26,7 +26,7 @@ public class TestableRandomTest {
     public void on_failure_shows_the_initial_seed() {
         TestableRandom random = new TestableRandom(123);
 
-        Throwable e = applyAndThrow(random, new Exception("original message"));
+        Throwable e = getExceptionThrownOnTestFailure(random);
 
         assertThat(e.toString(), containsString("seed was 123L"));
     }
@@ -38,7 +38,7 @@ public class TestableRandomTest {
         random.nextInt();
         random.nextShort();
 
-        Throwable e = applyAndThrow(random, new Exception("original message"));
+        Throwable e = getExceptionThrownOnTestFailure(random);
         assertThat(e.toString(), containsString("- (int) -1188957731\n- (short) 1173"));
     }
 
@@ -50,14 +50,14 @@ public class TestableRandomTest {
         random.resetSeed();
         random.nextInt();
 
-
-        Throwable e = applyAndThrow(random, new Exception("original message"));
+        Throwable e = getExceptionThrownOnTestFailure(random);
         assertThat(e.toString(), containsString("- (int) -1188957731\n- reset seed\n- (int) -1188957731"));
     }
 
-    private static Throwable applyAndThrow(TestableRandom random, Exception e) {
+
+    private static Throwable getExceptionThrownOnTestFailure(TestableRandom random) {
         try {
-            random.apply(new Fail(e), null).evaluate();
+            random.apply(new Fail(new Exception("original message")), null).evaluate();
         } catch (Throwable t) {
             return t;
         }
