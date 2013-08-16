@@ -9,6 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 public class IpcBufferTest {
 
@@ -34,8 +35,25 @@ public class IpcBufferTest {
         random.resetSeed();
         buffer.position(0);
         for (int i = 0; i < toBeWritten; i++) {
-            assertThat("index " + i, buffer.readByte(), is(random.nextByte()));
+            assertThat("byte at index " + i, buffer.readByte(), is(random.nextByte()));
         }
+    }
+
+    /**
+     * Opening memory-mapped files is relatively slow.
+     */
+    @Test
+    public void tries_to_minimize_the_number_of_times_that_a_backing_buffer_is_looked_up() {
+        AllocatedByteBufferSequence sequence = spy(new AllocatedByteBufferSequence(10));
+        IpcBuffer buffer = new IpcBuffer(sequence);
+
+        buffer.setByte(5, (byte) 0);
+        buffer.setByte(15, (byte) 0);
+        buffer.setByte(5, (byte) 0);
+        buffer.setByte(15, (byte) 0);
+
+        verify(sequence, times(1)).get(0);
+        verify(sequence, times(1)).get(1);
     }
 
     @Test

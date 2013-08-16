@@ -77,7 +77,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - expand buffer automatically
 				OK - maintain our own position
 				OK - convert positions to buffer's relative positions
-			!! - test well the splitting of data between buffers
+			!! - test well traversing forwards and backwards
+			- test well the splitting of data between buffers
 				- generic tests with initial buffer size varying from 0 to 4 bytes
 				- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
 		- create MMF based MappedByteBufferSequence

@@ -5,19 +5,18 @@
 package fi.jumi.core.ipc;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.nio.*;
 
 @NotThreadSafe
 public class IpcBuffer {
 
     private final ByteBufferSequence buffers;
     private int position = 0;
-    private List<Segment> segments = new ArrayList<>();
+    private Segment current;
 
     public IpcBuffer(ByteBufferSequence buffers) {
         this.buffers = buffers;
-        segments.add(new Segment(0, buffers.get(0)));
+        current = new Segment();
     }
 
     public IpcBuffer position(int newPosition) {
@@ -32,75 +31,81 @@ public class IpcBuffer {
         if (index < 0) {
             throw new IndexOutOfBoundsException();
         }
-
-        for (int i = 0; i < segments.size(); i++) {
-            Segment segment = segments.get(i);
-            if (index >= segment.startPosition && index < segment.startPosition + segment.buffer.capacity()) {
-                return segment;
-            } else if (i == segments.size() - 1) {
-                segments.add(new Segment(segment.startPosition + segment.buffer.capacity(), buffers.get(i + 1)));
-            }
+        while (index < current.startInclusive) { // FIXME: off by one? works even with "-1"
+            current = current.prev();
         }
-
-        throw new Error("This line should never be reached");
+        while (index >= current.endExclusive) {
+            current = current.next();
+        }
+        return current;
     }
 
     // absolute get
 
     public byte getByte(int index) {
         Segment segment = segmentContaining(index);
-        return segment.buffer.get(index - segment.startPosition);
+        index = segment.relativize(index);
+        return segment.buffer.get(index);
     }
 
     public short getShort(int index) {
         Segment segment = segmentContaining(index);
-        return segment.buffer.getShort(index - segment.startPosition);
+        index = segment.relativize(index);
+        return segment.buffer.getShort(index);
     }
 
     public char getChar(int index) {
         Segment segment = segmentContaining(index);
-        return segment.buffer.getChar(index - segment.startPosition);
+        index = segment.relativize(index);
+        return segment.buffer.getChar(index);
     }
 
     public int getInt(int index) {
         Segment segment = segmentContaining(index);
-        return segment.buffer.getInt(index - segment.startPosition);
+        index = segment.relativize(index);
+        return segment.buffer.getInt(index);
     }
 
     public long getLong(int index) {
         Segment segment = segmentContaining(index);
-        return segment.buffer.getLong(index - segment.startPosition);
+        index = segment.relativize(index);
+        return segment.buffer.getLong(index);
     }
 
     // absolute set
 
     public IpcBuffer setByte(int index, byte value) {
         Segment segment = segmentContaining(index);
-        segment.buffer.put(index - segment.startPosition, value);
+        index = segment.relativize(index);
+        segment.buffer.put(index, value);
         return this;
     }
 
     public IpcBuffer setShort(int index, short value) {
         Segment segment = segmentContaining(index);
-        segment.buffer.putShort(index - segment.startPosition, value);
+        index = segment.relativize(index);
+        segment.buffer.putShort(index, value);
         return this;
     }
 
     public IpcBuffer setChar(int index, char value) {
         Segment segment = segmentContaining(index);
-        segment.buffer.putChar(index - segment.startPosition, value);
+        index = segment.relativize(index);
+        segment.buffer.putChar(index, value);
         return this;
     }
 
     public IpcBuffer setInt(int index, int value) {
         Segment segment = segmentContaining(index);
-        segment.buffer.putInt(index - segment.startPosition, value);
+        index = segment.relativize(index);
+        segment.buffer.putInt(index, value);
         return this;
     }
 
     public IpcBuffer setLong(int index, long value) {
         Segment segment = segmentContaining(index);
-        segment.buffer.putLong(index - segment.startPosition, value);
+        index = segment.relativize(index);
+        segment.buffer.putLong(index, value);
         return this;
     }
 
@@ -170,13 +175,47 @@ public class IpcBuffer {
 
 
     @NotThreadSafe
-    private static class Segment {
-        public final int startPosition;
-        public final ByteBuffer buffer;
+    private class Segment {
+        public final Segment prev;
+        public Segment next;
 
-        public Segment(int startPosition, ByteBuffer buffer) {
-            this.startPosition = startPosition;
-            this.buffer = buffer;
+        private final int segmentIndex;
+        public final ByteBuffer buffer;
+        public final int startInclusive;
+        public final int endExclusive;
+
+        public Segment() {
+            prev = null;
+            segmentIndex = 0;
+            buffer = buffers.get(segmentIndex);
+            startInclusive = 0;
+            endExclusive = buffer.capacity();
+        }
+
+        public Segment(Segment prev) {
+            this.prev = prev;
+            segmentIndex = prev.segmentIndex + 1;
+            buffer = buffers.get(segmentIndex);
+            startInclusive = prev.endExclusive;
+            endExclusive = startInclusive + buffer.capacity();
+        }
+
+        private int relativize(int index) {
+            return index - startInclusive;
+        }
+
+        public Segment prev() {
+            if (prev == null) {
+                throw new BufferUnderflowException();
+            }
+            return prev;
+        }
+
+        public Segment next() {
+            if (next == null) {
+                next = new Segment(this);
+            }
+            return next;
         }
     }
 }
