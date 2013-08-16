@@ -44,7 +44,7 @@ public class IpcBufferTest {
 
     @Test
     public void absolute_byte() {
-        testAbsolute(1,
+        testAbsolute(Byte.SIZE,
                 (index) -> buffer.setByte(index, random.nextByte()),
                 (index) -> assertThat(buffer.getByte(index), is(random.nextByte()))
         );
@@ -52,7 +52,7 @@ public class IpcBufferTest {
 
     @Test
     public void absolute_short() {
-        testAbsolute(2,
+        testAbsolute(Short.SIZE,
                 (index) -> buffer.setShort(index, random.nextShort()),
                 (index) -> assertThat(buffer.getShort(index), is(random.nextShort()))
         );
@@ -60,7 +60,7 @@ public class IpcBufferTest {
 
     @Test
     public void absolute_char() {
-        testAbsolute(2,
+        testAbsolute(Character.SIZE,
                 (index) -> buffer.setChar(index, random.nextChar()),
                 (index) -> assertThat(buffer.getChar(index), is(random.nextChar()))
         );
@@ -68,7 +68,7 @@ public class IpcBufferTest {
 
     @Test
     public void absolute_int() {
-        testAbsolute(4,
+        testAbsolute(Integer.SIZE,
                 (index) -> buffer.setInt(index, random.nextInt()),
                 (index) -> assertThat(buffer.getInt(index), is(random.nextInt()))
         );
@@ -76,7 +76,7 @@ public class IpcBufferTest {
 
     @Test
     public void absolute_long() {
-        testAbsolute(8,
+        testAbsolute(Long.SIZE,
                 (index) -> buffer.setLong(index, random.nextLong()),
                 (index) -> assertThat(buffer.getLong(index), is(random.nextLong()))
         );
@@ -128,20 +128,21 @@ public class IpcBufferTest {
 
     // randomized testing
 
-    private void testAbsolute(int valueSize, AbsoluteWriter writer, AbsoluteReader reader) {
+    private void testAbsolute(int sizeInBits, AbsoluteWriter writer, AbsoluteReader reader) {
+        int sizeInBytes = sizeInBits / Byte.SIZE;
         final int startIndex = random.nextInt(10);
         int index;
 
         random.resetSeed();
         index = startIndex;
         assertReturnedItself(writer.run(index));
-        index += valueSize;
+        index += sizeInBytes;
         assertReturnedItself(writer.run(index));
 
         random.resetSeed();
         index = startIndex;
         reader.run(index);
-        index += valueSize;
+        index += sizeInBytes;
         reader.run(index);
     }
 

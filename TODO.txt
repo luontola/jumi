@@ -67,8 +67,10 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - char
 			OK - int
 			OK - long (currently not needed by our listeners)
-		!! - make it based on multiple ByteBuffers
-			!! - expand buffer automatically
+		OK - use Integer.SIZE etc. in absolute tests
+		!! - TestableRandom: on failure, print all generated values and events (including "reset"), maybe also allow logging custom messages
+		- make it based on multiple ByteBuffers
+			- expand buffer automatically
 				- interface ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
 				- create AllocatedByteBufferSequence
 				- same index returns same backing data
