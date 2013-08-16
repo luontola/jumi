@@ -70,11 +70,11 @@ OK - refactor BuildTest & SuiteConfiguration
 		OK - use Integer.SIZE etc. in absolute tests
 		OK - TestableRandom: on failure, print all generated values and events (including "reset"), maybe also allow logging custom messages
 		!! - make it based on multiple ByteBuffers
-			- expand buffer automatically
-				- interface ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
-				- create AllocatedByteBufferSequence
-				- same index returns same backing data
-				- we can assume sequential access to new indeces; IpcBuffer's position depends on every preceding segment's size
+			OK - create AllocatedByteBufferSequence
+				OK - interface ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
+				OK - same index returns same backing data
+				OK - we can assume sequential access to new indeces; IpcBuffer's position depends on every preceding segment's size
+			!! - expand buffer automatically
 			- test well the splitting of data between buffers
 				- generic tests with initial buffer size varying from 0 to 4 bytes
 				- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all
