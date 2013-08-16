@@ -74,6 +74,23 @@ public class IpcBufferTest {
         buffer.setByte(-1, (byte) 0);
     }
 
+    @Test
+    public void test_traversing_forward_and_backward() {
+        final int segmentCapacity = 2;
+        final int end = segmentCapacity * 5;
+        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(segmentCapacity));
+
+        // forward
+        for (int i = 0; i < end; i++) {
+            buffer.setByte(i, (byte) i);
+        }
+
+        // backward
+        for (int i = end - 1; i >= 0; i--) {
+            assertThat(buffer.getByte(i), is((byte) i));
+        }
+    }
+
 
     // absolute get/set
 

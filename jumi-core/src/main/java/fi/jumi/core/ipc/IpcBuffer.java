@@ -31,7 +31,7 @@ public class IpcBuffer {
         if (index < 0) {
             throw new IndexOutOfBoundsException();
         }
-        while (index < current.startInclusive) { // FIXME: off by one? works even with "-1"
+        while (index < current.startInclusive) {
             current = current.prev();
         }
         while (index >= current.endExclusive) {
