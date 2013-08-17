@@ -85,8 +85,8 @@ OK - refactor BuildTest & SuiteConfiguration
 				SKIP - consider using parameterized tests for the above
 				OK - also check that there is no gap in buffers; it should be possible to dumbly concatenate them all and read the same data
 		!! - create MMF based MappedByteBufferSequence
-			- extract contract test
-			- multiple instances/processes with same path should access same data
+			OK - extract contract test
+			!! - multiple instances/processes with same path should access same data
 				- doesn't need to cache the mapped buffers, but may re-map if called multiple times with same index
 			- new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
 			- when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
