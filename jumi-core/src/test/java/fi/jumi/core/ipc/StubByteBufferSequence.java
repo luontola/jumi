@@ -19,8 +19,24 @@ public class StubByteBufferSequence implements ByteBufferSequence {
         }
     }
 
+    public StubByteBufferSequence(ByteBuffer... segments) {
+        Collections.addAll(this.segments, segments);
+    }
+
     @Override
     public ByteBuffer get(int index) {
         return segments.get(index);
+    }
+
+    public ByteBuffer combinedBuffer() {
+        int capacity = 0;
+        for (ByteBuffer segment : segments) {
+            capacity += segment.capacity();
+        }
+        ByteBuffer combined = ByteBuffer.allocate(capacity);
+        for (ByteBuffer segment : segments) {
+            combined.put(segment);
+        }
+        return combined;
     }
 }

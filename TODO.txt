@@ -69,7 +69,7 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - long (currently not needed by our listeners)
 		OK - use Integer.SIZE etc. in absolute tests
 		OK - TestableRandom: on failure, print all generated values and events (including "reset"), maybe also allow logging custom messages
-		!! - make it based on multiple ByteBuffers
+		OK - make it based on multiple ByteBuffers
 			OK - create AllocatedByteBufferSequence
 				OK - interface ByteBufferSequence.get(int index):ByteBuffer for dynamically creating the MMFs (mockable in tests)
 				OK - same index returns same backing data
@@ -80,11 +80,11 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - test well traversing forwards and backwards
 			OK - use lambdas to remove duplication in all get/set methods
 			OK - escape analysis did not remove the allocations; undo the lambda refactoring
-			!! - test well the splitting of data between buffers
+			OK - test well the splitting of data between buffers
 				OK - generic tests with initial buffer size varying from 0 to sizeInBytes
-				!! - consider using parameterized tests for the above
-				- also check that there is no gap in buffers; it should be possible to dumbly concatenate them all and read the same data
-		- create MMF based MappedByteBufferSequence
+				SKIP - consider using parameterized tests for the above
+				OK - also check that there is no gap in buffers; it should be possible to dumbly concatenate them all and read the same data
+		!! - create MMF based MappedByteBufferSequence
 			- extract contract test
 			- multiple instances/processes with same path should access same data
 				- doesn't need to cache the mapped buffers, but may re-map if called multiple times with same index

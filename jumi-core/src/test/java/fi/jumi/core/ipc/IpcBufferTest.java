@@ -192,7 +192,8 @@ public class IpcBufferTest {
 
         for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < sizeInBytes; howMuchGoesToNextBuffer++) {
             int firstSegment = sizeInBytes - howMuchGoesToNextBuffer;
-            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, sizeInBytes * 2));
+            StubByteBufferSequence buffers = new StubByteBufferSequence(firstSegment, sizeInBytes * 2);
+            buffer = new IpcBuffer(buffers);
             random.info("scenario: " + sizeInBytes + " byte values, first segment is " + firstSegment + " bytes");
 
             random.resetSeed();
@@ -201,6 +202,14 @@ public class IpcBufferTest {
             index += sizeInBytes;
             assertReturnedItself(writer.run(index));
 
+            random.resetSeed();
+            index = 0;
+            reader.run(index);
+            index += sizeInBytes;
+            reader.run(index);
+
+            random.info("scenario: concatenated buffers, results should be the same");
+            buffer = new IpcBuffer(new StubByteBufferSequence(buffers.combinedBuffer()));
             random.resetSeed();
             index = 0;
             reader.run(index);
@@ -222,7 +231,8 @@ public class IpcBufferTest {
 
         for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < sizeInBytes; howMuchGoesToNextBuffer++) {
             int firstSegment = sizeInBytes - howMuchGoesToNextBuffer;
-            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, sizeInBytes * 2));
+            StubByteBufferSequence buffers = new StubByteBufferSequence(firstSegment, sizeInBytes * 2);
+            buffer = new IpcBuffer(buffers);
             random.info("scenario: " + sizeInBytes + " byte values, first segment is " + firstSegment + " bytes");
 
             random.resetSeed();
@@ -230,6 +240,13 @@ public class IpcBufferTest {
             assertReturnedItself(writer.run());
             assertReturnedItself(writer.run());
 
+            random.resetSeed();
+            buffer.position(0);
+            checker.run();
+            checker.run();
+
+            random.info("scenario: concatenated buffers, results should be the same");
+            buffer = new IpcBuffer(new StubByteBufferSequence(buffers.combinedBuffer()));
             random.resetSeed();
             buffer.position(0);
             checker.run();
