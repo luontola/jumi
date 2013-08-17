@@ -44,68 +44,82 @@ public class IpcBuffer {
 
     public byte getByte(int index) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.get(index);
+        return segment.buffer.get(segment.relativize(index));
     }
 
     public short getShort(int index) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getShort(index);
+        if (index + 2 <= segment.endExclusive) {
+            return segment.buffer.getShort(segment.relativize(index));
+        } else {
+            return (short) ((getByte(index) & 0xFF) << 8 | getByte(index + 1) & 0xFF);
+        }
     }
 
     public char getChar(int index) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getChar(index);
+        return (char) getShort(index);
     }
 
     public int getInt(int index) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getInt(index);
+        if (index + 4 <= segment.endExclusive) {
+            return segment.buffer.getInt(segment.relativize(index));
+        } else {
+            return (getShort(index) & 0xFFFF) << 16 | getShort(index + 2) & 0xFFFF;
+        }
     }
 
     public long getLong(int index) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        return segment.buffer.getLong(index);
+        if (index + 8 <= segment.endExclusive) {
+            return segment.buffer.getLong(segment.relativize(index));
+        } else {
+            return (getInt(index) & 0xFFFFFFFFL) << 32 | getInt(index + 4) & 0xFFFFFFFFL;
+        }
     }
 
     // absolute set
 
     public IpcBuffer setByte(int index, byte value) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.put(index, value);
+        segment.buffer.put(segment.relativize(index), value);
         return this;
     }
 
     public IpcBuffer setShort(int index, short value) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putShort(index, value);
+        if (index + 2 <= segment.endExclusive) {
+            segment.buffer.putShort(segment.relativize(index), value);
+        } else {
+            setByte(index, (byte) (value >>> 8));
+            setByte(index + 1, (byte) value);
+        }
         return this;
     }
 
     public IpcBuffer setChar(int index, char value) {
-        Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putChar(index, value);
-        return this;
+        return setShort(index, (short) value);
     }
 
     public IpcBuffer setInt(int index, int value) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putInt(index, value);
+        if (index + 4 <= segment.endExclusive) {
+            segment.buffer.putInt(segment.relativize(index), value);
+        } else {
+            setShort(index, (short) (value >>> 16));
+            setShort(index + 2, (short) value);
+        }
         return this;
     }
 
     public IpcBuffer setLong(int index, long value) {
         Segment segment = segmentContaining(index);
-        index = segment.relativize(index);
-        segment.buffer.putLong(index, value);
+        if (index + 8 <= segment.endExclusive) {
+            segment.buffer.putLong(segment.relativize(index), value);
+        } else {
+            setInt(index, (int) (value >>> 32));
+            setInt(index + 4, (int) value);
+        }
         return this;
     }
 
@@ -124,9 +138,7 @@ public class IpcBuffer {
     }
 
     public char readChar() {
-        char value = getChar(position);
-        position += 2;
-        return value;
+        return (char) readShort();
     }
 
     public int readInt() {
@@ -156,9 +168,7 @@ public class IpcBuffer {
     }
 
     public IpcBuffer writeChar(char value) {
-        setChar(position, value);
-        position += 2;
-        return this;
+        return writeShort((short) value);
     }
 
     public IpcBuffer writeInt(int value) {

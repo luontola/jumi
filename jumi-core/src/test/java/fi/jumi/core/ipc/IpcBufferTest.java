@@ -190,9 +190,9 @@ public class IpcBufferTest {
         final int sizeInBytes = sizeInBits / Byte.SIZE;
         int index;
 
-        for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < 1 /*TODO: sizeInBytes*/; howMuchGoesToNextBuffer++) {
+        for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < sizeInBytes; howMuchGoesToNextBuffer++) {
             int firstSegment = sizeInBytes - howMuchGoesToNextBuffer;
-            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, 20));
+            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, sizeInBytes * 2));
             random.info("scenario: " + sizeInBytes + " byte values, first segment is " + firstSegment + " bytes");
 
             random.resetSeed();
@@ -220,9 +220,9 @@ public class IpcBufferTest {
     private void testRelative(int sizeInBits, RelativeWriter writer, RelativeReader checker) {
         final int sizeInBytes = sizeInBits / Byte.SIZE;
 
-        for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < 1 /*TODO: sizeInBytes*/; howMuchGoesToNextBuffer++) {
+        for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < sizeInBytes; howMuchGoesToNextBuffer++) {
             int firstSegment = sizeInBytes - howMuchGoesToNextBuffer;
-            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, 20));
+            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, sizeInBytes * 2));
             random.info("scenario: " + sizeInBytes + " byte values, first segment is " + firstSegment + " bytes");
 
             random.resetSeed();
