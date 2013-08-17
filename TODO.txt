@@ -89,15 +89,20 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - use MMFs
 			OK - multiple instances/processes with same path should access same data
 				OK - doesn't need to cache the mapped buffers, but may re-map if called multiple times with same index
+			OK - IpcBuffer: avoid looking up adjacent buffers repeatedly (opening a MMF is relatively slow)
 			!! - new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
 			- when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
-			- IpcBuffer: avoid looking up adjacent buffers repeatedly (opening a MMF is relatively slow)
-		- string operations
+		- string operations (only relative read/write, because strings are variable size)
 	- hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
 		protocol draft:
-			header: "Jumi" (4 bytes), protocol-version (int), interface (byte or string?), events...
+			header: "Jumi" (4 bytes), protocol-version (int), interface (string), interface-version (int), events...
 			events: status (byte), event-type (byte), body
 			status: empty (0), exists (1), end-of-file (2)
+			* stuff that depends on interface & interface-version: event-type, body
+		- roundtrip tests
+		- concurrency tests
+			- between writing an event and the event's status there must be a happens-before relationship
+			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
 		- save v1 events to file for testing compatibility
 	- communicate over the buffer instead of socket
 	- after implementing, consider refactoring the following places:
