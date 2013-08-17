@@ -87,9 +87,9 @@ OK - refactor BuildTest & SuiteConfiguration
 		!! - create MMF based MappedByteBufferSequence
 			OK - extract contract test
 			OK - use MMFs
-			!! - multiple instances/processes with same path should access same data
-				- doesn't need to cache the mapped buffers, but may re-map if called multiple times with same index
-			- new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
+			OK - multiple instances/processes with same path should access same data
+				OK - doesn't need to cache the mapped buffers, but may re-map if called multiple times with same index
+			!! - new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
 			- when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
 			- IpcBuffer: avoid looking up adjacent buffers repeatedly (opening a MMF is relatively slow)
 		- string operations
