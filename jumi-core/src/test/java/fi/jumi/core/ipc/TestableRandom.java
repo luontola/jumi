@@ -41,7 +41,7 @@ public class TestableRandom implements TestRule {
     }
 
     public void resetSeed() {
-        logMessage("reset seed");
+        info("reset seed");
         random.setSeed(seed);
     }
 
@@ -72,8 +72,8 @@ public class TestableRandom implements TestRule {
 
     // debug information
 
-    private void logMessage(String message) {
-        log.add(new Message(message));
+    public void info(String message) {
+        log.add(new Info(message));
     }
 
     private <T> T log(T generatedValue) {
@@ -84,7 +84,7 @@ public class TestableRandom implements TestRule {
     private String getDebugInformation() {
         String message = TestableRandom.class.getSimpleName() + " seed was " + seed + "L";
         for (Object obj : log) {
-            if (obj instanceof Message) {
+            if (obj instanceof Info) {
                 message += "\n- " + obj;
             } else {
                 message += "\n- (" + formatType(obj) + ") " + obj;
@@ -106,10 +106,10 @@ public class TestableRandom implements TestRule {
     }
 
 
-    private static class Message {
+    private static class Info {
         private final String message;
 
-        public Message(String message) {
+        public Info(String message) {
             this.message = message;
         }
 

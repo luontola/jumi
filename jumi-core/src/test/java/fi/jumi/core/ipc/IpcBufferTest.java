@@ -19,7 +19,7 @@ public class IpcBufferTest {
     @Rule
     public final TestableRandom random = new TestableRandom();
 
-    private final IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(30));
+    private IpcBuffer buffer;
 
 
     @Test
@@ -58,18 +58,24 @@ public class IpcBufferTest {
 
     @Test
     public void cannot_make_position_negative() {
+        buffer = new IpcBuffer(new AllocatedByteBufferSequence(10));
+
         thrown.expect(IllegalArgumentException.class);
         buffer.position(-1);
     }
 
     @Test
     public void cannot_read_from_negative_positions() {
+        buffer = new IpcBuffer(new AllocatedByteBufferSequence(10));
+
         thrown.expect(IndexOutOfBoundsException.class);
         buffer.getByte(-1);
     }
 
     @Test
     public void cannot_write_to_negative_positions() {
+        buffer = new IpcBuffer(new AllocatedByteBufferSequence(10));
+
         thrown.expect(IndexOutOfBoundsException.class);
         buffer.setByte(-1, (byte) 0);
     }
@@ -139,7 +145,7 @@ public class IpcBufferTest {
 
     @Test
     public void relative_byte() {
-        testRelative(
+        testRelative(Byte.SIZE,
                 () -> buffer.writeByte(random.nextByte()),
                 () -> assertThat(buffer.readByte(), is(random.nextByte()))
         );
@@ -147,7 +153,7 @@ public class IpcBufferTest {
 
     @Test
     public void relative_short() {
-        testRelative(
+        testRelative(Short.SIZE,
                 () -> buffer.writeShort(random.nextShort()),
                 () -> assertThat(buffer.readShort(), is(random.nextShort()))
         );
@@ -155,7 +161,7 @@ public class IpcBufferTest {
 
     @Test
     public void relative_char() {
-        testRelative(
+        testRelative(Character.SIZE,
                 () -> buffer.writeChar(random.nextChar()),
                 () -> assertThat(buffer.readChar(), is(random.nextChar()))
         );
@@ -163,7 +169,7 @@ public class IpcBufferTest {
 
     @Test
     public void relative_int() {
-        testRelative(
+        testRelative(Integer.SIZE,
                 () -> buffer.writeInt(random.nextInt()),
                 () -> assertThat(buffer.readInt(), is(random.nextInt()))
         );
@@ -171,7 +177,7 @@ public class IpcBufferTest {
 
     @Test
     public void relative_long() {
-        testRelative(
+        testRelative(Long.SIZE,
                 () -> buffer.writeLong(random.nextLong()),
                 () -> assertThat(buffer.readLong(), is(random.nextLong()))
         );
@@ -181,21 +187,26 @@ public class IpcBufferTest {
     // randomized testing
 
     private void testAbsolute(int sizeInBits, AbsoluteWriter writer, AbsoluteReader reader) {
-        int sizeInBytes = sizeInBits / Byte.SIZE;
-        final int startIndex = random.nextInt(10);
+        final int sizeInBytes = sizeInBits / Byte.SIZE;
         int index;
 
-        random.resetSeed();
-        index = startIndex;
-        assertReturnedItself(writer.run(index));
-        index += sizeInBytes;
-        assertReturnedItself(writer.run(index));
+        for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < 1 /*TODO: sizeInBytes*/; howMuchGoesToNextBuffer++) {
+            int firstSegment = sizeInBytes - howMuchGoesToNextBuffer;
+            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, 20));
+            random.info("scenario: " + sizeInBytes + " byte values, first segment is " + firstSegment + " bytes");
 
-        random.resetSeed();
-        index = startIndex;
-        reader.run(index);
-        index += sizeInBytes;
-        reader.run(index);
+            random.resetSeed();
+            index = 0;
+            assertReturnedItself(writer.run(index));
+            index += sizeInBytes;
+            assertReturnedItself(writer.run(index));
+
+            random.resetSeed();
+            index = 0;
+            reader.run(index);
+            index += sizeInBytes;
+            reader.run(index);
+        }
     }
 
     private interface AbsoluteWriter {
@@ -206,18 +217,24 @@ public class IpcBufferTest {
         void run(int index);
     }
 
-    private void testRelative(RelativeWriter writer, RelativeReader checker) {
-        final int startIndex = random.nextInt(10);
+    private void testRelative(int sizeInBits, RelativeWriter writer, RelativeReader checker) {
+        final int sizeInBytes = sizeInBits / Byte.SIZE;
 
-        random.resetSeed();
-        buffer.position(startIndex);
-        assertReturnedItself(writer.run());
-        assertReturnedItself(writer.run());
+        for (int howMuchGoesToNextBuffer = 0; howMuchGoesToNextBuffer < 1 /*TODO: sizeInBytes*/; howMuchGoesToNextBuffer++) {
+            int firstSegment = sizeInBytes - howMuchGoesToNextBuffer;
+            buffer = new IpcBuffer(new StubByteBufferSequence(firstSegment, 20));
+            random.info("scenario: " + sizeInBytes + " byte values, first segment is " + firstSegment + " bytes");
 
-        random.resetSeed();
-        buffer.position(startIndex);
-        checker.run();
-        checker.run();
+            random.resetSeed();
+            buffer.position(0);
+            assertReturnedItself(writer.run());
+            assertReturnedItself(writer.run());
+
+            random.resetSeed();
+            buffer.position(0);
+            checker.run();
+            checker.run();
+        }
     }
 
     private interface RelativeWriter {
