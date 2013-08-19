@@ -15,25 +15,20 @@ import static java.nio.file.StandardOpenOption.*;
 @NotThreadSafe
 public class MappedByteBufferSequence implements ByteBufferSequence {
 
-    private final Path basePath;
-    private final int segmentCapacity;
+    private final FileSegmenter segmenter;
 
-    public MappedByteBufferSequence(Path basePath, int segmentCapacity) {
-        this.basePath = basePath;
-        this.segmentCapacity = segmentCapacity;
+    public MappedByteBufferSequence(FileSegmenter segmenter) {
+        this.segmenter = segmenter;
     }
 
     @Override
     public ByteBuffer get(int index) {
-        try (FileChannel fc = FileChannel.open(getSegmentPath(index), READ, WRITE, CREATE)) {
-            return fc.map(FileChannel.MapMode.READ_WRITE, 0, segmentCapacity);
+        Path path = segmenter.pathOf(index);
+        int size = segmenter.sizeOf(index);
+        try (FileChannel fc = FileChannel.open(path, READ, WRITE, CREATE)) {
+            return fc.map(FileChannel.MapMode.READ_WRITE, 0, size);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Path getSegmentPath(int index) {
-        String name = basePath.getFileName().toString() + "." + index;
-        return basePath.resolveSibling(name);
     }
 }

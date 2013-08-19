@@ -19,7 +19,7 @@ public class MappedByteBufferSequenceTest extends ByteBufferSequenceContract {
 
     @Override
     protected ByteBufferSequence newByteBufferSequence() {
-        return new MappedByteBufferSequence(getBasePath(), 10);
+        return new MappedByteBufferSequence(new FileSegmenter(getBasePath(), 10, 10));
     }
 
     private Path getBasePath() {
@@ -31,8 +31,8 @@ public class MappedByteBufferSequenceTest extends ByteBufferSequenceContract {
     public void multiple_instances_and_processes_using_the_same_path_will_access_the_same_data() {
         // we test only multiple instances, but the basic idea of memory-mapped files is the same
         Path basePath = getBasePath();
-        MappedByteBufferSequence buffer1 = new MappedByteBufferSequence(basePath, 10);
-        MappedByteBufferSequence buffer2 = new MappedByteBufferSequence(basePath, 10);
+        MappedByteBufferSequence buffer1 = new MappedByteBufferSequence(new FileSegmenter(basePath, 10, 10));
+        MappedByteBufferSequence buffer2 = new MappedByteBufferSequence(new FileSegmenter(basePath, 10, 10));
 
         buffer1.get(0).put((byte) 123);
         byte b = buffer2.get(0).get();
