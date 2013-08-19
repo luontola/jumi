@@ -39,4 +39,17 @@ public class MappedByteBufferSequenceTest extends ByteBufferSequenceContract {
 
         assertThat(b, is((byte) 123));
     }
+
+    @Test
+    public void if_file_exists_then_maps_the_whole_file_instead_of_what_the_default_segment_size_is() {
+        Path basePath = getBasePath();
+
+        MappedByteBufferSequence buffer1 = new MappedByteBufferSequence(new FileSegmenter(basePath, 10, 10));
+        int capacity1 = buffer1.get(0).capacity();
+
+        MappedByteBufferSequence buffer2 = new MappedByteBufferSequence(new FileSegmenter(basePath, 20, 20));
+        int capacity2 = buffer2.get(0).capacity();
+
+        assertThat("capacity of latter mapping", capacity2, is(capacity1));
+    }
 }

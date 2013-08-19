@@ -8,7 +8,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
+import java.nio.file.*;
 
 import static java.nio.file.StandardOpenOption.*;
 
@@ -24,7 +24,14 @@ public class MappedByteBufferSequence implements ByteBufferSequence {
     @Override
     public ByteBuffer get(int index) {
         Path path = segmenter.pathOf(index);
-        int size = segmenter.sizeOf(index);
+        long size = segmenter.sizeOf(index);
+        if (Files.exists(path)) {
+            try {
+                size = Files.size(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         try (FileChannel fc = FileChannel.open(path, READ, WRITE, CREATE)) {
             return fc.map(FileChannel.MapMode.READ_WRITE, 0, size);
         } catch (IOException e) {
