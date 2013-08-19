@@ -43,7 +43,7 @@ OK - refactor BuildTest & SuiteConfiguration
 		- list of possible optimizations: http://psy-lob-saw.blogspot.fi/2013/07/single-producer-single-consumer-queue.html
 		- MappedByteBuffer slower than ByteBuffer: http://mentablog.soliveirajr.com/2012/12/asynchronous-logging-versus-memory-mapped-files/
 	OK - spike communicating over memory-mapped files
-	!! - create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
+	OK - create IpcBuffer which wraps multiple MappedByteBuffers; combine the good parts of:
 		Mina 3:
 			+ lookup using singly linked list -> let's use a doubly linked list with O(1) in both directions, and field "current" instead of "head & tail"
 			- accesses primitives using 1-byte operations
@@ -84,7 +84,7 @@ OK - refactor BuildTest & SuiteConfiguration
 				OK - generic tests with initial buffer size varying from 0 to sizeInBytes
 				SKIP - consider using parameterized tests for the above
 				OK - also check that there is no gap in buffers; it should be possible to dumbly concatenate them all and read the same data
-		!! - create MMF based MappedByteBufferSequence
+		OK - create MMF based MappedByteBufferSequence
 			OK - extract contract test
 			OK - use MMFs
 			OK - multiple instances/processes with same path should access same data
@@ -93,15 +93,15 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
 			OK - when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
 			OK - retry if opening the file fails at first
-			!! - see about making fi.jumi.core.ipc.MappedByteBufferSequence#tryMapFile thread safe
-	- hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
+			OK - see about making fi.jumi.core.ipc.MappedByteBufferSequence#tryMapFile thread safe
+	!! - hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
 		protocol draft:
 			header: "Jumi" (4 bytes), protocol-version (int), interface (string), interface-version (int), events...
 			events: status (byte), event-type (byte), event-data
 			status: empty (0), exists (1), end-of-file (2)
 			* stuff that depends on interface & interface-version: event-type, event-data
-		- string operations (only relative read/write, because strings are variable size)
-		- roundtrip tests
+		!! - roundtrip tests
+			- string operations (only relative read/write, because strings are variable size)
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?

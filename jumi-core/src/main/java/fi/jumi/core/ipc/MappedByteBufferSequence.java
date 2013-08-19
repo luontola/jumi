@@ -38,6 +38,7 @@ public class MappedByteBufferSequence implements ByteBufferSequence {
         OpenOption[] options;
         if (Files.exists(path)) {
             size = Files.size(path);
+            assert size > 0;
             options = new OpenOption[]{READ, WRITE};
         } else {
             // To avoid a race condition if two processes open the file concurrently,
