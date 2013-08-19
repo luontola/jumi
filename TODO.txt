@@ -92,7 +92,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - IpcBuffer: avoid looking up adjacent buffers repeatedly (opening a MMF is relatively slow)
 			OK - new FileSegmenter(initialPath, initialSize, maxSize).pathOf(index) & sizeOf(index)
 			OK - when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
-			!! - retry if opening the file fails at first
+			OK - retry if opening the file fails at first
+			!! - see about making fi.jumi.core.ipc.MappedByteBufferSequence#tryMapFile thread safe
 	- hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
 		protocol draft:
 			header: "Jumi" (4 bytes), protocol-version (int), interface (string), interface-version (int), events...

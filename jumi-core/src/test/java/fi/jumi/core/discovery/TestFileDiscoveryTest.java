@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import static fi.jumi.core.util.Resilient.tryRepeatedly;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
@@ -23,9 +24,9 @@ public class TestFileDiscoveryTest {
 
     @Test
     public void looks_for_tests_from_directories_on_classpath() throws IOException {
-        Path libraryJar = tempDir.newFile("library.jar").toPath();
-        Path folder1 = tempDir.newFolder("folder1").toPath();
-        Path folder2 = tempDir.newFolder("folder2").toPath();
+        Path libraryJar = tryRepeatedly(() -> tempDir.newFile("library.jar").toPath());
+        Path folder1 = tryRepeatedly(() -> tempDir.newFolder("folder1").toPath());
+        Path folder2 = tryRepeatedly(() -> tempDir.newFolder("folder2").toPath());
 
         SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder()
                 .setIncludedTestsPattern("glob:the pattern")

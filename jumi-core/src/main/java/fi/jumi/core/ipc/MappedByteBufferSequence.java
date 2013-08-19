@@ -4,9 +4,11 @@
 
 package fi.jumi.core.ipc;
 
+import fi.jumi.core.util.Resilient;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.nio.*;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
 
@@ -25,17 +27,19 @@ public class MappedByteBufferSequence implements ByteBufferSequence {
     public ByteBuffer get(int index) {
         Path path = segmenter.pathOf(index);
         long size = segmenter.sizeOf(index);
+        try {
+            return Resilient.tryRepeatedly(() -> tryMapFile(path, size));
+        } catch (IOException e) {
+            throw new RuntimeException("failed to map " + path, e);
+        }
+    }
+
+    private static MappedByteBuffer tryMapFile(Path path, long size) throws IOException {
         if (Files.exists(path)) {
-            try {
-                size = Files.size(path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            size = Files.size(path);
         }
         try (FileChannel fc = FileChannel.open(path, READ, WRITE, CREATE)) {
             return fc.map(FileChannel.MapMode.READ_WRITE, 0, size);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
