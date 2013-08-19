@@ -106,6 +106,7 @@ OK - refactor BuildTest & SuiteConfiguration
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
 		- save v1 events to file for testing compatibility
+	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
 	- communicate over the buffer instead of socket
 	- after implementing, consider refactoring the following places:
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
