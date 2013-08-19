@@ -103,10 +103,19 @@ OK - refactor BuildTest & SuiteConfiguration
 		OK - roundtrip tests
 			OK - string operations (only relative read/write, because strings are variable size)
 		!! - fully test serializing StackTrace
+			- refactor: create StackTrace.Builder, use it also in StackTrace.copyOf, keep the constructor private
+			- make StackTrace.copyOf aware of StackTrace, to not rewrap it? else it might obstruct getExceptionClass (test: chain two copyOf() calls)
+			- test equality using Apache Commons EqualsBuilder; Mockito might already provide a matcher which uses it
+			- test: multiple chained causes
+			- test: multiple suppressions
+		- use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
+		- handle all (4) failure conditions when reading data that has wrong header fields
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
-		- handle all (4) failure conditions when reading data that has wrong header fields
+			- the writer should be the first to touch a new segment, so that the writer would determine its size
+				- concurrency test: writer uses 1 byte segments, reader 2 byte segments; afterwards all segments should be 1 byte
+				- append a null byte before writing the previous event's status?
 		- save v1 events to file for testing compatibility
 	- TestId: create a method for getting the path as int[]
 		- make fi.jumi.api.drivers.TestId#getPath public
