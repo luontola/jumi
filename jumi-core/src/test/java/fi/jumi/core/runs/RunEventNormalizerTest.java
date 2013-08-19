@@ -6,12 +6,10 @@ package fi.jumi.core.runs;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import fi.jumi.core.events.suiteListener.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -19,15 +17,8 @@ import static org.mockito.Mockito.*;
 
 public class RunEventNormalizerTest {
 
-    private final Map<Method, Object[]> targetInvocations = new HashMap<>();
-    private final SuiteListener target = spy(new SuiteListenerToEvent(new EventToSuiteListener(
-            (SuiteListener) Proxy.newProxyInstance(
-                    getClass().getClassLoader(),
-                    new Class[]{SuiteListener.class},
-                    (proxy, method, args) -> {
-                        targetInvocations.put(method, args);
-                        return null;
-                    }))));
+    private final SuiteListenerSpy spy = new SuiteListenerSpy();
+    private final SuiteListener target = spy(spy);
 
     private static final String INFORMATION_ABOUT_THE_CURRENT_CONTEXT = "Incorrect notifier API usage in com.example.DummyTest: ";
     private final TestFile testFile = TestFile.fromClassName("com.example.DummyTest");
@@ -61,7 +52,7 @@ public class RunEventNormalizerTest {
 
         for (Method sourceMethod : RunListener.class.getMethods()) {
             Method targetMethod = getMethod(sourceMethod.getName(), SuiteListener.class);
-            assertThat("this test failed to check all event types", targetInvocations.keySet(), hasItem(targetMethod));
+            assertThat("this test failed to check all event types", spy.methodInvocations.keySet(), hasItem(targetMethod));
         }
     }
 
