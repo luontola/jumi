@@ -4,6 +4,7 @@
       <w>capturer</w>
       <w>demuxer</w>
       <w>denormalizer</w>
+      <w>deserializes</w>
       <w>eventizer</w>
       <w>jumi</w>
       <w>segmenter</w>

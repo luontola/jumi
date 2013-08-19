@@ -9,69 +9,270 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.IpcBuffer;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.nio.file.Paths;
+import java.util.*;
 
 @NotThreadSafe
 public class SuiteEventSerializer implements SuiteListener {
 
-    public static void deserialize(IpcBuffer source, SuiteListener target) {
+    private static final byte onSuiteStarted = 1;
+    private static final byte onInternalError = 2;
+    private static final byte onTestFileFound = 3;
+    private static final byte onAllTestFilesFound = 4;
+    private static final byte onTestFound = 5;
+    private static final byte onRunStarted = 6;
+    private static final byte onTestStarted = 7;
+    private static final byte onPrintedOut = 8;
+    private static final byte onPrintedErr = 9;
+    private static final byte onFailure = 10;
+    private static final byte onTestFinished = 11;
+    private static final byte onRunFinished = 12;
+    private static final byte onTestFileFinished = 13;
+    private static final byte onSuiteFinished = 14;
+
+    private final IpcBuffer target;
+
+    public SuiteEventSerializer(IpcBuffer target) {
+        this.target = target;
     }
 
-    public SuiteEventSerializer(IpcBuffer buffer) {
+    public static void deserialize(IpcBuffer source, SuiteListener target) {
+        while (true) {
+            byte type = readEventType(source);
+            switch (type) {
+                case onSuiteStarted:
+                    target.onSuiteStarted();
+                    break;
+                case onInternalError:
+                    target.onInternalError(readString(source), readStackTrace(source));
+                    break;
+                case onTestFileFound:
+                    target.onTestFileFound(readTestFile(source));
+                    break;
+                case onAllTestFilesFound:
+                    target.onAllTestFilesFound();
+                    break;
+                case onTestFound:
+                    target.onTestFound(readTestFile(source), readTestId(source), readString(source));
+                    break;
+                case onRunStarted:
+                    target.onRunStarted(readRunId(source), readTestFile(source));
+                    break;
+                case onTestStarted:
+                    target.onTestStarted(readRunId(source), readTestId(source));
+                    break;
+                case onPrintedOut:
+                    target.onPrintedOut(readRunId(source), readString(source));
+                    break;
+                case onPrintedErr:
+                    target.onPrintedErr(readRunId(source), readString(source));
+                    break;
+                case onFailure:
+                    target.onFailure(readRunId(source), readStackTrace(source));
+                    break;
+                case onTestFinished:
+                    target.onTestFinished(readRunId(source));
+                    break;
+                case onRunFinished:
+                    target.onRunFinished(readRunId(source));
+                    break;
+                case onTestFileFinished:
+                    target.onTestFileFinished(readTestFile(source));
+                    break;
+                case onSuiteFinished:
+                    target.onSuiteFinished();
+                    break;
+                case 0:
+                    return; // TODO: check status instead of type
+                default:
+                    throw new IllegalArgumentException("Unknown type " + type);
+            }
+        }
     }
 
     @Override
     public void onSuiteStarted() {
+        writeEventType(onSuiteStarted);
     }
 
     @Override
     public void onInternalError(String message, StackTrace cause) {
+        writeEventType(onInternalError);
+        writeString(message);
+        writeStackTrace(cause);
     }
 
     @Override
     public void onTestFileFound(TestFile testFile) {
+        writeEventType(onTestFileFound);
+        writeTestFile(testFile);
     }
 
     @Override
     public void onAllTestFilesFound() {
+        writeEventType(onAllTestFilesFound);
     }
 
     @Override
     public void onTestFound(TestFile testFile, TestId testId, String name) {
+        writeEventType(onTestFound);
+        writeTestFile(testFile);
+        writeTestId(testId);
+        writeString(name);
     }
 
     @Override
     public void onRunStarted(RunId runId, TestFile testFile) {
+        writeEventType(onRunStarted);
+        writeRunId(runId);
+        writeTestFile(testFile);
     }
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
+        writeEventType(onTestStarted);
+        writeRunId(runId);
+        writeTestId(testId);
     }
 
     @Override
     public void onPrintedOut(RunId runId, String text) {
+        writeEventType(onPrintedOut);
+        writeRunId(runId);
+        writeString(text);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
+        writeEventType(onPrintedErr);
+        writeRunId(runId);
+        writeString(text);
     }
 
     @Override
     public void onFailure(RunId runId, StackTrace cause) {
+        writeEventType(onFailure);
+        writeRunId(runId);
+        writeStackTrace(cause);
     }
 
     @Override
     public void onTestFinished(RunId runId) {
+        writeEventType(onTestFinished);
+        writeRunId(runId);
     }
 
     @Override
     public void onRunFinished(RunId runId) {
+        writeEventType(onRunFinished);
+        writeRunId(runId);
     }
 
     @Override
     public void onTestFileFinished(TestFile testFile) {
+        writeEventType(onTestFileFinished);
+        writeTestFile(testFile);
     }
 
     @Override
     public void onSuiteFinished() {
+        writeEventType(onSuiteFinished);
+    }
+
+
+    // event type
+
+    private static byte readEventType(IpcBuffer source) {
+        return source.readByte();
+    }
+
+    private void writeEventType(byte type) {
+        target.writeByte(type);
+    }
+
+    // TestFile
+
+    private static TestFile readTestFile(IpcBuffer source) {
+        return TestFile.fromPath(Paths.get(readString(source)));
+    }
+
+    private void writeTestFile(TestFile testFile) {
+        writeString(testFile.getPath());
+    }
+
+    // TestId
+
+    private static TestId readTestId(IpcBuffer source) {
+        int[] path = new int[source.readInt()];
+        for (int i = 0; i < path.length; i++) {
+            path[i] = source.readInt();
+        }
+        return TestId.of(path);
+    }
+
+    private void writeTestId(TestId testId) {
+        // TODO: extract this into TestId as "getPath(): int[]"
+        List<Integer> path = new ArrayList<>();
+        for (TestId id = testId; !id.isRoot(); id = id.getParent()) {
+            path.add(id.getIndex());
+        }
+        Collections.reverse(path);
+
+        target.writeInt(path.size());
+        for (Integer index : path) {
+            target.writeInt(index);
+        }
+    }
+
+    // RunId
+
+    private static RunId readRunId(IpcBuffer source) {
+        return new RunId(source.readInt());
+    }
+
+    private void writeRunId(RunId runId) {
+        target.writeInt(runId.toInt());
+    }
+
+    // StackTrace
+
+    private static StackTrace readStackTrace(IpcBuffer source) {
+        String exceptionClass = readString(source);
+        String toString = readString(source);
+        String message = readString(source);
+        return StackTrace.copyOf(new Throwable(message) {
+            @Override
+            public String toString() {
+                return toString;
+            }
+        });
+    }
+
+    private void writeStackTrace(StackTrace stackTrace) {
+        writeString(stackTrace.getExceptionClass());
+        writeString(stackTrace.toString());
+        writeString(stackTrace.getMessage());
+        // TODO: cause
+        // TODO: stack trace elements
+        // TODO: suppressed
+    }
+
+    // String
+
+    private static String readString(IpcBuffer source) {
+        int length = source.readInt();
+        char[] chars = new char[length];
+        for (int i = 0; i < chars.length; i++) {
+            chars[i] = source.readChar();
+        }
+        return new String(chars);
+    }
+
+    private void writeString(String path) {
+        int length = path.length();
+        target.writeInt(length);
+        for (int i = 0; i < length; i++) {
+            target.writeChar(path.charAt(i));
+        }
     }
 }

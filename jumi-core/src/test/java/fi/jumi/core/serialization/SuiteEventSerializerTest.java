@@ -8,7 +8,7 @@ import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.*;
 import fi.jumi.core.util.SpyListener;
-import org.junit.*;
+import org.junit.Test;
 
 import java.lang.reflect.Method;
 
@@ -17,9 +17,8 @@ import static org.hamcrest.Matchers.hasItem;
 
 public class SuiteEventSerializerTest {
 
-    @Ignore // TODO
     @Test
-    public void serializes_all_events() {
+    public void serializes_and_deserializes_all_events() {
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         exampleUsage(spy.getListener());
         spy.replay();
@@ -62,7 +61,7 @@ public class SuiteEventSerializerTest {
         listener.onTestStarted(runId, TestId.of(0));
         listener.onPrintedOut(runId, "printed to out");
         listener.onPrintedErr(runId, "printed to err");
-        listener.onFailure(runId, StackTrace.copyOf(new AssertionError("assertion message")));
+        listener.onFailure(runId, StackTrace.copyOf(new AssertionError("assertion message"))); // TODO: add cause and suppressed, also test the stack trace elements
         listener.onTestFinished(runId);
         listener.onTestFinished(runId);
         listener.onRunFinished(runId);

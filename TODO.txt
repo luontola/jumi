@@ -100,12 +100,18 @@ OK - refactor BuildTest & SuiteConfiguration
 			events: status (byte), event-type (byte), event-data
 			status: empty (0), exists (1), end-of-file (2)
 			* stuff that depends on interface & interface-version: event-type, event-data
-		!! - roundtrip tests
-			- string operations (only relative read/write, because strings are variable size)
+		OK - roundtrip tests
+			OK - string operations (only relative read/write, because strings are variable size)
+		!! - fully test serializing StackTrace
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
+		- handle all (4) failure conditions when reading data that has wrong header fields
 		- save v1 events to file for testing compatibility
+	- TestId: create a method for getting the path as int[]
+		- make fi.jumi.api.drivers.TestId#getPath public
+		- write tests directly for getPath
+		- refactor SuiteEventSerializer#writeTestId to use it
 	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
 	- communicate over the buffer instead of socket
 	- after implementing, consider refactoring the following places:
