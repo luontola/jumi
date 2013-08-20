@@ -8,6 +8,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.*;
 
 import java.lang.reflect.*;
+import java.util.List;
 
 public class EqualityMatchers {
 
@@ -40,6 +41,27 @@ public class EqualityMatchers {
             return path;
         }
 
+        // collections have a custom equals, but we want deep equality on every collection element
+        // TODO: support other collection types? comparing Sets should be order-independent
+        if (obj1 instanceof List) {
+            List<?> col1 = (List<?>) obj1;
+            List<?> col2 = (List<?>) obj2;
+
+            int size1 = col1.size();
+            int size2 = col2.size();
+            if (size1 != size2) {
+                return path + ".size()";
+            }
+
+            for (int i = 0; i < Math.min(size1, size2); i++) {
+                String diff = findDifference(path + ".get(" + i + ")", col1.get(i), col2.get(i));
+                if (diff != null) {
+                    return diff;
+                }
+            }
+            return null;
+        }
+
         // use custom equals method if exists
         try {
             Method equals = obj1.getClass().getMethod("equals", Object.class);
@@ -50,7 +72,7 @@ public class EqualityMatchers {
             throw new RuntimeException(e);
         }
 
-        // fall back to structural equality
+        // arrays
         if (obj2.getClass().isArray()) {
             int length1 = Array.getLength(obj1);
             int length2 = Array.getLength(obj2);
@@ -66,20 +88,21 @@ public class EqualityMatchers {
                     return diff;
                 }
             }
-        } else {
+            return null;
+        }
 
-            for (Class<?> cl = obj2.getClass(); cl != null; cl = cl.getSuperclass()) {
-                for (Field field : cl.getDeclaredFields()) {
-                    try {
-                        String diff = findDifference(path + "." + field.getName(),
-                                FieldUtils.readField(field, obj1, true),
-                                FieldUtils.readField(field, obj2, true));
-                        if (diff != null) {
-                            return diff;
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
+        // structural equality
+        for (Class<?> cl = obj2.getClass(); cl != null; cl = cl.getSuperclass()) {
+            for (Field field : cl.getDeclaredFields()) {
+                try {
+                    String diff = findDifference(path + "." + field.getName(),
+                            FieldUtils.readField(field, obj1, true),
+                            FieldUtils.readField(field, obj2, true));
+                    if (diff != null) {
+                        return diff;
                     }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }

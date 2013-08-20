@@ -7,6 +7,8 @@ package fi.jumi.core.util;
 import org.hamcrest.StringDescription;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -35,6 +37,15 @@ public class EqualityMatchersTest {
     }
 
     @Test
+    public void lists() {
+        assertThat("same", Arrays.asList(1, 2), deepEqualTo(Arrays.asList(1, 2)));
+        assertThat("longer", Arrays.asList(1, 2, 3), not(deepEqualTo(Arrays.asList(1, 2))));
+        assertThat("shorter", Arrays.asList(1), not(deepEqualTo(Arrays.asList(1, 2))));
+        assertThat("different order", Arrays.asList(2, 1), not(deepEqualTo(Arrays.asList(1, 2))));
+        assertThat("different value", Arrays.asList(1, 3), not(deepEqualTo(Arrays.asList(1, 2))));
+    }
+
+    @Test
     public void classes_that_do_not_implement_equals() {
         assertThat("same", new NoEqualsDummy("foo"), deepEqualTo(new NoEqualsDummy("foo")));
         assertThat("different", new NoEqualsDummy("foo"), not(deepEqualTo(new NoEqualsDummy("bar"))));
@@ -44,10 +55,15 @@ public class EqualityMatchersTest {
 
         assertThat("array of same", new Object[]{new NoEqualsDummy("foo")}, deepEqualTo(new Object[]{new NoEqualsDummy("foo")}));
         assertThat("array of different", new Object[]{new NoEqualsDummy("foo")}, not(deepEqualTo(new Object[]{new NoEqualsDummy("bar")})));
+
+        assertThat("list of same", Arrays.asList(new NoEqualsDummy("foo")), deepEqualTo(Arrays.asList(new NoEqualsDummy("foo"))));
+        assertThat("list of different", Arrays.asList(new NoEqualsDummy("foo")), not(deepEqualTo(Arrays.asList(new NoEqualsDummy("bar")))));
     }
 
     @Test
     public void failure_description_says_what_field_was_different() {
+
+        // array
         assertThat(
                 getMismatchDescription(
                         new NoEqualsDummy(new Object[]{new NoEqualsDummy("foo")}),
@@ -58,6 +74,18 @@ public class EqualityMatchersTest {
                         new NoEqualsDummy(new Object[]{new NoEqualsDummy("foo")}),
                         new NoEqualsDummy(new Object[]{null, null})),
                 containsString("\"this.obj.length\""));
+
+        // list
+        assertThat(
+                getMismatchDescription(
+                        new NoEqualsDummy(Arrays.asList(new NoEqualsDummy("foo"))),
+                        new NoEqualsDummy(Arrays.asList(new NoEqualsDummy("bar")))),
+                containsString("\"this.obj.get(0).obj\""));
+        assertThat(
+                getMismatchDescription(
+                        new NoEqualsDummy(Arrays.asList(new NoEqualsDummy("foo"))),
+                        new NoEqualsDummy(Arrays.asList(null, null))),
+                containsString("\"this.obj.size()\""));
     }
 
     private static String getMismatchDescription(Object actual, Object expected) {
