@@ -106,7 +106,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - refactor: create StackTrace.Builder, use it also in StackTrace.copyOf, keep the constructor private
 			OK - make StackTrace.copyOf aware of StackTrace, to not rewrap it? else it might obstruct getExceptionClass (test: chain two copyOf() calls)
 			SKIP - test equality using Apache Commons EqualsBuilder; Mockito might already provide a matcher which uses it
-			!! - test deep structural equality using a custom matcher; the existing tools weren't enough
+			OK - test deep structural equality using a custom matcher; the existing tools weren't enough
+			!! - test: simple case
 			- test: multiple chained causes
 			- test: multiple suppressions
 		- test serializing strings

@@ -11,7 +11,6 @@ import java.lang.reflect.*;
 
 public class EqualityMatchers {
 
-
     public static <T> Matcher<T> deepEqualTo(T expected) {
         return new TypeSafeMatcher<T>() {
             @Override
@@ -34,6 +33,9 @@ public class EqualityMatchers {
     }
 
     private static String findDifference(String path, Object obj1, Object obj2) {
+        if (obj1 == null || obj2 == null) {
+            return obj1 == obj2 ? null : path;
+        }
         if (obj1.getClass() != obj2.getClass()) {
             return path;
         }

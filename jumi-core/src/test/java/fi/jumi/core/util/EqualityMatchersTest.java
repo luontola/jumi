@@ -19,6 +19,8 @@ public class EqualityMatchersTest {
         assertThat("foo", not(deepEqualTo("bar")));
         assertThat(1, deepEqualTo(1));
         assertThat(true, deepEqualTo(true));
+        assertThat("foo", not(deepEqualTo(null)));
+        assertThat(null, not(deepEqualTo("foo")));
     }
 
     @Test
