@@ -4,7 +4,6 @@
 
 package fi.jumi.core.util;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.*;
 
@@ -17,58 +16,71 @@ public class EqualityMatchers {
         return new TypeSafeMatcher<T>() {
             @Override
             protected boolean matchesSafely(T actual) {
-                return areDeepEqual(actual, expected);
+                return findDifference("this", actual, expected) == null;
             }
 
             @Override
             public void describeTo(Description description) {
-                description.appendText("structurally equal to ").appendValue(expected);
+                description.appendText("deep equal to ").appendValue(expected);
             }
 
-//            @Override
-//            protected void describeMismatchSafely(T actual, Description mismatchDescription) {
-//                boolean path = areDeepEqual(actual, expected);
-//                mismatchDescription.appendText("was different at ").appendValue(path)
-//                        .appendText(" of ").appendValue(actual);
-//            }
+            @Override
+            protected void describeMismatchSafely(T actual, Description mismatchDescription) {
+                String path = findDifference("this", actual, expected);
+                mismatchDescription.appendText("was different at ").appendValue(path)
+                        .appendText(" of ").appendValue(actual);
+            }
         };
     }
 
-    private static boolean areDeepEqual(Object actual, Object expected) {
-        if (actual.getClass() != expected.getClass()) {
-            return false;
+    private static String findDifference(String path, Object obj1, Object obj2) {
+        if (obj1.getClass() != obj2.getClass()) {
+            return path;
         }
 
         // use custom equals method if exists
         try {
-            Method equals = actual.getClass().getMethod("equals", Object.class);
+            Method equals = obj1.getClass().getMethod("equals", Object.class);
             if (equals.getDeclaringClass() != Object.class) {
-                return actual.equals(expected);
+                return obj1.equals(obj2) ? null : path;
             }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 
         // fall back to structural equality
-        EqualsBuilder eq = new EqualsBuilder();
-        if (expected.getClass().isArray()) {
-            int actualLength = Array.getLength(actual);
-            int expectedLength = Array.getLength(expected);
-            eq.append(actualLength, expectedLength);
-            for (int i = 0; i < Math.min(actualLength, expectedLength); i++) {
-                eq.append(areDeepEqual(Array.get(actual, i), Array.get(expected, i)), true);
+        if (obj2.getClass().isArray()) {
+            int length1 = Array.getLength(obj1);
+            int length2 = Array.getLength(obj2);
+            if (length1 != length2) {
+                return path + ".length";
+            }
+
+            for (int i = 0; i < Math.min(length1, length2); i++) {
+                String diff = findDifference(path + "[" + i + "]",
+                        Array.get(obj1, i),
+                        Array.get(obj2, i));
+                if (diff != null) {
+                    return diff;
+                }
             }
         } else {
-            for (Class<?> cl = expected.getClass(); cl != null; cl = cl.getSuperclass()) {
+
+            for (Class<?> cl = obj2.getClass(); cl != null; cl = cl.getSuperclass()) {
                 for (Field field : cl.getDeclaredFields()) {
                     try {
-                        eq.append(areDeepEqual(FieldUtils.readField(field, actual, true), FieldUtils.readField(field, expected, true)), true);
+                        String diff = findDifference(path + "." + field.getName(),
+                                FieldUtils.readField(field, obj1, true),
+                                FieldUtils.readField(field, obj2, true));
+                        if (diff != null) {
+                            return diff;
+                        }
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
                 }
             }
         }
-        return eq.build();
+        return null;
     }
 }

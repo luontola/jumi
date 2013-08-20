@@ -5,7 +5,7 @@
 package fi.jumi.core.util;
 
 import org.hamcrest.StringDescription;
-import org.junit.*;
+import org.junit.Test;
 
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,16 +44,24 @@ public class EqualityMatchersTest {
         assertThat("array of different", new Object[]{new NoEqualsDummy("foo")}, not(deepEqualTo(new Object[]{new NoEqualsDummy("bar")})));
     }
 
-    @Ignore // TODO
     @Test
     public void failure_description_says_what_field_was_different() {
-        NoEqualsDummy actual = new NoEqualsDummy(new Object[]{new NoEqualsDummy("foo")});
-        NoEqualsDummy expected = new NoEqualsDummy(new Object[]{new NoEqualsDummy("bar")});
+        assertThat(
+                getMismatchDescription(
+                        new NoEqualsDummy(new Object[]{new NoEqualsDummy("foo")}),
+                        new NoEqualsDummy(new Object[]{new NoEqualsDummy("bar")})),
+                containsString("\"this.obj[0].obj\""));
+        assertThat(
+                getMismatchDescription(
+                        new NoEqualsDummy(new Object[]{new NoEqualsDummy("foo")}),
+                        new NoEqualsDummy(new Object[]{null, null})),
+                containsString("\"this.obj.length\""));
+    }
 
+    private static String getMismatchDescription(Object actual, Object expected) {
         StringDescription description = new StringDescription();
         deepEqualTo(expected).describeMismatch(actual, description);
-
-        assertThat(description.toString(), containsString("\"this.obj[0].obj\""));
+        return description.toString();
     }
 
     private static class NoEqualsDummy {
