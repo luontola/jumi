@@ -10,10 +10,12 @@ import fi.jumi.core.ipc.*;
 import fi.jumi.core.util.SpyListener;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
+import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 
 public class SuiteEventSerializerTest {
 
@@ -69,5 +71,39 @@ public class SuiteEventSerializerTest {
         listener.onInternalError("error message", StackTrace.from(new Exception("exception message")));
         listener.onTestFileFinished(testFile);
         listener.onSuiteFinished();
+    }
+
+    @Test
+    public void test_serialization_of_StackTrace() {
+        StackTrace original = StackTrace.from(new IOException("the message"));
+
+        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+    }
+
+    @Test
+    public void test_serialization_of_StackTrace_with_causes() {
+        StackTrace original = StackTrace.from(
+                new IOException("the message",
+                        new IllegalArgumentException("cause 1",
+                                new IllegalStateException("cause 2"))));
+
+        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+    }
+
+    @Test
+    public void test_serialization_of_StackTrace_with_suppressed() {
+        IOException e = new IOException("the message");
+        e.addSuppressed(new IllegalArgumentException("suppressed 1"));
+        e.addSuppressed(new IllegalStateException("suppressed 2"));
+        StackTrace original = StackTrace.from(e);
+
+        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+    }
+
+    private static StackTrace serializeAndDeserialize(StackTrace expected) {
+        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(1024));
+        new SuiteEventSerializer(buffer).writeStackTrace(expected);
+        buffer.position(0);
+        return SuiteEventSerializer.readStackTrace(buffer);
     }
 }

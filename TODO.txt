@@ -107,9 +107,11 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - make StackTrace.copyOf aware of StackTrace, to not rewrap it? else it might obstruct getExceptionClass (test: chain two copyOf() calls)
 			SKIP - test equality using Apache Commons EqualsBuilder; Mockito might already provide a matcher which uses it
 			OK - test deep structural equality using a custom matcher; the existing tools weren't enough
-			!! - test: simple case
-			- test: multiple chained causes
-			- test: multiple suppressions
+			OK - test: simple case
+			OK - test: multiple chained causes
+			OK - test: multiple suppressions
+				OK - make deepEqualTo compare Collections using iteration
+			!! - refactor: unify cause and suppressed
 		- test serializing strings
 			- empty string
 			- random string of random length

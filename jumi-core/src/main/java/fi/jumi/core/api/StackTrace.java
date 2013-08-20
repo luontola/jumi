@@ -64,13 +64,13 @@ public class StackTrace extends Throwable {
         private Throwable cause;
         private Throwable[] suppressed;
 
-        public Builder setCause(Throwable cause) {
-            this.cause = cause;
+        public Builder setExceptionClass(String exceptionClass) {
+            this.exceptionClass = exceptionClass;
             return this;
         }
 
-        public Builder setExceptionClass(String exceptionClass) {
-            this.exceptionClass = exceptionClass;
+        public Builder setToString(String toString) {
+            this.toString = toString;
             return this;
         }
 
@@ -84,13 +84,13 @@ public class StackTrace extends Throwable {
             return this;
         }
 
-        public Builder setSuppressed(Throwable[] suppressed) {
-            this.suppressed = suppressed;
+        public Builder setCause(Throwable cause) {
+            this.cause = cause;
             return this;
         }
 
-        public Builder setToString(String toString) {
-            this.toString = toString;
+        public Builder setSuppressed(Throwable[] suppressed) {
+            this.suppressed = suppressed;
             return this;
         }
 

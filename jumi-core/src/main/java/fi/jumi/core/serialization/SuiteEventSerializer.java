@@ -236,25 +236,74 @@ public class SuiteEventSerializer implements SuiteListener {
 
     // StackTrace
 
-    private static StackTrace readStackTrace(IpcBuffer source) {
-        String exceptionClass = readString(source);
-        String toString = readString(source);
-        String message = readString(source);
-        return StackTrace.from(new Throwable(message) {
-            @Override
-            public String toString() {
-                return toString;
-            }
-        });
+    static StackTrace readStackTrace(IpcBuffer source) {
+        return new StackTrace.Builder()
+                .setExceptionClass(readString(source))
+                .setToString(readString(source))
+                .setMessage(readString(source))
+                .setStackTrace(readStackTraceElements(source))
+                .setCause(readExceptionCause(source))
+                .setSuppressed(readSuppressedExceptions(source))
+                .build();
     }
 
-    private void writeStackTrace(StackTrace stackTrace) {
+    void writeStackTrace(StackTrace stackTrace) {
         writeString(stackTrace.getExceptionClass());
         writeString(stackTrace.toString());
         writeString(stackTrace.getMessage());
-        // TODO: cause
-        // TODO: stack trace elements
-        // TODO: suppressed
+        writeStackTraceElements(stackTrace.getStackTrace());
+        writeExceptionCause((StackTrace) stackTrace.getCause());
+        writeSuppressedExceptions(stackTrace.getSuppressed());
+    }
+
+    private static StackTraceElement[] readStackTraceElements(IpcBuffer source) {
+        StackTraceElement[] elements = new StackTraceElement[source.readInt()];
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = new StackTraceElement(readString(source), readString(source), readString(source), source.readInt());
+        }
+        return elements;
+    }
+
+    private void writeStackTraceElements(StackTraceElement[] elements) {
+        target.writeInt(elements.length);
+        for (StackTraceElement element : elements) {
+            writeString(element.getClassName());
+            writeString(element.getMethodName());
+            writeString(element.getFileName());
+            target.writeInt(element.getLineNumber());
+        }
+    }
+
+    private static StackTrace readExceptionCause(IpcBuffer source) {
+        byte exists = source.readByte();
+        if (exists == 0) {
+            return null;
+        }
+        return readStackTrace(source);
+    }
+
+    private void writeExceptionCause(StackTrace cause) {
+        if (cause == null) {
+            target.writeByte((byte) 0);
+        } else {
+            target.writeByte((byte) 1);
+            writeStackTrace(cause);
+        }
+    }
+
+    private static Throwable[] readSuppressedExceptions(IpcBuffer source) {
+        Throwable[] suppressed = new Throwable[source.readInt()];
+        for (int i = 0; i < suppressed.length; i++) {
+            suppressed[i] = readStackTrace(source);
+        }
+        return suppressed;
+    }
+
+    private void writeSuppressedExceptions(Throwable[] suppressed) {
+        target.writeInt(suppressed.length);
+        for (Throwable t : suppressed) {
+            writeStackTrace((StackTrace) t);
+        }
     }
 
     // String
