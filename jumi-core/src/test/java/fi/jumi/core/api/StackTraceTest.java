@@ -5,10 +5,14 @@
 package fi.jumi.core.api;
 
 import com.google.common.base.Throwables;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class StackTraceTest {
@@ -74,5 +78,17 @@ public class StackTraceTest {
         assertThat(suppressed[0].getMessage(), is("suppressed 1"));
         assertThat(suppressed[1], is(instanceOf(StackTrace.class)));
         assertThat(suppressed[1].getMessage(), is("suppressed 2"));
+    }
+
+    @Test
+    public void copyOf_is_idempotent() {
+        IllegalArgumentException original = new IllegalArgumentException("original message", new NullPointerException("cause message"));
+        original.addSuppressed(new IOException("suppressed 1"));
+
+        StackTrace st1 = StackTrace.copyOf(original);
+        StackTrace st2 = StackTrace.copyOf(st1);
+
+        assertThat(st2.getExceptionClass(), is(st1.getExceptionClass()));
+        assertTrue(EqualsBuilder.reflectionEquals(st1, st2));
     }
 }

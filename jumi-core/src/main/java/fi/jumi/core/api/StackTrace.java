@@ -20,6 +20,9 @@ public class StackTrace extends Throwable {
         if (original == null) {
             return null;
         }
+        if (original instanceof StackTrace) {
+            return (StackTrace) original;
+        }
         return new Builder()
                 .setExceptionClass(original.getClass().getName())
                 .setToString(original.toString())
