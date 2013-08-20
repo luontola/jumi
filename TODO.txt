@@ -103,12 +103,22 @@ OK - refactor BuildTest & SuiteConfiguration
 		OK - roundtrip tests
 			OK - string operations (only relative read/write, because strings are variable size)
 		!! - fully test serializing StackTrace
-			- refactor: create StackTrace.Builder, use it also in StackTrace.copyOf, keep the constructor private
-			- make StackTrace.copyOf aware of StackTrace, to not rewrap it? else it might obstruct getExceptionClass (test: chain two copyOf() calls)
+			OK - refactor: create StackTrace.Builder, use it also in StackTrace.copyOf, keep the constructor private
+			!! - make StackTrace.copyOf aware of StackTrace, to not rewrap it? else it might obstruct getExceptionClass (test: chain two copyOf() calls)
 			- test equality using Apache Commons EqualsBuilder; Mockito might already provide a matcher which uses it
 			- test: multiple chained causes
 			- test: multiple suppressions
+		- test serializing strings
+			- empty string
+			- random string of random length
+			- all non-printable characters, i.e. 00-1F
+				http://web.itu.edu.tr/~sgunduz/courses/mikroisl/ascii.html
 		- use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
+			- spike whether that solved the timeout by mutating manually
+			- rename StubByteBufferSequence to FixedByteBufferSequence
+			- make FixedByteBufferSequence pass the contract
+			- test that accessing unavailable indexes throws IllegalArgumentException with clear message
+			- use FixedByteBufferSequence with one big enough buffer in the serializer's tests
 		- handle all (4) failure conditions when reading data that has wrong header fields
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
