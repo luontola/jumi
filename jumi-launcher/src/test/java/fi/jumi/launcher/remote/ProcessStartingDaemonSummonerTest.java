@@ -90,7 +90,7 @@ public class ProcessStartingDaemonSummonerTest {
 
         expect.onSuiteStarted();
         expect.onInternalError("Failed to start the test runner daemon process",
-                StackTrace.copyOf(new RuntimeException("Could not connect to the daemon: timed out after 0 ms")));
+                StackTrace.from(new RuntimeException("Could not connect to the daemon: timed out after 0 ms")));
         expect.onSuiteFinished();
         spy.replay();
 

@@ -21,7 +21,7 @@ public class StackTraceTest {
     public void has_same_message_as_original_exception() {
         Throwable original = new Throwable("original message");
 
-        StackTrace copy = StackTrace.copyOf(original);
+        StackTrace copy = StackTrace.from(original);
 
         assertThat(copy.getMessage(), is("original message"));
     }
@@ -30,7 +30,7 @@ public class StackTraceTest {
     public void has_same_toString_as_original_exception() {
         Throwable original = new Throwable("original message");
 
-        StackTrace copy = StackTrace.copyOf(original);
+        StackTrace copy = StackTrace.from(original);
 
         assertThat(copy.toString(), is(original.toString()));
     }
@@ -39,7 +39,7 @@ public class StackTraceTest {
     public void has_same_stack_trace_as_original_exception() {
         Throwable original = new Throwable("original message");
 
-        StackTrace copy = StackTrace.copyOf(original);
+        StackTrace copy = StackTrace.from(original);
 
         assertThat(copy.getStackTrace(), is(arrayContaining(original.getStackTrace())));
         assertThat(Throwables.getStackTraceAsString(copy), is(Throwables.getStackTraceAsString(original)));
@@ -49,7 +49,7 @@ public class StackTraceTest {
     public void provides_the_name_of_the_original_exception_class() {
         Throwable original = new Throwable("original message");
 
-        StackTrace copy = StackTrace.copyOf(original);
+        StackTrace copy = StackTrace.from(original);
 
         assertThat(copy.getExceptionClass(), is("java.lang.Throwable"));
     }
@@ -58,7 +58,7 @@ public class StackTraceTest {
     public void causes_are_also_copied_recursively() {
         Throwable original = new Throwable("original message", new Exception("the cause"));
 
-        StackTrace copy = StackTrace.copyOf(original);
+        StackTrace copy = StackTrace.from(original);
 
         assertThat(copy.getCause(), is(instanceOf(StackTrace.class)));
         assertThat(copy.getCause().getMessage(), is("the cause"));
@@ -70,7 +70,7 @@ public class StackTraceTest {
         original.addSuppressed(new Exception("suppressed 1"));
         original.addSuppressed(new RuntimeException("suppressed 2"));
 
-        StackTrace copy = StackTrace.copyOf(original);
+        StackTrace copy = StackTrace.from(original);
 
         Throwable[] suppressed = copy.getSuppressed();
         assertThat(suppressed.length, is(2));
@@ -81,12 +81,12 @@ public class StackTraceTest {
     }
 
     @Test
-    public void copyOf_is_idempotent() {
+    public void creating_a_StackTrace_is_idempotent() {
         IllegalArgumentException original = new IllegalArgumentException("original message", new NullPointerException("cause message"));
         original.addSuppressed(new IOException("suppressed 1"));
 
-        StackTrace st1 = StackTrace.copyOf(original);
-        StackTrace st2 = StackTrace.copyOf(st1);
+        StackTrace st1 = StackTrace.from(original);
+        StackTrace st2 = StackTrace.from(st1);
 
         assertThat(st2.getExceptionClass(), is(st1.getExceptionClass()));
         assertTrue(EqualsBuilder.reflectionEquals(st1, st2));

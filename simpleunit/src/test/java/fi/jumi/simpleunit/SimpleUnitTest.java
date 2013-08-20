@@ -78,7 +78,7 @@ public class SimpleUnitTest {
         listener.onRunStarted(RUN_1, testFile);
         listener.onTestStarted(RUN_1, testFile, TestId.ROOT);
         listener.onTestStarted(RUN_1, testFile, TestId.of(0));
-        listener.onFailure(RUN_1, testFile, TestId.of(0), StackTrace.copyOf(new AssertionError("dummy failure")));
+        listener.onFailure(RUN_1, testFile, TestId.of(0), StackTrace.from(new AssertionError("dummy failure")));
         listener.onTestFinished(RUN_1, testFile, TestId.of(0));
         listener.onTestFinished(RUN_1, testFile, TestId.ROOT);
         listener.onRunFinished(RUN_1, testFile);
@@ -98,7 +98,7 @@ public class SimpleUnitTest {
         TestFile testFile = TestFile.fromClass(testClass);
         listener.onRunStarted(RUN_1, testFile);
         listener.onTestStarted(RUN_1, testFile, TestId.ROOT);
-        listener.onFailure(RUN_1, testFile, TestId.ROOT, StackTrace.copyOf(new RuntimeException("dummy exception")));
+        listener.onFailure(RUN_1, testFile, TestId.ROOT, StackTrace.from(new RuntimeException("dummy exception")));
         listener.onTestFinished(RUN_1, testFile, TestId.ROOT);
         listener.onRunFinished(RUN_1, testFile);
 
@@ -121,7 +121,7 @@ public class SimpleUnitTest {
         listener.onRunStarted(RUN_1, testFile);
         listener.onTestStarted(RUN_1, testFile, TestId.ROOT);
         listener.onTestStarted(RUN_1, testFile, TestId.of(0));
-        listener.onFailure(RUN_1, testFile, TestId.of(0), StackTrace.copyOf(new IllegalArgumentException("wrong number of arguments")));
+        listener.onFailure(RUN_1, testFile, TestId.of(0), StackTrace.from(new IllegalArgumentException("wrong number of arguments")));
         listener.onTestFinished(RUN_1, testFile, TestId.of(0));
         listener.onTestFinished(RUN_1, testFile, TestId.ROOT);
         listener.onRunFinished(RUN_1, testFile);
@@ -145,7 +145,7 @@ public class SimpleUnitTest {
         listener.onRunStarted(RUN_1, testFile);
         listener.onTestStarted(RUN_1, testFile, TestId.ROOT);
         listener.onFailure(RUN_1, testFile, TestId.ROOT,
-                StackTrace.copyOf(new IllegalArgumentException("No test methods in class fi.jumi.simpleunit.SimpleUnitTest$NoTestMethodsTest")));
+                StackTrace.from(new IllegalArgumentException("No test methods in class fi.jumi.simpleunit.SimpleUnitTest$NoTestMethodsTest")));
         listener.onTestFinished(RUN_1, testFile, TestId.ROOT);
         listener.onRunFinished(RUN_1, testFile);
 

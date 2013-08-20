@@ -25,6 +25,6 @@ abstract class InternalErrorReporter {
             out.println(message);
             cause.printStackTrace(out);
         }
-        listener.onInternalError(message, StackTrace.copyOf(cause));
+        listener.onInternalError(message, StackTrace.from(cause));
     }
 }

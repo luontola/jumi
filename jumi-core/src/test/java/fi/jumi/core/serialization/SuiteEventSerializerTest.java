@@ -61,12 +61,12 @@ public class SuiteEventSerializerTest {
         listener.onTestStarted(runId, TestId.of(0));
         listener.onPrintedOut(runId, "printed to out");
         listener.onPrintedErr(runId, "printed to err");
-        listener.onFailure(runId, StackTrace.copyOf(new AssertionError("assertion message"))); // TODO: add cause and suppressed, also test the stack trace elements
+        listener.onFailure(runId, StackTrace.from(new AssertionError("assertion message"))); // TODO: add cause and suppressed, also test the stack trace elements
         listener.onTestFinished(runId);
         listener.onTestFinished(runId);
         listener.onRunFinished(runId);
 
-        listener.onInternalError("error message", StackTrace.copyOf(new Exception("exception message")));
+        listener.onInternalError("error message", StackTrace.from(new Exception("exception message")));
         listener.onTestFileFinished(testFile);
         listener.onSuiteFinished();
     }

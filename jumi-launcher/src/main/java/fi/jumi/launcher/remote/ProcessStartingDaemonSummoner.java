@@ -85,7 +85,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
         DaemonListener listener = eventizer.newFrontend(timeoutMessages);
         listener.onMessage(new OnSuiteStartedEvent());
         listener.onMessage(new OnInternalErrorEvent("Failed to start the test runner daemon process",
-                StackTrace.copyOf(new RuntimeException("Could not connect to the daemon: timed out after " + timeoutMillis + " ms"))));
+                StackTrace.from(new RuntimeException("Could not connect to the daemon: timed out after " + timeoutMillis + " ms"))));
         listener.onMessage(new OnSuiteFinishedEvent());
         return timeoutMessages;
     }

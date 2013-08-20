@@ -66,7 +66,7 @@ public class EventBuilder {
     }
 
     public void internalError(String message, Throwable cause) {
-        listener.onInternalError(message, StackTrace.copyOf(cause));
+        listener.onInternalError(message, StackTrace.from(cause));
     }
 
     public void runStarted(RunId runId, TestFile testFile) {
@@ -96,7 +96,7 @@ public class EventBuilder {
 
     public void failingTest(RunId runId, TestId testId, String name, Throwable cause) {
         test(runId, testId, name, () -> {
-            listener.onFailure(runId, StackTrace.copyOf(cause));
+            listener.onFailure(runId, StackTrace.from(cause));
         });
     }
 

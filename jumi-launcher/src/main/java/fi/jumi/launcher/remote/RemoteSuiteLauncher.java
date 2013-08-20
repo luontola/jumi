@@ -65,7 +65,7 @@ public class RemoteSuiteLauncher implements SuiteLauncher, DaemonListener {
     public void onDisconnected() {
         if (suiteState.inProgress) {
             suiteListener.send(new OnInternalErrorEvent("The test runner daemon process disconnected or died unexpectedly",
-                    StackTrace.copyOf(new Exception("disconnected"))));
+                    StackTrace.from(new Exception("disconnected"))));
             suiteListener.send(new OnSuiteFinishedEvent());
         }
 

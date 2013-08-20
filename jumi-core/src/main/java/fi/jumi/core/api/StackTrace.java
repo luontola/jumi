@@ -16,7 +16,7 @@ public class StackTrace extends Throwable {
     private final String exceptionClass;
     private final String toString;
 
-    public static StackTrace copyOf(Throwable original) {
+    public static StackTrace from(Throwable original) {
         if (original == null) {
             return null;
         }
@@ -95,10 +95,10 @@ public class StackTrace extends Throwable {
         }
 
         public StackTrace build() {
-            StackTrace st = new StackTrace(exceptionClass, toString, message, copyOf(cause));
+            StackTrace st = new StackTrace(exceptionClass, toString, message, StackTrace.from(cause));
             st.setStackTrace(stackTrace);
             for (Throwable t : suppressed) {
-                st.addSuppressed(copyOf(t));
+                st.addSuppressed(StackTrace.from(t));
             }
             return st;
         }

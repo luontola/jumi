@@ -83,7 +83,7 @@ public class SuiteListenerProtocolTest extends SuiteRunnerIntegrationHelper {
         expect.onTestFound(TEST_FILE_1, TestId.ROOT, "DummyTest");
         expect.onRunStarted(RUN_1, TEST_FILE_1);
         expect.onTestStarted(RUN_1, TestId.ROOT);
-        expect.onFailure(RUN_1, StackTrace.copyOf(new Exception("dummy failure")));
+        expect.onFailure(RUN_1, StackTrace.from(new Exception("dummy failure")));
         expect.onTestFinished(RUN_1);
         expect.onRunFinished(RUN_1);
         expect.onTestFileFinished(TEST_FILE_1);

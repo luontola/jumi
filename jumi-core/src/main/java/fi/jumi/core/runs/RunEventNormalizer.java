@@ -71,7 +71,7 @@ public class RunEventNormalizer implements RunListener {
     @Override
     public void onInternalError(String message, Throwable cause) {
         // TODO: should we prepend the testFile as context information to the message?
-        listener.onInternalError(message, StackTrace.copyOf(cause));
+        listener.onInternalError(message, StackTrace.from(cause));
     }
 
     @Override
@@ -103,7 +103,7 @@ public class RunEventNormalizer implements RunListener {
 
     @Override
     public void onFailure(RunId runId, TestId testId, Throwable cause) {
-        listener.onFailure(runId, StackTrace.copyOf(cause));
+        listener.onFailure(runId, StackTrace.from(cause));
     }
 
     @Override

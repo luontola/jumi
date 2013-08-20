@@ -30,7 +30,7 @@ public class SuiteResultsSummaryTest {
     @Test
     public void failing_tests_are_tests_with_failures() {
         summary.onTestStarted(unimportant, TEST_FILE, TestId.ROOT);
-        summary.onFailure(unimportant, TEST_FILE, TestId.ROOT, StackTrace.copyOf(new Throwable("failure")));
+        summary.onFailure(unimportant, TEST_FILE, TestId.ROOT, StackTrace.from(new Throwable("failure")));
 
         assertThat("passing tests", summary.getPassingTests(), is(0));
         assertThat("failing tests", summary.getFailingTests(), is(1));
@@ -40,8 +40,8 @@ public class SuiteResultsSummaryTest {
     @Test
     public void a_test_with_multiple_failures_counts_as_just_one_failing_test() {
         summary.onTestStarted(unimportant, TEST_FILE, TestId.ROOT);
-        summary.onFailure(unimportant, TEST_FILE, TestId.ROOT, StackTrace.copyOf(new Throwable("failure 1")));
-        summary.onFailure(unimportant, TEST_FILE, TestId.ROOT, StackTrace.copyOf(new Throwable("failure 2")));
+        summary.onFailure(unimportant, TEST_FILE, TestId.ROOT, StackTrace.from(new Throwable("failure 1")));
+        summary.onFailure(unimportant, TEST_FILE, TestId.ROOT, StackTrace.from(new Throwable("failure 2")));
 
         assertThat("passing tests", summary.getPassingTests(), is(0));
         assertThat("failing tests", summary.getFailingTests(), is(1));
@@ -51,9 +51,9 @@ public class SuiteResultsSummaryTest {
     @Test
     public void multiple_tests_with_failures_counts_as_multiple_failing_tests() {
         summary.onTestStarted(unimportant, TEST_FILE, TestId.of(1));
-        summary.onFailure(unimportant, TEST_FILE, TestId.of(1), StackTrace.copyOf(new Throwable("failure 1")));
+        summary.onFailure(unimportant, TEST_FILE, TestId.of(1), StackTrace.from(new Throwable("failure 1")));
         summary.onTestStarted(unimportant, TEST_FILE, TestId.of(2));
-        summary.onFailure(unimportant, TEST_FILE, TestId.of(2), StackTrace.copyOf(new Throwable("failure 2")));
+        summary.onFailure(unimportant, TEST_FILE, TestId.of(2), StackTrace.from(new Throwable("failure 2")));
 
         assertThat("passing tests", summary.getPassingTests(), is(0));
         assertThat("failing tests", summary.getFailingTests(), is(2));

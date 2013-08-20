@@ -62,7 +62,7 @@ public class SuiteEventDemuxerTest {
 
         toDemuxer.onRunStarted(runId, testFile);
         toDemuxer.onTestStarted(runId, testId);
-        toDemuxer.onFailure(runId, StackTrace.copyOf(new Throwable("dummy")));
+        toDemuxer.onFailure(runId, StackTrace.from(new Throwable("dummy")));
         toDemuxer.onPrintedOut(runId, "to out");
         toDemuxer.onPrintedErr(runId, "to err");
         toDemuxer.onTestFinished(runId);
@@ -73,7 +73,7 @@ public class SuiteEventDemuxerTest {
 
         expect.onRunStarted(runId, testFile);
         expect.onTestStarted(runId, testFile, testId);
-        expect.onFailure(runId, testFile, testId, StackTrace.copyOf(new Throwable("dummy")));
+        expect.onFailure(runId, testFile, testId, StackTrace.from(new Throwable("dummy")));
         expect.onPrintedOut(runId, testFile, testId, "to out");
         expect.onPrintedErr(runId, testFile, testId, "to err");
         expect.onTestFinished(runId, testFile, testId);

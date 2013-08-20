@@ -240,7 +240,7 @@ public class SuiteEventSerializer implements SuiteListener {
         String exceptionClass = readString(source);
         String toString = readString(source);
         String message = readString(source);
-        return StackTrace.copyOf(new Throwable(message) {
+        return StackTrace.from(new Throwable(message) {
             @Override
             public String toString() {
                 return toString;

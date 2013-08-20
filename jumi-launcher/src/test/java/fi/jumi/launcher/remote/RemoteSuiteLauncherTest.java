@@ -91,7 +91,7 @@ public class RemoteSuiteLauncherTest {
         SuiteListener expect = spy.getListener();
 
         expect.onSuiteStarted();
-        expect.onInternalError("The test runner daemon process disconnected or died unexpectedly", StackTrace.copyOf(new Exception("disconnected")));
+        expect.onInternalError("The test runner daemon process disconnected or died unexpectedly", StackTrace.from(new Exception("disconnected")));
         expect.onSuiteFinished();
 
         spy.replay();

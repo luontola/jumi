@@ -76,7 +76,7 @@ public class JUnitCompatibilityDriverTest {
         expect.onRunStarted(new RunId(1), testFile);
         expect.onTestStarted(new RunId(1), testFile, TestId.ROOT);
         expect.onTestStarted(new RunId(1), testFile, TestId.of(0));
-        expect.onFailure(new RunId(1), testFile, TestId.of(0), StackTrace.copyOf(new AssertionError("dummy failure")));
+        expect.onFailure(new RunId(1), testFile, TestId.of(0), StackTrace.from(new AssertionError("dummy failure")));
         expect.onTestFinished(new RunId(1), testFile, TestId.of(0));
         expect.onTestFinished(new RunId(1), testFile, TestId.ROOT);
         expect.onRunFinished(new RunId(1), testFile);
