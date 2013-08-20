@@ -102,7 +102,7 @@ OK - refactor BuildTest & SuiteConfiguration
 			* stuff that depends on interface & interface-version: event-type, event-data
 		OK - roundtrip tests
 			OK - string operations (only relative read/write, because strings are variable size)
-		!! - fully test serializing StackTrace
+		OK - fully test serializing StackTrace
 			OK - refactor: create StackTrace.Builder, use it also in StackTrace.copyOf, keep the constructor private
 			OK - make StackTrace.copyOf aware of StackTrace, to not rewrap it? else it might obstruct getExceptionClass (test: chain two copyOf() calls)
 			SKIP - test equality using Apache Commons EqualsBuilder; Mockito might already provide a matcher which uses it
@@ -111,8 +111,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - test: multiple chained causes
 			OK - test: multiple suppressions
 				OK - make deepEqualTo compare Collections using iteration
-			!! - refactor: unify cause and suppressed
-		- test serializing strings
+			OK - refactor: unify cause and suppressed
+		!! - test serializing strings
 			- empty string
 			- random string of random length
 			- all non-printable characters, i.e. 00-1F

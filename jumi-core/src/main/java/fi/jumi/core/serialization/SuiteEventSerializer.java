@@ -242,8 +242,8 @@ public class SuiteEventSerializer implements SuiteListener {
                 .setToString(readString(source))
                 .setMessage(readString(source))
                 .setStackTrace(readStackTraceElements(source))
-                .setCause(readExceptionCause(source))
-                .setSuppressed(readSuppressedExceptions(source))
+                .setCause(readOptionalException(source))
+                .setSuppressed(readManyExceptions(source))
                 .build();
     }
 
@@ -252,8 +252,8 @@ public class SuiteEventSerializer implements SuiteListener {
         writeString(stackTrace.toString());
         writeString(stackTrace.getMessage());
         writeStackTraceElements(stackTrace.getStackTrace());
-        writeExceptionCause((StackTrace) stackTrace.getCause());
-        writeSuppressedExceptions(stackTrace.getSuppressed());
+        writeOptionalException(stackTrace.getCause());
+        writeManyExceptions(stackTrace.getSuppressed());
     }
 
     private static StackTraceElement[] readStackTraceElements(IpcBuffer source) {
@@ -274,35 +274,27 @@ public class SuiteEventSerializer implements SuiteListener {
         }
     }
 
-    private static StackTrace readExceptionCause(IpcBuffer source) {
-        byte exists = source.readByte();
-        if (exists == 0) {
-            return null;
-        }
-        return readStackTrace(source);
+    private static Throwable readOptionalException(IpcBuffer source) {
+        Throwable[] exceptions = readManyExceptions(source);
+        return exceptions.length == 0 ? null : exceptions[0];
     }
 
-    private void writeExceptionCause(StackTrace cause) {
-        if (cause == null) {
-            target.writeByte((byte) 0);
-        } else {
-            target.writeByte((byte) 1);
-            writeStackTrace(cause);
-        }
+    private void writeOptionalException(Throwable exception) {
+        writeManyExceptions(exception == null ? new Throwable[0] : new Throwable[]{exception});
     }
 
-    private static Throwable[] readSuppressedExceptions(IpcBuffer source) {
-        Throwable[] suppressed = new Throwable[source.readInt()];
-        for (int i = 0; i < suppressed.length; i++) {
-            suppressed[i] = readStackTrace(source);
+    private static Throwable[] readManyExceptions(IpcBuffer source) {
+        Throwable[] exceptions = new Throwable[source.readInt()];
+        for (int i = 0; i < exceptions.length; i++) {
+            exceptions[i] = readStackTrace(source);
         }
-        return suppressed;
+        return exceptions;
     }
 
-    private void writeSuppressedExceptions(Throwable[] suppressed) {
-        target.writeInt(suppressed.length);
-        for (Throwable t : suppressed) {
-            writeStackTrace((StackTrace) t);
+    private void writeManyExceptions(Throwable[] exceptions) {
+        target.writeInt(exceptions.length);
+        for (Throwable exception : exceptions) {
+            writeStackTrace((StackTrace) exception);
         }
     }
 
