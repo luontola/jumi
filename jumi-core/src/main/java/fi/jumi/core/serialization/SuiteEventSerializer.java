@@ -300,7 +300,7 @@ public class SuiteEventSerializer implements SuiteListener {
 
     // String
 
-    private static String readString(IpcBuffer source) {
+    static String readString(IpcBuffer source) {
         int length = source.readInt();
         char[] chars = new char[length];
         for (int i = 0; i < chars.length; i++) {
@@ -309,7 +309,7 @@ public class SuiteEventSerializer implements SuiteListener {
         return new String(chars);
     }
 
-    private void writeString(String path) {
+    void writeString(String path) {
         int length = path.length();
         target.writeInt(length);
         for (int i = 0; i < length; i++) {

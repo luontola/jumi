@@ -8,6 +8,7 @@ import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.*;
 import fi.jumi.core.util.SpyListener;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -73,6 +74,9 @@ public class SuiteEventSerializerTest {
         listener.onSuiteFinished();
     }
 
+
+    // StackTrace
+
     @Test
     public void test_serialization_of_StackTrace() {
         StackTrace original = StackTrace.from(new IOException("the message"));
@@ -105,5 +109,31 @@ public class SuiteEventSerializerTest {
         new SuiteEventSerializer(buffer).writeStackTrace(expected);
         buffer.position(0);
         return SuiteEventSerializer.readStackTrace(buffer);
+    }
+
+
+    // String
+
+    @Test
+    public void test_serialization_of_String() {
+        assertThat("empty string", serializeAndDeserialize(""), is(""));
+
+        String original = RandomStringUtils.random(10);
+        assertThat("random string", serializeAndDeserialize(original), is(original));
+    }
+
+    @Test
+    public void test_serialization_of_String_with_non_printable_characters() {
+        for (char c = 0; c < ' '; c++) {
+            String original = "" + c;
+            assertThat("0x" + Integer.toHexString(c), serializeAndDeserialize(original), is(original));
+        }
+    }
+
+    private static String serializeAndDeserialize(String original) {
+        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(16));
+        new SuiteEventSerializer(buffer).writeString(original);
+        buffer.position(0);
+        return SuiteEventSerializer.readString(buffer);
     }
 }

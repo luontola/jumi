@@ -112,12 +112,12 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - test: multiple suppressions
 				OK - make deepEqualTo compare Collections using iteration
 			OK - refactor: unify cause and suppressed
-		!! - test serializing strings
-			- empty string
-			- random string of random length
-			- all non-printable characters, i.e. 00-1F
+		OK - test serializing strings
+			OK - empty string
+			OK - random string of random length
+			OK - all non-printable characters, i.e. 00-1F
 				http://web.itu.edu.tr/~sgunduz/courses/mikroisl/ascii.html
-		- use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
+		!! - use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
 			- spike whether that solved the timeout by mutating manually
 			- rename StubByteBufferSequence to FixedByteBufferSequence
 			- make FixedByteBufferSequence pass the contract
