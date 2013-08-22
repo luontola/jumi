@@ -30,7 +30,7 @@ public class SuiteEventSerializerTest {
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         exampleUsage(spy.getListener());
         spy.replay();
-        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(1024));
+        IpcBuffer buffer = new IpcBuffer(new FixedByteBufferSequence(15000));
 
         // serialize
         exampleUsage(new SuiteEventSerializer(buffer));
