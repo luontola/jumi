@@ -9,7 +9,8 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.*;
 import fi.jumi.core.util.SpyListener;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -17,8 +18,12 @@ import java.lang.reflect.Method;
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.fail;
 
 public class SuiteEventSerializerTest {
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void serializes_and_deserializes_all_events() {
@@ -133,9 +138,21 @@ public class SuiteEventSerializerTest {
     @Test
     public void test_serialization_of_null_String() {
         String nullString = null;
-        assertThat("null string", roundTripString(nullString), is(nullString));
+        assertThat("null string", roundTripNullableString(nullString), is(nullString));
 
-        // TODO: create writeNullableString, make the default non-nullable
+        try {
+            serializeAndDeserialize(nullString, SuiteEventSerializer::writeString, SuiteEventSerializer::readNullableString);
+            fail("should have thrown NullPointerException on serialization");
+        } catch (NullPointerException e) {
+            // OK
+        }
+
+        try {
+            serializeAndDeserialize(nullString, SuiteEventSerializer::writeNullableString, SuiteEventSerializer::readString);
+            fail("should have thrown NullPointerException on deserialization");
+        } catch (NullPointerException e) {
+            // OK
+        }
     }
 
 
@@ -147,6 +164,10 @@ public class SuiteEventSerializerTest {
 
     private static String roundTripString(String original) {
         return serializeAndDeserialize(original, SuiteEventSerializer::writeString, SuiteEventSerializer::readString);
+    }
+
+    private static String roundTripNullableString(String original) {
+        return serializeAndDeserialize(original, SuiteEventSerializer::writeNullableString, SuiteEventSerializer::readNullableString);
     }
 
     private static <T> T serializeAndDeserialize(T original, WriteOp<T> writeOp, ReadOp<T> readOp) {

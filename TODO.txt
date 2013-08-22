@@ -119,8 +119,8 @@ OK - refactor BuildTest & SuiteConfiguration
 				http://web.itu.edu.tr/~sgunduz/courses/mikroisl/ascii.html
 		OK - java.lang.Throwable#getMessage may be null
 			OK - add test for StackTrace serialization
-			!! - create writeNullableString or change writeString? use length of -1 as marker, or write a single byte marker?
-		- use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
+			OK - create writeNullableString or change writeString? use length of -1 as marker, or write a single byte marker?
+		!! - use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
 			- spike whether that solved the timeout by mutating manually
 			- rename StubByteBufferSequence to FixedByteBufferSequence
 			- make FixedByteBufferSequence pass the contract

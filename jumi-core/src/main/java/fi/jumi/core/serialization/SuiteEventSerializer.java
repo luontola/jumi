@@ -240,7 +240,7 @@ public class SuiteEventSerializer implements SuiteListener {
         return new StackTrace.Builder()
                 .setExceptionClass(readString(source))
                 .setToString(readString(source))
-                .setMessage(readString(source))
+                .setMessage(readNullableString(source))
                 .setStackTrace(readStackTraceElements(source))
                 .setCause(readOptionalException(source))
                 .setSuppressed(readManyExceptions(source))
@@ -250,7 +250,7 @@ public class SuiteEventSerializer implements SuiteListener {
     void writeStackTrace(StackTrace stackTrace) {
         writeString(stackTrace.getExceptionClass());
         writeString(stackTrace.toString());
-        writeString(stackTrace.getMessage());
+        writeNullableString(stackTrace.getMessage());
         writeStackTraceElements(stackTrace.getStackTrace());
         writeOptionalException(stackTrace.getCause());
         writeManyExceptions(stackTrace.getSuppressed());
@@ -301,6 +301,14 @@ public class SuiteEventSerializer implements SuiteListener {
     // String
 
     static String readString(IpcBuffer source) {
+        String s = readNullableString(source);
+        if (s == null) {
+            throw new NullPointerException();
+        }
+        return s;
+    }
+
+    static String readNullableString(IpcBuffer source) {
         int length = source.readInt();
         if (length < 0) {
             return null;
@@ -314,6 +322,13 @@ public class SuiteEventSerializer implements SuiteListener {
     }
 
     void writeString(String s) {
+        if (s == null) {
+            throw new NullPointerException();
+        }
+        writeNullableString(s);
+    }
+
+    void writeNullableString(String s) {
         if (s == null) {
             target.writeInt(-1);
         } else {
