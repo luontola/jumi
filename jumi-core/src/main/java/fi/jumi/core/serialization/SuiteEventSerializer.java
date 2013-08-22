@@ -302,18 +302,26 @@ public class SuiteEventSerializer implements SuiteListener {
 
     static String readString(IpcBuffer source) {
         int length = source.readInt();
-        char[] chars = new char[length];
-        for (int i = 0; i < chars.length; i++) {
-            chars[i] = source.readChar();
+        if (length < 0) {
+            return null;
+        } else {
+            char[] chars = new char[length];
+            for (int i = 0; i < chars.length; i++) {
+                chars[i] = source.readChar();
+            }
+            return new String(chars);
         }
-        return new String(chars);
     }
 
-    void writeString(String path) {
-        int length = path.length();
-        target.writeInt(length);
-        for (int i = 0; i < length; i++) {
-            target.writeChar(path.charAt(i));
+    void writeString(String s) {
+        if (s == null) {
+            target.writeInt(-1);
+        } else {
+            int length = s.length();
+            target.writeInt(length);
+            for (int i = 0; i < length; i++) {
+                target.writeChar(s.charAt(i));
+            }
         }
     }
 }

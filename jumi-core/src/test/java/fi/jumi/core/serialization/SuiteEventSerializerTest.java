@@ -79,6 +79,13 @@ public class SuiteEventSerializerTest {
 
     @Test
     public void test_serialization_of_StackTrace() {
+        StackTrace original = StackTrace.from(new IOException());
+
+        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+    }
+
+    @Test
+    public void test_serialization_of_StackTrace_with_message() {
         StackTrace original = StackTrace.from(new IOException("the message"));
 
         assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
@@ -128,6 +135,14 @@ public class SuiteEventSerializerTest {
             String original = "" + c;
             assertThat("0x" + Integer.toHexString(c), serializeAndDeserialize(original), is(original));
         }
+    }
+
+    @Test
+    public void test_serialization_of_null_String() {
+        String nullString = null;
+        assertThat("null string", serializeAndDeserialize(nullString), is(nullString));
+
+        // TODO: create writeNullableString, make the default non-nullable
     }
 
     private static String serializeAndDeserialize(String original) {
