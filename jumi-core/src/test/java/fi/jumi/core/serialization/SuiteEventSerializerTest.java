@@ -81,14 +81,14 @@ public class SuiteEventSerializerTest {
     public void test_serialization_of_StackTrace() {
         StackTrace original = StackTrace.from(new IOException());
 
-        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
     }
 
     @Test
     public void test_serialization_of_StackTrace_with_message() {
         StackTrace original = StackTrace.from(new IOException("the message"));
 
-        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class SuiteEventSerializerTest {
                         new IllegalArgumentException("cause 1",
                                 new IllegalStateException("cause 2"))));
 
-        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
+        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
     }
 
     @Test
@@ -108,14 +108,7 @@ public class SuiteEventSerializerTest {
         e.addSuppressed(new IllegalStateException("suppressed 2"));
         StackTrace original = StackTrace.from(e);
 
-        assertThat(serializeAndDeserialize(original), is(deepEqualTo(original)));
-    }
-
-    private static StackTrace serializeAndDeserialize(StackTrace expected) {
-        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(1024));
-        new SuiteEventSerializer(buffer).writeStackTrace(expected);
-        buffer.position(0);
-        return SuiteEventSerializer.readStackTrace(buffer);
+        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
     }
 
 
@@ -123,32 +116,51 @@ public class SuiteEventSerializerTest {
 
     @Test
     public void test_serialization_of_String() {
-        assertThat("empty string", serializeAndDeserialize(""), is(""));
+        assertThat("empty string", roundTripString(""), is(""));
 
         String original = RandomStringUtils.random(10);
-        assertThat("random string", serializeAndDeserialize(original), is(original));
+        assertThat("random string", roundTripString(original), is(original));
     }
 
     @Test
     public void test_serialization_of_String_with_non_printable_characters() {
         for (char c = 0; c < ' '; c++) {
             String original = "" + c;
-            assertThat("0x" + Integer.toHexString(c), serializeAndDeserialize(original), is(original));
+            assertThat("0x" + Integer.toHexString(c), roundTripString(original), is(original));
         }
     }
 
     @Test
     public void test_serialization_of_null_String() {
         String nullString = null;
-        assertThat("null string", serializeAndDeserialize(nullString), is(nullString));
+        assertThat("null string", roundTripString(nullString), is(nullString));
 
         // TODO: create writeNullableString, make the default non-nullable
     }
 
-    private static String serializeAndDeserialize(String original) {
-        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(16));
-        new SuiteEventSerializer(buffer).writeString(original);
+
+    // helpers
+
+    private static StackTrace roundTripStackTrace(StackTrace expected) {
+        return serializeAndDeserialize(expected, SuiteEventSerializer::writeStackTrace, SuiteEventSerializer::readStackTrace);
+    }
+
+    private static String roundTripString(String original) {
+        return serializeAndDeserialize(original, SuiteEventSerializer::writeString, SuiteEventSerializer::readString);
+    }
+
+    private static <T> T serializeAndDeserialize(T original, WriteOp<T> writeOp, ReadOp<T> readOp) {
+        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(100));
+        writeOp.write(new SuiteEventSerializer(buffer), original);
         buffer.position(0);
-        return SuiteEventSerializer.readString(buffer);
+        return readOp.read(buffer);
+    }
+
+    private interface WriteOp<T> {
+        void write(SuiteEventSerializer target, T data);
+    }
+
+    private interface ReadOp<T> {
+        T read(IpcBuffer source);
     }
 }
