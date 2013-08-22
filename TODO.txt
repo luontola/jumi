@@ -121,11 +121,11 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - add test for StackTrace serialization
 			OK - create writeNullableString or change writeString? use length of -1 as marker, or write a single byte marker?
 		!! - use a fixed-size buffer for the round-trip tests, to avoid PIT timeouting (removing a writeString() causes it to try read huge strings)
-			- spike whether that solved the timeout by mutating manually
-			- rename StubByteBufferSequence to FixedByteBufferSequence
-			- make FixedByteBufferSequence pass the contract
-			- test that accessing unavailable indexes throws IllegalArgumentException with clear message
-			- use FixedByteBufferSequence with one big enough buffer in the serializer's tests
+			OK - spike whether that solved the timeout by mutating manually
+			OK - rename StubByteBufferSequence to FixedByteBufferSequence
+			OK - make FixedByteBufferSequence pass the contract
+			OK - test that accessing unavailable indexes throws IllegalArgumentException with clear message
+			!! - use FixedByteBufferSequence with one big enough buffer in the serializer's tests
 		- handle all (4) failure conditions when reading data that has wrong header fields
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship

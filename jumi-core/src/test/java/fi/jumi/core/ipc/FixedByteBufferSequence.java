@@ -9,22 +9,26 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 @NotThreadSafe
-public class StubByteBufferSequence implements ByteBufferSequence {
+public class FixedByteBufferSequence implements ByteBufferSequence {
 
     private final List<ByteBuffer> segments = new ArrayList<>();
 
-    public StubByteBufferSequence(int... segmentCapacities) {
+    public FixedByteBufferSequence(int... segmentCapacities) {
         for (int capacity : segmentCapacities) {
             segments.add(ByteBuffer.allocate(capacity));
         }
     }
 
-    public StubByteBufferSequence(ByteBuffer... segments) {
+    public FixedByteBufferSequence(ByteBuffer... segments) {
         Collections.addAll(this.segments, segments);
     }
 
     @Override
     public ByteBuffer get(int index) {
+        if (index >= segments.size()) {
+            throw new IllegalArgumentException("tried to get segment at index " + index
+                    + ", but there were only " + segments.size() + " segments");
+        }
         return segments.get(index);
     }
 
