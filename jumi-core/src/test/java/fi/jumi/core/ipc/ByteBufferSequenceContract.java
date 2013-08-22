@@ -37,4 +37,16 @@ public abstract class ByteBufferSequenceContract {
 
         assertThat(actual, is((byte) 10));
     }
+
+    @Test
+    public void the_returned_ByteBuffer_has_its_position_and_limit_at_default_values() {
+        ByteBufferSequence sequence = newByteBufferSequence();
+
+        ByteBuffer mutated = sequence.get(0);
+        mutated.position(5).limit(6);
+
+        ByteBuffer fresh = sequence.get(0);
+        assertThat("position", fresh.position(), is(0));
+        assertThat("limit", fresh.limit(), is(fresh.capacity()));
+    }
 }

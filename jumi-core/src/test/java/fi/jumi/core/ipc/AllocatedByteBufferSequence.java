@@ -23,6 +23,6 @@ public class AllocatedByteBufferSequence implements ByteBufferSequence {
         while (segments.size() <= index) {
             segments.add(ByteBuffer.allocate(segmentCapacity));
         }
-        return segments.get(index);
+        return segments.get(index).duplicate();
     }
 }

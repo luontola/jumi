@@ -29,7 +29,7 @@ public class FixedByteBufferSequence implements ByteBufferSequence {
             throw new IllegalArgumentException("tried to get segment at index " + index
                     + ", but there were only " + segments.size() + " segments");
         }
-        return segments.get(index);
+        return segments.get(index).duplicate();
     }
 
     public ByteBuffer combinedBuffer() {
@@ -39,7 +39,7 @@ public class FixedByteBufferSequence implements ByteBufferSequence {
         }
         ByteBuffer combined = ByteBuffer.allocate(capacity);
         for (ByteBuffer segment : segments) {
-            combined.put(segment);
+            combined.put(segment.duplicate());
         }
         return combined;
     }

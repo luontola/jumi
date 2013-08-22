@@ -7,6 +7,11 @@ package fi.jumi.core.ipc;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.nio.ByteBuffer;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 public class FixedByteBufferSequenceTest extends ByteBufferSequenceContract {
 
     @Rule
@@ -24,5 +29,21 @@ public class FixedByteBufferSequenceTest extends ByteBufferSequenceContract {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("tried to get segment at index 2, but there were only 2 segments");
         sequence.get(2);
+    }
+
+    @Test
+    public void can_combine_all_segments_into_one_ByteBuffer() {
+        FixedByteBufferSequence sequence = new FixedByteBufferSequence(2, 2);
+
+        sequence.get(0).put((byte) 1).put((byte) 2);
+        sequence.get(1).put((byte) 3).put((byte) 4);
+
+        ByteBuffer expected = ByteBuffer.allocate(4)
+                .put((byte) 1)
+                .put((byte) 2)
+                .put((byte) 3)
+                .put((byte) 4);
+        assertThat(sequence.combinedBuffer(), is(expected));
+        assertThat("should not change the underlying buffer's position", sequence.get(0).position(), is(0));
     }
 }
