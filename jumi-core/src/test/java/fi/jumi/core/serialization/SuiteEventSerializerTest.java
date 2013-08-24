@@ -30,7 +30,7 @@ public class SuiteEventSerializerTest {
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         exampleUsage(spy.getListener());
         spy.replay();
-        IpcBuffer buffer = new IpcBuffer(new FixedByteBufferSequence(15000));
+        IpcBuffer buffer = newIpcBuffer();
 
         // serialize
         exampleUsage(new SuiteEventSerializer(buffer));
@@ -171,7 +171,7 @@ public class SuiteEventSerializerTest {
     }
 
     private static <T> T serializeAndDeserialize(T original, WriteOp<T> writeOp, ReadOp<T> readOp) {
-        IpcBuffer buffer = new IpcBuffer(new AllocatedByteBufferSequence(100));
+        IpcBuffer buffer = newIpcBuffer();
         writeOp.write(new SuiteEventSerializer(buffer), original);
         buffer.position(0);
         return readOp.read(buffer);
@@ -183,5 +183,9 @@ public class SuiteEventSerializerTest {
 
     private interface ReadOp<T> {
         T read(IpcBuffer source);
+    }
+
+    private static IpcBuffer newIpcBuffer() {
+        return new IpcBuffer(new AllocatedByteBufferSequence(100, 30 * 1000));
     }
 }

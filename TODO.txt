@@ -126,9 +126,9 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - make FixedByteBufferSequence pass the contract
 			OK - test that accessing unavailable indexes throws IllegalArgumentException with clear message
 			OK - use FixedByteBufferSequence with one big enough buffer in the serializer's tests
-		!! - there are still a couple of PIT timeouts in writeStackTrace
+		OK - there are still a couple of PIT timeouts in writeStackTrace
 			OK - use FixedByteBufferSequence for StackTrace tests or add totalCapacityLimit to AllocatedByteBufferSequence
-		- handle all (4) failure conditions when reading data that has wrong header fields
+		!! - handle all (4) failure conditions when reading data that has wrong header fields
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
