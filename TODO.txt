@@ -128,8 +128,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - use FixedByteBufferSequence with one big enough buffer in the serializer's tests
 		OK - there are still a couple of PIT timeouts in writeStackTrace
 			OK - use FixedByteBufferSequence for StackTrace tests or add totalCapacityLimit to AllocatedByteBufferSequence
-		!! - handle all (4) failure conditions when reading data that has wrong header fields
-		- concurrency tests
+		OK - handle all (4) failure conditions when reading data that has wrong header fields
+		!! - concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
 			- the writer should be the first to touch a new segment, so that the writer would determine its size

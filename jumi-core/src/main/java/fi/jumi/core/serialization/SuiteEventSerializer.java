@@ -9,11 +9,17 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.IpcBuffer;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
 @NotThreadSafe
 public class SuiteEventSerializer implements SuiteListener {
+
+    private static final byte[] HEADER_MAGIC_BYTES = "Jumi".getBytes(StandardCharsets.US_ASCII);
+    private static final int PROTOCOL_VERSION = 1;
+    private static final String INTERFACE = SuiteListener.class.getName();
+    private static final int INTERFACE_VERSION = 1;
 
     private static final byte onSuiteStarted = 1;
     private static final byte onInternalError = 2;
@@ -36,7 +42,25 @@ public class SuiteEventSerializer implements SuiteListener {
         this.target = target;
     }
 
+    public void start() {
+        for (byte b : HEADER_MAGIC_BYTES) {
+            target.writeByte(b);
+        }
+        target.writeInt(PROTOCOL_VERSION);
+        writeString(SuiteListener.class.getName());
+        target.writeInt(INTERFACE_VERSION);
+    }
+
+    public void end() {
+
+    }
+
     public static void deserialize(IpcBuffer source, SuiteListener target) {
+        checkHeader(source);
+        checkProtocolVersion(source);
+        checkInterface(source);
+        checkInterfaceVersion(source);
+
         while (true) {
             byte type = readEventType(source);
             switch (type) {
@@ -89,6 +113,49 @@ public class SuiteEventSerializer implements SuiteListener {
             }
         }
     }
+
+    private static void checkHeader(IpcBuffer source) {
+        byte[] actual = new byte[HEADER_MAGIC_BYTES.length];
+        for (int i = 0; i < actual.length; i++) {
+            actual[i] = source.readByte();
+        }
+        if (!Arrays.equals(actual, HEADER_MAGIC_BYTES)) {
+
+            throw new IllegalArgumentException("wrong header: expected " + format(HEADER_MAGIC_BYTES) + " but was " + format(actual));
+        }
+    }
+
+    private static String format(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b));
+        }
+        return sb.toString().trim();
+    }
+
+    private static void checkProtocolVersion(IpcBuffer source) {
+        int actual = source.readInt();
+        if (actual != PROTOCOL_VERSION) {
+            throw new IllegalArgumentException("unsupported protocol version: " + actual);
+        }
+    }
+
+    private static void checkInterface(IpcBuffer source) {
+        String actual = readString(source);
+        if (!actual.equals(INTERFACE)) {
+            throw new IllegalArgumentException("wrong interface: expected " + INTERFACE + " but was " + actual);
+        }
+    }
+
+    private static void checkInterfaceVersion(IpcBuffer source) {
+        int actual = source.readInt();
+        if (actual != INTERFACE_VERSION) {
+            throw new IllegalArgumentException("unsupported interface version: " + actual);
+        }
+    }
+
+
+    // serializing events
 
     @Override
     public void onSuiteStarted() {

@@ -19,6 +19,7 @@ import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class SuiteEventSerializerTest {
 
@@ -33,7 +34,10 @@ public class SuiteEventSerializerTest {
         IpcBuffer buffer = newIpcBuffer();
 
         // serialize
-        exampleUsage(new SuiteEventSerializer(buffer));
+        SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
+        serializer.start();
+        exampleUsage(serializer);
+        serializer.end();
 
         // deserialize
         buffer.position(0);
@@ -77,6 +81,70 @@ public class SuiteEventSerializerTest {
         listener.onInternalError("error message", StackTrace.from(new Exception("exception message")));
         listener.onTestFileFinished(testFile);
         listener.onSuiteFinished();
+    }
+
+
+    // headers
+
+    @Test
+    public void cannot_deserialize_if_header_has_wrong_magic_bytes() {
+        IpcBuffer buffer = serializeSomeEvents();
+
+        buffer.setInt(0, 1);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("wrong header: expected 4A 75 6D 69 but was 00 00 00 01");
+        tryToDeserialize(buffer);
+    }
+
+    @Test
+    public void cannot_deserialize_if_header_has_wrong_protocol_version() {
+        IpcBuffer buffer = serializeSomeEvents();
+
+        buffer.setInt(4, 9999);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("unsupported protocol version: 9999");
+        tryToDeserialize(buffer);
+    }
+
+    @Test
+    public void cannot_deserialize_if_header_has_wrong_interface() {
+        IpcBuffer buffer = serializeSomeEvents();
+
+        buffer.position(8);
+        new SuiteEventSerializer(buffer).writeString("com.example.AnotherInterface");
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("wrong interface: expected fi.jumi.core.api.SuiteListener but was com.example.AnotherInterface");
+        tryToDeserialize(buffer);
+    }
+
+    @Test
+    public void cannot_deserialize_if_header_has_wrong_interface_version() {
+        IpcBuffer buffer = serializeSomeEvents();
+
+        buffer.position(8);
+        SuiteEventSerializer.readString(buffer); // go to interface version's position
+        buffer.writeInt(9999);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("unsupported interface version: 9999");
+        tryToDeserialize(buffer);
+    }
+
+    private static IpcBuffer serializeSomeEvents() {
+        IpcBuffer buffer = newIpcBuffer();
+        SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
+        serializer.start();
+        serializer.onSuiteStarted();
+        serializer.end();
+        return buffer;
+    }
+
+    private static void tryToDeserialize(IpcBuffer buffer) {
+        buffer.position(0);
+        SuiteEventSerializer.deserialize(buffer, mock(SuiteListener.class));
     }
 
 
