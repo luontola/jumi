@@ -130,11 +130,13 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - use FixedByteBufferSequence for StackTrace tests or add totalCapacityLimit to AllocatedByteBufferSequence
 		OK - handle all (4) failure conditions when reading data that has wrong header fields
 		!! - concurrency tests
-			- between writing an event and the event's status there must be a happens-before relationship
-			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
+			OK - test: concurrent producer-consumer pair and some 100 events
+			!! - make header work: write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
+			- make events work: between writing an event and the event's status there must be a happens-before relationship
 			- the writer should be the first to touch a new segment, so that the writer would determine its size
 				- concurrency test: writer uses 1 byte segments, reader 2 byte segments; afterwards all segments should be 1 byte
 				- append a null byte before writing the previous event's status?
+		- refactor: separate the protocol and SuiteListener specific stuff
 		- save v1 events to file for testing compatibility
 			- save the current example usage
 			- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
@@ -143,7 +145,9 @@ OK - refactor BuildTest & SuiteConfiguration
 		- write tests directly for getPath
 		- refactor SuiteEventSerializer#writeTestId to use it
 	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
-	- communicate over the buffer instead of socket
+	- communicate suite results over MMFs instead of a socket
+	- communicate commands over MMFs instead of a socket
+		- serialization of CommandListener events
 	- after implementing, consider refactoring the following places:
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected

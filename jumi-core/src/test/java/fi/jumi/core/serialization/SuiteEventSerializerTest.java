@@ -7,13 +7,17 @@ package fi.jumi.core.serialization;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.*;
+import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.SpyListener;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
+import org.junit.rules.*;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.*;
 
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,6 +29,10 @@ public class SuiteEventSerializerTest {
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public final TemporaryFolder tempDir = new TemporaryFolder();
+
 
     @Test
     public void serializes_and_deserializes_all_events() {
@@ -81,6 +89,64 @@ public class SuiteEventSerializerTest {
         listener.onInternalError("error message", StackTrace.from(new Exception("exception message")));
         listener.onTestFileFinished(testFile);
         listener.onSuiteFinished();
+    }
+
+    @Ignore // TODO
+    @Test
+    public void test_concurrent_producer_and_consumer() throws Exception {
+        SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
+        lotsOfEventsForConcurrencyTesting(expectations.getListener());
+        expectations.replay();
+
+        Path mmf = tempDir.getRoot().toPath().resolve("mmf");
+
+        Runnable producer = () -> {
+            IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(new FileSegmenter(mmf, 4 * 1024, 512 * 1024)));
+
+            SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
+            serializer.start();
+            lotsOfEventsForConcurrencyTesting(serializer);
+            serializer.end();
+        };
+
+        Runnable consumer = () -> {
+            IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(
+                    new FileSegmenter(mmf, 1024, 1024))); // different segment size, because the reader should not create new segments
+
+            SuiteEventSerializer.deserialize(buffer, expectations.getListener());
+        };
+
+        runConcurrently(producer, consumer); // start consumer first, to cover also the lack of a header
+    }
+
+    private static void runConcurrently(Runnable... tasks) throws ExecutionException, InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(tasks.length);
+        try {
+            List<Future<?>> futures = new ArrayList<>();
+            for (Runnable task : tasks) {
+                futures.add(executor.submit(task));
+            }
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private static void lotsOfEventsForConcurrencyTesting(SuiteListener listener) {
+        TestFile testFile = TestFile.fromClassName("DummyTest");
+        RunIdSequence runIds = new RunIdSequence();
+        for (int i = 0; i < 10000; i++) {
+            RunId runId = runIds.nextRunId();
+
+            // Not a realistic scenario, because we are only interested in concurrency testing
+            // the IPC protocol and not the specifics of a particular interface.
+            listener.onSuiteStarted();
+            listener.onRunStarted(runId, testFile);
+            listener.onRunFinished(runId);
+            listener.onSuiteFinished();
+        }
     }
 
 
