@@ -13,13 +13,23 @@ public class AllocatedByteBufferSequence implements ByteBufferSequence {
 
     private final List<ByteBuffer> segments = new ArrayList<>();
     private final int segmentCapacity;
+    private final int maxSegments;
 
     public AllocatedByteBufferSequence(int segmentCapacity) {
+        this(segmentCapacity, Integer.MAX_VALUE);
+    }
+
+    public AllocatedByteBufferSequence(int segmentCapacity, int totalCapacityLimit) {
         this.segmentCapacity = segmentCapacity;
+        this.maxSegments = totalCapacityLimit / segmentCapacity;
     }
 
     @Override
     public ByteBuffer get(int index) {
+        if (index >= maxSegments) {
+            throw new IllegalArgumentException("tried to get segment at index " + index +
+                    ", but there were only " + maxSegments + " segments");
+        }
         while (segments.size() <= index) {
             segments.add(ByteBuffer.allocate(segmentCapacity));
         }

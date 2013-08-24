@@ -126,7 +126,9 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - make FixedByteBufferSequence pass the contract
 			OK - test that accessing unavailable indexes throws IllegalArgumentException with clear message
 			OK - use FixedByteBufferSequence with one big enough buffer in the serializer's tests
-		!! - handle all (4) failure conditions when reading data that has wrong header fields
+		!! - there are still a couple of PIT timeouts in writeStackTrace
+			OK - use FixedByteBufferSequence for StackTrace tests or add totalCapacityLimit to AllocatedByteBufferSequence
+		- handle all (4) failure conditions when reading data that has wrong header fields
 		- concurrency tests
 			- between writing an event and the event's status there must be a happens-before relationship
 			- write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
@@ -134,6 +136,8 @@ OK - refactor BuildTest & SuiteConfiguration
 				- concurrency test: writer uses 1 byte segments, reader 2 byte segments; afterwards all segments should be 1 byte
 				- append a null byte before writing the previous event's status?
 		- save v1 events to file for testing compatibility
+			- save the current example usage
+			- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
 	- TestId: create a method for getting the path as int[]
 		- make fi.jumi.api.drivers.TestId#getPath public
 		- write tests directly for getPath
