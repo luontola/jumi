@@ -20,6 +20,12 @@ public class Resilient {
             } catch (Exception e) {
                 if (tries >= maxTries) {
                     throw e;
+                } else {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e1) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }
