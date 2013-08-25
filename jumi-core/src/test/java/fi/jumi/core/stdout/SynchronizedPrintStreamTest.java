@@ -40,7 +40,7 @@ public class SynchronizedPrintStreamTest {
      * monitor of the PrintStream first, before all other locks.
      */
     @Test
-    public void does_not_deadlock_if_somebody_locks_in_the_PrintStream_externally() throws InterruptedException {
+    public void does_not_deadlock_if_somebody_locks_in_the_PrintStream_externally() throws Exception {
         final int ITERATIONS = 10;
         PrintStream printStream = SynchronizedPrintStream.create(new NullOutputStream(), Charset.defaultCharset(), lock);
 

@@ -114,7 +114,7 @@ public class OutputCapturerTest {
     // concurrency
 
     @Test
-    public void concurrent_captures_are_isolated_from_each_other() throws InterruptedException {
+    public void concurrent_captures_are_isolated_from_each_other() throws Exception {
         CountDownLatch barrier = new CountDownLatch(2);
         OutputListenerSpy listener1 = new OutputListenerSpy();
         OutputListenerSpy listener2 = new OutputListenerSpy();
@@ -134,7 +134,7 @@ public class OutputCapturerTest {
     }
 
     @Test
-    public void captures_what_is_printed_in_spawned_threads() throws InterruptedException {
+    public void captures_what_is_printed_in_spawned_threads() throws Exception {
         OutputListenerSpy listener = new OutputListenerSpy();
 
         capturer.captureTo(listener);
@@ -174,7 +174,7 @@ public class OutputCapturerTest {
      * it's possible for stdout and stderr to get interleaved.
      */
     @Test
-    public void printing_to_stdout_and_stderr_concurrently() throws InterruptedException {
+    public void printing_to_stdout_and_stderr_concurrently() throws Exception {
         final int ITERATIONS = 30;
         CombinedOutput combinedOutput = new CombinedOutput();
         capturer.captureTo(combinedOutput);
@@ -199,7 +199,7 @@ public class OutputCapturerTest {
      * printing to {@code System.err}.
      */
     @Test
-    public void printing_a_stack_trace_to_stderr_and_normally_to_stdout_concurrently() throws InterruptedException {
+    public void printing_a_stack_trace_to_stderr_and_normally_to_stdout_concurrently() throws Exception {
         CountDownLatch isPrintingToOut = new CountDownLatch(1);
         CountDownLatch hasPrintedStackTrace = new CountDownLatch(1);
         Exception exception = new Exception("dummy exception");

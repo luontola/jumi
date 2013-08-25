@@ -16,9 +16,8 @@ import org.junit.rules.*;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.*;
 
+import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -116,22 +115,7 @@ public class SuiteEventSerializerTest {
             SuiteEventSerializer.deserialize(buffer, expectations.getListener());
         };
 
-        runConcurrently(producer, consumer); // start consumer first, to cover also the lack of a header
-    }
-
-    private static void runConcurrently(Runnable... tasks) throws ExecutionException, InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(tasks.length);
-        try {
-            List<Future<?>> futures = new ArrayList<>();
-            for (Runnable task : tasks) {
-                futures.add(executor.submit(task));
-            }
-            for (Future<?> future : futures) {
-                future.get();
-            }
-        } finally {
-            executor.shutdownNow();
-        }
+        runConcurrently(producer, consumer);
     }
 
     private static void lotsOfEventsForConcurrencyTesting(SuiteListener listener) {

@@ -9,18 +9,27 @@ import java.util.concurrent.*;
 
 public class ConcurrencyUtil {
 
-    public static void runConcurrently(Runnable... commands) throws InterruptedException {
-        List<Thread> threads = new ArrayList<>();
-        for (Runnable command : commands) {
-            threads.add(startThread(command));
-        }
-        for (Thread thread : threads) {
-            thread.join();
+    public static void runConcurrently(Runnable... tasks) throws ExecutionException, InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(tasks.length);
+        CountDownLatch allTasksStarted = new CountDownLatch(tasks.length);
+        try {
+            List<Future<?>> futures = new ArrayList<>();
+            for (Runnable task : tasks) {
+                futures.add(executor.submit(() -> {
+                    sync(allTasksStarted, 1000);
+                    task.run();
+                }));
+            }
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        } finally {
+            executor.shutdownNow();
         }
     }
 
-    public static Thread startThread(Runnable command) {
-        Thread t = new Thread(command);
+    public static Thread startThread(Runnable task) {
+        Thread t = new Thread(task);
         t.start();
         return t;
     }
