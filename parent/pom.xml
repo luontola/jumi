@@ -49,6 +49,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <minimumMavenVersion>3.0.3</minimumMavenVersion>
         <jumi-actors.version>0.1.196</jumi-actors.version>
+        <testTempDir>${project.build.directory}/tmp</testTempDir>
     </properties>
 
     <prerequisites>
@@ -270,6 +271,9 @@
                     </includes>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <jvm>${env.JAVA7_HOME}/bin/java</jvm>
+                    <systemPropertyVariables>
+                        <java.io.tmpdir>${testTempDir}</java.io.tmpdir>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -281,6 +285,9 @@
                     </includes>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <jvm>${env.JAVA7_HOME}/bin/java</jvm>
+                    <systemPropertyVariables>
+                        <java.io.tmpdir>${testTempDir}</java.io.tmpdir>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -429,6 +436,22 @@
                                     <arg value="-jar"/>
                                     <arg value="${project.build.directory}/retrolambda.jar"/>
                                 </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <!-- Create custom temporary directory. Our tests use memory-mapped files which the tests
+                         cannot remove themselves (the OS may keep them locked until the process dies) -->
+
+                    <execution>
+                        <id>create-temp-dir</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${testTempDir}"/>
                             </target>
                         </configuration>
                     </execution>

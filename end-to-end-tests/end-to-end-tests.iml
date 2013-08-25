@@ -17,6 +17,7 @@
       <excludeFolder url="file://$MODULE_DIR$/target/project-artifacts" />
       <excludeFolder url="file://$MODULE_DIR$/target/sandbox" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
+      <excludeFolder url="file://$MODULE_DIR$/target/tmp" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
