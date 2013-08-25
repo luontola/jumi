@@ -49,25 +49,26 @@ public class SpyListener<T> implements InvocationHandler {
         if (current != actualCalls) {
             throw new IllegalStateException("replay() was not called");
         }
-        String message = "not all expectations were met\n";
+        StringBuilder message = new StringBuilder();
+        message.append("not all expectations were met\n");
 
-        message += "Expected:\n";
+        message.append("Expected:\n");
         for (int i = 0; i < expectations.size(); i++) {
-            message += listItem(i, expectations);
+            message.append(listItem(i, expectations));
             if (!matchesAt(i)) {
-                message += ERROR_MARKER + "\n";
+                message.append(ERROR_MARKER + "\n");
             }
         }
 
-        message += "but was:\n";
+        message.append("but was:\n");
         for (int i = 0; i < actualCalls.size(); i++) {
-            message += listItem(i, actualCalls);
+            message.append(listItem(i, actualCalls));
             if (!matchesAt(i)) {
-                message += ERROR_MARKER + "\n";
+                message.append(ERROR_MARKER + "\n");
             }
         }
 
-        assertThat(message, actualCalls.equals(expectations));
+        assertThat(message.toString(), actualCalls.equals(expectations));
     }
 
     private boolean matchesAt(int i) {
