@@ -5,14 +5,19 @@
 package fi.jumi.core.ipc;
 
 import org.junit.*;
-import org.junit.rules.TemporaryFolder;
+import org.junit.rules.*;
 
-import java.nio.file.Path;
+import java.io.IOException;
+import java.nio.file.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
 public class MappedByteBufferSequenceTest extends ByteBufferSequenceContract {
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
@@ -51,5 +56,19 @@ public class MappedByteBufferSequenceTest extends ByteBufferSequenceContract {
         int capacity2 = buffer2.get(0).capacity();
 
         assertThat("capacity of latter mapping", capacity2, is(capacity1));
+    }
+
+    @Test
+    public void refuses_to_open_files_that_are_0_bytes_long() throws IOException {
+        FileSegmenter segmenter = new FileSegmenter(getBasePath(), 10, 10);
+        MappedByteBufferSequence buffer = new MappedByteBufferSequence(segmenter);
+
+        Files.createFile(segmenter.pathOf(0));
+
+        thrown.expectCause(instanceOf(IOException.class));
+        thrown.expectCause(hasMessage(is("file size was 0 bytes")));
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("failed to map " + segmenter.pathOf(0));
+        buffer.get(0);
     }
 }
