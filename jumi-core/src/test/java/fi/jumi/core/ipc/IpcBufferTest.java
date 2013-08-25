@@ -57,6 +57,15 @@ public class IpcBufferTest {
     }
 
     @Test
+    public void position_can_be_changed() {
+        buffer = new IpcBuffer(new FixedByteBufferSequence(10));
+        assertThat(buffer.position(), is(0));
+
+        buffer.position(5);
+        assertThat(buffer.position(), is(5));
+    }
+
+    @Test
     public void cannot_make_position_negative() {
         buffer = new IpcBuffer(new AllocatedByteBufferSequence(10));
 

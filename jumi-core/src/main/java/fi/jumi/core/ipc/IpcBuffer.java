@@ -19,6 +19,10 @@ public class IpcBuffer {
         current = new Segment();
     }
 
+    public int position() {
+        return position;
+    }
+
     public IpcBuffer position(int newPosition) {
         if (newPosition < 0) {
             throw new IllegalArgumentException();
