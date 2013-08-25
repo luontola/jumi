@@ -16,6 +16,7 @@ import org.junit.rules.*;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.concurrent.locks.LockSupport;
 
 import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
@@ -91,10 +92,10 @@ public class SuiteEventSerializerTest {
     }
 
     @Ignore // TODO
-    @Test
+    @Test(timeout = 5000)
     public void test_concurrent_producer_and_consumer() throws Exception {
         SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
-        lotsOfEventsForConcurrencyTesting(expectations.getListener());
+        lotsOfEventsForConcurrencyTesting(expectations.getListener(), 0);
         expectations.replay();
 
         Path mmf = tempDir.getRoot().toPath().resolve("mmf");
@@ -104,7 +105,7 @@ public class SuiteEventSerializerTest {
 
             SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
             serializer.start();
-            lotsOfEventsForConcurrencyTesting(serializer);
+            lotsOfEventsForConcurrencyTesting(serializer, 1);
             serializer.end();
         };
 
@@ -116,20 +117,26 @@ public class SuiteEventSerializerTest {
         };
 
         runConcurrently(producer, consumer);
+
+        expectations.verify();
     }
 
-    private static void lotsOfEventsForConcurrencyTesting(SuiteListener listener) {
+    private static void lotsOfEventsForConcurrencyTesting(SuiteListener listener, int nanosToPark) {
         TestFile testFile = TestFile.fromClassName("DummyTest");
         RunIdSequence runIds = new RunIdSequence();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10; i++) {
             RunId runId = runIds.nextRunId();
 
             // Not a realistic scenario, because we are only interested in concurrency testing
             // the IPC protocol and not the specifics of a particular interface.
             listener.onSuiteStarted();
+            LockSupport.parkNanos(nanosToPark);
             listener.onRunStarted(runId, testFile);
+            LockSupport.parkNanos(nanosToPark);
             listener.onRunFinished(runId);
+            LockSupport.parkNanos(nanosToPark);
             listener.onSuiteFinished();
+            LockSupport.parkNanos(nanosToPark);
         }
     }
 
@@ -140,10 +147,10 @@ public class SuiteEventSerializerTest {
     public void cannot_deserialize_if_header_has_wrong_magic_bytes() {
         IpcBuffer buffer = serializeSomeEvents();
 
-        buffer.setInt(0, 1);
+        buffer.setInt(0, 0x0A0B0C0D);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("wrong header: expected 4A 75 6D 69 but was 00 00 00 01");
+        thrown.expectMessage("wrong header: expected 4A 75 6D 69 but was 0A 0B 0C 0D");
         tryToDeserialize(buffer);
     }
 

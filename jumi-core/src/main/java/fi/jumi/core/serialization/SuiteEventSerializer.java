@@ -7,6 +7,7 @@ package fi.jumi.core.serialization;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.IpcBuffer;
+import fi.jumi.core.util.MemoryBarrier;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +37,7 @@ public class SuiteEventSerializer implements SuiteListener {
     private static final byte onTestFileFinished = 13;
     private static final byte onSuiteFinished = 14;
 
+    private final MemoryBarrier memoryBarrier = new MemoryBarrier();
     private final IpcBuffer target;
 
     public SuiteEventSerializer(IpcBuffer target) {
@@ -106,19 +108,41 @@ public class SuiteEventSerializer implements SuiteListener {
     }
 
     private void writeHeader() {
-        for (byte b : HEADER_MAGIC_BYTES) {
-            target.writeByte(b);
+        // first byte is zero to signify that the whole header has not yet been written
+        target.writeByte((byte) 0);
+        for (int i = 1; i < HEADER_MAGIC_BYTES.length; i++) {
+            target.writeByte(HEADER_MAGIC_BYTES[i]);
         }
+
         target.writeInt(PROTOCOL_VERSION);
         writeString(SuiteListener.class.getName());
         target.writeInt(INTERFACE_VERSION);
+
+        // all done
+        memoryBarrier.storeStore();
+        target.setByte(0, HEADER_MAGIC_BYTES[0]);
     }
 
     private static void readHeader(IpcBuffer source) {
+        waitUntilNonZero(source, 0);
+
         checkMagicBytes(source);
         checkProtocolVersion(source);
         checkInterface(source);
         checkInterfaceVersion(source);
+    }
+
+    private static void waitUntilNonZero(IpcBuffer source, int index) {
+        // TODO: create proper waiting util
+        // TODO: we should do a read barrier here
+        while (source.getByte(index) == 0) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
     }
 
     private static void checkMagicBytes(IpcBuffer source) {
@@ -127,7 +151,6 @@ public class SuiteEventSerializer implements SuiteListener {
             actual[i] = source.readByte();
         }
         if (!Arrays.equals(actual, HEADER_MAGIC_BYTES)) {
-
             throw new IllegalArgumentException("wrong header: expected " + format(HEADER_MAGIC_BYTES) + " but was " + format(actual));
         }
     }
