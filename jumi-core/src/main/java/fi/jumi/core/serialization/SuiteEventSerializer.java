@@ -22,6 +22,10 @@ public class SuiteEventSerializer implements SuiteListener {
     private static final String INTERFACE = SuiteListener.class.getName();
     private static final int INTERFACE_VERSION = 1;
 
+    private static final byte STATUS_EMPTY = 0;
+    private static final byte STATUS_EXISTS = 1;
+    private static final byte STATUS_END_OF_STREAM = 2;
+
     private static final byte onSuiteStarted = 1;
     private static final byte onInternalError = 2;
     private static final byte onTestFileFound = 3;
@@ -49,12 +53,31 @@ public class SuiteEventSerializer implements SuiteListener {
     }
 
     public void end() {
+        writeStatusEndOfStream();
     }
 
     public static void deserialize(IpcBuffer source, SuiteListener target) {
         readHeader(source);
 
         while (true) {
+            // TODO: create proper waiting util
+            int index = source.position();
+            byte status = readStatus(source);
+            if (status == STATUS_EMPTY) {
+                source.position(index);
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                continue;
+            } else if (status == STATUS_END_OF_STREAM) {
+                return;
+            } else {
+                assert status == STATUS_EXISTS : status;
+            }
+
             byte type = readEventType(source);
             switch (type) {
                 case onSuiteStarted:
@@ -99,8 +122,6 @@ public class SuiteEventSerializer implements SuiteListener {
                 case onSuiteFinished:
                     target.onSuiteFinished();
                     break;
-                case 0:
-                    return; // TODO: check status instead of type
                 default:
                     throw new IllegalArgumentException("Unknown type " + type);
             }
@@ -185,95 +206,144 @@ public class SuiteEventSerializer implements SuiteListener {
     }
 
 
+    // event write status
+
+    private static byte readStatus(IpcBuffer source) {
+        return source.readByte();
+    }
+
+    private int writeStatusEmpty() {
+        int index = target.position();
+        target.writeByte(STATUS_EMPTY);
+        return index;
+    }
+
+    private void setStatusExists(int index) {
+        target.setByte(index, STATUS_EXISTS);
+    }
+
+    private void writeStatusEndOfStream() {
+        target.writeByte(STATUS_END_OF_STREAM);
+    }
+
+
     // serializing events
 
     @Override
     public void onSuiteStarted() {
+        int index = writeStatusEmpty();
         writeEventType(onSuiteStarted);
+        setStatusExists(index);
     }
 
     @Override
     public void onInternalError(String message, StackTrace cause) {
+        int index = writeStatusEmpty();
         writeEventType(onInternalError);
         writeString(message);
         writeStackTrace(cause);
+        setStatusExists(index);
     }
 
     @Override
     public void onTestFileFound(TestFile testFile) {
+        int index = writeStatusEmpty();
         writeEventType(onTestFileFound);
         writeTestFile(testFile);
+        setStatusExists(index);
     }
 
     @Override
     public void onAllTestFilesFound() {
+        int index = writeStatusEmpty();
         writeEventType(onAllTestFilesFound);
+        setStatusExists(index);
     }
 
     @Override
     public void onTestFound(TestFile testFile, TestId testId, String name) {
+        int index = writeStatusEmpty();
         writeEventType(onTestFound);
         writeTestFile(testFile);
         writeTestId(testId);
         writeString(name);
+        setStatusExists(index);
     }
 
     @Override
     public void onRunStarted(RunId runId, TestFile testFile) {
+        int index = writeStatusEmpty();
         writeEventType(onRunStarted);
         writeRunId(runId);
         writeTestFile(testFile);
+        setStatusExists(index);
     }
 
     @Override
     public void onTestStarted(RunId runId, TestId testId) {
+        int index = writeStatusEmpty();
         writeEventType(onTestStarted);
         writeRunId(runId);
         writeTestId(testId);
+        setStatusExists(index);
     }
 
     @Override
     public void onPrintedOut(RunId runId, String text) {
+        int index = writeStatusEmpty();
         writeEventType(onPrintedOut);
         writeRunId(runId);
         writeString(text);
+        setStatusExists(index);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
+        int index = writeStatusEmpty();
         writeEventType(onPrintedErr);
         writeRunId(runId);
         writeString(text);
+        setStatusExists(index);
     }
 
     @Override
     public void onFailure(RunId runId, StackTrace cause) {
+        int index = writeStatusEmpty();
         writeEventType(onFailure);
         writeRunId(runId);
         writeStackTrace(cause);
+        setStatusExists(index);
     }
 
     @Override
     public void onTestFinished(RunId runId) {
+        int index = writeStatusEmpty();
         writeEventType(onTestFinished);
         writeRunId(runId);
+        setStatusExists(index);
     }
 
     @Override
     public void onRunFinished(RunId runId) {
+        int index = writeStatusEmpty();
         writeEventType(onRunFinished);
         writeRunId(runId);
+        setStatusExists(index);
     }
 
     @Override
     public void onTestFileFinished(TestFile testFile) {
+        int index = writeStatusEmpty();
         writeEventType(onTestFileFinished);
         writeTestFile(testFile);
+        setStatusExists(index);
     }
 
     @Override
     public void onSuiteFinished() {
+        int index = writeStatusEmpty();
         writeEventType(onSuiteFinished);
+        setStatusExists(index);
     }
 
 

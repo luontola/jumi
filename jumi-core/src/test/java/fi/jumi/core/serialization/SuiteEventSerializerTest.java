@@ -91,7 +91,6 @@ public class SuiteEventSerializerTest {
         listener.onSuiteFinished();
     }
 
-    @Ignore // TODO
     @Test(timeout = 5000)
     public void test_concurrent_producer_and_consumer() throws Exception {
         SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
