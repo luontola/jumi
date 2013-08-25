@@ -61,6 +61,7 @@ public class SuiteEventSerializer implements SuiteListener {
 
         while (true) {
             // TODO: create proper waiting util
+            // TODO: we should do a read barrier here
             int index = source.position();
             byte status = readStatus(source);
             if (status == STATUS_EMPTY) {
