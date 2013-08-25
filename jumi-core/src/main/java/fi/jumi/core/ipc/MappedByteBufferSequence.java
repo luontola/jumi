@@ -39,7 +39,7 @@ public class MappedByteBufferSequence implements ByteBufferSequence {
         if (Files.exists(path)) {
             size = Files.size(path);
             if (size <= 0) {
-                throw new IOException("file size was 0 bytes");
+                throw new IOException("file size was " + size + " bytes");
             }
             options = new OpenOption[]{READ, WRITE};
         } else {
