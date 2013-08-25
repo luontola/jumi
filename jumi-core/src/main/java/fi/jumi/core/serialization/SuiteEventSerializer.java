@@ -43,23 +43,14 @@ public class SuiteEventSerializer implements SuiteListener {
     }
 
     public void start() {
-        for (byte b : HEADER_MAGIC_BYTES) {
-            target.writeByte(b);
-        }
-        target.writeInt(PROTOCOL_VERSION);
-        writeString(SuiteListener.class.getName());
-        target.writeInt(INTERFACE_VERSION);
+        writeHeader();
     }
 
     public void end() {
-
     }
 
     public static void deserialize(IpcBuffer source, SuiteListener target) {
-        checkHeader(source);
-        checkProtocolVersion(source);
-        checkInterface(source);
-        checkInterfaceVersion(source);
+        readHeader(source);
 
         while (true) {
             byte type = readEventType(source);
@@ -114,7 +105,23 @@ public class SuiteEventSerializer implements SuiteListener {
         }
     }
 
-    private static void checkHeader(IpcBuffer source) {
+    private void writeHeader() {
+        for (byte b : HEADER_MAGIC_BYTES) {
+            target.writeByte(b);
+        }
+        target.writeInt(PROTOCOL_VERSION);
+        writeString(SuiteListener.class.getName());
+        target.writeInt(INTERFACE_VERSION);
+    }
+
+    private static void readHeader(IpcBuffer source) {
+        checkMagicBytes(source);
+        checkProtocolVersion(source);
+        checkInterface(source);
+        checkInterfaceVersion(source);
+    }
+
+    private static void checkMagicBytes(IpcBuffer source) {
         byte[] actual = new byte[HEADER_MAGIC_BYTES.length];
         for (int i = 0; i < actual.length; i++) {
             actual[i] = source.readByte();
