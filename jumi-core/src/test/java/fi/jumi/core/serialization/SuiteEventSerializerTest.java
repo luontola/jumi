@@ -4,8 +4,11 @@
 
 package fi.jumi.core.serialization;
 
+import fi.jumi.actors.eventizers.Event;
+import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
+import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.ipc.*;
 import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.SpyListener;
@@ -38,14 +41,14 @@ public class SuiteEventSerializerTest {
         IpcBuffer buffer = TestUtil.newIpcBuffer();
 
         // serialize
-        SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
+        SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
         serializer.start();
-        exampleUsage(serializer.sender());
+        exampleUsage(sendTo(serializer));
         serializer.end();
 
         // deserialize
         buffer.position(0);
-        SuiteEventSerializer.deserialize(buffer, spy.getListener());
+        serializer.deserialize(spy.getListener());
 
         spy.verify();
     }
@@ -98,9 +101,9 @@ public class SuiteEventSerializerTest {
         Runnable producer = () -> {
             IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(new FileSegmenter(mmf, 4 * 1024, 512 * 1024)));
 
-            SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
+            SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
             serializer.start();
-            lotsOfEventsForConcurrencyTesting(serializer.sender(), 1);
+            lotsOfEventsForConcurrencyTesting(sendTo(serializer), 1);
             serializer.end();
         };
 
@@ -108,7 +111,7 @@ public class SuiteEventSerializerTest {
             IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(
                     new FileSegmenter(mmf, 1024, 1024))); // different segment size, because the reader should not create new segments
 
-            SuiteEventSerializer.deserialize(buffer, expectations.getListener());
+            newSerializer(buffer).deserialize(expectations.getListener());
         };
 
         runConcurrently(producer, consumer);
@@ -187,15 +190,24 @@ public class SuiteEventSerializerTest {
 
     private static IpcBuffer serializeSomeEvents() {
         IpcBuffer buffer = TestUtil.newIpcBuffer();
-        SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
+        SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
         serializer.start();
-        serializer.sender().onSuiteStarted();
+        sendTo(serializer).onSuiteStarted();
         serializer.end();
         return buffer;
     }
 
     private static void tryToDeserialize(IpcBuffer buffer) {
         buffer.position(0);
-        SuiteEventSerializer.deserialize(buffer, mock(SuiteListener.class));
+        SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
+        serializer.deserialize(mock(SuiteListener.class));
+    }
+
+    private static SuiteEventSerializer<SuiteListener> newSerializer(IpcBuffer buffer) {
+        return new SuiteEventSerializer<>(buffer, SuiteListenerEncoding::new);
+    }
+
+    private static SuiteListener sendTo(MessageSender<Event<SuiteListener>> target) {
+        return new SuiteListenerEventizer().newFrontend(target);
     }
 }

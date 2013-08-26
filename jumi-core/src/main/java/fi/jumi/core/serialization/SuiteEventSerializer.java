@@ -6,8 +6,6 @@ package fi.jumi.core.serialization;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
-import fi.jumi.core.api.SuiteListener;
-import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.ipc.IpcBuffer;
 import fi.jumi.core.util.MemoryBarrier;
 
@@ -18,7 +16,7 @@ import java.util.Arrays;
 import static fi.jumi.core.serialization.StringEncoding.*;
 
 @NotThreadSafe
-public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>> {
+public class SuiteEventSerializer<T> implements MessageSender<Event<T>> {
 
     private static final byte[] HEADER_MAGIC_BYTES = "Jumi".getBytes(StandardCharsets.US_ASCII);
     private static final int PROTOCOL_VERSION = 1;
@@ -28,12 +26,12 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
     private static final byte STATUS_END_OF_STREAM = 2;
 
     private final MemoryBarrier memoryBarrier = new MemoryBarrier();
-    private final IpcBuffer target;
-    private final SuiteListenerEncoding encoding;
+    private final IpcBuffer buffer;
+    private final MessageEncoding<T> messageEncoding;
 
-    public SuiteEventSerializer(IpcBuffer target) {
-        this.target = target;
-        encoding = new SuiteListenerEncoding(target);
+    public SuiteEventSerializer(IpcBuffer buffer, EncodingFactory<T> encodingFactory) {
+        this.buffer = buffer;
+        this.messageEncoding = encodingFactory.create(buffer);
     }
 
     public void start() {
@@ -44,27 +42,23 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
         writeStatusEndOfStream();
     }
 
-    public SuiteListener sender() {
-        return new SuiteListenerEventizer().newFrontend(this);
-    }
-
     @Override
-    public void send(Event<SuiteListener> message) {
+    public void send(Event<T> message) {
         int index = writeStatusEmpty();
-        encoding.serialize(message);
+        messageEncoding.encode(message);
         setStatusExists(index);
     }
 
-    public static void deserialize(IpcBuffer source, SuiteListener target) {
-        readHeader(source);
+    public void deserialize(T target) {
+        readHeader();
 
         while (true) {
             // TODO: create proper waiting util
             // TODO: we should do a read barrier here
-            int index = source.position();
-            byte status = readStatus(source);
+            int index = buffer.position();
+            byte status = readStatus();
             if (status == STATUS_EMPTY) {
-                source.position(index);
+                buffer.position(index);
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -78,39 +72,42 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
                 assert status == STATUS_EXISTS : status;
             }
 
-            SuiteListenerEncoding.deserialize(source, target);
+            messageEncoding.decode(target);
         }
     }
+
+
+    // header
 
     private void writeHeader() {
         // first byte is zero to signify that the whole header has not yet been written
-        target.writeByte((byte) 0);
+        buffer.writeByte((byte) 0);
         for (int i = 1; i < HEADER_MAGIC_BYTES.length; i++) {
-            target.writeByte(HEADER_MAGIC_BYTES[i]);
+            buffer.writeByte(HEADER_MAGIC_BYTES[i]);
         }
 
-        target.writeInt(PROTOCOL_VERSION);
-        writeString(target, SuiteListenerEncoding.INTERFACE_NAME);
-        target.writeInt(SuiteListenerEncoding.INTERFACE_VERSION);
+        buffer.writeInt(PROTOCOL_VERSION);
+        writeString(buffer, messageEncoding.getInterfaceName());
+        buffer.writeInt(messageEncoding.getInterfaceVersion());
 
         // all done
         memoryBarrier.storeStore();
-        target.setByte(0, HEADER_MAGIC_BYTES[0]);
+        buffer.setByte(0, HEADER_MAGIC_BYTES[0]);
     }
 
-    private static void readHeader(IpcBuffer source) {
-        waitUntilNonZero(source, 0);
+    private void readHeader() {
+        waitUntilNonZero(buffer, 0);
 
-        checkMagicBytes(source);
-        checkProtocolVersion(source);
-        checkInterface(source);
-        checkInterfaceVersion(source);
+        checkMagicBytes();
+        checkProtocolVersion();
+        checkInterface();
+        checkInterfaceVersion();
     }
 
-    private static void waitUntilNonZero(IpcBuffer source, int index) {
+    private void waitUntilNonZero(IpcBuffer buffer, int index) {
         // TODO: create proper waiting util
         // TODO: we should do a read barrier here
-        while (source.getByte(index) == 0) {
+        while (buffer.getByte(index) == 0) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
@@ -120,17 +117,17 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
         }
     }
 
-    private static void checkMagicBytes(IpcBuffer source) {
+    private void checkMagicBytes() {
         byte[] actual = new byte[HEADER_MAGIC_BYTES.length];
         for (int i = 0; i < actual.length; i++) {
-            actual[i] = source.readByte();
+            actual[i] = buffer.readByte();
         }
         if (!Arrays.equals(actual, HEADER_MAGIC_BYTES)) {
             throw new IllegalArgumentException("wrong header: expected " + format(HEADER_MAGIC_BYTES) + " but was " + format(actual));
         }
     }
 
-    private static String format(byte[] bytes) {
+    private String format(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02X ", b));
@@ -138,45 +135,50 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
         return sb.toString().trim();
     }
 
-    private static void checkProtocolVersion(IpcBuffer source) {
-        int actual = source.readInt();
+    private void checkProtocolVersion() {
+        int actual = buffer.readInt();
         if (actual != PROTOCOL_VERSION) {
             throw new IllegalArgumentException("unsupported protocol version: " + actual);
         }
     }
 
-    private static void checkInterface(IpcBuffer source) {
-        String actual = readString(source);
-        if (!actual.equals(SuiteListenerEncoding.INTERFACE_NAME)) {
-            throw new IllegalArgumentException("wrong interface: expected " + SuiteListenerEncoding.INTERFACE_NAME + " but was " + actual);
+    private void checkInterface() {
+        String actual = readString(buffer);
+        if (!actual.equals(messageEncoding.getInterfaceName())) {
+            throw new IllegalArgumentException("wrong interface: expected " + messageEncoding.getInterfaceName() + " but was " + actual);
         }
     }
 
-    private static void checkInterfaceVersion(IpcBuffer source) {
-        int actual = source.readInt();
-        if (actual != SuiteListenerEncoding.INTERFACE_VERSION) {
+    private void checkInterfaceVersion() {
+        int actual = buffer.readInt();
+        if (actual != messageEncoding.getInterfaceVersion()) {
             throw new IllegalArgumentException("unsupported interface version: " + actual);
         }
     }
 
 
-    // event write status
+    // messages
 
-    private static byte readStatus(IpcBuffer source) {
-        return source.readByte();
+    private byte readStatus() {
+        return buffer.readByte();
     }
 
     private int writeStatusEmpty() {
-        int index = target.position();
-        target.writeByte(STATUS_EMPTY);
+        int index = buffer.position();
+        buffer.writeByte(STATUS_EMPTY);
         return index;
     }
 
     private void setStatusExists(int index) {
-        target.setByte(index, STATUS_EXISTS);
+        buffer.setByte(index, STATUS_EXISTS);
     }
 
     private void writeStatusEndOfStream() {
-        target.writeByte(STATUS_END_OF_STREAM);
+        buffer.writeByte(STATUS_END_OF_STREAM);
+    }
+
+
+    public interface EncodingFactory<T> {
+        MessageEncoding<T> create(IpcBuffer buffer);
     }
 }

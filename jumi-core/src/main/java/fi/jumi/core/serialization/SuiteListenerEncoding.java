@@ -13,13 +13,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static fi.jumi.core.serialization.StringEncoding.*;
-
 @NotThreadSafe
-public class SuiteListenerEncoding implements SuiteListener {
-
-    public static final String INTERFACE_NAME = SuiteListener.class.getName();
-    public static final int INTERFACE_VERSION = 1;
+public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<SuiteListener> {
 
     private static final byte onSuiteStarted = 1;
     private static final byte onInternalError = 2;
@@ -36,57 +31,69 @@ public class SuiteListenerEncoding implements SuiteListener {
     private static final byte onTestFileFinished = 13;
     private static final byte onSuiteFinished = 14;
 
-    private final IpcBuffer target;
+    private final IpcBuffer buffer;
 
-    public SuiteListenerEncoding(IpcBuffer target) {
-        this.target = target;
+    public SuiteListenerEncoding(IpcBuffer buffer) {
+        this.buffer = buffer;
     }
 
-    public void serialize(Event<SuiteListener> message) {
+    @Override
+    public String getInterfaceName() {
+        return SuiteListener.class.getName();
+    }
+
+    @Override
+    public int getInterfaceVersion() {
+        return 1;
+    }
+
+    @Override
+    public void encode(Event<SuiteListener> message) {
         message.fireOn(this);
     }
 
-    public static void deserialize(IpcBuffer source, SuiteListener target) {
-        byte type = readEventType(source);
+    @Override
+    public void decode(SuiteListener target) {
+        byte type = readEventType();
         switch (type) {
             case onSuiteStarted:
                 target.onSuiteStarted();
                 break;
             case onInternalError:
-                target.onInternalError(readString(source), readStackTrace(source));
+                target.onInternalError(readString(), readStackTrace());
                 break;
             case onTestFileFound:
-                target.onTestFileFound(readTestFile(source));
+                target.onTestFileFound(readTestFile());
                 break;
             case onAllTestFilesFound:
                 target.onAllTestFilesFound();
                 break;
             case onTestFound:
-                target.onTestFound(readTestFile(source), readTestId(source), readString(source));
+                target.onTestFound(readTestFile(), readTestId(), readString());
                 break;
             case onRunStarted:
-                target.onRunStarted(readRunId(source), readTestFile(source));
+                target.onRunStarted(readRunId(), readTestFile());
                 break;
             case onTestStarted:
-                target.onTestStarted(readRunId(source), readTestId(source));
+                target.onTestStarted(readRunId(), readTestId());
                 break;
             case onPrintedOut:
-                target.onPrintedOut(readRunId(source), readString(source));
+                target.onPrintedOut(readRunId(), readString());
                 break;
             case onPrintedErr:
-                target.onPrintedErr(readRunId(source), readString(source));
+                target.onPrintedErr(readRunId(), readString());
                 break;
             case onFailure:
-                target.onFailure(readRunId(source), readStackTrace(source));
+                target.onFailure(readRunId(), readStackTrace());
                 break;
             case onTestFinished:
-                target.onTestFinished(readRunId(source));
+                target.onTestFinished(readRunId());
                 break;
             case onRunFinished:
-                target.onRunFinished(readRunId(source));
+                target.onRunFinished(readRunId());
                 break;
             case onTestFileFinished:
-                target.onTestFileFinished(readTestFile(source));
+                target.onTestFileFinished(readTestFile());
                 break;
             case onSuiteFinished:
                 target.onSuiteFinished();
@@ -106,7 +113,7 @@ public class SuiteListenerEncoding implements SuiteListener {
     @Override
     public void onInternalError(String message, StackTrace cause) {
         writeEventType(onInternalError);
-        writeString(target, message);
+        writeString(message);
         writeStackTrace(cause);
     }
 
@@ -126,7 +133,7 @@ public class SuiteListenerEncoding implements SuiteListener {
         writeEventType(onTestFound);
         writeTestFile(testFile);
         writeTestId(testId);
-        writeString(target, name);
+        writeString(name);
     }
 
     @Override
@@ -147,14 +154,14 @@ public class SuiteListenerEncoding implements SuiteListener {
     public void onPrintedOut(RunId runId, String text) {
         writeEventType(onPrintedOut);
         writeRunId(runId);
-        writeString(target, text);
+        writeString(text);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
         writeEventType(onPrintedErr);
         writeRunId(runId);
-        writeString(target, text);
+        writeString(text);
     }
 
     @Override
@@ -190,30 +197,30 @@ public class SuiteListenerEncoding implements SuiteListener {
 
     // event type
 
-    private static byte readEventType(IpcBuffer source) {
-        return source.readByte();
+    private byte readEventType() {
+        return buffer.readByte();
     }
 
     private void writeEventType(byte type) {
-        target.writeByte(type);
+        buffer.writeByte(type);
     }
 
     // TestFile
 
-    private static TestFile readTestFile(IpcBuffer source) {
-        return TestFile.fromPath(Paths.get(readString(source)));
+    private TestFile readTestFile() {
+        return TestFile.fromPath(Paths.get(readString()));
     }
 
     private void writeTestFile(TestFile testFile) {
-        writeString(target, testFile.getPath());
+        writeString(testFile.getPath());
     }
 
     // TestId
 
-    private static TestId readTestId(IpcBuffer source) {
-        int[] path = new int[source.readInt()];
+    private TestId readTestId() {
+        int[] path = new int[buffer.readInt()];
         for (int i = 0; i < path.length; i++) {
-            path[i] = source.readInt();
+            path[i] = buffer.readInt();
         }
         return TestId.of(path);
     }
@@ -226,64 +233,64 @@ public class SuiteListenerEncoding implements SuiteListener {
         }
         Collections.reverse(path);
 
-        target.writeInt(path.size());
+        buffer.writeInt(path.size());
         for (Integer index : path) {
-            target.writeInt(index);
+            buffer.writeInt(index);
         }
     }
 
     // RunId
 
-    private static RunId readRunId(IpcBuffer source) {
-        return new RunId(source.readInt());
+    private RunId readRunId() {
+        return new RunId(buffer.readInt());
     }
 
     private void writeRunId(RunId runId) {
-        target.writeInt(runId.toInt());
+        buffer.writeInt(runId.toInt());
     }
 
     // StackTrace
 
-    static StackTrace readStackTrace(IpcBuffer source) {
+    StackTrace readStackTrace() {
         return new StackTrace.Builder()
-                .setExceptionClass(readString(source))
-                .setToString(readString(source))
-                .setMessage(readNullableString(source))
-                .setStackTrace(readStackTraceElements(source))
-                .setCause(readOptionalException(source))
-                .setSuppressed(readManyExceptions(source))
+                .setExceptionClass(readString())
+                .setToString(readString())
+                .setMessage(readNullableString())
+                .setStackTrace(readStackTraceElements())
+                .setCause(readOptionalException())
+                .setSuppressed(readManyExceptions())
                 .build();
     }
 
     void writeStackTrace(StackTrace stackTrace) {
-        writeString(target, stackTrace.getExceptionClass());
-        writeString(target, stackTrace.toString());
-        writeNullableString(target, stackTrace.getMessage());
+        writeString(stackTrace.getExceptionClass());
+        writeString(stackTrace.toString());
+        writeNullableString(stackTrace.getMessage());
         writeStackTraceElements(stackTrace.getStackTrace());
         writeOptionalException(stackTrace.getCause());
         writeManyExceptions(stackTrace.getSuppressed());
     }
 
-    private static StackTraceElement[] readStackTraceElements(IpcBuffer source) {
-        StackTraceElement[] elements = new StackTraceElement[source.readInt()];
+    private StackTraceElement[] readStackTraceElements() {
+        StackTraceElement[] elements = new StackTraceElement[buffer.readInt()];
         for (int i = 0; i < elements.length; i++) {
-            elements[i] = new StackTraceElement(readString(source), readString(source), readString(source), source.readInt());
+            elements[i] = new StackTraceElement(readString(), readString(), readString(), buffer.readInt());
         }
         return elements;
     }
 
     private void writeStackTraceElements(StackTraceElement[] elements) {
-        target.writeInt(elements.length);
+        buffer.writeInt(elements.length);
         for (StackTraceElement element : elements) {
-            writeString(target, element.getClassName());
-            writeString(target, element.getMethodName());
-            writeString(target, element.getFileName());
-            target.writeInt(element.getLineNumber());
+            writeString(element.getClassName());
+            writeString(element.getMethodName());
+            writeString(element.getFileName());
+            buffer.writeInt(element.getLineNumber());
         }
     }
 
-    private static Throwable readOptionalException(IpcBuffer source) {
-        Throwable[] exceptions = readManyExceptions(source);
+    private Throwable readOptionalException() {
+        Throwable[] exceptions = readManyExceptions();
         return exceptions.length == 0 ? null : exceptions[0];
     }
 
@@ -291,18 +298,36 @@ public class SuiteListenerEncoding implements SuiteListener {
         writeManyExceptions(exception == null ? new Throwable[0] : new Throwable[]{exception});
     }
 
-    private static Throwable[] readManyExceptions(IpcBuffer source) {
-        Throwable[] exceptions = new Throwable[source.readInt()];
+    private Throwable[] readManyExceptions() {
+        Throwable[] exceptions = new Throwable[buffer.readInt()];
         for (int i = 0; i < exceptions.length; i++) {
-            exceptions[i] = readStackTrace(source);
+            exceptions[i] = readStackTrace();
         }
         return exceptions;
     }
 
     private void writeManyExceptions(Throwable[] exceptions) {
-        target.writeInt(exceptions.length);
+        buffer.writeInt(exceptions.length);
         for (Throwable exception : exceptions) {
             writeStackTrace((StackTrace) exception);
         }
+    }
+
+    // String
+
+    private String readString() {
+        return StringEncoding.readString(buffer);
+    }
+
+    private void writeString(String s) {
+        StringEncoding.writeString(buffer, s);
+    }
+
+    private String readNullableString() {
+        return StringEncoding.readNullableString(buffer);
+    }
+
+    private void writeNullableString(String s) {
+        StringEncoding.writeNullableString(buffer, s);
     }
 }

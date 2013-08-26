@@ -53,6 +53,6 @@ public class SuiteListenerEncodingTest {
     private static StackTrace roundTripStackTrace(StackTrace original) {
         return TestUtil.serializeAndDeserialize(original,
                 (buffer, data) -> new SuiteListenerEncoding(buffer).writeStackTrace(data),
-                SuiteListenerEncoding::readStackTrace);
+                (buffer) -> new SuiteListenerEncoding(buffer).readStackTrace());
     }
 }
