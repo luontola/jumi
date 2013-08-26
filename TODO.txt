@@ -134,9 +134,13 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - make header work: write protocol-version after the rest of the header (i.e. same way as status) to avoid race conditions?
 			OK - make events work: between writing an event and the event's status there must be a happens-before relationship
 		!! - refactor: separate the protocol and SuiteListener specific stuff
-			- remove duplication of writing the status: take event objects as input (implement MessageReceiver), so that we can surround them with the status writes
-			- extract deserialization of events to its own method (excluding status reads)
-			- move the event reading and writing to its own class (SuiteListenerEncoding)
+			OK - remove duplication of writing the status: take event objects as input (implement MessageSender), so that we can surround them with the status writes
+			OK - extract deserialization of events to its own method (excluding status reads)
+			OK - move the event reading and writing to its own class (SuiteListenerEncoding)
+			!! - String read/write to its own class
+			- extract Encoding interface
+				- make SuiteListenerEncoding#deserialize non-static
+				- accessorts for interface name and version
 			- rename SuiteEventSerializer to IpcProtocol/IpcChannel
 			- split SuiteEventSerializerTest to match the new classes
 		- refactor: support deserializing one event at a time
@@ -157,7 +161,7 @@ OK - refactor BuildTest & SuiteConfiguration
 	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
 	- communicate suite results over MMFs instead of a socket
 	- communicate commands over MMFs instead of a socket
-		- serialization of CommandListener events
+		- serialization of CommandListener events (rename to LauncherListener?)
 	- after implementing, consider refactoring the following places:
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected

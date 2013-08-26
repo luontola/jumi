@@ -44,7 +44,7 @@ public class SuiteEventSerializerTest {
         // serialize
         SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
         serializer.start();
-        exampleUsage(serializer);
+        exampleUsage(serializer.sender());
         serializer.end();
 
         // deserialize
@@ -104,7 +104,7 @@ public class SuiteEventSerializerTest {
 
             SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
             serializer.start();
-            lotsOfEventsForConcurrencyTesting(serializer, 1);
+            lotsOfEventsForConcurrencyTesting(serializer.sender(), 1);
             serializer.end();
         };
 
@@ -193,7 +193,7 @@ public class SuiteEventSerializerTest {
         IpcBuffer buffer = newIpcBuffer();
         SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
         serializer.start();
-        serializer.onSuiteStarted();
+        serializer.sender().onSuiteStarted();
         serializer.end();
         return buffer;
     }
