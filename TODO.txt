@@ -137,8 +137,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - remove duplication of writing the status: take event objects as input (implement MessageSender), so that we can surround them with the status writes
 			OK - extract deserialization of events to its own method (excluding status reads)
 			OK - move the event reading and writing to its own class (SuiteListenerEncoding)
-			!! - String read/write to its own class
-			- extract Encoding interface
+			OK - String read/write to its own class
+			!! - extract Encoding interface
 				- make SuiteListenerEncoding#deserialize non-static
 				- accessorts for interface name and version
 			- rename SuiteEventSerializer to IpcProtocol/IpcChannel

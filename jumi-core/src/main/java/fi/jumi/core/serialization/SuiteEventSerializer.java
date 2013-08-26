@@ -6,7 +6,7 @@ package fi.jumi.core.serialization;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
-import fi.jumi.core.api.*;
+import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.ipc.IpcBuffer;
 import fi.jumi.core.util.MemoryBarrier;
@@ -14,6 +14,8 @@ import fi.jumi.core.util.MemoryBarrier;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import static fi.jumi.core.serialization.StringEncoding.*;
 
 @NotThreadSafe
 public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>> {
@@ -88,7 +90,7 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
         }
 
         target.writeInt(PROTOCOL_VERSION);
-        writeString(SuiteListenerEncoding.INTERFACE_NAME);
+        writeString(target, SuiteListenerEncoding.INTERFACE_NAME);
         target.writeInt(SuiteListenerEncoding.INTERFACE_VERSION);
 
         // all done
@@ -176,34 +178,5 @@ public class SuiteEventSerializer implements MessageSender<Event<SuiteListener>>
 
     private void writeStatusEndOfStream() {
         target.writeByte(STATUS_END_OF_STREAM);
-    }
-
-
-    // StackTrace
-
-    static StackTrace readStackTrace(IpcBuffer source) {
-        return SuiteListenerEncoding.readStackTrace(source);
-    }
-
-    void writeStackTrace(StackTrace stackTrace) {
-        encoding.writeStackTrace(stackTrace);
-    }
-
-    // String
-
-    static String readString(IpcBuffer source) {
-        return SuiteListenerEncoding.readString(source);
-    }
-
-    static String readNullableString(IpcBuffer source) {
-        return SuiteListenerEncoding.readNullableString(source);
-    }
-
-    void writeString(String s) {
-        encoding.writeString(s);
-    }
-
-    void writeNullableString(String s) {
-        encoding.writeNullableString(s);
     }
 }

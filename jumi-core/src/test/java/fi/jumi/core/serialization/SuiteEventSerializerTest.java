@@ -9,7 +9,6 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.ipc.*;
 import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.SpyListener;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
 import org.junit.rules.*;
 
@@ -22,7 +21,6 @@ import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 public class SuiteEventSerializerTest {
@@ -39,7 +37,7 @@ public class SuiteEventSerializerTest {
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         exampleUsage(spy.getListener());
         spy.replay();
-        IpcBuffer buffer = newIpcBuffer();
+        IpcBuffer buffer = TestUtil.newIpcBuffer();
 
         // serialize
         SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
@@ -169,7 +167,7 @@ public class SuiteEventSerializerTest {
         IpcBuffer buffer = serializeSomeEvents();
 
         buffer.position(8);
-        new SuiteEventSerializer(buffer).writeString("com.example.AnotherInterface");
+        StringEncoding.writeString(buffer, "com.example.AnotherInterface");
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("wrong interface: expected fi.jumi.core.api.SuiteListener but was com.example.AnotherInterface");
@@ -181,7 +179,7 @@ public class SuiteEventSerializerTest {
         IpcBuffer buffer = serializeSomeEvents();
 
         buffer.position(8);
-        SuiteEventSerializer.readString(buffer); // go to interface version's position
+        StringEncoding.readString(buffer); // go to interface version's position
         buffer.writeInt(9999);
 
         thrown.expect(IllegalArgumentException.class);
@@ -190,7 +188,7 @@ public class SuiteEventSerializerTest {
     }
 
     private static IpcBuffer serializeSomeEvents() {
-        IpcBuffer buffer = newIpcBuffer();
+        IpcBuffer buffer = TestUtil.newIpcBuffer();
         SuiteEventSerializer serializer = new SuiteEventSerializer(buffer);
         serializer.start();
         serializer.sender().onSuiteStarted();
@@ -241,75 +239,11 @@ public class SuiteEventSerializerTest {
     }
 
 
-    // String
-
-    @Test
-    public void test_serialization_of_String() {
-        assertThat("empty string", roundTripString(""), is(""));
-
-        String original = RandomStringUtils.random(10);
-        assertThat("random string", roundTripString(original), is(original));
-    }
-
-    @Test
-    public void test_serialization_of_String_with_non_printable_characters() {
-        for (char c = 0; c < ' '; c++) {
-            String original = "" + c;
-            assertThat("0x" + Integer.toHexString(c), roundTripString(original), is(original));
-        }
-    }
-
-    @Test
-    public void test_serialization_of_null_String() {
-        String nullString = null;
-        assertThat("null string", roundTripNullableString(nullString), is(nullString));
-
-        try {
-            serializeAndDeserialize(nullString, SuiteEventSerializer::writeString, SuiteEventSerializer::readNullableString);
-            fail("should have thrown NullPointerException on serialization");
-        } catch (NullPointerException e) {
-            // OK
-        }
-
-        try {
-            serializeAndDeserialize(nullString, SuiteEventSerializer::writeNullableString, SuiteEventSerializer::readString);
-            fail("should have thrown NullPointerException on deserialization");
-        } catch (NullPointerException e) {
-            // OK
-        }
-    }
-
-
     // helpers
 
     private static StackTrace roundTripStackTrace(StackTrace expected) {
-        return serializeAndDeserialize(expected, SuiteEventSerializer::writeStackTrace, SuiteEventSerializer::readStackTrace);
-    }
-
-    private static String roundTripString(String original) {
-        return serializeAndDeserialize(original, SuiteEventSerializer::writeString, SuiteEventSerializer::readString);
-    }
-
-    private static String roundTripNullableString(String original) {
-        return serializeAndDeserialize(original, SuiteEventSerializer::writeNullableString, SuiteEventSerializer::readNullableString);
-    }
-
-    private static <T> T serializeAndDeserialize(T original, WriteOp<T> writeOp, ReadOp<T> readOp) {
-        IpcBuffer buffer = newIpcBuffer();
-        writeOp.write(new SuiteEventSerializer(buffer), original);
-        buffer.position(0);
-        return readOp.read(buffer);
-    }
-
-    private interface WriteOp<T> {
-        void write(SuiteEventSerializer target, T data);
-    }
-
-    private interface ReadOp<T> {
-        T read(IpcBuffer source);
-    }
-
-    private static IpcBuffer newIpcBuffer() {
-        return new IpcBuffer(new AllocatedByteBufferSequence(100, 30 * 1000));
+        return TestUtil.serializeAndDeserialize(expected,
+                (buffer, data) -> new SuiteListenerEncoding(buffer).writeStackTrace(data),
+                SuiteListenerEncoding::readStackTrace);
     }
 }

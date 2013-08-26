@@ -13,6 +13,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static fi.jumi.core.serialization.StringEncoding.*;
+
 @NotThreadSafe
 public class SuiteListenerEncoding implements SuiteListener {
 
@@ -104,7 +106,7 @@ public class SuiteListenerEncoding implements SuiteListener {
     @Override
     public void onInternalError(String message, StackTrace cause) {
         writeEventType(onInternalError);
-        writeString(message);
+        writeString(target, message);
         writeStackTrace(cause);
     }
 
@@ -124,7 +126,7 @@ public class SuiteListenerEncoding implements SuiteListener {
         writeEventType(onTestFound);
         writeTestFile(testFile);
         writeTestId(testId);
-        writeString(name);
+        writeString(target, name);
     }
 
     @Override
@@ -145,14 +147,14 @@ public class SuiteListenerEncoding implements SuiteListener {
     public void onPrintedOut(RunId runId, String text) {
         writeEventType(onPrintedOut);
         writeRunId(runId);
-        writeString(text);
+        writeString(target, text);
     }
 
     @Override
     public void onPrintedErr(RunId runId, String text) {
         writeEventType(onPrintedErr);
         writeRunId(runId);
-        writeString(text);
+        writeString(target, text);
     }
 
     @Override
@@ -203,7 +205,7 @@ public class SuiteListenerEncoding implements SuiteListener {
     }
 
     private void writeTestFile(TestFile testFile) {
-        writeString(testFile.getPath());
+        writeString(target, testFile.getPath());
     }
 
     // TestId
@@ -254,9 +256,9 @@ public class SuiteListenerEncoding implements SuiteListener {
     }
 
     void writeStackTrace(StackTrace stackTrace) {
-        writeString(stackTrace.getExceptionClass());
-        writeString(stackTrace.toString());
-        writeNullableString(stackTrace.getMessage());
+        writeString(target, stackTrace.getExceptionClass());
+        writeString(target, stackTrace.toString());
+        writeNullableString(target, stackTrace.getMessage());
         writeStackTraceElements(stackTrace.getStackTrace());
         writeOptionalException(stackTrace.getCause());
         writeManyExceptions(stackTrace.getSuppressed());
@@ -273,9 +275,9 @@ public class SuiteListenerEncoding implements SuiteListener {
     private void writeStackTraceElements(StackTraceElement[] elements) {
         target.writeInt(elements.length);
         for (StackTraceElement element : elements) {
-            writeString(element.getClassName());
-            writeString(element.getMethodName());
-            writeString(element.getFileName());
+            writeString(target, element.getClassName());
+            writeString(target, element.getMethodName());
+            writeString(target, element.getFileName());
             target.writeInt(element.getLineNumber());
         }
     }
@@ -301,48 +303,6 @@ public class SuiteListenerEncoding implements SuiteListener {
         target.writeInt(exceptions.length);
         for (Throwable exception : exceptions) {
             writeStackTrace((StackTrace) exception);
-        }
-    }
-
-    // String
-
-    static String readString(IpcBuffer source) {
-        String s = readNullableString(source);
-        if (s == null) {
-            throw new NullPointerException();
-        }
-        return s;
-    }
-
-    static String readNullableString(IpcBuffer source) {
-        int length = source.readInt();
-        if (length < 0) {
-            return null;
-        } else {
-            char[] chars = new char[length];
-            for (int i = 0; i < chars.length; i++) {
-                chars[i] = source.readChar();
-            }
-            return new String(chars);
-        }
-    }
-
-    void writeString(String s) {
-        if (s == null) {
-            throw new NullPointerException();
-        }
-        writeNullableString(s);
-    }
-
-    void writeNullableString(String s) {
-        if (s == null) {
-            target.writeInt(-1);
-        } else {
-            int length = s.length();
-            target.writeInt(length);
-            for (int i = 0; i < length; i++) {
-                target.writeChar(s.charAt(i));
-            }
         }
     }
 }
