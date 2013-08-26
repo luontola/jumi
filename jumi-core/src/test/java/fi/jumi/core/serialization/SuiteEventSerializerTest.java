@@ -12,15 +12,13 @@ import fi.jumi.core.util.SpyListener;
 import org.junit.*;
 import org.junit.rules.*;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.concurrent.locks.LockSupport;
 
 import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
-import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 
 public class SuiteEventSerializerTest {
@@ -199,51 +197,5 @@ public class SuiteEventSerializerTest {
     private static void tryToDeserialize(IpcBuffer buffer) {
         buffer.position(0);
         SuiteEventSerializer.deserialize(buffer, mock(SuiteListener.class));
-    }
-
-
-    // StackTrace
-
-    @Test
-    public void test_serialization_of_StackTrace() {
-        StackTrace original = StackTrace.from(new IOException());
-
-        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
-    }
-
-    @Test
-    public void test_serialization_of_StackTrace_with_message() {
-        StackTrace original = StackTrace.from(new IOException("the message"));
-
-        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
-    }
-
-    @Test
-    public void test_serialization_of_StackTrace_with_causes() {
-        StackTrace original = StackTrace.from(
-                new IOException("the message",
-                        new IllegalArgumentException("cause 1",
-                                new IllegalStateException("cause 2"))));
-
-        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
-    }
-
-    @Test
-    public void test_serialization_of_StackTrace_with_suppressed() {
-        IOException e = new IOException("the message");
-        e.addSuppressed(new IllegalArgumentException("suppressed 1"));
-        e.addSuppressed(new IllegalStateException("suppressed 2"));
-        StackTrace original = StackTrace.from(e);
-
-        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
-    }
-
-
-    // helpers
-
-    private static StackTrace roundTripStackTrace(StackTrace expected) {
-        return TestUtil.serializeAndDeserialize(expected,
-                (buffer, data) -> new SuiteListenerEncoding(buffer).writeStackTrace(data),
-                SuiteListenerEncoding::readStackTrace);
     }
 }
