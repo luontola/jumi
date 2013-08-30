@@ -48,7 +48,7 @@ public class IpcProtocolTest {
 
         // decode
         buffer.position(0);
-        protocol.decode(spy.getListener());
+        decodeAll(protocol, spy.getListener());
 
         spy.verify();
     }
@@ -111,7 +111,7 @@ public class IpcProtocolTest {
             IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(
                     new FileSegmenter(mmf, 1024, 1024))); // different segment size, because the reader should not create new segments
 
-            newIpcProtocol(buffer).decode(expectations.getListener());
+            decodeAll(newIpcProtocol(buffer), expectations.getListener());
         };
 
         runConcurrently(producer, consumer);
@@ -200,7 +200,16 @@ public class IpcProtocolTest {
     private static void tryToDecode(IpcBuffer buffer) {
         buffer.position(0);
         IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-        protocol.decode(mock(SuiteListener.class));
+        decodeAll(protocol, mock(SuiteListener.class));
+    }
+
+    public static <T> void decodeAll(IpcProtocol<T> protocol, T target) {
+        while (!Thread.interrupted()) {
+            DecodeResult result = protocol.decodeNextMessage(target);
+            if (result == DecodeResult.FINISHED) {
+                return;
+            }
+        }
     }
 
     private static IpcProtocol<SuiteListener> newIpcProtocol(IpcBuffer buffer) {

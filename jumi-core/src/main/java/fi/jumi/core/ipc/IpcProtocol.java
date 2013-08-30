@@ -49,30 +49,35 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
         setStatusExists(index);
     }
 
-    public void decode(T target) {
-        readHeader();
+    public DecodeResult decodeNextMessage(T target) {
+        int index = buffer.position();
+        byte status = readStatus();
+        // TODO: we should do a read barrier here
 
-        while (true) {
-            // TODO: create proper waiting util
-            // TODO: we should do a read barrier here
-            int index = buffer.position();
-            byte status = readStatus();
-            if (status == STATUS_EMPTY) {
-                buffer.position(index);
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                continue;
-            } else if (status == STATUS_END_OF_STREAM) {
-                return;
-            } else {
-                assert status == STATUS_EXISTS : status;
+        if (status == STATUS_EMPTY) {
+            buffer.position(index);
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
+            return DecodeResult.NO_NEW_MESSAGES;
 
-            messageEncoding.decode(target);
+        } else if (status == STATUS_END_OF_STREAM) {
+            return DecodeResult.FINISHED;
+
+        } else {
+            if (index == 0) {
+                // For the header, the first byte works both as the status (when zero),
+                // and part of the magic bytes (when non-zero), so we must not consume the byte before readHeader().
+                buffer.position(index);
+                readHeader();
+
+            } else {
+                assert status == STATUS_EXISTS : "unexpected status: " + status;
+                messageEncoding.decode(target);
+            }
+            return DecodeResult.GOT_MESSAGE;
         }
     }
 
@@ -96,25 +101,10 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
     }
 
     private void readHeader() {
-        waitUntilNonZero(buffer, 0);
-
         checkMagicBytes();
         checkProtocolVersion();
         checkInterface();
         checkInterfaceVersion();
-    }
-
-    private void waitUntilNonZero(IpcBuffer buffer, int index) {
-        // TODO: create proper waiting util
-        // TODO: we should do a read barrier here
-        while (buffer.getByte(index) == 0) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
     }
 
     private void checkMagicBytes() {

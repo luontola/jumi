@@ -145,10 +145,10 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - rename SuiteEventSerializer to IpcProtocol
 			OK - split SuiteEventSerializerTest to match the new classes
 			OK - rename packages: ipc -> ipc.buffer, serialization -> ipc
-		!! - refactor: support deserializing one event at a time
-			- create a poll method (no sleeps nor loops) that returns NONE, SOME or END based on whether the stream had events
-			- move the wait loop to a utility method
-		- refactor: create a wait loop timer utility that uses progressively longer sleeps
+		OK - refactor: support deserializing one event at a time
+			OK - create a poll method (no sleeps nor loops) that returns NONE, SOME or END based on whether the stream had events
+			OK - move the wait loop to a utility method
+		!! - refactor: create a wait loop timer utility that uses progressively longer sleeps
 		- make sure that all the memory barrers are in place
 		- public APIs for read-only & write-only access
 			- make IpcProtocol implement restricted interfaces IpcReader and IpcWriter
