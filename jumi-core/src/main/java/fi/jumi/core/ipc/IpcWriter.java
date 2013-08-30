@@ -12,8 +12,5 @@ import java.io.Closeable;
 public interface IpcWriter<T> extends MessageSender<Event<T>>, Closeable {
 
     @Override
-    void send(Event<T> message);
-
-    @Override
     void close();
 }
