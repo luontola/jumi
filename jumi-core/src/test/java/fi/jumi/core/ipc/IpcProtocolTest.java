@@ -204,8 +204,16 @@ public class IpcProtocolTest {
     }
 
     public static <T> void decodeAll(IpcProtocol<T> protocol, T target) {
+        // TODO: move to production sources?
+        WaitStrategy waitStrategy = new ProgressiveSleepWaitStrategy();
         while (!Thread.interrupted()) {
             DecodeResult result = protocol.decodeNextMessage(target);
+            if (result == DecodeResult.NO_NEW_MESSAGES) {
+                waitStrategy.await();
+            }
+            if (result == DecodeResult.GOT_MESSAGE) {
+                waitStrategy.reset();
+            }
             if (result == DecodeResult.FINISHED) {
                 return;
             }

@@ -56,29 +56,23 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
 
         if (status == STATUS_EMPTY) {
             buffer.position(index);
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
             return DecodeResult.NO_NEW_MESSAGES;
-
-        } else if (status == STATUS_END_OF_STREAM) {
+        }
+        if (status == STATUS_END_OF_STREAM) {
             return DecodeResult.FINISHED;
+        }
+
+        if (index == 0) {
+            // For the header, the first byte works both as the status (when zero),
+            // and part of the magic bytes (when non-zero), so we must not consume the byte before readHeader().
+            buffer.position(index);
+            readHeader();
 
         } else {
-            if (index == 0) {
-                // For the header, the first byte works both as the status (when zero),
-                // and part of the magic bytes (when non-zero), so we must not consume the byte before readHeader().
-                buffer.position(index);
-                readHeader();
-
-            } else {
-                assert status == STATUS_EXISTS : "unexpected status: " + status;
-                messageEncoding.decode(target);
-            }
-            return DecodeResult.GOT_MESSAGE;
+            assert status == STATUS_EXISTS : "unexpected status: " + status;
+            messageEncoding.decode(target);
         }
+        return DecodeResult.GOT_MESSAGE;
     }
 
 
