@@ -149,8 +149,8 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - create a poll method (no sleeps nor loops) that returns NONE, SOME or END based on whether the stream had events
 			OK - move the wait loop to a utility method
 		OK - refactor: create a wait loop timer utility that uses progressively longer sleeps
-		!! - make sure that all the memory barrers are in place
-		- public APIs for read-only & write-only access
+		OK - make sure that all the memory barrers are in place
+		!! - public APIs for read-only & write-only access
 			- make IpcProtocol implement restricted interfaces IpcReader and IpcWriter
 			- create factory methods IpcChannel.reader/writer(Path)
 			- add a read-only flag to MappedByteBufferSequence (or factory methods readWrite/readOnly), in which case will open/map files read-only and won't create new files

@@ -46,14 +46,14 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
     public void send(Event<T> message) {
         int index = writeStatusEmpty();
         messageEncoding.encode(message);
+        memoryBarrier.storeStore();
         setStatusExists(index);
     }
 
     public DecodeResult decodeNextMessage(T target) {
         int index = buffer.position();
-        byte status = readStatus();
-        // TODO: we should do a read barrier here
 
+        byte status = readStatus();
         if (status == STATUS_EMPTY) {
             buffer.position(index);
             return DecodeResult.NO_NEW_MESSAGES;
@@ -61,6 +61,7 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
         if (status == STATUS_END_OF_STREAM) {
             return DecodeResult.FINISHED;
         }
+        memoryBarrier.loadLoad();
 
         if (index == 0) {
             // For the header, the first byte works both as the status (when zero),
