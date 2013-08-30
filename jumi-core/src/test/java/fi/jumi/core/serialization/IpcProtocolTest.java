@@ -24,7 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 
-public class SuiteEventSerializerTest {
+public class IpcProtocolTest {
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -34,21 +34,21 @@ public class SuiteEventSerializerTest {
 
 
     @Test
-    public void serializes_and_deserializes_all_events() {
+    public void encodes_and_decodes_all_events() {
         SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
         exampleUsage(spy.getListener());
         spy.replay();
         IpcBuffer buffer = TestUtil.newIpcBuffer();
 
-        // serialize
-        SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
-        serializer.start();
-        exampleUsage(sendTo(serializer));
-        serializer.end();
+        // encode
+        IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
+        protocol.start();
+        exampleUsage(sendTo(protocol));
+        protocol.end();
 
-        // deserialize
+        // decode
         buffer.position(0);
-        serializer.deserialize(spy.getListener());
+        protocol.decode(spy.getListener());
 
         spy.verify();
     }
@@ -101,17 +101,17 @@ public class SuiteEventSerializerTest {
         Runnable producer = () -> {
             IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(new FileSegmenter(mmf, 4 * 1024, 512 * 1024)));
 
-            SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
-            serializer.start();
-            lotsOfEventsForConcurrencyTesting(sendTo(serializer), 1);
-            serializer.end();
+            IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
+            protocol.start();
+            lotsOfEventsForConcurrencyTesting(sendTo(protocol), 1);
+            protocol.end();
         };
 
         Runnable consumer = () -> {
             IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(
                     new FileSegmenter(mmf, 1024, 1024))); // different segment size, because the reader should not create new segments
 
-            newSerializer(buffer).deserialize(expectations.getListener());
+            newIpcProtocol(buffer).decode(expectations.getListener());
         };
 
         runConcurrently(producer, consumer);
@@ -142,42 +142,42 @@ public class SuiteEventSerializerTest {
     // headers
 
     @Test
-    public void cannot_deserialize_if_header_has_wrong_magic_bytes() {
-        IpcBuffer buffer = serializeSomeEvents();
+    public void cannot_decode_if_header_has_wrong_magic_bytes() {
+        IpcBuffer buffer = encodeSomeEvents();
 
         buffer.setInt(0, 0x0A0B0C0D);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("wrong header: expected 4A 75 6D 69 but was 0A 0B 0C 0D");
-        tryToDeserialize(buffer);
+        tryToDecode(buffer);
     }
 
     @Test
-    public void cannot_deserialize_if_header_has_wrong_protocol_version() {
-        IpcBuffer buffer = serializeSomeEvents();
+    public void cannot_decode_if_header_has_wrong_protocol_version() {
+        IpcBuffer buffer = encodeSomeEvents();
 
         buffer.setInt(4, 9999);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("unsupported protocol version: 9999");
-        tryToDeserialize(buffer);
+        tryToDecode(buffer);
     }
 
     @Test
-    public void cannot_deserialize_if_header_has_wrong_interface() {
-        IpcBuffer buffer = serializeSomeEvents();
+    public void cannot_decode_if_header_has_wrong_interface() {
+        IpcBuffer buffer = encodeSomeEvents();
 
         buffer.position(8);
         StringEncoding.writeString(buffer, "com.example.AnotherInterface");
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("wrong interface: expected fi.jumi.core.api.SuiteListener but was com.example.AnotherInterface");
-        tryToDeserialize(buffer);
+        tryToDecode(buffer);
     }
 
     @Test
-    public void cannot_deserialize_if_header_has_wrong_interface_version() {
-        IpcBuffer buffer = serializeSomeEvents();
+    public void cannot_decode_if_header_has_wrong_interface_version() {
+        IpcBuffer buffer = encodeSomeEvents();
 
         buffer.position(8);
         StringEncoding.readString(buffer); // go to interface version's position
@@ -185,26 +185,26 @@ public class SuiteEventSerializerTest {
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("unsupported interface version: 9999");
-        tryToDeserialize(buffer);
+        tryToDecode(buffer);
     }
 
-    private static IpcBuffer serializeSomeEvents() {
+    private static IpcBuffer encodeSomeEvents() {
         IpcBuffer buffer = TestUtil.newIpcBuffer();
-        SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
-        serializer.start();
-        sendTo(serializer).onSuiteStarted();
-        serializer.end();
+        IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
+        protocol.start();
+        sendTo(protocol).onSuiteStarted();
+        protocol.end();
         return buffer;
     }
 
-    private static void tryToDeserialize(IpcBuffer buffer) {
+    private static void tryToDecode(IpcBuffer buffer) {
         buffer.position(0);
-        SuiteEventSerializer<SuiteListener> serializer = newSerializer(buffer);
-        serializer.deserialize(mock(SuiteListener.class));
+        IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
+        protocol.decode(mock(SuiteListener.class));
     }
 
-    private static SuiteEventSerializer<SuiteListener> newSerializer(IpcBuffer buffer) {
-        return new SuiteEventSerializer<>(buffer, SuiteListenerEncoding::new);
+    private static IpcProtocol<SuiteListener> newIpcProtocol(IpcBuffer buffer) {
+        return new IpcProtocol<>(buffer, SuiteListenerEncoding::new);
     }
 
     private static SuiteListener sendTo(MessageSender<Event<SuiteListener>> target) {

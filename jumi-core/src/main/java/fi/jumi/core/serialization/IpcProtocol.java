@@ -16,7 +16,7 @@ import java.util.Arrays;
 import static fi.jumi.core.serialization.StringEncoding.*;
 
 @NotThreadSafe
-public class SuiteEventSerializer<T> implements MessageSender<Event<T>> {
+public class IpcProtocol<T> implements MessageSender<Event<T>> {
 
     private static final byte[] HEADER_MAGIC_BYTES = "Jumi".getBytes(StandardCharsets.US_ASCII);
     private static final int PROTOCOL_VERSION = 1;
@@ -29,7 +29,7 @@ public class SuiteEventSerializer<T> implements MessageSender<Event<T>> {
     private final IpcBuffer buffer;
     private final MessageEncoding<T> messageEncoding;
 
-    public SuiteEventSerializer(IpcBuffer buffer, EncodingFactory<T> encodingFactory) {
+    public IpcProtocol(IpcBuffer buffer, EncodingFactory<T> encodingFactory) {
         this.buffer = buffer;
         this.messageEncoding = encodingFactory.create(buffer);
     }
@@ -49,7 +49,7 @@ public class SuiteEventSerializer<T> implements MessageSender<Event<T>> {
         setStatusExists(index);
     }
 
-    public void deserialize(T target) {
+    public void decode(T target) {
         readHeader();
 
         while (true) {

@@ -142,9 +142,9 @@ OK - refactor BuildTest & SuiteConfiguration
 				OK - accessors for interface name and version
 				OK - make SuiteListenerEncoding#deserialize non-static
 				OK - rename source/target IpcBuffers to just buffer, keep it in a instance field
-			!! - rename SuiteEventSerializer to IpcProtocol
-			- split SuiteEventSerializerTest to match the new classes
-			- rename packages: ipc -> ipc.buffer, serialization -> ipc
+			OK - rename SuiteEventSerializer to IpcProtocol
+			OK - split SuiteEventSerializerTest to match the new classes
+			!! - rename packages: ipc -> ipc.buffer, serialization -> ipc
 		- refactor: support deserializing one event at a time
 			- create a poll method (no sleeps nor loops) that returns NONE, SOME or END based on whether the stream had events
 			- move the wait loop to a utility method
