@@ -7,6 +7,6 @@ package fi.jumi.core.ipc;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public enum DecodeResult {
-    GOT_MESSAGE, NO_NEW_MESSAGES, FINISHED
+public enum PollResult {
+    HAD_SOME_MESSAGES, NO_NEW_MESSAGES, END_OF_STREAM
 }

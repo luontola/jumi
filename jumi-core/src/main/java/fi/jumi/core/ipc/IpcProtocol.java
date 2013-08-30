@@ -5,7 +5,6 @@
 package fi.jumi.core.ipc;
 
 import fi.jumi.actors.eventizers.Event;
-import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.ipc.buffer.IpcBuffer;
 import fi.jumi.core.util.MemoryBarrier;
 
@@ -16,7 +15,7 @@ import java.util.Arrays;
 import static fi.jumi.core.ipc.StringEncoding.*;
 
 @NotThreadSafe
-public class IpcProtocol<T> implements MessageSender<Event<T>> {
+public class IpcProtocol<T> implements IpcReader<T>, IpcWriter<T> {
 
     private static final byte[] HEADER_MAGIC_BYTES = "Jumi".getBytes(StandardCharsets.US_ASCII);
     private static final int PROTOCOL_VERSION = 1;
@@ -34,12 +33,11 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
         this.messageEncoding = encodingFactory.create(buffer);
     }
 
+
+    // write operations
+
     public void start() {
         writeHeader();
-    }
-
-    public void end() {
-        writeStatusEndOfStream();
     }
 
     @Override
@@ -50,16 +48,25 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
         setStatusExists(index);
     }
 
-    public DecodeResult decodeNextMessage(T target) {
+    @Override
+    public void close() {
+        writeStatusEndOfStream();
+    }
+
+
+    // read operations
+
+    @Override
+    public PollResult poll(T target) {
         int index = buffer.position();
 
         byte status = readStatus();
         if (status == STATUS_EMPTY) {
             buffer.position(index);
-            return DecodeResult.NO_NEW_MESSAGES;
+            return PollResult.NO_NEW_MESSAGES;
         }
         if (status == STATUS_END_OF_STREAM) {
-            return DecodeResult.FINISHED;
+            return PollResult.END_OF_STREAM;
         }
         memoryBarrier.loadLoad();
 
@@ -73,7 +80,7 @@ public class IpcProtocol<T> implements MessageSender<Event<T>> {
             assert status == STATUS_EXISTS : "unexpected status: " + status;
             messageEncoding.decode(target);
         }
-        return DecodeResult.GOT_MESSAGE;
+        return PollResult.HAD_SOME_MESSAGES;
     }
 
 

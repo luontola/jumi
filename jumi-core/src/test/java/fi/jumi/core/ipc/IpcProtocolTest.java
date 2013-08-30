@@ -9,7 +9,7 @@ import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
-import fi.jumi.core.ipc.buffer.*;
+import fi.jumi.core.ipc.buffer.IpcBuffer;
 import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;
@@ -44,7 +44,7 @@ public class IpcProtocolTest {
         IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
         protocol.start();
         exampleUsage(sendTo(protocol));
-        protocol.end();
+        protocol.close();
 
         // decode
         buffer.position(0);
@@ -99,19 +99,14 @@ public class IpcProtocolTest {
         Path mmf = tempDir.getRoot().toPath().resolve("mmf");
 
         Runnable producer = () -> {
-            IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(new FileSegmenter(mmf, 4 * 1024, 512 * 1024)));
-
-            IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-            protocol.start();
-            lotsOfEventsForConcurrencyTesting(sendTo(protocol), 1);
-            protocol.end();
+            IpcWriter<SuiteListener> writer = IpcChannel.writer(mmf, SuiteListenerEncoding::new);
+            lotsOfEventsForConcurrencyTesting(sendTo(writer), 1);
+            writer.close();
         };
 
         Runnable consumer = () -> {
-            IpcBuffer buffer = new IpcBuffer(new MappedByteBufferSequence(
-                    new FileSegmenter(mmf, 1024, 1024))); // different segment size, because the reader should not create new segments
-
-            decodeAll(newIpcProtocol(buffer), expectations.getListener());
+            IpcReader<SuiteListener> reader = IpcChannel.reader(mmf, SuiteListenerEncoding::new);
+            decodeAll(reader, expectations.getListener());
         };
 
         runConcurrently(producer, consumer);
@@ -193,7 +188,7 @@ public class IpcProtocolTest {
         IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
         protocol.start();
         sendTo(protocol).onSuiteStarted();
-        protocol.end();
+        protocol.close();
         return buffer;
     }
 
@@ -203,18 +198,18 @@ public class IpcProtocolTest {
         decodeAll(protocol, mock(SuiteListener.class));
     }
 
-    public static <T> void decodeAll(IpcProtocol<T> protocol, T target) {
+    public static <T> void decodeAll(IpcReader<T> reader, T target) {
         // TODO: move to production sources?
         WaitStrategy waitStrategy = new ProgressiveSleepWaitStrategy();
         while (!Thread.interrupted()) {
-            DecodeResult result = protocol.decodeNextMessage(target);
-            if (result == DecodeResult.NO_NEW_MESSAGES) {
+            PollResult result = reader.poll(target);
+            if (result == PollResult.NO_NEW_MESSAGES) {
                 waitStrategy.await();
             }
-            if (result == DecodeResult.GOT_MESSAGE) {
+            if (result == PollResult.HAD_SOME_MESSAGES) {
                 waitStrategy.reset();
             }
-            if (result == DecodeResult.FINISHED) {
+            if (result == PollResult.END_OF_STREAM) {
                 return;
             }
         }
