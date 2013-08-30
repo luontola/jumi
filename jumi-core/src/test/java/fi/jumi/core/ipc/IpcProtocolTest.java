@@ -2,14 +2,14 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.serialization;
+package fi.jumi.core.ipc;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
-import fi.jumi.core.ipc.*;
+import fi.jumi.core.ipc.buffer.*;
 import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;

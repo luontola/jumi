@@ -4,9 +4,15 @@
 
 package fi.jumi.core.ipc;
 
-import java.nio.ByteBuffer;
+import fi.jumi.actors.eventizers.Event;
 
-public interface ByteBufferSequence {
+public interface MessageEncoding<T> {
 
-    ByteBuffer get(int index);
+    String getInterfaceName();
+
+    int getInterfaceVersion();
+
+    void encode(Event<T> message);
+
+    void decode(T target);
 }
