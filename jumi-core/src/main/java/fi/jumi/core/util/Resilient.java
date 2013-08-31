@@ -5,33 +5,38 @@
 package fi.jumi.core.util;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.io.IOException;
 
 @ThreadSafe
 public class Resilient {
 
-    public static <T, E extends Throwable> T tryRepeatedly(Action<T, E> action) throws E {
+    public static <T> T tryRepeatedly(IoAction<T> action) throws IOException {
         return tryRepeatedly(10, action);
     }
 
-    public static <T, E extends Throwable> T tryRepeatedly(int maxTries, Action<T, E> action) throws E {
+    public static <T> T tryRepeatedly(int maxTries, IoAction<T> action) throws IOException {
         for (int tries = 1; ; tries++) {
             try {
                 return action.run();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 if (tries >= maxTries) {
                     throw e;
                 } else {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e1) {
-                        Thread.currentThread().interrupt();
-                    }
+                    sleep(10);
                 }
             }
         }
     }
 
-    public interface Action<T, E extends Throwable> {
-        T run() throws E;
+    private static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public interface IoAction<T> {
+        T run() throws IOException;
     }
 }

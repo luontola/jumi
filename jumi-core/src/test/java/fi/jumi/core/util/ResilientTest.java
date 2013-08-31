@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 public class ResilientTest {
 
     @Test
-    public void executes_once_if_there_is_no_exception() throws Throwable {
+    public void executes_once_if_there_is_no_exception() throws IOException {
         String result = Resilient.tryRepeatedly(10, () -> "result");
 
         assertThat(result, is("result"));
