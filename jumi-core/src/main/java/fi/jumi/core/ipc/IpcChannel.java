@@ -17,14 +17,22 @@ public class IpcChannel {
     private static final int MAX_SEGMENT_SIZE = 512 * KB;
 
     public static <T> IpcWriter<T> writer(Path basePath, IpcProtocol.EncodingFactory<T> encodingFactory) {
-        IpcBuffer buffer = new IpcBuffer(MappedByteBufferSequence.readWrite(defaultFileSegmenter(basePath)));
+        return writer(defaultFileSegmenter(basePath), encodingFactory);
+    }
+
+    public static <T> IpcWriter<T> writer(FileSegmenter fileSegmenter, IpcProtocol.EncodingFactory<T> encodingFactory) {
+        IpcBuffer buffer = new IpcBuffer(MappedByteBufferSequence.readWrite(fileSegmenter));
         IpcProtocol<T> protocol = new IpcProtocol<>(buffer, encodingFactory);
         protocol.start();
         return protocol;
     }
 
     public static <T> IpcReader<T> reader(Path basePath, IpcProtocol.EncodingFactory<T> encodingFactory) {
-        IpcBuffer buffer = new IpcBuffer(MappedByteBufferSequence.readWrite(defaultFileSegmenter(basePath)));
+        return reader(defaultFileSegmenter(basePath), encodingFactory);
+    }
+
+    public static <T> IpcReader<T> reader(FileSegmenter fileSegmenter, IpcProtocol.EncodingFactory<T> encodingFactory) {
+        IpcBuffer buffer = new IpcBuffer(MappedByteBufferSequence.readWrite(fileSegmenter));
         return new IpcProtocol<>(buffer, encodingFactory);
     }
 

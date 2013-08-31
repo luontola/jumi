@@ -9,22 +9,24 @@ import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
-import fi.jumi.core.ipc.buffer.IpcBuffer;
+import fi.jumi.core.ipc.buffer.*;
 import fi.jumi.core.runs.RunIdSequence;
 import fi.jumi.core.util.SpyListener;
 import org.junit.*;
 import org.junit.rules.*;
 
 import java.lang.reflect.Method;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.concurrent.locks.LockSupport;
 
 import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 
 public class IpcProtocolTest {
+
+    private static final int TIMEOUT = 5000;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -90,25 +92,22 @@ public class IpcProtocolTest {
         listener.onSuiteFinished();
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = TIMEOUT)
     public void test_concurrent_producer_and_consumer() throws Exception {
+        Path mmf = tempDir.getRoot().toPath().resolve("mmf");
         SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
         lotsOfEventsForConcurrencyTesting(expectations.getListener(), 0);
         expectations.replay();
-
-        Path mmf = tempDir.getRoot().toPath().resolve("mmf");
 
         Runnable producer = () -> {
             IpcWriter<SuiteListener> writer = IpcChannel.writer(mmf, SuiteListenerEncoding::new);
             lotsOfEventsForConcurrencyTesting(sendTo(writer), 1);
             writer.close();
         };
-
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(mmf, SuiteListenerEncoding::new);
             decodeAll(reader, expectations.getListener());
         };
-
         runConcurrently(producer, consumer);
 
         expectations.verify();
@@ -129,6 +128,51 @@ public class IpcProtocolTest {
             listener.onRunFinished(runId);
             LockSupport.parkNanos(nanosToPark);
             listener.onSuiteFinished();
+            LockSupport.parkNanos(nanosToPark);
+        }
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void producer_will_always_decide_segment_size_except_for_the_first_segment() throws Exception {
+        Path mmf = tempDir.getRoot().toPath().resolve("mmf");
+        SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
+        smallEventsForSegmentSizeConcurrencyTesting(expectations.getListener(), 0);
+        expectations.replay();
+
+        Runnable producer = () -> {
+            IpcWriter<SuiteListener> writer = IpcChannel.writer(new FileSegmenter(mmf, 1, 1), SuiteListenerEncoding::new);
+            smallEventsForSegmentSizeConcurrencyTesting(sendTo(writer), 10000000);
+            writer.close();
+        };
+        Runnable consumer = () -> {
+            IpcReader<SuiteListener> reader = IpcChannel.reader(new FileSegmenter(mmf, 2, 2), SuiteListenerEncoding::new);
+            decodeAll(reader, expectations.getListener());
+        };
+        runConcurrently(producer, consumer);
+
+        expectations.verify();
+        try (DirectoryStream<Path> segments = Files.newDirectoryStream(tempDir.getRoot().toPath())) {
+            for (Path segment : segments) {
+                if (segment.equals(mmf)) {
+                    // XXX: ignoring the first segment
+                    // We can't make the consumer to wait on the producer without it opening
+                    // at least one segment, so the producer may decide the size for the first segment.
+                    // So we'll need to take care of it at a higher level, that the consumer won't know
+                    // the file name before the producer has had time to create it.
+                    continue;
+                }
+
+                assertThat("size of " + segment, Files.size(segment), is(1L));
+            }
+        }
+    }
+
+    private static void smallEventsForSegmentSizeConcurrencyTesting(SuiteListener listener, int nanosToPark) {
+        for (int i = 0; i < 10; i++) {
+
+            // Not a realistic scenario, because we are only interested in concurrency testing
+            // the IPC protocol and not the specifics of a particular interface.
+            listener.onSuiteStarted();
             LockSupport.parkNanos(nanosToPark);
         }
     }

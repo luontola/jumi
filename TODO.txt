@@ -154,10 +154,11 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - make IpcProtocol implement restricted interfaces IpcReader and IpcWriter
 			OK - create factory methods IpcChannel.reader/writer(Path)
 			OK - add a read-only flag to MappedByteBufferSequence (or factory methods readWrite/readOnly), in which case will open/map files read-only
-		!! - the writer should be the first to touch a new segment, so that the writer would determine its size
-			!! - concurrency test: writer uses 1 byte segments, reader 2 byte segments; afterwards all segments should be 1 byte (can we do it also for the first segment?)
-			- append a null byte before writing the previous event's status?
-			- should read-only MappedByteBufferSequence not be able to create new segments?
+		OK - the writer should be the first to touch a new segment, so that the writer would determine its size
+			OK - concurrency test: writer uses 1 byte segments, reader 2 byte segments; afterwards all segments should be 1 byte (can we do it also for the first segment?)
+			OK - append a null byte before writing the previous event's status?
+			SKIP - should read-only MappedByteBufferSequence not be able to create new segments?
+	!! - refactor fi.jumi.core.util.Resilient#tryRepeatedly to use only IOException, no generic exceptions
 	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
 	- TestId: create a method for getting the path as int[]
 		- make fi.jumi.api.drivers.TestId#getPath public

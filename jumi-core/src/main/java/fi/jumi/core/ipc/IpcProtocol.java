@@ -42,10 +42,12 @@ public class IpcProtocol<T> implements IpcReader<T>, IpcWriter<T> {
 
     @Override
     public void send(Event<T> message) {
-        int index = writeStatusEmpty();
+        int currentMessage = writeStatusEmpty();
         messageEncoding.encode(message);
+        initNextMessage();
+
         memoryBarrier.storeStore();
-        setStatusExists(index);
+        setStatusExists(currentMessage);
     }
 
     @Override
@@ -159,6 +161,12 @@ public class IpcProtocol<T> implements IpcReader<T>, IpcWriter<T> {
         int index = buffer.position();
         buffer.writeByte(STATUS_EMPTY);
         return index;
+    }
+
+    private void initNextMessage() {
+        // Write empty status for next message, so that the producer
+        // is the first to touch a new segment, thus determining its size.
+        buffer.setByte(buffer.position(), STATUS_EMPTY);
     }
 
     private void setStatusExists(int index) {
