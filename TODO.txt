@@ -157,14 +157,11 @@ OK - refactor BuildTest & SuiteConfiguration
 		- the writer should be the first to touch a new segment, so that the writer would determine its size
 			- concurrency test: writer uses 1 byte segments, reader 2 byte segments; afterwards all segments should be 1 byte (can we do it also for the first segment?)
 			- append a null byte before writing the previous event's status?
-		- save v1 events to file for testing compatibility
-			- save the current example usage
-			- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
+	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
 	- TestId: create a method for getting the path as int[]
 		- make fi.jumi.api.drivers.TestId#getPath public
 		- write tests directly for getPath
 		- refactor SuiteEventSerializer#writeTestId to use it
-	- IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
 	- communicate suite results over MMFs instead of a socket
 	- communicate commands over MMFs instead of a socket
 		- serialization of CommandListener events (rename to LauncherListener?)
@@ -173,6 +170,9 @@ OK - refactor BuildTest & SuiteConfiguration
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
 	- refactor: do not convert to a Path at SuiteEventSerializer#readTestFile and then back to String in TestFile#fromPath, but expose a raw String constructor or factory?
+	- save v1 events to file for testing compatibility
+		- save the current example usage
+		- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
 
 - write daemon output to log file
 	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
