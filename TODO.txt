@@ -94,7 +94,7 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - when MMF already exists, use its file size (i.e. map whole file) instead of whatever FileSegmenter tells by default
 			OK - retry if opening the file fails at first
 			OK - see about making fi.jumi.core.ipc.MappedByteBufferSequence#tryMapFile thread safe
-	!! - hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
+	OK - hand-written serialization of SuiteListener and CommandListener events (rename to LauncherListener?)
 		protocol draft:
 			header: "Jumi" (4 bytes), protocol-version (int), interface (string), interface-version (int), events...
 			events: status (byte), event-type (byte), event-data
@@ -165,13 +165,44 @@ OK - refactor BuildTest & SuiteConfiguration
 		OK - make fi.jumi.api.drivers.TestId#getPath public
 		OK - write tests directly for getPath
 		OK - refactor SuiteListenerEncoding#writeTestId to use it
-	!! - communicate suite results over MMFs instead of a socket
-	- communicate commands over MMFs instead of a socket
-		- serialization of CommandListener events (rename to LauncherListener?)
+	!! - communicate suite results and commands over MMFs instead of a socket
+		- tell the other side that which MMF file to use
+			- DaemonConfiguration: daemon specific --var-dir
+			- DirBasedSteward: create a new var dir
+			- ProcessStartingDaemonSummoner: get the var dir from Steward, tell it to daemon
+		- make the daemon poll receive commands from var dir
+			- create CommandListenerEncoding
+			- make the daemon monitor the var dir for new command MMFs (var-dir/commands/*)
+				- create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
+				- read commands from every new command file
+				- one command per file (in new dir for )
+				- write result to the same file or use a naming pattern, e.g. "request/reply" file extension
+					- include the suite results file path in the reply
+					- write suite results to a MMF
+					- write suite results header before sending the reply
+				- close and forget the command MMFs after use
+				- close the suite results MMF after the suite is finished
+				- start it in Main, alongside DaemonNetworkEndpoint (using a different SuiteFactory instance?)
+		- switch to communicating over MMFs
+			- rename ProcessStartingDaemonSummoner to NetworkedProcessStartingDaemonSummoner
+			- rename RemoteSuiteLauncher to NetworkedRemoteSuiteLauncher
+			- create a new (non-actor) ProcessStartingDaemonSummoner which creates the var dir, starts the daemon process, and returns a CommandListener to it
+			- create a new RemoteSuiteLauncher
+				- send the runTests command
+				- handle timeout if onSuiteStarted doesn't happen
+				- handle timeout if process dies
+					- daemon needs to create and update a heartbeat MMF
+					- monitor that heartbeat on the launcher side
+			- use the new MMF-based classes instead of the old networked classes
+		- remove NetworkedRemoteSuiteLauncher
+		- remove NetworkedProcessStartingDaemonSummoner
+		- remove DaemonNetworkEndpoint
+		- remove fi.jumi.core.network and all that depends on it
 	- after implementing, consider refactoring the following places:
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
+	- DirBasedSteward: remove old var dirs after they are no more needed (keep last X dirs, at least Y days)
 	- refactor: do not convert to a Path at SuiteEventSerializer#readTestFile and then back to String in TestFile#fromPath, but expose a raw String constructor or factory?
 	- save v1 events to file for testing compatibility
 		- save the current example usage
