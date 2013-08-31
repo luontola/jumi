@@ -159,12 +159,13 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - append a null byte before writing the previous event's status?
 			SKIP - should read-only MappedByteBufferSequence not be able to create new segments?
 	OK - refactor fi.jumi.core.util.Resilient#tryRepeatedly to use only IOException, no generic exceptions
-	!! - IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
-	- TestId: create a method for getting the path as int[]
-		- make fi.jumi.api.drivers.TestId#getPath public
-		- write tests directly for getPath
-		- refactor SuiteEventSerializer#writeTestId to use it
-	- communicate suite results over MMFs instead of a socket
+	SKIP - IpcBuffer: test how it handles it if some segments are of size 0 (e.g. if there was a concurrency race in creating the file)
+		-> MappedByteBufferSequence will throw an exception
+	OK - TestId: create a method for getting the path as int[]
+		OK - make fi.jumi.api.drivers.TestId#getPath public
+		OK - write tests directly for getPath
+		OK - refactor SuiteListenerEncoding#writeTestId to use it
+	!! - communicate suite results over MMFs instead of a socket
 	- communicate commands over MMFs instead of a socket
 		- serialization of CommandListener events (rename to LauncherListener?)
 	- after implementing, consider refactoring the following places:

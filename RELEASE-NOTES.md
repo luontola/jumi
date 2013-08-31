@@ -5,6 +5,7 @@ Release Notes
 ### Upcoming Changes
 
 - Deprecated the `SuiteConfiguration.classPath` property. Use `classpath` instead. The old methods will be removed after about 180 days
+- Made `TestId.getPath()` public
 
 ### Jumi 0.5.390 (2013-08-07)
 

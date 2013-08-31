@@ -11,7 +11,6 @@ import fi.jumi.core.ipc.buffer.IpcBuffer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.file.Paths;
-import java.util.*;
 
 @NotThreadSafe
 public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<SuiteListener> {
@@ -226,14 +225,8 @@ public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<Sui
     }
 
     private void writeTestId(TestId testId) {
-        // TODO: extract this into TestId as "getPath(): int[]"
-        List<Integer> path = new ArrayList<>();
-        for (TestId id = testId; !id.isRoot(); id = id.getParent()) {
-            path.add(id.getIndex());
-        }
-        Collections.reverse(path);
-
-        buffer.writeInt(path.size());
+        int[] path = testId.getPath();
+        buffer.writeInt(path.length);
         for (Integer index : path) {
             buffer.writeInt(index);
         }

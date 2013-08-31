@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -59,8 +59,7 @@ public abstract class TestId implements Comparable<TestId>, Serializable {
 
     public abstract int getIndex();
 
-    private int[] getPath() {
-        // TODO: make public? should then write explicit tests for it
+    public int[] getPath() {
         return getPath(0);
     }
 

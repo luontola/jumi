@@ -1,9 +1,10 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.api.drivers;
 
+import org.hamcrest.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -96,6 +97,14 @@ public class TestIdTest {
         assertThat(TestId.of(0).getIndex(), is(0));
         assertThat(TestId.of(1).getIndex(), is(1));
         assertThat(TestId.of(1, 2).getIndex(), is(2));
+    }
+
+    @Test
+    public void get_path() {
+        assertThat(TestId.ROOT.getPath(), intArray());
+        assertThat(TestId.of(0).getPath(), intArray(0));
+        assertThat(TestId.of(1).getPath(), intArray(1));
+        assertThat(TestId.of(5, 6, 7).getPath(), intArray(5, 6, 7));
     }
 
     @Test
@@ -221,5 +230,27 @@ public class TestIdTest {
         thrown.expect(UnsupportedOperationException.class);
         thrown.expectMessage("root has no siblings");
         TestId.ROOT.getNextSibling();
+    }
+
+
+    // helpers
+
+    private static Matcher<int[]> intArray(int... expected) {
+        return new TypeSafeMatcher<int[]>() {
+            @Override
+            protected boolean matchesSafely(int[] actual) {
+                return Arrays.equals(actual, expected);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("int array ").appendText(Arrays.toString(expected));
+            }
+
+            @Override
+            protected void describeMismatchSafely(int[] actual, Description mismatchDescription) {
+                mismatchDescription.appendText("was ").appendText(Arrays.toString(actual));
+            }
+        };
     }
 }
