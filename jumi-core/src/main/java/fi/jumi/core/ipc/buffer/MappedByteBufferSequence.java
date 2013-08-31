@@ -18,9 +18,19 @@ import static java.nio.file.StandardOpenOption.*;
 public class MappedByteBufferSequence implements ByteBufferSequence {
 
     private final FileSegmenter segmenter;
+    private final boolean readOnly;
 
-    public MappedByteBufferSequence(FileSegmenter segmenter) {
+    public static MappedByteBufferSequence readWrite(FileSegmenter segmenter) {
+        return new MappedByteBufferSequence(segmenter, false);
+    }
+
+    public static MappedByteBufferSequence readOnly(FileSegmenter segmenter) {
+        return new MappedByteBufferSequence(segmenter, true);
+    }
+
+    private MappedByteBufferSequence(FileSegmenter segmenter, boolean readOnly) {
         this.segmenter = segmenter;
+        this.readOnly = readOnly;
     }
 
     @Override
@@ -34,7 +44,7 @@ public class MappedByteBufferSequence implements ByteBufferSequence {
         }
     }
 
-    private static MappedByteBuffer tryMapFile(Path path, long size) throws IOException {
+    private MappedByteBuffer tryMapFile(Path path, long size) throws IOException {
         OpenOption[] options;
         if (Files.exists(path)) {
             size = Files.size(path);
@@ -48,7 +58,13 @@ public class MappedByteBufferSequence implements ByteBufferSequence {
             options = new OpenOption[]{READ, WRITE, CREATE_NEW};
         }
         try (FileChannel fc = FileChannel.open(path, options)) {
-            return fc.map(FileChannel.MapMode.READ_WRITE, 0, size);
+            return fc.map(mapMode(), 0, size);
         }
     }
+
+    private FileChannel.MapMode mapMode() {
+        return readOnly ? FileChannel.MapMode.READ_ONLY : FileChannel.MapMode.READ_WRITE;
+    }
+
+    // TODO: should read-only MappedByteBufferSequence not be able to create new segments?
 }
