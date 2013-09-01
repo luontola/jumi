@@ -166,18 +166,18 @@ OK - refactor BuildTest & SuiteConfiguration
 		OK - write tests directly for getPath
 		OK - refactor SuiteListenerEncoding#writeTestId to use it
 	!! - communicate suite results and commands over MMFs instead of a socket
-		- tell the other side that which MMF file to use
-			- DaemonConfiguration: daemon specific --var-dir
-			- DirBasedSteward: create a new var dir
-			- ProcessStartingDaemonSummoner: get the var dir from Steward, tell it to daemon
-		- make the daemon poll receive commands from var dir
+		- tell the other side that where to put the MMFs
+			- DaemonConfiguration: daemon specific --daemon-dir
+			- DirBasedSteward: create a new daemon dir (JUMI_HOME/daemons/*)
+			- ProcessStartingDaemonSummoner: get the daemon dir from Steward, tell it to daemon
+		- make the daemon poll receive commands from daemon dir
 			- create CommandListenerEncoding
-			- make the daemon monitor the var dir for new command MMFs (var-dir/commands/*)
+			- make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
 				- create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
-				- read commands from every new command file
-				- one command per file (in new dir for )
-				- write result to the same file or use a naming pattern, e.g. "request/reply" file extension
-					- include the suite results file path in the reply
+				- read commands from every new command file (daemon-dir/commands/*/request)
+				- read commands until IPC channel closed (though typically only one command per file)
+				- write result to a corresponding file (daemon-dir/commands/*/reply)
+					- include the suite results file path in the reply (daemon-dir/suites/*/suite)
 					- write suite results to a MMF
 					- write suite results header before sending the reply
 				- close and forget the command MMFs after use
@@ -186,13 +186,14 @@ OK - refactor BuildTest & SuiteConfiguration
 		- switch to communicating over MMFs
 			- rename ProcessStartingDaemonSummoner to NetworkedProcessStartingDaemonSummoner
 			- rename RemoteSuiteLauncher to NetworkedRemoteSuiteLauncher
-			- create a new (non-actor) ProcessStartingDaemonSummoner which creates the var dir, starts the daemon process, and returns a CommandListener to it
+			- create a new (non-actor) ProcessStartingDaemonSummoner which creates the daemon dir, starts the daemon process, and returns a CommandListener to it
 			- create a new RemoteSuiteLauncher
 				- send the runTests command
 				- handle timeout if onSuiteStarted doesn't happen
 				- handle timeout if process dies
-					- daemon needs to create and update a heartbeat MMF
-					- monitor that heartbeat on the launcher side
+					- create a heartbeat MMF on the launcher side (daemon-dir/heartbeat), includes currentTimeMillis (in binary)
+					- daemon updates the heartbeat every 100 ms or so; create daemon thread in main
+					- monitor that heartbeat on the launcher side, give an internal error if the process dies in the middle of a suite
 			- use the new MMF-based classes instead of the old networked classes
 		- remove NetworkedRemoteSuiteLauncher
 		- remove NetworkedProcessStartingDaemonSummoner
@@ -202,7 +203,7 @@ OK - refactor BuildTest & SuiteConfiguration
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
-	- DirBasedSteward: remove old var dirs after they are no more needed (keep last X dirs, at least Y days)
+	- DirBasedSteward: remove old daemon dirs after they are no more needed (keep last X dirs, at least Y days)
 	- refactor: do not convert to a Path at SuiteEventSerializer#readTestFile and then back to String in TestFile#fromPath, but expose a raw String constructor or factory?
 	- save v1 events to file for testing compatibility
 		- save the current example usage
@@ -210,7 +211,7 @@ OK - refactor BuildTest & SuiteConfiguration
 
 - write daemon output to log file
 	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
-		- write log to JUMI_HOME/run/*/console.log
+		- write log to JUMI_HOME/daemons/*/console.log
 		- default JUMI_HOME to ~/.jumi
 	- update e2e tests to read the output from the log file
 	- get rid of fi.jumi.launcher.remote.ProcessStartingDaemonSummoner#copyInBackground
