@@ -22,6 +22,7 @@ import org.junit.*;
 import org.junit.rules.Timeout;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.concurrent.*;
 
 import static fi.jumi.core.util.AsyncAssert.assertEventually;
@@ -51,6 +52,19 @@ public class ProcessStartingDaemonSummonerTest {
     private final SuiteConfiguration dummySuiteConfig = new SuiteConfiguration();
     private final DaemonConfiguration dummyDaemonConfig = new DaemonConfiguration();
     private final DaemonListener daemonListener = mock(DaemonListener.class);
+    private final Path dummyDaemonDir = Paths.get("dummy-daemon-dir");
+
+    {
+        stub(steward.createDaemonDir(dummyDaemonConfig.getJumiHome())).toReturn(dummyDaemonDir);
+    }
+
+    @Test
+    public void tells_to_daemon_the_daemon_directory_to_use() {
+        daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, ActorRef.wrap(daemonListener));
+
+        DaemonConfiguration daemonConfig = parseDaemonArguments(processStarter.lastArgs);
+        assertThat(daemonConfig.getDaemonDir(), is(dummyDaemonDir));
+    }
 
     @Test
     public void tells_to_daemon_the_socket_to_contact() {

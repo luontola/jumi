@@ -54,7 +54,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
                 new OneTimeDaemonListenerFactory(
                         withInitialMessageTimeout(listener.tell(), daemon.getStartupTimeout())));
         daemon = daemon.melt()
-                .setDaemonDir(daemon.getJumiHome().resolve("daemons").resolve(System.currentTimeMillis() + "")) // XXX: spike code
+                .setDaemonDir(steward.createDaemonDir(daemon.getJumiHome()))
                 .setLauncherPort(port)
                 .freeze();
 
