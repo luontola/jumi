@@ -6,19 +6,23 @@ package fi.jumi.launcher.daemon;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.*;
-import org.junit.rules.TemporaryFolder;
+import org.junit.rules.*;
 
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class DirBasedStewardTest {
 
     @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     private static final String expectedName = "daemon-1.2.3.jar";
     private final byte[] expectedContent = new byte[]{1, 2, 3};
@@ -32,6 +36,45 @@ public class DirBasedStewardTest {
         jumiHome = tempDir.newFolder("jumiHome").toPath();
         steward = new DirBasedSteward(stubDaemonJar);
     }
+
+
+    // Daemon directory
+
+    @Test
+    public void creates_a_daemon_directory() {
+        Path daemonDir = steward.createDaemonDir(jumiHome);
+
+        assertThat("should be under $JUMI_HOME/daemons", daemonDir.getParent(), is(jumiHome.resolve("daemons")));
+        assertThat("should be a directory", Files.isDirectory(daemonDir), is(true));
+    }
+
+    @Test
+    public void concurrently_created_daemons_will_always_get_their_own_daemon_directories() {
+        List<Path> daemonDirs = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            daemonDirs.add(steward.createDaemonDir(jumiHome));
+        }
+
+        Set<Path> uniqueDaemonDirs = new HashSet<>(daemonDirs);
+        assertThat("unique daemon dirs", uniqueDaemonDirs.size(), is(daemonDirs.size()));
+    }
+
+    @Test
+    public void throws_exception_if_cannot_create_daemon_directory() throws IOException {
+        Path parentDir = steward.createDaemonDir(jumiHome).getParent();
+        FileUtils.deleteDirectory(parentDir.toFile());
+
+        Files.createFile(parentDir); // prevents it from creating the daemon directory
+
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("Unable to create daemon directory");
+        thrown.expectMessage(parentDir.toString());
+        thrown.expectCause(instanceOf(FileAlreadyExistsException.class));
+        steward.createDaemonDir(jumiHome);
+    }
+
+
+    // Daemon JAR
 
     @Test
     public void copies_the_embedded_daemon_JAR_to_the_settings_dir() throws IOException {

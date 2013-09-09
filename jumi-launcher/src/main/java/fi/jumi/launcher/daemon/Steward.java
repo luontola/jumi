@@ -8,5 +8,7 @@ import java.nio.file.Path;
 
 public interface Steward {
 
+    Path createDaemonDir(Path jumiHome);
+
     Path getDaemonJar(Path jumiHome);
 }

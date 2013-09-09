@@ -13,10 +13,33 @@ import java.nio.file.*;
 @NotThreadSafe
 public class DirBasedSteward implements Steward {
 
+    private static final int MAX_TRIES = 100;
+    private static final String DAEMONS_DIR = "daemons";
+
     private final DaemonJar daemonJar;
 
     public DirBasedSteward(DaemonJar daemonJar) {
         this.daemonJar = daemonJar;
+    }
+
+    @Override
+    public Path createDaemonDir(Path jumiHome) {
+        Path parentDir = jumiHome.resolve(DAEMONS_DIR);
+        long baseName = System.currentTimeMillis();
+
+        for (int tries = 0; ; tries++) {
+            Path daemonDir = parentDir.resolve(baseName + "-" + tries);
+            try {
+                Files.createDirectories(parentDir);
+                Files.createDirectory(daemonDir);
+                return daemonDir;
+
+            } catch (IOException e) {
+                if (tries >= MAX_TRIES) {
+                    throw new RuntimeException("Unable to create daemon directory: " + daemonDir, e);
+                }
+            }
+        }
     }
 
     @Override
