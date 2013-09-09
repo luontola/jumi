@@ -19,6 +19,23 @@ public class TestUtil {
         return new IpcBuffer(new AllocatedByteBufferSequence(100, 30 * 1000));
     }
 
+    public static <T> void decodeAll(IpcReader<T> reader, T target) {
+        // TODO: move to production sources?
+        WaitStrategy waitStrategy = new ProgressiveSleepWaitStrategy();
+        while (!Thread.interrupted()) {
+            PollResult result = reader.poll(target);
+            if (result == PollResult.NO_NEW_MESSAGES) {
+                waitStrategy.await();
+            }
+            if (result == PollResult.HAD_SOME_MESSAGES) {
+                waitStrategy.reset();
+            }
+            if (result == PollResult.END_OF_STREAM) {
+                return;
+            }
+        }
+    }
+
     public interface WriteOp<T> {
         void write(IpcBuffer target, T data);
     }

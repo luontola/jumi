@@ -6,7 +6,6 @@ package fi.jumi.core.ipc;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
-import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.ipc.buffer.*;
@@ -15,13 +14,12 @@ import fi.jumi.core.util.SpyListener;
 import org.junit.*;
 import org.junit.rules.*;
 
-import java.lang.reflect.Method;
 import java.nio.file.*;
 import java.util.concurrent.locks.LockSupport;
 
 import static fi.jumi.core.util.ConcurrencyUtil.runConcurrently;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 public class IpcProtocolTest {
@@ -34,63 +32,6 @@ public class IpcProtocolTest {
     @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
 
-
-    @Test
-    public void encodes_and_decodes_all_events() {
-        SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
-        exampleUsage(spy.getListener());
-        spy.replay();
-        IpcBuffer buffer = TestUtil.newIpcBuffer();
-
-        // encode
-        IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-        protocol.start();
-        exampleUsage(sendTo(protocol));
-        protocol.close();
-
-        // decode
-        buffer.position(0);
-        decodeAll(protocol, spy.getListener());
-
-        spy.verify();
-    }
-
-    @Test
-    public void example_usage_invokes_every_method_in_the_interface() {
-        SuiteListenerSpy spy = new SuiteListenerSpy();
-
-        exampleUsage(spy);
-
-        for (Method method : SuiteListener.class.getMethods()) {
-            assertThat("invoked methods", spy.methodInvocations.keySet(), hasItem(method));
-        }
-    }
-
-    private static void exampleUsage(SuiteListener listener) {
-        TestFile testFile = TestFile.fromClassName("com.example.SampleTest");
-        RunId runId = new RunId(1);
-
-        listener.onSuiteStarted();
-        listener.onTestFileFound(testFile);
-        listener.onAllTestFilesFound();
-
-        listener.onTestFound(testFile, TestId.ROOT, "SampleTest");
-        listener.onTestFound(testFile, TestId.of(0), "testName");
-
-        listener.onRunStarted(runId, testFile);
-        listener.onTestStarted(runId, TestId.ROOT);
-        listener.onTestStarted(runId, TestId.of(0));
-        listener.onPrintedOut(runId, "printed to out");
-        listener.onPrintedErr(runId, "printed to err");
-        listener.onFailure(runId, StackTrace.from(new AssertionError("assertion message"))); // TODO: add cause and suppressed, also test the stack trace elements
-        listener.onTestFinished(runId);
-        listener.onTestFinished(runId);
-        listener.onRunFinished(runId);
-
-        listener.onInternalError("error message", StackTrace.from(new Exception("exception message")));
-        listener.onTestFileFinished(testFile);
-        listener.onSuiteFinished();
-    }
 
     @Test(timeout = TIMEOUT)
     public void test_concurrent_producer_and_consumer() throws Exception {
@@ -106,7 +47,7 @@ public class IpcProtocolTest {
         };
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(mmf, SuiteListenerEncoding::new);
-            decodeAll(reader, expectations.getListener());
+            TestUtil.decodeAll(reader, expectations.getListener());
         };
         runConcurrently(producer, consumer);
 
@@ -146,7 +87,7 @@ public class IpcProtocolTest {
         };
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(new FileSegmenter(mmf, 2, 2), SuiteListenerEncoding::new);
-            decodeAll(reader, expectations.getListener());
+            TestUtil.decodeAll(reader, expectations.getListener());
         };
         runConcurrently(producer, consumer);
 
@@ -239,24 +180,7 @@ public class IpcProtocolTest {
     private static void tryToDecode(IpcBuffer buffer) {
         buffer.position(0);
         IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-        decodeAll(protocol, mock(SuiteListener.class));
-    }
-
-    public static <T> void decodeAll(IpcReader<T> reader, T target) {
-        // TODO: move to production sources?
-        WaitStrategy waitStrategy = new ProgressiveSleepWaitStrategy();
-        while (!Thread.interrupted()) {
-            PollResult result = reader.poll(target);
-            if (result == PollResult.NO_NEW_MESSAGES) {
-                waitStrategy.await();
-            }
-            if (result == PollResult.HAD_SOME_MESSAGES) {
-                waitStrategy.reset();
-            }
-            if (result == PollResult.END_OF_STREAM) {
-                return;
-            }
-        }
+        TestUtil.decodeAll(protocol, mock(SuiteListener.class));
     }
 
     private static IpcProtocol<SuiteListener> newIpcProtocol(IpcBuffer buffer) {
