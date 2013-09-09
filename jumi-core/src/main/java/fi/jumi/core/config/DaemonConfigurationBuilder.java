@@ -13,6 +13,7 @@ public class DaemonConfigurationBuilder {
 
     // command line arguments
     private Path jumiHome;
+    private Path daemonDir;
     private int launcherPort;
 
     // system properties
@@ -27,6 +28,7 @@ public class DaemonConfigurationBuilder {
 
     DaemonConfigurationBuilder(DaemonConfiguration src) {
         jumiHome = src.getJumiHome();
+        daemonDir = src.getDaemonDir();
         launcherPort = src.getLauncherPort();
         testThreadsCount = src.getTestThreadsCount();
         logActorMessages = src.getLogActorMessages();
@@ -49,6 +51,9 @@ public class DaemonConfigurationBuilder {
                 case DaemonConfiguration.JUMI_HOME:
                     setJumiHome(Paths.get(it.next()));
                     break;
+                case DaemonConfiguration.DAEMON_DIR:
+                    setDaemonDir(Paths.get(it.next()));
+                    break;
                 case DaemonConfiguration.LAUNCHER_PORT:
                     setLauncherPort(Integer.parseInt(it.next()));
                     break;
@@ -61,6 +66,9 @@ public class DaemonConfigurationBuilder {
     }
 
     private void checkRequiredParameters() {
+        if (getDaemonDir().toString().isEmpty()) {
+            throw new IllegalArgumentException("missing required parameter: " + DaemonConfiguration.DAEMON_DIR);
+        }
         if (getLauncherPort() <= 0) {
             throw new IllegalArgumentException("missing required parameter: " + DaemonConfiguration.LAUNCHER_PORT);
         }
@@ -87,6 +95,15 @@ public class DaemonConfigurationBuilder {
 
     public int getLauncherPort() {
         return launcherPort;
+    }
+
+    public DaemonConfigurationBuilder setDaemonDir(Path daemonDir) {
+        this.daemonDir = daemonDir;
+        return this;
+    }
+
+    public Path getDaemonDir() {
+        return daemonDir;
     }
 
     public DaemonConfigurationBuilder setLauncherPort(int launcherPort) {

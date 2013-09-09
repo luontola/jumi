@@ -16,6 +16,7 @@ public class DaemonConfiguration {
 
     // command line arguments
     public static final String JUMI_HOME = "--jumi-home";
+    public static final String DAEMON_DIR = "--daemon-dir";
     public static final String LAUNCHER_PORT = "--launcher-port";
 
     // system properties
@@ -27,6 +28,7 @@ public class DaemonConfiguration {
 
     // command line arguments
     private final Path jumiHome;
+    private final Path daemonDir;
     private final int launcherPort;
 
     // system properties
@@ -37,6 +39,7 @@ public class DaemonConfiguration {
 
     public DaemonConfiguration() {
         jumiHome = Paths.get(System.getProperty("user.home"), ".jumi");
+        daemonDir = Paths.get("");
         launcherPort = 0;
         testThreadsCount = 0;
         logActorMessages = false;
@@ -46,6 +49,7 @@ public class DaemonConfiguration {
 
     DaemonConfiguration(DaemonConfigurationBuilder src) {
         jumiHome = src.getJumiHome();
+        daemonDir = src.getDaemonDir();
         launcherPort = src.getLauncherPort();
         testThreadsCount = src.getTestThreadsCount();
         logActorMessages = src.getLogActorMessages();
@@ -63,6 +67,7 @@ public class DaemonConfiguration {
     public String[] toProgramArgs() {
         return new String[]{
                 JUMI_HOME, getJumiHome().toString(),
+                DAEMON_DIR, getDaemonDir().toString(),
                 LAUNCHER_PORT, String.valueOf(getLauncherPort())
         };
     }
@@ -80,6 +85,10 @@ public class DaemonConfiguration {
 
     public Path getJumiHome() {
         return jumiHome;
+    }
+
+    public Path getDaemonDir() {
+        return daemonDir;
     }
 
     public int getLauncherPort() {

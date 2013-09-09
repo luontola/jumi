@@ -166,10 +166,11 @@ OK - refactor BuildTest & SuiteConfiguration
 		OK - write tests directly for getPath
 		OK - refactor SuiteListenerEncoding#writeTestId to use it
 	!! - communicate suite results and commands over MMFs instead of a socket
-		- tell the other side that where to put the MMFs
-			- DaemonConfiguration: daemon specific --daemon-dir
-			- DirBasedSteward: create a new daemon dir (JUMI_HOME/daemons/*)
+		!! - tell the other side that where to put the MMFs
+			OK - DaemonConfiguration: daemon specific --daemon-dir
+			!! - DirBasedSteward: create a new daemon dir (JUMI_HOME/daemons/*)
 			- ProcessStartingDaemonSummoner: get the daemon dir from Steward, tell it to daemon
+				- remove the setDaemonDir spike code ProcessStartingDaemonSummoner#connectToDaemon
 		- make the daemon poll receive commands from daemon dir
 			- create CommandListenerEncoding
 			- make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)

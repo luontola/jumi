@@ -27,7 +27,9 @@ public class DaemonConfigurationTest {
     @Before
     public void setup() {
         // initialize required parameters to avoid failing unrelated tests
-        builder.setLauncherPort(new Random().nextInt(100) + 1);
+        Random random = new Random();
+        builder.setDaemonDir(Paths.get(String.valueOf(random.nextInt())));
+        builder.setLauncherPort(random.nextInt(100) + 1);
 
         // make sure that melting makes all fields back mutable
         builder = builder.freeze().melt();
@@ -60,6 +62,25 @@ public class DaemonConfigurationTest {
 
         assertThat(configuration().getJumiHome().getParent(), is(Paths.get(userHome)));
     }
+
+    // daemonDir
+
+    @Test
+    public void daemon_dir_is_configurable() {
+        builder.setDaemonDir(Paths.get("foo"));
+
+        assertThat(configuration().getDaemonDir(), is(Paths.get("foo")));
+    }
+
+    @Test
+    public void daemon_dir_is_required() {
+        builder.setDaemonDir(DaemonConfiguration.DEFAULTS.getDaemonDir());
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("missing required parameter: " + DaemonConfiguration.DAEMON_DIR);
+        configuration();
+    }
+
 
     // launcherPort
 
