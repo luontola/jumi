@@ -300,7 +300,7 @@ OK - refactor BuildTest & SuiteConfiguration
 		http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet/com/sun/javadoc/Tag.html
 		http://www.oracle.com/technetwork/java/javase/documentation/index-137483.html
 		http://maven.apache.org/plugins/maven-javadoc-plugin/examples/taglet-configuration.html
-	- DaemonConfiguration: refactor the code for parsing command line parameters
+	- DaemonConfiguration: refactor the code for parsing command line parameters (try to minimize shotgun surgery, e.g. commit 1ea1b44a186ef00b32b2ae0ad05f88387e422fcb)
 		fi.jumi.core.config.DaemonConfigurationBuilder#parseProgramArgs
 		fi.jumi.core.config.DaemonConfiguration#toProgramArgs
 		fi.jumi.core.config.DaemonConfiguration#JUMI_HOME and other constants
