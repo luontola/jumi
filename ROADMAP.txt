@@ -59,9 +59,11 @@ use cases and which features are most important to you.
 
 - Look for the fastest order of running tests from class loading point of view (best-effort thread affinity at test class level, to avoid all threads being blocked by loading the same classes?)
 
-- Detect what classes a test depends on (e.g. by spying on the class loader) and run only those (or those first)
+- Detect what classes a test depends on (e.g. run one test in new class loader and spy that what classes it loads) and run only those (or those first)
 
 - IO/CPU boundness checking (to choose how many threads to use)
+
+- Measure how long class loading takes by comparing cold and warm starts: Would that be useful statistics? Would it help identify fat tests?
 
 
 	USABILITY
@@ -75,6 +77,10 @@ use cases and which features are most important to you.
 - Per-module working directory (requires a separate JVM for each module)
 
 - Get a thread dump of tests that appear to be frozen
+
+- Automatically report exceptions in background threads by setting a default handler
+
+- Wait for background threads to finish at the end of a test run, to help notice leaking tests
 
 
 	TEST COMPATIBILITY

@@ -172,7 +172,10 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - ProcessStartingDaemonSummoner: get the daemon dir from Steward, tell it to daemon
 				OK - remove the setDaemonDir spike code ProcessStartingDaemonSummoner#connectToDaemon
 		!! - make the daemon poll receive commands from daemon dir
-			- create CommandListenerEncoding
+			!! - create CommandListenerEncoding
+				!! - example usage & serializing all events
+				- remove duplication: CommandListenerEncoding & SuiteListenerEncoding
+				- remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
 			- make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
 				- create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
 				- read commands from every new command file (daemon-dir/commands/*/request)
@@ -246,6 +249,7 @@ OK - refactor BuildTest & SuiteConfiguration
 		http://trystack.org/
 	- are there Itaniums (IA64) on any cloud for rent?
 	- Azul's Vega should have a relaxed memory model; ask for co-operation, also to ensure scalability?
+		"Azul hands out 'academic' accounts all the time." https://groups.google.com/d/msg/clojure/XHqWLMcsH-c/ZYeyMP_w66cJ
 
 - class loader caching
 
@@ -293,6 +297,7 @@ OK - refactor BuildTest & SuiteConfiguration
 	>	(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
 
 - misc refactoring (choose some, defer others)
+	- PIT shows incorrect coverage for TestId; stopped working near commit cccff66d4541a0811509a3dadf41084abca278a4, after upgrading to JDK 8
 	- prepend TestFile as context information to the message in fi.jumi.core.runs.RunEventNormalizer#onInternalError?
 	- create a custom taglet (as independent project) for cross-references from public API's javadocs to tests: e.g. {@ref com.example.FooTest#someTestName}
 		http://docs.oracle.com/javase/6/docs/technotes/guides/javadoc/taglet/overview.html
