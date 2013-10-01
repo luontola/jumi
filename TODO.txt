@@ -213,6 +213,12 @@ OK - refactor BuildTest & SuiteConfiguration
 		- save the current example usage
 		- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
 
+- optimize PIT timings; too many TIMED_OUT mutations, makes the build slow
+	FAIL - tried to lower timeoutConstant; didn't help on the slow CI server, and only marginal improvement on fast desktop (total build time from 3:30 to 3:00)
+	- add a sanity check that will detect infinite loops and will throw an exception
+		- investigate individual TIMED_OUT mutations; in what kind of an infinite loop do they get stuck? can we detect it and break?
+		- safety threshold to readNullableString and everywhere else where an array length is read?
+
 - write daemon output to log file
 	- use ProcessBuilder.redirectOutput to write the log file (else the process would hang when the launcher JVM exits)
 		- write log to JUMI_HOME/daemons/*/console.log
