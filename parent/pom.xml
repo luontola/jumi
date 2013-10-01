@@ -637,6 +637,7 @@
                                 <mutator>ALL</mutator>
                             </mutators>
                             <mutateStaticInitializers>true</mutateStaticInitializers>
+                            <timeoutConstant>1000</timeoutConstant>
                         </configuration>
                     </plugin>
                 </plugins>
