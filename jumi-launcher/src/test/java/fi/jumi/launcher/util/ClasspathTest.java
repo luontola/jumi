@@ -22,7 +22,7 @@ public class ClasspathTest {
 
     @Test
     public void extracts_classpath_elements_on_Unix() {
-        assertThat(Classpath.getClasspathElements("/foo.jar;/bar.jar", ";"),
+        assertThat(Classpath.getClasspathElements("/foo.jar:/bar.jar", ":"),
                 is(asList(Paths.get("/foo.jar"), Paths.get("/bar.jar"))));
     }
 
