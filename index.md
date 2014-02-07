@@ -9,6 +9,7 @@ Jumi is not only open source, but also open development. The process of how Jumi
 
 - Mailing list: <https://groups.google.com/d/forum/jumi-test-runner>
 - Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md))
+- Issue tracker: <https://github.com/orfjackal/jumi/issues>
 - Source code:
     - <https://github.com/orfjackal/jumi>
     - <https://github.com/orfjackal/jumi-scripts>
