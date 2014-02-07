@@ -213,6 +213,18 @@ OK - refactor BuildTest & SuiteConfiguration
 		- save the current example usage
 		- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
 
+- Eclipse's JUnit integration adds to classpath entries that are not valid file paths on Windows
+	C:\Users\ORFJackal\Desktop\test\gid5\aid5\target\test-classes;C:\Users\ORFJackal\Desktop\test\gid5\aid5\target\classes;C:\Users\ORFJackal\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\ORFJackal\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-launcher\0.5.390\jumi-launcher-0.5.390.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-core\0.5.390\jumi-core-0.5.390.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-actors\0.1.196\jumi-actors-0.1.196.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-api\0.5.390\jumi-api-0.5.390.jar;/C:/eclipse/configuration/org.eclipse.osgi/bundles/200/1/.cp/;/C:/eclipse/configuration/org.eclipse.osgi/bundles/199/1/.cp/
+	- detect when running on Windows and a path starts with "/C:/" (regex "/[A-Z]:/"), drop the first "/"
+		- detect with os.name?
+			http://stackoverflow.com/questions/2357758/what-does-system-getpropertyos-name-return-in-latest-windows-oss
+			http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+			http://www.javaneverdie.com/java/java-os-name-property-values/
+		- detect by checking the FileSystem's roots?
+			FileSystems.getDefault().getRootDirectories() - check if first of them starts with "/"
+			http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystems.html#getDefault()
+			http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getRootDirectories()
+
 - optimize PIT timings; too many TIMED_OUT mutations, makes the build slow
 	FAIL - tried to lower timeoutConstant; didn't help on the slow CI server, and only marginal improvement on fast desktop (total build time from 3:30 to 3:00)
 	- add a sanity check that will detect infinite loops and will throw an exception
