@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -86,12 +86,12 @@ public class BuildTest {
                                 POM_FILES,
                                 BASE_PACKAGE + "core/"),
                         new Deprecations()
-                                .add("fi.jumi.core.config.SuiteConfiguration#getClassPath()", "2013-08-13", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#getClassPath()", "2013-08-13", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.nio.file.Path[])", "2013-08-13", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.net.URI[])", "2013-08-13", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.nio.file.Path)", "2013-08-13", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.net.URI)", "2013-08-13", 180)
+                                .add("fi.jumi.core.config.SuiteConfiguration#getClassPath()", "2014-02-07", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#getClassPath()", "2014-02-07", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.nio.file.Path[])", "2014-02-07", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.net.URI[])", "2014-02-07", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.nio.file.Path)", "2014-02-07", 180)
+                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.net.URI)", "2014-02-07", 180)
                 },
 
                 {"jumi-daemon",
