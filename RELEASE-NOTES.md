@@ -4,6 +4,7 @@ Release Notes
 
 ### Upcoming Changes
 
+- Workaround for Eclipse's JUnit integration producing non-standard classpath elements on Windows ([Issue #6](https://github.com/orfjackal/jumi/issues/6))
 - Deprecated the `SuiteConfiguration.classPath` property. Use `classpath` instead. The old methods will be removed after about 180 days
 - Made `TestId.getPath()` public
 

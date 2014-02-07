@@ -5,6 +5,7 @@
 package fi.jumi.launcher.util;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.io.File;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -22,7 +23,7 @@ public class Classpath {
     public static List<Path> getClasspathElements(String classpath, String pathSeparator) {
         List<Path> results = new ArrayList<>();
         for (String path : classpath.split(Pattern.quote(pathSeparator))) {
-            results.add(Paths.get(path));
+            results.add(new File(path).toPath());
         }
         return results;
     }

@@ -213,7 +213,7 @@ OK - refactor BuildTest & SuiteConfiguration
 		- save the current example usage
 		- save all the variations of exceptions (hand-written stack trace elements) and test them for deep equality
 
-- Eclipse's JUnit integration adds to classpath entries that are not valid file paths on Windows
+OK - Eclipse's JUnit integration adds to classpath entries that are not valid file paths on Windows
 	C:\Users\ORFJackal\Desktop\test\gid5\aid5\target\test-classes;C:\Users\ORFJackal\Desktop\test\gid5\aid5\target\classes;C:\Users\ORFJackal\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\ORFJackal\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-launcher\0.5.390\jumi-launcher-0.5.390.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-core\0.5.390\jumi-core-0.5.390.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-actors\0.1.196\jumi-actors-0.1.196.jar;C:\Users\ORFJackal\.m2\repository\fi\jumi\jumi-api\0.5.390\jumi-api-0.5.390.jar;/C:/eclipse/configuration/org.eclipse.osgi/bundles/200/1/.cp/;/C:/eclipse/configuration/org.eclipse.osgi/bundles/199/1/.cp/
 	- detect when running on Windows and a path starts with "/C:/" (regex "/[A-Z]:/"), drop the first "/"
 		- detect with os.name?
