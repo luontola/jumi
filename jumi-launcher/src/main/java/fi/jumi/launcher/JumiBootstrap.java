@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -6,14 +6,12 @@ package fi.jumi.launcher;
 
 import fi.jumi.core.config.*;
 import fi.jumi.launcher.ui.*;
+import fi.jumi.launcher.util.Classpath;
 import org.apache.commons.io.output.*;
 
 import javax.annotation.WillClose;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.regex.Pattern;
 
 @NotThreadSafe
 public class JumiBootstrap {
@@ -30,7 +28,7 @@ public class JumiBootstrap {
         }
     }
 
-    public SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder().setClasspath(currentClasspath());
+    public SuiteConfigurationBuilder suite = new SuiteConfigurationBuilder().setClasspath(Classpath.currentClasspath());
     public DaemonConfigurationBuilder daemon = new DaemonConfigurationBuilder();
 
     private boolean passingTestsVisible = false;
@@ -60,20 +58,6 @@ public class JumiBootstrap {
         setDaemonOutput(daemonOutput);
         this.daemon.setLogActorMessages(true);
         return this;
-    }
-
-    public static Path[] currentClasspath() {
-        Path javaHome = Paths.get(System.getProperty("java.home"));
-
-        List<Path> classpath = new ArrayList<>();
-        String pathSeparator = System.getProperty("path.separator");
-        for (String library : System.getProperty("java.class.path").split(Pattern.quote(pathSeparator))) {
-            Path libraryPath = Paths.get(library);
-            if (!libraryPath.startsWith(javaHome)) {
-                classpath.add(libraryPath);
-            }
-        }
-        return classpath.toArray(new Path[classpath.size()]);
     }
 
     public void runSuite() throws IOException, InterruptedException {
