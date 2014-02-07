@@ -7,11 +7,10 @@ package fi.jumi.launcher.util;
 import org.junit.Test;
 
 import java.nio.file.*;
-import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class ClasspathTest {
 
@@ -33,8 +32,9 @@ public class ClasspathTest {
         // elements which start with "/C:" and java.nio.file.Paths.get() can't handle it.
         String troublesomePath = "/C:/eclipse/configuration/org.eclipse.osgi/bundles/200/1/.cp/";
 
-        List<Path> classpath = Classpath.getClasspathElements(troublesomePath, ";");
+        Path fixedPath = Classpath.getClasspathElements(troublesomePath, ";").get(0);
 
-        assertThat(classpath, is(asList(Paths.get("C:\\eclipse\\configuration\\org.eclipse.osgi\\bundles\\200\\1\\.cp"))));
+        assertThat(fixedPath.toString(), containsString("C:"));
+        assertThat(fixedPath.getFileName().toString(), is(".cp"));
     }
 }
