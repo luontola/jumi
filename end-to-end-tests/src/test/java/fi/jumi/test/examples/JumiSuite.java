@@ -1,16 +1,14 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.test.examples;
 
 import fi.jumi.launcher.JumiBootstrap;
-import org.junit.Test;
 
 public class JumiSuite {
 
-    @Test
-    public void all_tests() throws Exception {
+    public static void main(String[] args) throws Exception {
         JumiBootstrap bootstrap = new JumiBootstrap();
         bootstrap.suite
                 .addJvmOptions("-ea")
