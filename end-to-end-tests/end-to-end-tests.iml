@@ -15,6 +15,7 @@
       <excludeFolder url="file://$MODULE_DIR$/target/failsafe-reports" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/project-artifacts" />
+      <excludeFolder url="file://$MODULE_DIR$/target/retrolambda" />
       <excludeFolder url="file://$MODULE_DIR$/target/sandbox" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/tmp" />

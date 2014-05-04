@@ -238,12 +238,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.orfjackal.retrolambda</groupId>
-                <artifactId>retrolambda</artifactId>
-                <version>1.1.2</version>
-            </dependency>
-
-            <dependency>
                 <groupId>fi.luontola.buildtest</groupId>
                 <artifactId>buildtest</artifactId>
                 <version>1.0.0</version>
@@ -372,25 +366,14 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <groupId>net.orfjackal.retrolambda</groupId>
+                <artifactId>retrolambda-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-retrolambda</id>
-                        <phase>process-classes</phase>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>process-main</goal>
+                            <goal>process-test</goal>
                         </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>net.orfjackal.retrolambda</groupId>
-                                    <artifactId>retrolambda</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                    <destFileName>retrolambda.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -398,47 +381,6 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
-
-                    <!-- Process our byte codes to make them run on Java 7 -->
-
-                    <execution>
-                        <id>retrolambda-classes</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <property name="compile_classpath" refid="maven.compile.classpath"/>
-                                <exec executable="${env.JAVA8_HOME}/bin/java" failonerror="true">
-                                    <arg value="-Dretrolambda.inputDir=${project.build.outputDirectory}"/>
-                                    <arg value="-Dretrolambda.classpath=${compile_classpath}"/>
-                                    <arg value="-javaagent:${project.build.directory}/retrolambda.jar"/>
-                                    <arg value="-jar"/>
-                                    <arg value="${project.build.directory}/retrolambda.jar"/>
-                                </exec>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>retrolambda-test-classes</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <property name="test_classpath" refid="maven.test.classpath"/>
-                                <exec executable="${env.JAVA8_HOME}/bin/java" failonerror="true">
-                                    <arg value="-Dretrolambda.inputDir=${project.build.testOutputDirectory}"/>
-                                    <arg value="-Dretrolambda.classpath=${test_classpath}"/>
-                                    <arg value="-javaagent:${project.build.directory}/retrolambda.jar"/>
-                                    <arg value="-jar"/>
-                                    <arg value="${project.build.directory}/retrolambda.jar"/>
-                                </exec>
-                            </target>
-                        </configuration>
-                    </execution>
 
                     <!-- Create custom temporary directory. Our tests use memory-mapped files which the tests
                          cannot remove themselves (the OS may keep them locked until the process dies) -->
@@ -488,6 +430,16 @@
                     <configuration>
                         <source>1.7</source>
                         <target>1.7</target>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>net.orfjackal.retrolambda</groupId>
+                    <artifactId>retrolambda-maven-plugin</artifactId>
+                    <version>1.2.1</version>
+                    <configuration>
+                        <target>1.7</target>
+                        <java8home>${env.JAVA8_HOME}</java8home>
                     </configuration>
                 </plugin>
 
