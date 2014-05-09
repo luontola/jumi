@@ -366,6 +366,7 @@
             </plugin>
 
             <plugin>
+                <!-- TODO: Java 8, remove me -->
                 <groupId>net.orfjackal.retrolambda</groupId>
                 <artifactId>retrolambda-maven-plugin</artifactId>
                 <executions>
@@ -434,6 +435,7 @@
                 </plugin>
 
                 <plugin>
+                    <!-- TODO: Java 8, remove me -->
                     <groupId>net.orfjackal.retrolambda</groupId>
                     <artifactId>retrolambda-maven-plugin</artifactId>
                     <version>1.2.1</version>
@@ -473,6 +475,7 @@
                     <version>2.9.1</version>
                     <configuration>
                         <!-- Generate external links to Java 7 API instead of Java 8 API (due to Retrolambda use) -->
+                        <!-- TODO: Java 8, remove me -->
                         <javadocVersion>1.7</javadocVersion>
                     </configuration>
                 </plugin>

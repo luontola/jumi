@@ -315,6 +315,13 @@ OK - Eclipse's JUnit integration adds to classpath entries that are not valid fi
 	>	(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
 
 - misc refactoring (choose some, defer others)
+	- upgrade to Java 8
+		- check that most developers have upgraded to Java 8, or wait for Java 7 end-of-life (April 2015, as estimated as of May 2014)
+		- search the code for "Java 8" TODO comments and upgrade those to use Java 8 APIs
+		- look for other places that could benefit
+			- for loops -> Stream
+			- StringBuilder usage -> StringJoiner
+		- update documentation of Jumi and dependent projects to reflect the new minimum requirement
 	- PIT shows incorrect coverage for TestId; stopped working near commit cccff66d4541a0811509a3dadf41084abca278a4, after upgrading to JDK 8
 	- prepend TestFile as context information to the message in fi.jumi.core.runs.RunEventNormalizer#onInternalError?
 	- create a custom taglet (as independent project) for cross-references from public API's javadocs to tests: e.g. {@ref com.example.FooTest#someTestName}
