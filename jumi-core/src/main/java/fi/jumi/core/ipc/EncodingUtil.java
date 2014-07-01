@@ -15,7 +15,7 @@ public abstract class EncodingUtil {
 
     protected final IpcBuffer buffer;
 
-    protected EncodingUtil(IpcBuffer buffer) {
+    public EncodingUtil(IpcBuffer buffer) {
         this.buffer = buffer;
     }
 
@@ -31,13 +31,12 @@ public abstract class EncodingUtil {
 
     // URI
 
-    protected void writeUriList(List<URI> uris) {
+    protected void writeUris(List<URI> uris) {
         writeList(uris, this::writeUri);
     }
 
-    protected URI[] readUriList() {
-        List<URI> uris = readList(this::readUri);
-        return uris.toArray(new URI[uris.size()]);
+    protected URI[] readUris() {
+        return readArray(this::readUri, URI[]::new);
     }
 
     protected void writeUri(URI uri) {
@@ -54,13 +53,12 @@ public abstract class EncodingUtil {
 
     // String
 
-    protected void writeStringList(List<String> strings) {
+    protected void writeStrings(List<String> strings) {
         writeList(strings, this::writeString);
     }
 
-    protected String[] readStringList() {
-        List<String> list = readList(this::readString);
-        return list.toArray(new String[list.size()]);
+    protected String[] readStrings() {
+        return readArray(this::readString, String[]::new);
     }
 
     protected String readString() {
@@ -79,25 +77,17 @@ public abstract class EncodingUtil {
         StringEncoding.writeNullableString(buffer, s);
     }
 
-    // List
+    // Collections
+
+    protected <T> void writeArray(T[] values, WriteOp<T> op) {
+        writeList(Arrays.asList(values), op);
+    }
 
     protected <T> void writeList(List<T> values, WriteOp<T> op) {
         buffer.writeInt(values.size());
         for (T value : values) {
             op.write(value);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> List<T> readList(ReadOp<T> op) {
-        ArrayFactory<Object> array = Object[]::new;
-        return Arrays.asList(readArray(op, (ArrayFactory<T>) array));
-    }
-
-    // arrays
-
-    protected <T> void writeArray(T[] values, WriteOp<T> op) {
-        writeList(Arrays.asList(values), op);
     }
 
     protected <T> T[] readArray(ReadOp<T> op, ArrayFactory<T> array) {

@@ -68,10 +68,10 @@ public class CommandListenerEncoding extends EncodingUtil implements CommandList
             }
             switch (name) {
                 case classpath:
-                    config.setClasspath(readUriList());
+                    config.setClasspath(readUris());
                     break;
                 case jvmOptions:
-                    config.setJvmOptions(readStringList());
+                    config.setJvmOptions(readStrings());
                     break;
                 case workingDirectory:
                     config.setWorkingDirectory(readUri());
@@ -96,10 +96,10 @@ public class CommandListenerEncoding extends EncodingUtil implements CommandList
         writeEventType(runTests);
 
         writeString(classpath);
-        writeUriList(config.getClasspath());
+        writeUris(config.getClasspath());
 
         writeString(jvmOptions);
-        writeStringList(config.getJvmOptions());
+        writeStrings(config.getJvmOptions());
 
         writeString(workingDirectory);
         writeUri(config.getWorkingDirectory());
