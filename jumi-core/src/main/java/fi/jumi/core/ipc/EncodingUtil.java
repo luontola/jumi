@@ -94,14 +94,44 @@ public abstract class EncodingUtil {
 
     protected <T> List<T> readList(ReadOp<T> op) {
         int size = buffer.readInt();
-        List<T> strings = new ArrayList<>(size);
+        List<T> values = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            strings.add(op.read());
+            values.add(op.read());
         }
-        return strings;
+        return values;
     }
 
     protected interface ReadOp<T> {
         T read();
+    }
+
+    // arrays
+
+    protected <T> void writeArray(T[] values, WriteOp<T> op) {
+        writeList(Arrays.asList(values), op);
+    }
+
+    protected <T> T[] readArray(ReadOp<T> readStackTraceElement, ArrayFactory<T> array) {
+        List<T> values = readList(readStackTraceElement);
+        return values.toArray(array.create(values.size()));
+    }
+
+    protected interface ArrayFactory<T> {
+        T[] create(int length);
+    }
+
+    protected void writeIntArray(int[] values) {
+        buffer.writeInt(values.length);
+        for (int value : values) {
+            buffer.writeInt(value);
+        }
+    }
+
+    protected int[] readIntArray() {
+        int[] values = new int[buffer.readInt()];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = buffer.readInt();
+        }
+        return values;
     }
 }

@@ -194,43 +194,44 @@ public class SuiteListenerEncoding extends EncodingUtil implements SuiteListener
 
     // TestFile
 
-    private TestFile readTestFile() {
-        return TestFile.fromPath(Paths.get(readString()));
-    }
-
     private void writeTestFile(TestFile testFile) {
         writeString(testFile.getPath());
     }
 
-    // TestId
-
-    private TestId readTestId() {
-        int[] path = new int[buffer.readInt()];
-        for (int i = 0; i < path.length; i++) {
-            path[i] = buffer.readInt();
-        }
-        return TestId.of(path);
+    private TestFile readTestFile() {
+        return TestFile.fromPath(Paths.get(readString()));
     }
 
+    // TestId
+
     private void writeTestId(TestId testId) {
-        int[] path = testId.getPath();
-        buffer.writeInt(path.length);
-        for (Integer index : path) {
-            buffer.writeInt(index);
-        }
+        writeIntArray(testId.getPath());
+    }
+
+    private TestId readTestId() {
+        return TestId.of(readIntArray());
     }
 
     // RunId
-
-    private RunId readRunId() {
-        return new RunId(buffer.readInt());
-    }
 
     private void writeRunId(RunId runId) {
         buffer.writeInt(runId.toInt());
     }
 
+    private RunId readRunId() {
+        return new RunId(buffer.readInt());
+    }
+
     // StackTrace
+
+    void writeStackTrace(StackTrace stackTrace) {
+        writeString(stackTrace.getExceptionClass());
+        writeString(stackTrace.toString());
+        writeNullableString(stackTrace.getMessage());
+        writeStackTraceElements(stackTrace.getStackTrace());
+        writeOptionalException(stackTrace.getCause());
+        writeExceptions(stackTrace.getSuppressed());
+    }
 
     StackTrace readStackTrace() {
         return new StackTrace.Builder()
@@ -239,58 +240,57 @@ public class SuiteListenerEncoding extends EncodingUtil implements SuiteListener
                 .setMessage(readNullableString())
                 .setStackTrace(readStackTraceElements())
                 .setCause(readOptionalException())
-                .setSuppressed(readManyExceptions())
+                .setSuppressed(readExceptions())
                 .build();
     }
 
-    void writeStackTrace(StackTrace stackTrace) {
-        writeString(stackTrace.getExceptionClass());
-        writeString(stackTrace.toString());
-        writeNullableString(stackTrace.getMessage());
-        writeStackTraceElements(stackTrace.getStackTrace());
-        writeOptionalException(stackTrace.getCause());
-        writeManyExceptions(stackTrace.getSuppressed());
+    private void writeStackTraceElements(StackTraceElement[] elements) {
+        writeArray(elements, this::writeStackTraceElement);
     }
 
     private StackTraceElement[] readStackTraceElements() {
-        StackTraceElement[] elements = new StackTraceElement[buffer.readInt()];
-        for (int i = 0; i < elements.length; i++) {
-            elements[i] = new StackTraceElement(readString(), readString(), readString(), buffer.readInt());
-        }
-        return elements;
+        return readArray(this::readStackTraceElement, StackTraceElement[]::new);
     }
 
-    private void writeStackTraceElements(StackTraceElement[] elements) {
-        buffer.writeInt(elements.length);
-        for (StackTraceElement element : elements) {
-            writeString(element.getClassName());
-            writeString(element.getMethodName());
-            writeString(element.getFileName());
-            buffer.writeInt(element.getLineNumber());
-        }
+    private void writeStackTraceElement(StackTraceElement element) {
+        writeString(element.getClassName());
+        writeString(element.getMethodName());
+        writeString(element.getFileName());
+        buffer.writeInt(element.getLineNumber());
+    }
+
+    private StackTraceElement readStackTraceElement() {
+        String className = readString();
+        String methodName = readString();
+        String fileName = readString();
+        int lineNumber = buffer.readInt();
+        return new StackTraceElement(className, methodName, fileName, lineNumber);
+    }
+
+    // Throwable (assumed to be StackTrace at runtime)
+
+    private void writeOptionalException(Throwable exception) {
+        writeExceptions(exception == null ? new Throwable[0] : new Throwable[]{exception});
     }
 
     private Throwable readOptionalException() {
-        Throwable[] exceptions = readManyExceptions();
+        Throwable[] exceptions = readExceptions();
         return exceptions.length == 0 ? null : exceptions[0];
     }
 
-    private void writeOptionalException(Throwable exception) {
-        writeManyExceptions(exception == null ? new Throwable[0] : new Throwable[]{exception});
+    private void writeExceptions(Throwable[] exceptions) {
+        writeArray(exceptions, this::writeException);
     }
 
-    private Throwable[] readManyExceptions() {
-        Throwable[] exceptions = new Throwable[buffer.readInt()];
-        for (int i = 0; i < exceptions.length; i++) {
-            exceptions[i] = readStackTrace();
-        }
-        return exceptions;
+    private Throwable[] readExceptions() {
+        return readArray(this::readException, Throwable[]::new);
     }
 
-    private void writeManyExceptions(Throwable[] exceptions) {
-        buffer.writeInt(exceptions.length);
-        for (Throwable exception : exceptions) {
-            writeStackTrace((StackTrace) exception);
-        }
+    private void writeException(Throwable exception) {
+        writeStackTrace((StackTrace) exception);
+    }
+
+    private Throwable readException() {
+        return readStackTrace();
     }
 }
