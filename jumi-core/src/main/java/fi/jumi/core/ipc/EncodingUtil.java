@@ -79,27 +79,23 @@ public abstract class EncodingUtil {
 
     // Collections
 
-    protected <T> void writeArray(T[] values, WriteOp<T> op) {
-        writeList(Arrays.asList(values), op);
+    protected <T> void writeArray(T[] values, WriteOp<T> writer) {
+        writeList(Arrays.asList(values), writer);
     }
 
-    protected <T> void writeList(List<T> values, WriteOp<T> op) {
+    protected <T> void writeList(List<T> values, WriteOp<T> writer) {
         buffer.writeInt(values.size());
         for (T value : values) {
-            op.write(value);
+            writer.write(value);
         }
     }
 
-    protected <T> T[] readArray(ReadOp<T> op, ArrayFactory<T> array) {
-        T[] values = array.create(buffer.readInt());
+    protected <T> T[] readArray(ReadOp<T> reader, ArrayFactory<T> arrayFactory) {
+        T[] values = arrayFactory.create(buffer.readInt());
         for (int i = 0; i < values.length; i++) {
-            values[i] = op.read();
+            values[i] = reader.read();
         }
         return values;
-    }
-
-    protected interface ArrayFactory<T> {
-        T[] create(int length);
     }
 
     protected void writeIntArray(int[] values) {
@@ -123,5 +119,9 @@ public abstract class EncodingUtil {
 
     protected interface ReadOp<T> {
         T read();
+    }
+
+    protected interface ArrayFactory<T> {
+        T[] create(int length);
     }
 }
