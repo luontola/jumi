@@ -88,21 +88,10 @@ public abstract class EncodingUtil {
         }
     }
 
-    protected interface WriteOp<T> {
-        void write(T value);
-    }
-
+    @SuppressWarnings("unchecked")
     protected <T> List<T> readList(ReadOp<T> op) {
-        int size = buffer.readInt();
-        List<T> values = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            values.add(op.read());
-        }
-        return values;
-    }
-
-    protected interface ReadOp<T> {
-        T read();
+        ArrayFactory<Object> array = Object[]::new;
+        return Arrays.asList(readArray(op, (ArrayFactory<T>) array));
     }
 
     // arrays
@@ -111,9 +100,12 @@ public abstract class EncodingUtil {
         writeList(Arrays.asList(values), op);
     }
 
-    protected <T> T[] readArray(ReadOp<T> readStackTraceElement, ArrayFactory<T> array) {
-        List<T> values = readList(readStackTraceElement);
-        return values.toArray(array.create(values.size()));
+    protected <T> T[] readArray(ReadOp<T> op, ArrayFactory<T> array) {
+        T[] values = array.create(buffer.readInt());
+        for (int i = 0; i < values.length; i++) {
+            values[i] = op.read();
+        }
+        return values;
     }
 
     protected interface ArrayFactory<T> {
@@ -133,5 +125,13 @@ public abstract class EncodingUtil {
             values[i] = buffer.readInt();
         }
         return values;
+    }
+
+    protected interface WriteOp<T> {
+        void write(T value);
+    }
+
+    protected interface ReadOp<T> {
+        T read();
     }
 }

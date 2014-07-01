@@ -174,8 +174,8 @@ OK - refactor BuildTest & SuiteConfiguration
 		!! - make the daemon poll receive commands from daemon dir
 			!! - create CommandListenerEncoding
 				OK - example usage & serializing all events
-				!! - remove duplication: CommandListenerEncoding & SuiteListenerEncoding
-				- remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
+				OK - remove duplication: CommandListenerEncoding & SuiteListenerEncoding
+				!! - remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
 			- make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
 				- create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
 				- read commands from every new command file (daemon-dir/commands/*/request)
