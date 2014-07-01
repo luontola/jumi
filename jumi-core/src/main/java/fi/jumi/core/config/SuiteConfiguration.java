@@ -1,10 +1,11 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.config;
 
 import fi.jumi.core.util.*;
+import org.apache.commons.lang3.builder.*;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
@@ -44,6 +45,15 @@ public class SuiteConfiguration implements Serializable {
         return new SuiteConfigurationBuilder(this);
     }
 
+    @Override
+    public boolean equals(Object that) {
+        return EqualsBuilder.reflectionEquals(this, that);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 
     // factory methods
 

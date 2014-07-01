@@ -100,7 +100,7 @@ public class SuiteListenerEncoding extends EncodingUtil implements SuiteListener
         }
     }
 
-    // serializing events
+    // encoding events
 
     @Override
     public void onSuiteStarted() {

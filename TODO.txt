@@ -173,8 +173,8 @@ OK - refactor BuildTest & SuiteConfiguration
 				OK - remove the setDaemonDir spike code ProcessStartingDaemonSummoner#connectToDaemon
 		!! - make the daemon poll receive commands from daemon dir
 			!! - create CommandListenerEncoding
-				!! - example usage & serializing all events
-				- remove duplication: CommandListenerEncoding & SuiteListenerEncoding
+				OK - example usage & serializing all events
+				!! - remove duplication: CommandListenerEncoding & SuiteListenerEncoding
 				- remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
 			- make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
 				- create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
