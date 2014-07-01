@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -13,7 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.file.Paths;
 
 @NotThreadSafe
-public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<SuiteListener> {
+public class SuiteListenerEncoding extends EncodingUtil implements SuiteListener, MessageEncoding<SuiteListener> {
 
     private static final byte onSuiteStarted = 1;
     private static final byte onInternalError = 2;
@@ -30,10 +30,8 @@ public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<Sui
     private static final byte onTestFileFinished = 13;
     private static final byte onSuiteFinished = 14;
 
-    private final IpcBuffer buffer;
-
     public SuiteListenerEncoding(IpcBuffer buffer) {
-        this.buffer = buffer;
+        super(buffer);
     }
 
     @Override
@@ -194,16 +192,6 @@ public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<Sui
     }
 
 
-    // event type
-
-    private byte readEventType() {
-        return buffer.readByte();
-    }
-
-    private void writeEventType(byte type) {
-        buffer.writeByte(type);
-    }
-
     // TestFile
 
     private TestFile readTestFile() {
@@ -304,23 +292,5 @@ public class SuiteListenerEncoding implements SuiteListener, MessageEncoding<Sui
         for (Throwable exception : exceptions) {
             writeStackTrace((StackTrace) exception);
         }
-    }
-
-    // String
-
-    private String readString() {
-        return StringEncoding.readString(buffer);
-    }
-
-    private void writeString(String s) {
-        StringEncoding.writeString(buffer, s);
-    }
-
-    private String readNullableString() {
-        return StringEncoding.readNullableString(buffer);
-    }
-
-    private void writeNullableString(String s) {
-        StringEncoding.writeNullableString(buffer, s);
     }
 }
