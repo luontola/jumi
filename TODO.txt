@@ -172,11 +172,11 @@ OK - refactor BuildTest & SuiteConfiguration
 			OK - ProcessStartingDaemonSummoner: get the daemon dir from Steward, tell it to daemon
 				OK - remove the setDaemonDir spike code ProcessStartingDaemonSummoner#connectToDaemon
 		!! - make the daemon poll receive commands from daemon dir
-			!! - create CommandListenerEncoding
+			OK - create CommandListenerEncoding
 				OK - example usage & serializing all events
 				OK - remove duplication: CommandListenerEncoding & SuiteListenerEncoding
-				!! - remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
-			- make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
+				OK - remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
+			!! - make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
 				- create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
 				- read commands from every new command file (daemon-dir/commands/*/request)
 				- read commands until IPC channel closed (though typically only one command per file)

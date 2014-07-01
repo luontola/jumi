@@ -1,59 +1,27 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.ipc;
 
-import fi.jumi.actors.eventizers.Event;
-import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
-import fi.jumi.core.events.SuiteListenerEventizer;
-import fi.jumi.core.ipc.buffer.IpcBuffer;
-import fi.jumi.core.util.SpyListener;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import static fi.jumi.core.util.EqualityMatchers.deepEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
-public class SuiteListenerEncodingTest {
+public class SuiteListenerEncodingTest extends EncodingContract<SuiteListener> {
 
-    @Test
-    public void encodes_and_decodes_all_events() {
-        SpyListener<SuiteListener> spy = new SpyListener<>(SuiteListener.class);
-        exampleUsage(spy.getListener());
-        spy.replay();
-        IpcBuffer buffer = TestUtil.newIpcBuffer();
-
-        // encode
-        IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-        protocol.start();
-        exampleUsage(sendTo(protocol));
-        protocol.close();
-
-        // decode
-        buffer.position(0);
-        TestUtil.decodeAll(protocol, spy.getListener());
-
-        spy.verify();
+    public SuiteListenerEncodingTest() {
+        super(SuiteListenerEncoding::new);
     }
 
-    @Test
-    public void example_usage_invokes_every_method_in_the_interface() {
-        SuiteListenerSpy spy = new SuiteListenerSpy();
-
-        exampleUsage(spy);
-
-        for (Method method : SuiteListener.class.getMethods()) {
-            assertThat("invoked methods", spy.methodInvocations.keySet(), hasItem(method));
-        }
-    }
-
-    private static void exampleUsage(SuiteListener listener) {
+    @Override
+    protected void exampleUsage(SuiteListener listener) {
         TestFile testFile = TestFile.fromClassName("com.example.SampleTest");
         RunId runId = new RunId(1);
 
@@ -116,20 +84,9 @@ public class SuiteListenerEncodingTest {
         assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
     }
 
-
-    // helpers
-
     private static StackTrace roundTripStackTrace(StackTrace original) {
         return TestUtil.serializeAndDeserialize(original,
                 (buffer, data) -> new SuiteListenerEncoding(buffer).writeStackTrace(data),
                 (buffer) -> new SuiteListenerEncoding(buffer).readStackTrace());
-    }
-
-    private static IpcProtocol<SuiteListener> newIpcProtocol(IpcBuffer buffer) {
-        return new IpcProtocol<>(buffer, SuiteListenerEncoding::new);
-    }
-
-    private static SuiteListener sendTo(MessageSender<Event<SuiteListener>> target) {
-        return new SuiteListenerEventizer().newFrontend(target);
     }
 }
