@@ -17,7 +17,7 @@ import java.util.concurrent.*;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class DirectoryObserverTest {
 
@@ -116,11 +116,11 @@ public class DirectoryObserverTest {
         return taken;
     }
 
-    private Matcher<Iterable<Path>> containsFiles(String... filenames) {
-        ArrayList<Path> expected = new ArrayList<>();
-        for (String filename : filenames) {
-            expected.add(directory.resolve(filename));
+    private Matcher<Iterable<? extends Path>> containsFiles(String... filenames) {
+        Path[] expected = new Path[filenames.length];
+        for (int i = 0; i < filenames.length; i++) {
+            expected[i] = directory.resolve(filenames[i]);
         }
-        return is((Iterable<Path>) expected);
+        return containsInAnyOrder(expected);
     }
 }
