@@ -30,8 +30,13 @@ public class DirectoryObserver implements Runnable {
 
             handleAllFiles();
 
-            while (!Thread.interrupted()) {
-                WatchKey key = watcher.take();
+            while (true) {
+                WatchKey key;
+                try {
+                    key = watcher.take();
+                } catch (InterruptedException e) {
+                    break;
+                }
                 for (WatchEvent<?> event : key.pollEvents()) {
                     if (event.kind() == OVERFLOW) {
                         handleAllFiles();
@@ -46,8 +51,6 @@ public class DirectoryObserver implements Runnable {
                 }
             }
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         } catch (Throwable t) {
             throw new RuntimeException("Error in watching directory " + directory, t);
         }
