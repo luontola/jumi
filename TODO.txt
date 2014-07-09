@@ -176,15 +176,15 @@ OK - refactor BuildTest & SuiteConfiguration
 				OK - example usage & serializing all events
 				OK - remove duplication: CommandListenerEncoding & SuiteListenerEncoding
 				OK - remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
-			!! - make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
-				!! - create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
-					OK - new packages:
-						ipc.encoding (*Encoding)
-						ipc.channel/protocol (IpcChannel, IpcProtocol, IpcReader, IpcWriter, PollResult, *WaitStrategy)
-						ipc.api (CommandListener)
-						ipc.watcher/monitor/endpoint/coordinator/supervisor or just the top-level ipc package
-				- read commands from every new command file (daemon-dir/commands/*/request)
+			OK - new packages:
+				ipc.encoding (*Encoding)
+				ipc.channel/protocol (IpcChannel, IpcProtocol, IpcReader, IpcWriter, PollResult, *WaitStrategy)
+				ipc.api (CommandListener)
+				ipc.watcher/monitor/endpoint/coordinator/supervisor or just the top-level ipc package
+			!! - make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*), create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
+				!! - util for noticing new files
 					http://docs.oracle.com/javase/tutorial/essential/io/notification.html
+				- read commands from every new command file (daemon-dir/commands/*/request)
 				- read commands until IPC channel closed (though typically only one command per file)
 				- write result to a corresponding file (daemon-dir/commands/*/reply)
 					- include the suite results file path in the reply (daemon-dir/suites/*/suite)
