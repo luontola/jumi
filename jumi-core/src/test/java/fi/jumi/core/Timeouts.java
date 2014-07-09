@@ -8,7 +8,7 @@ import org.junit.rules.Timeout;
 
 public class Timeouts {
 
-    public static final int TIMEOUT = 5000;
+    public static final int TIMEOUT = 1000;
 
     public static Timeout forUnitTest() {
         return new Timeout(TIMEOUT);
