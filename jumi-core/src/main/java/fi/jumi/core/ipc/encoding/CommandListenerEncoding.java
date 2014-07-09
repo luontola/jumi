@@ -2,12 +2,12 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.ipc;
+package fi.jumi.core.ipc.encoding;
 
 
 import fi.jumi.actors.eventizers.Event;
-import fi.jumi.core.CommandListener;
 import fi.jumi.core.config.*;
+import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.buffer.IpcBuffer;
 
 import javax.annotation.concurrent.NotThreadSafe;

@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,10 +8,10 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.eventizers.dynamic.DynamicEventizer;
 import fi.jumi.actors.queue.*;
-import fi.jumi.core.CommandListener;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.suiteListener.*;
+import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.network.*;
 import fi.jumi.core.util.timeout.InitialMessageTimeout;
 import fi.jumi.launcher.daemon.Steward;

@@ -1,18 +1,19 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.ipc;
+package fi.jumi.core.ipc.channel;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.core.ipc.buffer.IpcBuffer;
+import fi.jumi.core.ipc.encoding.MessageEncoding;
 import fi.jumi.core.util.MemoryBarrier;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static fi.jumi.core.ipc.StringEncoding.*;
+import static fi.jumi.core.ipc.encoding.StringEncoding.*;
 
 @NotThreadSafe
 public class IpcProtocol<T> implements IpcReader<T>, IpcWriter<T> {

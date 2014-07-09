@@ -2,10 +2,11 @@
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
-package fi.jumi.core.ipc;
+package fi.jumi.core.ipc.encoding;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
+import fi.jumi.core.ipc.TestUtil;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -178,7 +178,7 @@ OK - refactor BuildTest & SuiteConfiguration
 				OK - remove duplication: CommandListenerEncodingTest & SuiteListenerEncodingTest
 			!! - make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*)
 				!! - create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
-					- new packages:
+					OK - new packages:
 						ipc.encoding (*Encoding)
 						ipc.channel/protocol (IpcChannel, IpcProtocol, IpcReader, IpcWriter, PollResult, *WaitStrategy)
 						ipc.api (CommandListener)
