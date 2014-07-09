@@ -11,6 +11,8 @@ import org.junit.runners.model.Statement;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static org.junit.Assert.assertTrue;
+
 public class TestingExecutor extends ThreadPoolExecutor implements TestRule {
 
     private final List<Throwable> uncaughtExceptions = Collections.synchronizedList(new ArrayList<>());
@@ -40,10 +42,11 @@ public class TestingExecutor extends ThreadPoolExecutor implements TestRule {
                 } finally {
                     shutdownNow();
                 }
-                awaitTermination(1000, TimeUnit.MILLISECONDS);
+                boolean terminated = awaitTermination(1000, TimeUnit.MILLISECONDS);
                 for (Throwable uncaughtException : uncaughtExceptions) {
                     throw uncaughtException;
                 }
+                assertTrue("Executor did not terminate properly", terminated);
             }
         };
     }
