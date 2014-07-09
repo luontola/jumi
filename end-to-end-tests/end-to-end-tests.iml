@@ -30,7 +30,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty:3.5.5.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.commons:commons-lang3:3.3.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:3.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: cglib:cglib-nodep:2.2.2" level="project" />
     <orderEntry type="module" module-name="jumi-core" scope="TEST" production-on-test="" />
     <orderEntry type="library" scope="TEST" name="Maven: fi.jumi:jumi-core:test-jar:tests:0.5-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: junit:junit:4.11" level="project" />
