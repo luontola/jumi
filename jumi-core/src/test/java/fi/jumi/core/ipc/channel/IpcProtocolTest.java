@@ -6,6 +6,7 @@ package fi.jumi.core.ipc.channel;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
+import fi.jumi.core.Timeouts;
 import fi.jumi.core.api.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.ipc.TestUtil;
@@ -26,16 +27,16 @@ import static org.mockito.Mockito.mock;
 
 public class IpcProtocolTest {
 
-    private static final int TIMEOUT = 5000;
-
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
 
+    @Rule
+    public final Timeout timeout = Timeouts.forUnitTest();
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void test_concurrent_producer_and_consumer() throws Exception {
         Path mmf = tempDir.getRoot().toPath().resolve("mmf");
         SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
@@ -75,7 +76,7 @@ public class IpcProtocolTest {
         }
     }
 
-    @Test(timeout = TIMEOUT)
+    @Test
     public void producer_will_always_decide_segment_size_except_for_the_first_segment() throws Exception {
         Path mmf = tempDir.getRoot().toPath().resolve("mmf");
         SpyListener<SuiteListener> expectations = new SpyListener<>(SuiteListener.class);
