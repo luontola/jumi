@@ -90,6 +90,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.thewonggei</groupId>
+            <artifactId>regex-tester</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Annotations -->
 
         <dependency>
@@ -233,6 +239,18 @@
             </dependency>
 
             <dependency>
+                <groupId>com.thewonggei</groupId>
+                <artifactId>regex-tester</artifactId>
+                <version>0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-all</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.caliper</groupId>
                 <artifactId>caliper</artifactId>
                 <version>1.0-beta-1</version>
@@ -329,6 +347,22 @@
                                 <requireEnvironmentVariable>
                                     <variableName>JAVA8_HOME</variableName>
                                 </requireEnvironmentVariable>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-no-hamcrest-all</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <!-- We prefer the fine-grained artifacts -->
+                                        <exclude>org.hamcrest:hamcrest-all</exclude>
+                                    </excludes>
+                                </bannedDependencies>
                             </rules>
                         </configuration>
                     </execution>
