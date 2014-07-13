@@ -184,8 +184,9 @@ OK - refactor BuildTest & SuiteConfiguration
 			!! - make the daemon monitor the daemon dir for new command MMFs (daemon-dir/commands/*), create IpcCommandMonitor as replacement for DaemonNetworkEndpoint
 				OK - util for noticing new files
 					http://docs.oracle.com/javase/tutorial/essential/io/notification.html
-				!! - read commands from every new command file (daemon-dir/commands/*/request)
-				- read commands until IPC channel closed (though typically only one command per file)
+				OK - read commands from every new command file (daemon-dir/commands/*/request)
+				OK - read commands until IPC channel closed (though typically only one command per file)
+				!! - something to manage the daemon dir, e.g. creating command dirs
 				- write result to a corresponding file (daemon-dir/commands/*/reply)
 					- include the suite results file path in the reply (daemon-dir/suites/*/suite)
 					- write suite results to a MMF

@@ -9,7 +9,7 @@ import fi.jumi.actors.eventizers.dynamic.DynamicEventizer;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.ipc.TestUtil;
 import fi.jumi.core.ipc.buffer.IpcBuffer;
-import fi.jumi.core.ipc.channel.IpcProtocol;
+import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.util.*;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public abstract class EncodingContract<T> {
 
         // decode
         buffer.position(0);
-        TestUtil.decodeAll(protocol, spy.getListener());
+        IpcReaders.decodeAll(protocol, spy.getListener());
 
         spy.verify();
     }

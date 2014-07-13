@@ -50,7 +50,7 @@ public class IpcProtocolTest {
         };
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(mmf, SuiteListenerEncoding::new);
-            TestUtil.decodeAll(reader, expectations.getListener());
+            IpcReaders.decodeAll(reader, expectations.getListener());
         };
         runConcurrently(producer, consumer);
 
@@ -90,7 +90,7 @@ public class IpcProtocolTest {
         };
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(new FileSegmenter(mmf, 2, 2), SuiteListenerEncoding::new);
-            TestUtil.decodeAll(reader, expectations.getListener());
+            IpcReaders.decodeAll(reader, expectations.getListener());
         };
         runConcurrently(producer, consumer);
 
@@ -183,7 +183,7 @@ public class IpcProtocolTest {
     private static void tryToDecode(IpcBuffer buffer) {
         buffer.position(0);
         IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-        TestUtil.decodeAll(protocol, mock(SuiteListener.class));
+        IpcReaders.decodeAll(protocol, mock(SuiteListener.class));
     }
 
     private static IpcProtocol<SuiteListener> newIpcProtocol(IpcBuffer buffer) {
