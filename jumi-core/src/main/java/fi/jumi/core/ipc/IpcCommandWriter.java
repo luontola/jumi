@@ -7,11 +7,11 @@ package fi.jumi.core.ipc;
 import fi.jumi.core.events.CommandListenerEventizer;
 import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.channel.*;
+import fi.jumi.core.ipc.dirs.CommandDir;
 import fi.jumi.core.ipc.encoding.CommandListenerEncoding;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
-import java.nio.file.Path;
 
 @NotThreadSafe
 public class IpcCommandWriter implements Closeable {
@@ -19,9 +19,8 @@ public class IpcCommandWriter implements Closeable {
     private final IpcWriter<CommandListener> writer;
     private final CommandListener target;
 
-    public IpcCommandWriter(Path dir) {
-        Path request = dir.resolve("request");
-        writer = IpcChannel.writer(request, CommandListenerEncoding::new);
+    public IpcCommandWriter(CommandDir dir) {
+        writer = IpcChannel.writer(dir.getRequestPath(), CommandListenerEncoding::new);
         target = new CommandListenerEventizer().newFrontend(writer);
     }
 

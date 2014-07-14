@@ -6,11 +6,11 @@ package fi.jumi.core.ipc;
 
 import fi.jumi.core.config.*;
 import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.dirs.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import static org.mockito.Mockito.*;
 
@@ -22,9 +22,10 @@ public class IpcCommandReadingAndWritingTest {
     @Test
     public void receives_commands() throws IOException {
         CommandListener listener = mock(CommandListener.class);
-        Path workdir = tempDir.newFolder("workdir").toPath();
-        IpcCommandReader receiver = new IpcCommandReader(workdir, listener);
-        IpcCommandWriter sender = new IpcCommandWriter(workdir);
+        DaemonDir daemonDir = new DaemonDir(tempDir.newFolder("daemonDir").toPath());
+        CommandDir commandDir = daemonDir.createCommandDir();
+        IpcCommandReader receiver = new IpcCommandReader(commandDir, listener);
+        IpcCommandWriter sender = new IpcCommandWriter(commandDir);
         SuiteConfiguration suiteConfiguration = new SuiteConfigurationBuilder()
                 .addJvmOptions("-some-options")
                 .freeze();

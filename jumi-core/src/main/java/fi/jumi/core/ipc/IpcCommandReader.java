@@ -6,10 +6,10 @@ package fi.jumi.core.ipc;
 
 import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.channel.*;
+import fi.jumi.core.ipc.dirs.CommandDir;
 import fi.jumi.core.ipc.encoding.CommandListenerEncoding;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.nio.file.Path;
 
 @NotThreadSafe
 public class IpcCommandReader {
@@ -17,10 +17,9 @@ public class IpcCommandReader {
     private final IpcReader<CommandListener> reader;
     private final CommandListener target;
 
-    public IpcCommandReader(Path dir, CommandListener target) {
+    public IpcCommandReader(CommandDir dir, CommandListener target) {
         this.target = target;
-        Path request = dir.resolve("request");
-        reader = IpcChannel.reader(request, CommandListenerEncoding::new);
+        this.reader = IpcChannel.reader(dir.getRequestPath(), CommandListenerEncoding::new);
     }
 
     public void run() {
