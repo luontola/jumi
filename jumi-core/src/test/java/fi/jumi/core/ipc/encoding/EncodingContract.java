@@ -14,6 +14,7 @@ import fi.jumi.core.util.*;
 import org.junit.Test;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -67,6 +68,46 @@ public abstract class EncodingContract<T> {
     }
 
     protected abstract void exampleUsage(T listener) throws Exception;
+
+    private static final Map<Class<?>, MessageEncoding<?>> encodingsByType = new HashMap<>();
+
+    @Test
+    public void the_interface_name_and_version_combination_is_unique() {
+        MessageEncoding<T> actual = encodingFactory.create(null);
+
+        for (MessageEncoding<?> other : encodingsByType.values()) {
+            if (actual.getInterfaceName().equals(other.getInterfaceName()) &&
+                    actual.getInterfaceVersion() == other.getInterfaceVersion()) {
+                throw new AssertionError(actual.getClass().getName()
+                        + " had the same interface name and version as " + other.getClass().getName()
+                        + ": " + actual.getInterfaceName() + " v" + actual.getInterfaceVersion());
+            }
+        }
+
+        encodingsByType.put(actual.getClass(), actual);
+    }
+
+    /**
+     * NOTE: It might be desirable for backward compatibility reasons to loosen this restriction in the future, because
+     * otherwise we will not be able to rename the Java classes without breaking backward compatibility.
+     */
+    @Test
+    public void the_interface_name_is_in_sync_with_the_actual_Java_interface() throws ClassNotFoundException {
+        MessageEncoding<T> encoding = encodingFactory.create(null);
+
+        String interfaceName = encoding.getInterfaceName();
+
+        assertThat(encoding, is(instanceOf(Class.forName(interfaceName))));
+    }
+
+    @Test
+    public void interface_version_starts_from_1() {
+        MessageEncoding<T> encoding = encodingFactory.create(null);
+
+        int interfaceVersion = encoding.getInterfaceVersion();
+
+        assertThat(interfaceVersion, is(greaterThanOrEqualTo(1)));
+    }
 
     private IpcProtocol<T> newIpcProtocol(IpcBuffer buffer) {
         return new IpcProtocol<>(buffer, encodingFactory);
