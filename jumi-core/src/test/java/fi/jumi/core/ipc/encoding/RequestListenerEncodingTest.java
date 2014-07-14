@@ -5,7 +5,7 @@
 package fi.jumi.core.ipc.encoding;
 
 import fi.jumi.core.config.*;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 
 import java.lang.reflect.*;
 import java.nio.file.Paths;
@@ -13,14 +13,14 @@ import java.nio.file.Paths;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class CommandListenerEncodingTest extends EncodingContract<CommandListener> {
+public class RequestListenerEncodingTest extends EncodingContract<RequestListener> {
 
-    public CommandListenerEncodingTest() {
-        super(CommandListenerEncoding::new);
+    public RequestListenerEncodingTest() {
+        super(RequestListenerEncoding::new);
     }
 
     @Override
-    protected void exampleUsage(CommandListener listener) throws Exception {
+    protected void exampleUsage(RequestListener listener) throws Exception {
         SuiteConfiguration config = new SuiteConfigurationBuilder()
                 .addToClasspath(Paths.get("foo/bar.jar"))
                 .addJvmOptions("-jvmOption")

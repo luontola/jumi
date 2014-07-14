@@ -11,7 +11,7 @@ import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.SuiteListenerEventizer;
 import fi.jumi.core.events.suiteListener.OnSuiteStartedEvent;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.network.*;
 import fi.jumi.core.util.SpyListener;
 import fi.jumi.launcher.FakeProcess;
@@ -89,7 +89,7 @@ public class ProcessStartingDaemonSummonerTest {
     public void tells_to_daemon_listener_what_events_the_daemon_sends() {
         daemonSummoner.connectToDaemon(dummySuiteConfig, dummyDaemonConfig, ActorRef.wrap(daemonListener));
 
-        NetworkEndpoint<Event<SuiteListener>, Event<CommandListener>> endpoint = daemonConnector.lastEndpointFactory.createEndpoint();
+        NetworkEndpoint<Event<SuiteListener>, Event<RequestListener>> endpoint = daemonConnector.lastEndpointFactory.createEndpoint();
 
         OnSuiteStartedEvent anyMessage = new OnSuiteStartedEvent();
         endpoint.onMessage(anyMessage);
@@ -156,12 +156,12 @@ public class ProcessStartingDaemonSummonerTest {
 
     private static class SpyNetworkServer implements NetworkServer {
 
-        public NetworkEndpointFactory<Event<SuiteListener>, Event<CommandListener>> lastEndpointFactory;
+        public NetworkEndpointFactory<Event<SuiteListener>, Event<RequestListener>> lastEndpointFactory;
         public int portToReturn = 1;
 
         @Override
         public <In, Out> int listenOnAnyPort(NetworkEndpointFactory<In, Out> endpointFactory) {
-            this.lastEndpointFactory = (NetworkEndpointFactory<Event<SuiteListener>, Event<CommandListener>>) endpointFactory;
+            this.lastEndpointFactory = (NetworkEndpointFactory<Event<SuiteListener>, Event<RequestListener>>) endpointFactory;
             return portToReturn;
         }
 
@@ -179,7 +179,7 @@ public class ProcessStartingDaemonSummonerTest {
         }
 
         @Override
-        public void onConnected(NetworkConnection connection, MessageSender<Event<CommandListener>> sender) {
+        public void onConnected(NetworkConnection connection, MessageSender<Event<RequestListener>> sender) {
         }
 
         @Override

@@ -7,13 +7,13 @@ package fi.jumi.core.ipc.encoding;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.core.config.*;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.ipc.buffer.IpcBuffer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
-public class CommandListenerEncoding extends EncodingUtil implements CommandListener, MessageEncoding<CommandListener> {
+public class RequestListenerEncoding extends EncodingUtil implements RequestListener, MessageEncoding<RequestListener> {
 
     private static final byte runTests = 1;
     private static final byte shutdown = 2;
@@ -25,13 +25,13 @@ public class CommandListenerEncoding extends EncodingUtil implements CommandList
     private static final String includedTestsPattern = "includedTestsPattern";
     private static final String excludedTestsPattern = "excludedTestsPattern";
 
-    public CommandListenerEncoding(IpcBuffer buffer) {
+    public RequestListenerEncoding(IpcBuffer buffer) {
         super(buffer);
     }
 
     @Override
     public String getInterfaceName() {
-        return CommandListener.class.getName();
+        return RequestListener.class.getName();
     }
 
     @Override
@@ -40,12 +40,12 @@ public class CommandListenerEncoding extends EncodingUtil implements CommandList
     }
 
     @Override
-    public void encode(Event<CommandListener> message) {
+    public void encode(Event<RequestListener> message) {
         message.fireOn(this);
     }
 
     @Override
-    public void decode(CommandListener target) {
+    public void decode(RequestListener target) {
         byte type = readEventType();
         switch (type) {
             case runTests:

@@ -107,7 +107,7 @@
                                 <interface>java.lang.Runnable</interface>
                                 <interface>java.util.concurrent.Executor</interface>
                                 <interface>fi.jumi.actors.workers.WorkerListener</interface>
-                                <interface>fi.jumi.core.ipc.api.CommandListener</interface>
+                                <interface>fi.jumi.core.ipc.api.RequestListener</interface>
                                 <interface>fi.jumi.core.util.Startable</interface>
                                 <interface>fi.jumi.core.api.SuiteListener</interface>
                                 <interface>fi.jumi.core.discovery.TestFileFinderListener</interface>

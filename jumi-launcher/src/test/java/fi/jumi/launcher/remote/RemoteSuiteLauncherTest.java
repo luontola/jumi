@@ -9,9 +9,9 @@ import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
-import fi.jumi.core.events.CommandListenerEventizer;
+import fi.jumi.core.events.RequestListenerEventizer;
 import fi.jumi.core.events.suiteListener.*;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.util.SpyListener;
 import fi.jumi.launcher.FakeActorThread;
 import org.junit.*;
@@ -28,8 +28,8 @@ public class RemoteSuiteLauncherTest {
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
-    private final CommandListener daemon = mock(CommandListener.class);
-    private final MessageSender<Event<CommandListener>> senderToDaemon = new CommandListenerEventizer().newBackend(daemon);
+    private final RequestListener daemon = mock(RequestListener.class);
+    private final MessageSender<Event<RequestListener>> senderToDaemon = new RequestListenerEventizer().newBackend(daemon);
     private final SpyDaemonSummoner daemonSummoner = new SpyDaemonSummoner();
     private final SuiteConfiguration dummySuiteConfig = new SuiteConfiguration();
     private final DaemonConfiguration dummyDaemonConfig = new DaemonConfiguration();

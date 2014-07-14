@@ -4,22 +4,22 @@
 
 package fi.jumi.core.ipc;
 
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.ipc.dirs.CommandDir;
-import fi.jumi.core.ipc.encoding.CommandListenerEncoding;
+import fi.jumi.core.ipc.encoding.RequestListenerEncoding;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
 public class IpcCommandReader {
 
-    private final IpcReader<CommandListener> reader;
-    private final CommandListener target;
+    private final IpcReader<RequestListener> reader;
+    private final RequestListener target;
 
-    public IpcCommandReader(CommandDir dir, CommandListener target) {
+    public IpcCommandReader(CommandDir dir, RequestListener target) {
         this.target = target;
-        this.reader = IpcChannel.reader(dir.getRequestPath(), CommandListenerEncoding::new);
+        this.reader = IpcChannel.reader(dir.getRequestPath(), RequestListenerEncoding::new);
     }
 
     public void run() {

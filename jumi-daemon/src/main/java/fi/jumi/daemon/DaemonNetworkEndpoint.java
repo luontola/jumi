@@ -9,7 +9,7 @@ import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.SuiteListenerEventizer;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.network.*;
 import fi.jumi.core.suite.SuiteFactory;
 import fi.jumi.core.util.timeout.*;
@@ -17,7 +17,7 @@ import fi.jumi.core.util.timeout.*;
 import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
-public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<CommandListener>, Event<SuiteListener>>, CommandListener {
+public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<RequestListener>, Event<SuiteListener>>, RequestListener {
 
     private final SuiteFactory suiteFactory;
     private final Runnable shutdownHook;
@@ -46,7 +46,7 @@ public class DaemonNetworkEndpoint implements NetworkEndpoint<Event<CommandListe
     }
 
     @Override
-    public void onMessage(Event<CommandListener> message) {
+    public void onMessage(Event<RequestListener> message) {
         message.fireOn(this);
     }
 

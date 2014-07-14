@@ -11,7 +11,7 @@ import fi.jumi.actors.queue.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
 import fi.jumi.core.events.suiteListener.*;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.network.*;
 import fi.jumi.core.util.timeout.InitialMessageTimeout;
 import fi.jumi.launcher.daemon.Steward;
@@ -108,7 +108,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
     }
 
     @ThreadSafe
-    private static class OneTimeDaemonListenerFactory implements NetworkEndpointFactory<Event<SuiteListener>, Event<CommandListener>> {
+    private static class OneTimeDaemonListenerFactory implements NetworkEndpointFactory<Event<SuiteListener>, Event<RequestListener>> {
 
         private final BlockingQueue<DaemonListener> oneTimeListener = new ArrayBlockingQueue<>(1);
 
@@ -117,7 +117,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
         }
 
         @Override
-        public NetworkEndpoint<Event<SuiteListener>, Event<CommandListener>> createEndpoint() {
+        public NetworkEndpoint<Event<SuiteListener>, Event<RequestListener>> createEndpoint() {
             DaemonListener listener = oneTimeListener.poll();
             if (listener == null) {
                 throw new IllegalStateException("already connected once");

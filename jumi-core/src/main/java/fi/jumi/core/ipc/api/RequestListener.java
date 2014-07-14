@@ -6,7 +6,7 @@ package fi.jumi.core.ipc.api;
 
 import fi.jumi.core.config.SuiteConfiguration;
 
-public interface CommandListener {
+public interface RequestListener {
 
     void runTests(SuiteConfiguration suiteConfiguration);
 

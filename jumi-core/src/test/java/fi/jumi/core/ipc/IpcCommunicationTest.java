@@ -5,7 +5,7 @@
 package fi.jumi.core.ipc;
 
 import fi.jumi.core.config.*;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.ipc.dirs.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -29,10 +29,10 @@ public class IpcCommunicationTest {
 
     @Test
     public void launcher_sends_commands_to_daemon() throws IOException {
-        CommandListener listener = mock(CommandListener.class);
+        RequestListener requestListener = mock(RequestListener.class);
         DaemonDir daemonDir = new DaemonDir(baseDir);
         CommandDir commandDir = daemonDir.createCommandDir();
-        IpcCommandReader receiver = new IpcCommandReader(commandDir, listener);
+        IpcCommandReader receiver = new IpcCommandReader(commandDir, requestListener);
         IpcCommandWriter sender = new IpcCommandWriter(commandDir);
         SuiteConfiguration suiteConfiguration = new SuiteConfigurationBuilder()
                 .addJvmOptions("-some-options")
@@ -43,13 +43,13 @@ public class IpcCommunicationTest {
 
         receiver.run();
 
-        verify(listener).runTests(suiteConfiguration);
-        verifyNoMoreInteractions(listener);
+        verify(requestListener).runTests(suiteConfiguration);
+        verifyNoMoreInteractions(requestListener);
     }
 
     @Ignore // TODO
     @Test
-    public void daemon_sends_suite_events_to_launcher() {
+    public void daemon_sends_suite_events_to_launcher() throws IOException {
 
     }
 }

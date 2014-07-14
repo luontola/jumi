@@ -6,8 +6,8 @@ package fi.jumi.launcher.remote;
 
 import fi.jumi.actors.eventizers.Event;
 import fi.jumi.core.api.SuiteListener;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.network.NetworkEndpoint;
 
-public interface DaemonListener extends NetworkEndpoint<Event<SuiteListener>, Event<CommandListener>> {
+public interface DaemonListener extends NetworkEndpoint<Event<SuiteListener>, Event<RequestListener>> {
 }

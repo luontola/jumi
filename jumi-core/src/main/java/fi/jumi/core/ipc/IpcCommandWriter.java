@@ -4,11 +4,11 @@
 
 package fi.jumi.core.ipc;
 
-import fi.jumi.core.events.CommandListenerEventizer;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.events.RequestListenerEventizer;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.ipc.dirs.CommandDir;
-import fi.jumi.core.ipc.encoding.CommandListenerEncoding;
+import fi.jumi.core.ipc.encoding.RequestListenerEncoding;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
@@ -16,15 +16,15 @@ import java.io.Closeable;
 @NotThreadSafe
 public class IpcCommandWriter implements Closeable {
 
-    private final IpcWriter<CommandListener> writer;
-    private final CommandListener target;
+    private final IpcWriter<RequestListener> writer;
+    private final RequestListener target;
 
     public IpcCommandWriter(CommandDir dir) {
-        writer = IpcChannel.writer(dir.getRequestPath(), CommandListenerEncoding::new);
-        target = new CommandListenerEventizer().newFrontend(writer);
+        writer = IpcChannel.writer(dir.getRequestPath(), RequestListenerEncoding::new);
+        target = new RequestListenerEventizer().newFrontend(writer);
     }
 
-    public CommandListener tell() {
+    public RequestListener tell() {
         return target;
     }
 

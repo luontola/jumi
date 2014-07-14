@@ -9,9 +9,9 @@ import fi.jumi.actors.eventizers.Event;
 import fi.jumi.actors.queue.MessageSender;
 import fi.jumi.core.api.*;
 import fi.jumi.core.config.*;
-import fi.jumi.core.events.CommandListenerEventizer;
+import fi.jumi.core.events.RequestListenerEventizer;
 import fi.jumi.core.events.suiteListener.*;
-import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.network.NetworkConnection;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -24,7 +24,7 @@ public class RemoteSuiteLauncher implements SuiteLauncher, DaemonListener {
 
     private SuiteConfiguration suiteConfiguration;
     private MessageSender<Event<SuiteListener>> suiteListener;
-    private CommandListener daemon;
+    private RequestListener daemon;
     private final SuiteState suiteState = new SuiteState();
 
     public RemoteSuiteLauncher(ActorThread currentThread, ActorRef<DaemonSummoner> daemonSummoner) {
@@ -50,8 +50,8 @@ public class RemoteSuiteLauncher implements SuiteLauncher, DaemonListener {
     }
 
     @Override
-    public void onConnected(NetworkConnection connection, MessageSender<Event<CommandListener>> daemon) {
-        this.daemon = new CommandListenerEventizer().newFrontend(daemon);
+    public void onConnected(NetworkConnection connection, MessageSender<Event<RequestListener>> daemon) {
+        this.daemon = new RequestListenerEventizer().newFrontend(daemon);
         this.daemon.runTests(suiteConfiguration);
     }
 
