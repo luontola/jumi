@@ -36,6 +36,14 @@ public class DaemonDirTest {
         assertThat("response file", relativeToBaseDir(dir.getResponsePath()), doesMatchRegex("commands/\\d+/response"));
     }
 
+    @Test
+    public void creates_suite_directories() throws IOException {
+        SuiteDir dir = daemonDir.createSuiteDir();
+
+        assertThat("suite dir", relativeToBaseDir(dir.getPath()), doesMatchRegex("suites/\\d+"));
+        assertThat("suite results file", relativeToBaseDir(dir.getSuiteResultsPath()), doesMatchRegex("suites/\\d+/suite"));
+    }
+
     private String relativeToBaseDir(Path path) {
         return normalized(baseDir.relativize(path));
     }

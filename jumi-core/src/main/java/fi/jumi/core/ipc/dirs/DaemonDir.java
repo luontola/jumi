@@ -18,7 +18,14 @@ public class DaemonDir {
     }
 
     public CommandDir createCommandDir() throws IOException {
-        Path dir = UniqueDirectories.createUniqueDir(baseDir.resolve("commands"), System.currentTimeMillis());
-        return new CommandDir(dir);
+        return new CommandDir(createUniqueDirUnder("commands"));
+    }
+
+    public SuiteDir createSuiteDir() throws IOException {
+        return new SuiteDir(createUniqueDirUnder("suites"));
+    }
+
+    private Path createUniqueDirUnder(String name) throws IOException {
+        return UniqueDirectories.createUniqueDir(baseDir.resolve(name), System.currentTimeMillis());
     }
 }
