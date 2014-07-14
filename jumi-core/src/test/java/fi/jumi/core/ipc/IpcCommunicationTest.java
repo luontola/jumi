@@ -11,18 +11,26 @@ import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static org.mockito.Mockito.*;
 
-public class IpcCommandReadingAndWritingTest {
+public class IpcCommunicationTest {
 
     @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
 
+    private Path baseDir;
+
+    @Before
+    public void setup() throws IOException {
+        baseDir = tempDir.getRoot().toPath();
+    }
+
     @Test
-    public void receives_commands() throws IOException {
+    public void launcher_sends_commands_to_daemon() throws IOException {
         CommandListener listener = mock(CommandListener.class);
-        DaemonDir daemonDir = new DaemonDir(tempDir.newFolder("daemonDir").toPath());
+        DaemonDir daemonDir = new DaemonDir(baseDir);
         CommandDir commandDir = daemonDir.createCommandDir();
         IpcCommandReader receiver = new IpcCommandReader(commandDir, listener);
         IpcCommandWriter sender = new IpcCommandWriter(commandDir);
@@ -31,13 +39,17 @@ public class IpcCommandReadingAndWritingTest {
                 .freeze();
 
         sender.tell().runTests(suiteConfiguration);
-        sender.tell().shutdown();
         sender.close();
 
         receiver.run();
 
         verify(listener).runTests(suiteConfiguration);
-        verify(listener).shutdown();
         verifyNoMoreInteractions(listener);
+    }
+
+    @Ignore // TODO
+    @Test
+    public void daemon_sends_suite_events_to_launcher() {
+
     }
 }
