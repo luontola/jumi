@@ -4,8 +4,9 @@
 
 package fi.jumi.core.ipc;
 
+import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
-import fi.jumi.core.ipc.api.RequestListener;
+import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.dirs.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -21,35 +22,74 @@ public class IpcCommunicationTest {
     public final TemporaryFolder tempDir = new TemporaryFolder();
 
     private Path baseDir;
+    private DaemonDir daemonDir;
+    private CommandDir commandDir;
 
     @Before
     public void setup() throws IOException {
         baseDir = tempDir.getRoot().toPath();
+        daemonDir = new DaemonDir(baseDir);
+        commandDir = daemonDir.createCommandDir();
     }
 
     @Test
     public void launcher_sends_commands_to_daemon() throws IOException {
-        RequestListener requestListener = mock(RequestListener.class);
-        DaemonDir daemonDir = new DaemonDir(baseDir);
-        CommandDir commandDir = daemonDir.createCommandDir();
-        IpcCommandReader receiver = new IpcCommandReader(commandDir, requestListener);
-        IpcCommandWriter sender = new IpcCommandWriter(commandDir);
+        CommandListener daemonSide = mock(CommandListener.class);
+
+        IpcCommandReceiver receiver = new IpcCommandReceiver(commandDir, daemonSide);
+        IpcCommandSender sender = new IpcCommandSender(commandDir);
         SuiteConfiguration suiteConfiguration = new SuiteConfigurationBuilder()
                 .addJvmOptions("-some-options")
                 .freeze();
 
-        sender.tell().runTests(suiteConfiguration);
+        sender.runTests(suiteConfiguration, null);
+        sender.shutdown();
         sender.close();
 
         receiver.run();
 
-        verify(requestListener).runTests(suiteConfiguration);
-        verifyNoMoreInteractions(requestListener);
+        verify(daemonSide).runTests(eq(suiteConfiguration), any(SuiteListener.class));
+        verify(daemonSide).shutdown();
+        verifyNoMoreInteractions(daemonSide);
     }
 
     @Ignore // TODO
     @Test
     public void daemon_sends_suite_events_to_launcher() throws IOException {
+        SuiteListener launcherSide = mock(SuiteListener.class);
+        SpyCommandListener commandProcessor = new SpyCommandListener();
 
+        IpcCommandReceiver receiver = new IpcCommandReceiver(commandDir, commandProcessor);
+        IpcCommandSender sender = new IpcCommandSender(commandDir);
+
+        sender.runTests(new SuiteConfiguration(), launcherSide);
+        sender.close();
+
+        receiver.run();
+
+        // TODO: this is asynchronous
+        SuiteListener daemonSide = commandProcessor.suiteListener;
+        daemonSide.onSuiteStarted();
+        daemonSide.onSuiteFinished();
+
+        // TODO: this is asynchronous
+        verify(launcherSide).onSuiteStarted();
+        verify(launcherSide).onSuiteFinished();
+        verifyNoMoreInteractions(launcherSide);
+    }
+
+    private static class SpyCommandListener implements CommandListener {
+        SuiteConfiguration suiteConfiguration;
+        SuiteListener suiteListener;
+
+        @Override
+        public void runTests(SuiteConfiguration suiteConfiguration, SuiteListener suiteListener) {
+            this.suiteConfiguration = suiteConfiguration;
+            this.suiteListener = suiteListener;
+        }
+
+        @Override
+        public void shutdown() {
+        }
     }
 }
