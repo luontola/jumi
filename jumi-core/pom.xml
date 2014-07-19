@@ -142,6 +142,10 @@
                                     <shadedPattern>${shadedPrefix}.org.apache</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>${shadedPrefix}.com.google</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>org.jboss</pattern>
                                     <shadedPattern>${shadedPrefix}.org.jboss</shadedPattern>
                                 </relocation>
@@ -163,6 +167,12 @@
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
                                         <exclude>templates/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.google.guava:guava</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
