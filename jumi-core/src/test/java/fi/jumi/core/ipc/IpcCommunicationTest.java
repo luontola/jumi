@@ -30,7 +30,7 @@ public class IpcCommunicationTest {
     }
 
     @Test
-    public void launcher_sends_commands_to_daemon() throws IOException {
+    public void launcher_sends_commands_to_daemon() throws Exception {
         CommandListener daemonSide = mock(CommandListener.class);
 
         IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, daemonSide);
@@ -51,24 +51,24 @@ public class IpcCommunicationTest {
     }
 
     @Test
-    public void daemon_sends_suite_events_to_launcher() throws IOException {
+    public void daemon_sends_suite_events_to_launcher() throws Exception {
         SuiteListener launcherSide = mock(SuiteListener.class);
         SpyCommandListener commandProcessor = new SpyCommandListener();
 
-        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, commandProcessor);
         IpcCommandSender sender = new IpcCommandSender(commandDir);
-
         sender.runTests(new SuiteConfiguration(), launcherSide);
         sender.close();
 
-        receiver.run();
+        // TODO: use the DirectoryObserver (which then creates IpcCommandReceiver)
+        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, commandProcessor);
+        receiver.run(); // XXX: should be in a worker thread
 
-        // TODO: this should be asynchronous
+        // TODO: this should be asynchronous (do this in the CommandListener fake)
         SuiteListener daemonSide = commandProcessor.suiteListener;
         daemonSide.onSuiteStarted();
         daemonSide.onSuiteFinished();
 
-        sender.poll_UGLY_HACK();
+        sender.poll_UGLY_HACK(); // XXX: should be in a worker thread
 
         // TODO: this should be asynchronous
         verify(launcherSide).onSuiteStarted();

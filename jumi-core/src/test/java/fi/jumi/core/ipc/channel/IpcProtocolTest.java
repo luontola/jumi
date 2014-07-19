@@ -50,7 +50,11 @@ public class IpcProtocolTest {
         };
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(mmf, SuiteListenerEncoding::new);
-            IpcReaders.decodeAll(reader, expectations.getListener());
+            try {
+                IpcReaders.decodeAll(reader, expectations.getListener());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         };
         runConcurrently(producer, consumer);
 
@@ -90,7 +94,11 @@ public class IpcProtocolTest {
         };
         Runnable consumer = () -> {
             IpcReader<SuiteListener> reader = IpcChannel.reader(new FileSegmenter(mmf, 2, 2), SuiteListenerEncoding::new);
-            IpcReaders.decodeAll(reader, expectations.getListener());
+            try {
+                IpcReaders.decodeAll(reader, expectations.getListener());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         };
         runConcurrently(producer, consumer);
 
@@ -183,7 +191,11 @@ public class IpcProtocolTest {
     private static void tryToDecode(IpcBuffer buffer) {
         buffer.position(0);
         IpcProtocol<SuiteListener> protocol = newIpcProtocol(buffer);
-        IpcReaders.decodeAll(protocol, mock(SuiteListener.class));
+        try {
+            IpcReaders.decodeAll(protocol, mock(SuiteListener.class));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static IpcProtocol<SuiteListener> newIpcProtocol(IpcBuffer buffer) {

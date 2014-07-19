@@ -34,7 +34,7 @@ public class IpcCommandReceiver implements Closeable {
         this.response = new ResponseListenerEventizer().newFrontend(responseWriter);
     }
 
-    public void run() {
+    public void run() throws InterruptedException {
         IpcReaders.decodeAll(requestReader, new MyRequestListener());
     }
 

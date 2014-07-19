@@ -44,14 +44,18 @@ public class IpcCommandSender implements CommandListener, Closeable {
 
     private SuiteListener tmpSuiteListener; // XXX
 
-    public void poll_UGLY_HACK() { // XXX
+    public void poll_UGLY_HACK() throws InterruptedException { // XXX
         // TODO: this should be asynchronous
         IpcReaders.decodeAll(responseReader, new ResponseListener() {
             @Override
             public void onSuiteStarted(Path suiteResults) {
                 // XXX
                 IpcReader<SuiteListener> suiteReader = IpcChannel.reader(suiteResults, SuiteListenerEncoding::new);
-                IpcReaders.decodeAll(suiteReader, tmpSuiteListener);
+                try {
+                    IpcReaders.decodeAll(suiteReader, tmpSuiteListener);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         });
     }

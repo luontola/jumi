@@ -31,7 +31,7 @@ public class ProgressiveSleepWaitStrategy implements WaitStrategy {
     }
 
     @Override
-    public void await() {
+    public void snooze() {
         if (invocations < yieldCount) {
             yield();
             invocations++;

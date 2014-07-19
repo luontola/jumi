@@ -22,7 +22,7 @@ public class ProgressiveSleepWaitStrategyTest {
         waitStrategy = new SpiedProgressiveSleepWaitStrategy(3, 1, 10);
 
         for (int i = 0; i < 3; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
 
         assertThat(spy, is(asList("yield", "yield", "yield")));
@@ -33,7 +33,7 @@ public class ProgressiveSleepWaitStrategyTest {
         waitStrategy = new SpiedProgressiveSleepWaitStrategy(0, 1, 10);
 
         for (int i = 0; i < 3; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
 
         assertThat(spy, is(asList("sleep 1", "sleep 2", "sleep 3")));
@@ -44,7 +44,7 @@ public class ProgressiveSleepWaitStrategyTest {
         waitStrategy = new SpiedProgressiveSleepWaitStrategy(0, 5, 10);
 
         for (int i = 0; i < 3; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
 
         assertThat(spy, is(asList("sleep 5", "sleep 6", "sleep 7")));
@@ -54,12 +54,12 @@ public class ProgressiveSleepWaitStrategyTest {
     public void sleeps_at_most_the_maximum_sleep_time() {
         waitStrategy = new SpiedProgressiveSleepWaitStrategy(0, 1, 10);
         for (int i = 0; i < 9; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
         spy.clear();
 
         for (int i = 0; i < 3; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
 
         assertThat(spy, is(asList("sleep 10", "sleep 10", "sleep 10")));
@@ -69,13 +69,13 @@ public class ProgressiveSleepWaitStrategyTest {
     public void on_reset_goes_back_to_beginning() {
         waitStrategy = new SpiedProgressiveSleepWaitStrategy(1, 1, 10);
         for (int i = 0; i < 9; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
         spy.clear();
 
         waitStrategy.reset();
         for (int i = 0; i < 3; i++) {
-            waitStrategy.await();
+            waitStrategy.snooze();
         }
 
         assertThat(spy, is(asList("yield", "sleep 1", "sleep 2")));

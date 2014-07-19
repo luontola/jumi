@@ -8,5 +8,5 @@ public interface WaitStrategy {
 
     void reset();
 
-    void await();
+    void snooze();
 }
