@@ -22,14 +22,13 @@ import java.util.concurrent.*;
 public class IpcCommandSender implements Closeable {
 
     private final IpcWriter<RequestListener> requestWriter;
-    private final RequestListener request;
-    private final IpcReader<ResponseListener> responseReader;
+    private final RequestListener requestSender;
     private final BlockingQueue<ResponseListener> handlersForExpectedResponses = new LinkedBlockingQueue<>();
 
-    public IpcCommandSender(CommandDir dir) {
-        requestWriter = IpcChannel.writer(dir.getRequestPath(), RequestListenerEncoding::new);
-        request = new RequestListenerEventizer().newFrontend(requestWriter);
-        responseReader = IpcChannel.reader(dir.getResponsePath(), ResponseListenerEncoding::new);
+    public IpcCommandSender(CommandDir commandDir, Executor workerThreads) {
+        this.requestWriter = IpcChannel.writer(commandDir.getRequestPath(), RequestListenerEncoding::new);
+        this.requestSender = new RequestListenerEventizer().newFrontend(requestWriter);
+        workerThreads.execute(new ResponseReader(commandDir, handlersForExpectedResponses));
     }
 
     @Override
@@ -45,24 +44,44 @@ public class IpcCommandSender implements Closeable {
                 future.set(IpcChannel.reader(suiteResults, SuiteListenerEncoding::new));
             }
         });
-        request.runTests(suiteConfiguration);
+        requestSender.runTests(suiteConfiguration);
         return future;
     }
 
-    public void readResponses() throws InterruptedException {
-        IpcReaders.decodeAll(responseReader, new ResponseListener() {
-            @Override
-            public void onSuiteStarted(Path suiteResults) {
-                ResponseListener handler = handlersForExpectedResponses.poll();
-                if (handler == null) {
-                    throw new IllegalStateException("Nobody was expecting this event");
-                }
-                handler.onSuiteStarted(suiteResults);
-            }
-        });
+    public void shutdown() {
+        requestSender.shutdown();
     }
 
-    public void shutdown() {
-        request.shutdown();
+
+    @NotThreadSafe
+    private static class ResponseReader implements Runnable {
+        private final CommandDir commandDir;
+        private final BlockingQueue<ResponseListener> handlersForExpectedResponses;
+
+        public ResponseReader(CommandDir commandDir, BlockingQueue<ResponseListener> handlersForExpectedResponses) {
+            this.commandDir = commandDir;
+            this.handlersForExpectedResponses = handlersForExpectedResponses;
+        }
+
+        @Override
+        public void run() {
+            IpcReader<ResponseListener> responseReader = IpcChannel.reader(commandDir.getResponsePath(), ResponseListenerEncoding::new);
+            ResponseListener responseHandler = new ResponseListener() {
+                @Override
+                public void onSuiteStarted(Path suiteResults) {
+                    ResponseListener handler = handlersForExpectedResponses.poll();
+                    if (handler == null) {
+                        throw new IllegalStateException("Nobody was expecting this event");
+                    }
+                    handler.onSuiteStarted(suiteResults);
+                }
+            };
+            try {
+                IpcReaders.decodeAll(responseReader, responseHandler);
+            } catch (InterruptedException e) {
+                System.err.println(this + " interrupted");
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

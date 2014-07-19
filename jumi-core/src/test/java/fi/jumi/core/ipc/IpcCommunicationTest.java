@@ -4,13 +4,15 @@
 
 package fi.jumi.core.ipc;
 
+import fi.jumi.core.Timeouts;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
 import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.ipc.dirs.*;
+import fi.jumi.core.util.TestingExecutor;
 import org.junit.*;
-import org.junit.rules.TemporaryFolder;
+import org.junit.rules.*;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -20,7 +22,13 @@ import static org.mockito.Mockito.*;
 public class IpcCommunicationTest {
 
     @Rule
+    public final Timeout timeout = Timeouts.forUnitTest();
+
+    @Rule
     public final TemporaryFolder tempDir = new TemporaryFolder();
+
+    @Rule
+    public final TestingExecutor executor = new TestingExecutor();
 
     private DaemonDir daemonDir;
     private CommandDir commandDir;
@@ -36,7 +44,7 @@ public class IpcCommunicationTest {
         CommandListener daemonSide = mock(CommandListener.class);
 
         IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, daemonSide);
-        IpcCommandSender sender = new IpcCommandSender(commandDir);
+        IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
         SuiteConfiguration suiteConfiguration = new SuiteConfigurationBuilder()
                 .addJvmOptions("-some-options")
                 .freeze();
@@ -54,7 +62,7 @@ public class IpcCommunicationTest {
 
     @Test
     public void daemon_sends_suite_events_to_launcher() throws Exception {
-        IpcCommandSender sender = new IpcCommandSender(commandDir);
+        IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
         Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(new SuiteConfiguration());
         sender.close();
 
@@ -71,9 +79,7 @@ public class IpcCommunicationTest {
             public void shutdown() {
             }
         });
-        receiver.run(); // XXX: should be in a worker thread
-
-        sender.readResponses(); // XXX: should be in a worker thread
+        executor.execute(receiver);
 
         SuiteListener suiteListener = mock(SuiteListener.class);
         IpcReaders.decodeAll(suiteReader.get(), suiteListener);
