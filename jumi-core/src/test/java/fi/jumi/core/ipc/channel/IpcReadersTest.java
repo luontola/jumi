@@ -7,8 +7,6 @@ package fi.jumi.core.ipc.channel;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import java.util.function.Consumer;
-
 public class IpcReadersTest {
 
     @Rule
@@ -24,5 +22,9 @@ public class IpcReadersTest {
 
         thrown.expect(InterruptedException.class);
         IpcReaders.decodeAll(reader, target);
+    }
+
+    private interface Consumer<T> {
+        void accept(T t);
     }
 }
