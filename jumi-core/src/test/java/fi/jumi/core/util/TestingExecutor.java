@@ -18,7 +18,7 @@ public class TestingExecutor extends ThreadPoolExecutor implements TestRule {
     private final List<Throwable> uncaughtExceptions = Collections.synchronizedList(new ArrayList<>());
 
     public TestingExecutor() {
-        super(1, Integer.MAX_VALUE, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        super(0, Integer.MAX_VALUE, 100, TimeUnit.MILLISECONDS, new SynchronousQueue<>());
     }
 
     @Override
