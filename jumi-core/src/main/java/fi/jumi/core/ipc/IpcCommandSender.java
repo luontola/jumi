@@ -4,6 +4,7 @@
 
 package fi.jumi.core.ipc;
 
+import com.google.common.util.concurrent.SettableFuture;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.RequestListenerEventizer;
@@ -15,13 +16,15 @@ import fi.jumi.core.ipc.encoding.*;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
 import java.nio.file.Path;
+import java.util.concurrent.*;
 
 @NotThreadSafe
-public class IpcCommandSender implements CommandListener, Closeable {
+public class IpcCommandSender implements Closeable {
 
     private final IpcWriter<RequestListener> requestWriter;
     private final RequestListener request;
     private final IpcReader<ResponseListener> responseReader;
+    private final BlockingQueue<ResponseListener> handlersForExpectedResponses = new LinkedBlockingQueue<>();
 
     public IpcCommandSender(CommandDir dir) {
         requestWriter = IpcChannel.writer(dir.getRequestPath(), RequestListenerEncoding::new);
@@ -34,33 +37,31 @@ public class IpcCommandSender implements CommandListener, Closeable {
         requestWriter.close();
     }
 
-    @Override
-    public void runTests(SuiteConfiguration suiteConfiguration, SuiteListener suiteListener) {
-        this.tmpSuiteListener = suiteListener;
+    public Future<IpcReader<SuiteListener>> runTests(SuiteConfiguration suiteConfiguration) {
+        SettableFuture<IpcReader<SuiteListener>> future = SettableFuture.create();
+        handlersForExpectedResponses.add(new ResponseListener() {
+            @Override
+            public void onSuiteStarted(Path suiteResults) {
+                future.set(IpcChannel.reader(suiteResults, SuiteListenerEncoding::new));
+            }
+        });
         request.runTests(suiteConfiguration);
-        // TODO: read response (async)
+        return future;
     }
 
-
-    private SuiteListener tmpSuiteListener; // XXX
-
-    public void poll_UGLY_HACK() throws InterruptedException { // XXX
-        // TODO: this should be asynchronous
+    public void readResponses() throws InterruptedException {
         IpcReaders.decodeAll(responseReader, new ResponseListener() {
             @Override
             public void onSuiteStarted(Path suiteResults) {
-                // XXX
-                IpcReader<SuiteListener> suiteReader = IpcChannel.reader(suiteResults, SuiteListenerEncoding::new);
-                try {
-                    IpcReaders.decodeAll(suiteReader, tmpSuiteListener);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                ResponseListener handler = handlersForExpectedResponses.poll();
+                if (handler == null) {
+                    throw new IllegalStateException("Nobody was expecting this event");
                 }
+                handler.onSuiteStarted(suiteResults);
             }
         });
     }
 
-    @Override
     public void shutdown() {
         request.shutdown();
     }

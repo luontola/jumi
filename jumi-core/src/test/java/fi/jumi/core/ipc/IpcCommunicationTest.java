@@ -7,11 +7,13 @@ package fi.jumi.core.ipc;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
 import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.ipc.dirs.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
 
 import static org.mockito.Mockito.*;
 
@@ -39,7 +41,7 @@ public class IpcCommunicationTest {
                 .addJvmOptions("-some-options")
                 .freeze();
 
-        sender.runTests(suiteConfiguration, null);
+        sender.runTests(suiteConfiguration);
         sender.shutdown();
         sender.close();
 
@@ -52,42 +54,31 @@ public class IpcCommunicationTest {
 
     @Test
     public void daemon_sends_suite_events_to_launcher() throws Exception {
-        SuiteListener launcherSide = mock(SuiteListener.class);
-        SpyCommandListener commandProcessor = new SpyCommandListener();
-
         IpcCommandSender sender = new IpcCommandSender(commandDir);
-        sender.runTests(new SuiteConfiguration(), launcherSide);
+        Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(new SuiteConfiguration());
         sender.close();
 
         // TODO: use the DirectoryObserver (which then creates IpcCommandReceiver)
-        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, commandProcessor);
+        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, new CommandListener() {
+            @Override
+            public void runTests(SuiteConfiguration suiteConfiguration, SuiteListener suiteListener) {
+                // this happens on daemon side
+                suiteListener.onSuiteStarted();
+                suiteListener.onSuiteFinished();
+            }
+
+            @Override
+            public void shutdown() {
+            }
+        });
         receiver.run(); // XXX: should be in a worker thread
 
-        // TODO: this should be asynchronous (do this in the CommandListener fake)
-        SuiteListener daemonSide = commandProcessor.suiteListener;
-        daemonSide.onSuiteStarted();
-        daemonSide.onSuiteFinished();
+        sender.readResponses(); // XXX: should be in a worker thread
 
-        sender.poll_UGLY_HACK(); // XXX: should be in a worker thread
-
-        // TODO: this should be asynchronous
-        verify(launcherSide).onSuiteStarted();
-        verify(launcherSide).onSuiteFinished();
-        verifyNoMoreInteractions(launcherSide);
-    }
-
-    private static class SpyCommandListener implements CommandListener {
-        SuiteConfiguration suiteConfiguration;
-        SuiteListener suiteListener;
-
-        @Override
-        public void runTests(SuiteConfiguration suiteConfiguration, SuiteListener suiteListener) {
-            this.suiteConfiguration = suiteConfiguration;
-            this.suiteListener = suiteListener;
-        }
-
-        @Override
-        public void shutdown() {
-        }
+        SuiteListener suiteListener = mock(SuiteListener.class);
+        IpcReaders.decodeAll(suiteReader.get(), suiteListener);
+        verify(suiteListener).onSuiteStarted();
+        verify(suiteListener).onSuiteFinished();
+        verifyNoMoreInteractions(suiteListener);
     }
 }
