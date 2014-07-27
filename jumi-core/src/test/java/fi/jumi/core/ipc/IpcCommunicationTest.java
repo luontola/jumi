@@ -4,6 +4,9 @@
 
 package fi.jumi.core.ipc;
 
+import fi.jumi.actors.*;
+import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
+import fi.jumi.actors.listeners.*;
 import fi.jumi.core.Timeouts;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
@@ -17,6 +20,8 @@ import org.junit.rules.*;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 public class IpcCommunicationTest {
@@ -32,53 +37,46 @@ public class IpcCommunicationTest {
 
     private DaemonDir daemonDir;
     private CommandDir commandDir;
+    private ActorThread actorThread;
 
     @Before
     public void setup() throws IOException {
         daemonDir = new DaemonDir(tempDir.getRoot().toPath());
         commandDir = daemonDir.createCommandDir();
+        Actors actors = new MultiThreadedActors(
+                executor,
+                new DynamicEventizerProvider(),
+                new CrashEarlyFailureHandler(),
+                new NullMessageListener()
+        );
+        actorThread = actors.startActorThread();
     }
 
     @Test
-    public void launcher_sends_commands_to_daemon() throws Exception {
-        CommandListener daemonSide = mock(CommandListener.class);
-
-        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, daemonSide);
-        IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
-        SuiteConfiguration suiteConfiguration = new SuiteConfigurationBuilder()
+    public void launcher_tells_daemon_to_runTests_and_daemon_replies() throws Exception {
+        SuiteConfiguration expectedSuiteConfiguration = new SuiteConfigurationBuilder()
                 .addJvmOptions("-some-options")
                 .freeze();
 
-        sender.runTests(suiteConfiguration);
-        sender.shutdown();
-        sender.close();
-
-        receiver.run();
-
-        verify(daemonSide).runTests(eq(suiteConfiguration), any(SuiteListener.class));
-        verify(daemonSide).shutdown();
-        verifyNoMoreInteractions(daemonSide);
-    }
-
-    @Test
-    public void daemon_sends_suite_events_to_launcher() throws Exception {
         IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
-        Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(new SuiteConfiguration());
+        Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(expectedSuiteConfiguration);
         sender.close();
 
         // TODO: use the DirectoryObserver (which then creates IpcCommandReceiver)
-        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, new CommandListener() {
+        CommandListener commandListener = new CommandListener() {
             @Override
-            public void runTests(SuiteConfiguration suiteConfiguration, SuiteListener suiteListener) {
+            public void runTests(SuiteConfiguration suiteConfiguration, ActorRef<SuiteListener> suiteListener) {
                 // this happens on daemon side
-                suiteListener.onSuiteStarted();
-                suiteListener.onSuiteFinished();
+                assertThat(suiteConfiguration, is(expectedSuiteConfiguration));
+                suiteListener.tell().onSuiteStarted();
+                suiteListener.tell().onSuiteFinished();
             }
 
             @Override
             public void shutdown() {
             }
-        });
+        };
+        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, commandListener, actorThread);
         executor.execute(receiver);
 
         SuiteListener suiteListener = mock(SuiteListener.class);

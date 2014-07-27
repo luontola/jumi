@@ -4,12 +4,13 @@
 
 package fi.jumi.core.ipc.api;
 
+import fi.jumi.actors.ActorRef;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.SuiteConfiguration;
 
 public interface CommandListener {
 
-    void runTests(SuiteConfiguration suiteConfiguration, SuiteListener suiteListener);
+    void runTests(SuiteConfiguration suiteConfiguration, ActorRef<SuiteListener> suiteListener);
 
     void shutdown();
 }
