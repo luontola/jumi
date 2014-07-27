@@ -58,12 +58,7 @@ public class IpcCommunicationTest {
                 .addJvmOptions("-some-options")
                 .freeze();
 
-        IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
-        Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(expectedSuiteConfiguration);
-        sender.close();
-
-        // TODO: use the DirectoryObserver (which then creates IpcCommandReceiver)
-        CommandListener commandListener = new CommandListener() {
+        executor.execute(new CommandsDirectoryObserver(daemonDir, executor, actorThread, new CommandListener() {
             @Override
             public void runTests(SuiteConfiguration suiteConfiguration, ActorRef<SuiteListener> suiteListener) {
                 // this happens on daemon side
@@ -75,9 +70,11 @@ public class IpcCommunicationTest {
             @Override
             public void shutdown() {
             }
-        };
-        IpcCommandReceiver receiver = new IpcCommandReceiver(daemonDir, commandDir, commandListener, actorThread);
-        executor.execute(receiver);
+        }));
+
+        IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
+        Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(expectedSuiteConfiguration);
+        sender.close();
 
         SuiteListener suiteListener = mock(SuiteListener.class);
         IpcReaders.decodeAll(suiteReader.get(), suiteListener);

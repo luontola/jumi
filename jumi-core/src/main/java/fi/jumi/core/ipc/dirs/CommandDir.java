@@ -8,7 +8,7 @@ import javax.annotation.concurrent.Immutable;
 import java.nio.file.Path;
 
 @Immutable
-public class CommandDir {
+public final class CommandDir {
 
     private final Path path;
 
@@ -26,5 +26,10 @@ public class CommandDir {
 
     public Path getResponsePath() {
         return path.resolve("response");
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + path + ")";
     }
 }

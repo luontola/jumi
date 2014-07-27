@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @Immutable
-public class DaemonDir {
+public final class DaemonDir {
 
     private final Path baseDir;
 
@@ -17,15 +17,28 @@ public class DaemonDir {
         this.baseDir = baseDir;
     }
 
+    public Path getCommandsDir() {
+        return baseDir.resolve("commands");
+    }
+
     public CommandDir createCommandDir() throws IOException {
-        return new CommandDir(createUniqueDirUnder("commands"));
+        return new CommandDir(createUniqueDirUnder(getCommandsDir()));
+    }
+
+    private Path getSuitesDir() {
+        return baseDir.resolve("suites");
     }
 
     public SuiteDir createSuiteDir() throws IOException {
-        return new SuiteDir(createUniqueDirUnder("suites"));
+        return new SuiteDir(createUniqueDirUnder(getSuitesDir()));
     }
 
-    private Path createUniqueDirUnder(String name) throws IOException {
-        return UniqueDirectories.createUniqueDir(baseDir.resolve(name), System.currentTimeMillis());
+    private Path createUniqueDirUnder(Path dir) throws IOException {
+        return UniqueDirectories.createUniqueDir(dir, System.currentTimeMillis());
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + baseDir + ")";
     }
 }
