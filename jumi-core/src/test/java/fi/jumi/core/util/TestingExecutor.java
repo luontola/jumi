@@ -39,15 +39,24 @@ public class TestingExecutor extends ThreadPoolExecutor implements TestRule {
             public void evaluate() throws Throwable {
                 try {
                     base.evaluate();
+                } catch (Throwable t) {
+                    throw withUncaughtExceptions(t);
                 } finally {
                     shutdownNow();
                 }
                 boolean terminated = awaitTermination(1000, TimeUnit.MILLISECONDS);
-                for (Throwable uncaughtException : uncaughtExceptions) {
-                    throw uncaughtException;
+                if (!uncaughtExceptions.isEmpty()) {
+                    throw withUncaughtExceptions(new AssertionError("There were uncaught exceptions in executor threads"));
                 }
                 assertTrue("Executor did not terminate properly", terminated);
             }
         };
+    }
+
+    private Throwable withUncaughtExceptions(Throwable t) {
+        for (Throwable uncaughtException : uncaughtExceptions) {
+            t.addSuppressed(uncaughtException);
+        }
+        return t;
     }
 }
