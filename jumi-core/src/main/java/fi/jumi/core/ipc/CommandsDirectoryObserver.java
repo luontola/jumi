@@ -21,6 +21,7 @@ public class CommandsDirectoryObserver implements Runnable {
         directoryObserver = new DirectoryObserver(daemonDir.getCommandsDir(), new DirectoryObserver.Listener() {
             @Override
             public void onFileNoticed(Path path) {
+                // TODO: check that the path is really a directory?
                 executor.execute(new IpcCommandReceiver(daemonDir, new CommandDir(path), commandListener, actorThread));
             }
         });

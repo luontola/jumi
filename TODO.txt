@@ -187,13 +187,13 @@ OK - refactor BuildTest & SuiteConfiguration
 				OK - read commands from every new command file (daemon-dir/commands/*/request)
 				OK - read commands until IPC channel closed (though typically only one command per file)
 				OK - something to manage the daemon dir, e.g. creating command dirs
-				!! - write result to a corresponding file (daemon-dir/commands/*/reply)
-					- include the suite results file path in the reply (daemon-dir/suites/*/suite)
-					- write suite results to a MMF
-					- write suite results header before sending the reply
-				- close and forget the command MMFs after use
-				- close the suite results MMF after the suite is finished
-				- start it in Main, alongside DaemonNetworkEndpoint (using a different SuiteFactory instance?)
+				OK - write result to a corresponding file (daemon-dir/commands/*/reply)
+					OK - include the suite results file path in the reply (daemon-dir/suites/*/suite)
+					OK - write suite results to a MMF
+					OK - write suite results header before sending the reply
+				OK - close and forget the command MMFs after use
+				OK - close the suite results MMF after the suite is finished
+				!! - start it in Main, alongside DaemonNetworkEndpoint (using a different SuiteFactory instance?)
 		- switch to communicating over MMFs
 			- rename ProcessStartingDaemonSummoner to NetworkedProcessStartingDaemonSummoner
 			- rename RemoteSuiteLauncher to NetworkedRemoteSuiteLauncher
