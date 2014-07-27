@@ -4,7 +4,9 @@
 
 package fi.jumi.core.ipc.api;
 
-public interface CloseableRequestListener extends RequestListener {
+public interface RequestHandler extends RequestListener {
 
-    void close();
+    void start();
+
+    void finish();
 }

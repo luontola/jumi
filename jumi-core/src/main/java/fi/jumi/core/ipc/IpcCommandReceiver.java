@@ -22,38 +22,62 @@ import java.nio.file.Path;
 public class IpcCommandReceiver implements Runnable {
 
     private final DaemonDir daemonDir;
+    private final CommandDir commandDir;
     private final CommandListener commandListener;
     private final ActorThread actorThread;
-    private final IpcReader<RequestListener> requestReader;
-    private final IpcWriter<ResponseListener> responseWriter;
-    private final ResponseListener response;
 
     public IpcCommandReceiver(DaemonDir daemonDir, CommandDir commandDir, CommandListener commandListener, ActorThread actorThread) {
         this.daemonDir = daemonDir;
+        this.commandDir = commandDir;
         this.commandListener = commandListener;
         this.actorThread = actorThread;
-        this.requestReader = IpcChannel.reader(commandDir.getRequestPath(), RequestListenerEncoding::new);
-
-        // XXX: constructing these should happen in the actor thread that does all the writing to them
-        this.responseWriter = IpcChannel.writer(commandDir.getResponsePath(), ResponseListenerEncoding::new);
-        this.response = new ResponseListenerEventizer().newFrontend(responseWriter);
     }
 
     @Override
     public void run() {
-        ActorRef<CloseableRequestListener> requestListener = actorThread.bindActor(CloseableRequestListener.class, new RequestReader());
+        IpcReader<RequestListener> requestReader = IpcChannel.reader(commandDir.getRequestPath(), RequestListenerEncoding::new);
+        ActorRef<RequestHandler> requestHandler = actorThread.bindActor(RequestHandler.class,
+                new RequestHandlerImpl(daemonDir, commandDir, commandListener, actorThread));
+        requestHandler.tell().start();
         try {
-            IpcReaders.decodeAll(this.requestReader, requestListener.tell());
+            IpcReaders.decodeAll(requestReader, requestHandler.tell());
         } catch (InterruptedException e) {
             System.err.println(this + " interrupted");
             Thread.currentThread().interrupt();
         }
-        requestListener.tell().close();
+        requestHandler.tell().finish();
     }
 
 
     @NotThreadSafe
-    private class RequestReader implements CloseableRequestListener {
+    private static class RequestHandlerImpl implements RequestHandler {
+
+        private final DaemonDir daemonDir;
+        private final CommandDir commandDir;
+        private final CommandListener commandListener;
+        private final ActorThread actorThread;
+
+        private IpcWriter<ResponseListener> responseWriter;
+        private ResponseListener response;
+
+        public RequestHandlerImpl(DaemonDir daemonDir, CommandDir commandDir, CommandListener commandListener, ActorThread actorThread) {
+            this.daemonDir = daemonDir;
+            this.commandDir = commandDir;
+            this.commandListener = commandListener;
+            this.actorThread = actorThread;
+        }
+
+
+        @Override
+        public void start() {
+            this.responseWriter = IpcChannel.writer(commandDir.getResponsePath(), ResponseListenerEncoding::new);
+            this.response = new ResponseListenerEventizer().newFrontend(responseWriter);
+        }
+
+        @Override
+        public void finish() {
+            responseWriter.close();
+        }
 
         @Override
         public void runTests(SuiteConfiguration suiteConfiguration) {
@@ -86,11 +110,6 @@ public class IpcCommandReceiver implements Runnable {
         @Override
         public void shutdown() {
             commandListener.shutdown();
-        }
-
-        @Override
-        public void close() {
-            responseWriter.close();
         }
     }
 }
