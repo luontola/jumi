@@ -67,7 +67,6 @@ public class IpcCommandReceiver implements Runnable {
             this.actorThread = actorThread;
         }
 
-
         @Override
         public void start() {
             this.responseWriter = IpcChannel.writer(commandDir.getResponsePath(), ResponseListenerEncoding::new);
@@ -110,6 +109,11 @@ public class IpcCommandReceiver implements Runnable {
         @Override
         public void shutdown() {
             commandListener.shutdown();
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getName() + "(" + commandDir + ")";
         }
     }
 }
