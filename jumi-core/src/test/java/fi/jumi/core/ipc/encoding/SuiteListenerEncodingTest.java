@@ -90,4 +90,28 @@ public class SuiteListenerEncodingTest extends EncodingContract<SuiteListener> {
                 (buffer, data) -> new SuiteListenerEncoding(buffer).writeStackTrace(data),
                 (buffer) -> new SuiteListenerEncoding(buffer).readStackTrace());
     }
+
+    @Test
+    public void test_serialization_of_StackTrace_elements_with_unknown_source() {
+        StackTraceElement element = new StackTraceElement("Foo", "bar", null, -1);
+        assertThat(element.toString(), is("Foo.bar(Unknown Source)"));
+        StackTrace original = StackTrace.from(exceptionWithStackTrace(element));
+
+        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
+    }
+
+    @Test
+    public void test_serialization_of_StackTrace_elements_with_native_method() {
+        StackTraceElement element = new StackTraceElement("Foo", "bar", null, -2);
+        assertThat(element.toString(), is("Foo.bar(Native Method)"));
+        StackTrace original = StackTrace.from(exceptionWithStackTrace(element));
+
+        assertThat(roundTripStackTrace(original), is(deepEqualTo(original)));
+    }
+
+    private static Exception exceptionWithStackTrace(StackTraceElement... stackTrace) {
+        Exception e = new Exception();
+        e.setStackTrace(stackTrace);
+        return e;
+    }
 }

@@ -255,14 +255,14 @@ public class SuiteListenerEncoding extends EncodingUtil implements SuiteListener
     private void writeStackTraceElement(StackTraceElement element) {
         writeString(element.getClassName());
         writeString(element.getMethodName());
-        writeString(element.getFileName());
+        writeNullableString(element.getFileName());
         buffer.writeInt(element.getLineNumber());
     }
 
     private StackTraceElement readStackTraceElement() {
         String className = readString();
         String methodName = readString();
-        String fileName = readString();
+        String fileName = readNullableString();
         int lineNumber = buffer.readInt();
         return new StackTraceElement(className, methodName, fileName, lineNumber);
     }
