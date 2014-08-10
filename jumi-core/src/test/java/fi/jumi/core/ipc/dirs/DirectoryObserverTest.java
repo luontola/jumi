@@ -12,6 +12,7 @@ import org.hamcrest.Matcher;
 import org.junit.*;
 import org.junit.rules.*;
 
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -30,6 +31,9 @@ public class DirectoryObserverTest {
 
     @Rule
     public final TestingExecutor executor = new TestingExecutor();
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     private final BlockingQueue<Path> noticedFiles = new LinkedBlockingQueue<>();
     private Path directory;
@@ -90,6 +94,24 @@ public class DirectoryObserverTest {
         FileUtils.deleteDirectory(directory.toFile());
 
         observerFuture.get(); // should not timeout
+    }
+
+    @Test
+    public void requires_the_directory_to_exist_before_observing_it() {
+        Path noSuchDirectory = directory.resolve("no-such-directory");
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Does not exist: " + noSuchDirectory);
+        new DirectoryObserver(noSuchDirectory, noticedFiles::add);
+    }
+
+    @Test
+    public void requires_the_path_to_be_a_directory() throws IOException {
+        Path regularFile = tempDir.newFile("regular-file").toPath();
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Not a directory: " + regularFile);
+        new DirectoryObserver(regularFile, noticedFiles::add);
     }
 
 

@@ -19,8 +19,18 @@ public class DirectoryObserver implements Runnable {
     private final Set<Path> seenFiles = new HashSet<>();
 
     public DirectoryObserver(Path directory, Listener listener) {
+        checkDirectoryExists(directory);
         this.directory = directory;
         this.listener = listener;
+    }
+
+    private static void checkDirectoryExists(Path directory) {
+        if (!Files.exists(directory)) {
+            throw new IllegalArgumentException("Does not exist: " + directory);
+        }
+        if (!Files.isDirectory(directory)) {
+            throw new IllegalArgumentException("Not a directory: " + directory);
+        }
     }
 
     @Override
