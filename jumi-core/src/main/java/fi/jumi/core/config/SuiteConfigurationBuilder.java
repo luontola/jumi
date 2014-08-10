@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -39,24 +39,8 @@ public class SuiteConfigurationBuilder {
 
     // getters and setters
 
-    /**
-     * @deprecated Use {@link #getClasspath()} instead.
-     */
-    @Deprecated
-    public List<URI> getClassPath() {
-        return getClasspath();
-    }
-
     public List<URI> getClasspath() {
         return classpath;
-    }
-
-    /**
-     * @deprecated Use {@link #setClasspath(Path...)} instead.
-     */
-    @Deprecated
-    public SuiteConfigurationBuilder setClassPath(Path... files) {
-        return setClasspath(files);
     }
 
     public SuiteConfigurationBuilder setClasspath(Path... files) {
@@ -67,14 +51,6 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    /**
-     * @deprecated Use {@link #setClasspath(URI...)} instead.
-     */
-    @Deprecated
-    public SuiteConfigurationBuilder setClassPath(URI... files) {
-        return setClasspath(files);
-    }
-
     public SuiteConfigurationBuilder setClasspath(URI... files) {
         classpath.clear();
         for (URI file : files) {
@@ -83,24 +59,8 @@ public class SuiteConfigurationBuilder {
         return this;
     }
 
-    /**
-     * @deprecated Use {@link #addToClasspath(Path)} instead.
-     */
-    @Deprecated
-    public SuiteConfigurationBuilder addToClassPath(Path file) {
-        return addToClasspath(file.toUri());
-    }
-
     public SuiteConfigurationBuilder addToClasspath(Path file) {
         return addToClasspath(file.toUri());
-    }
-
-    /**
-     * @deprecated Use {@link #addToClasspath(URI)} instead.
-     */
-    @Deprecated
-    public SuiteConfigurationBuilder addToClassPath(URI file) {
-        return addToClasspath(file);
     }
 
     public SuiteConfigurationBuilder addToClasspath(URI file) {

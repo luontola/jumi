@@ -86,12 +86,6 @@ public class BuildTest {
                                 POM_FILES,
                                 BASE_PACKAGE + "core/"),
                         new Deprecations()
-                                .add("fi.jumi.core.config.SuiteConfiguration#getClassPath()", "2014-02-07", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#getClassPath()", "2014-02-07", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.nio.file.Path[])", "2014-02-07", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.net.URI[])", "2014-02-07", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.nio.file.Path)", "2014-02-07", 180)
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.net.URI)", "2014-02-07", 180)
                 },
 
                 {"jumi-daemon",
@@ -105,13 +99,6 @@ public class BuildTest {
                                 BASE_PACKAGE + "core/",
                                 BASE_PACKAGE + "daemon/"),
                         new Deprecations()
-                                // copied from jumi-core
-                                .add("fi.jumi.core.config.SuiteConfiguration#getClassPath()")
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#getClassPath()")
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.nio.file.Path[])")
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#setClassPath(java.net.URI[])")
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.nio.file.Path)")
-                                .add("fi.jumi.core.config.SuiteConfigurationBuilder#addToClassPath(java.net.URI)")
                 },
 
                 {"jumi-launcher",

@@ -64,14 +64,6 @@ public class SuiteConfiguration implements Serializable {
 
     // getters
 
-    /**
-     * @deprecated Use {@link #getClasspath()} instead.
-     */
-    @Deprecated
-    public List<URI> getClassPath() {
-        return getClasspath();
-    }
-
     public List<URI> getClasspath() {
         return classpath;
     }

@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -27,42 +27,6 @@ public class SuiteConfigurationTest {
     public void setup() {
         // make sure that melting makes all fields back mutable
         builder = builder.freeze().melt();
-    }
-
-
-    // classPath (deprecated 2013-08-12; renamed the property from "classPath" to "classpath")
-
-    @Deprecated
-    @Test
-    public void class_path_can_be_changed__Path() {
-        builder.setClassPath(Paths.get("old.jar"))
-                .setClassPath(Paths.get("foo.jar"), Paths.get("bar.jar"));
-
-        assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
-    }
-
-    @Deprecated
-    @Test
-    public void class_path_can_be_changed__URI() {
-        builder.setClassPath(Paths.get("old.jar").toUri())
-                .setClassPath(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri());
-
-        assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
-    }
-
-    @Deprecated
-    @Test
-    public void class_path_can_be_appended_to() {
-        builder.addToClassPath(Paths.get("foo.jar"))
-                .addToClassPath(Paths.get("bar.jar"));
-
-        assertThat(configuration().getClassPath(), is(asList(Paths.get("foo.jar").toUri(), Paths.get("bar.jar").toUri())));
-    }
-
-    @Deprecated
-    @Test
-    public void class_path_defaults_to_empty() {
-        assertThat(configuration().getClassPath(), is(empty()));
     }
 
 
