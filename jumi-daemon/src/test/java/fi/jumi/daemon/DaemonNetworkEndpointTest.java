@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -22,7 +22,7 @@ public class DaemonNetworkEndpointTest {
     private final SpyTimeout startupTimeout = new SpyTimeout();
     private final SpyTimeout idleTimeout = new SpyTimeout();
 
-    private final DaemonNetworkEndpoint endpoint = new DaemonNetworkEndpoint(null, null, startupTimeout, idleTimeout);
+    private final DaemonNetworkEndpoint endpoint = new DaemonNetworkEndpoint(null, null, startupTimeout, idleTimeout, null);
 
     @Before
     public void setInitialTimeoutStates() {

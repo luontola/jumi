@@ -13,11 +13,13 @@ import fi.jumi.core.config.*;
 import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.ipc.dirs.*;
+import fi.jumi.core.ipc.encoding.SuiteListenerEncoding;
 import fi.jumi.core.util.TestingExecutor;
 import org.junit.*;
 import org.junit.rules.*;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.Future;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -73,11 +75,11 @@ public class IpcCommunicationTest {
         }));
 
         IpcCommandSender sender = new IpcCommandSender(commandDir, executor);
-        Future<IpcReader<SuiteListener>> suiteReader = sender.runTests(expectedSuiteConfiguration);
+        Future<Path> suiteResults = sender.runTests(expectedSuiteConfiguration);
         sender.close();
 
         SuiteListener suiteListener = mock(SuiteListener.class);
-        IpcReaders.decodeAll(suiteReader.get(), suiteListener);
+        IpcReaders.decodeAll(IpcChannel.reader(suiteResults.get(), SuiteListenerEncoding::new), suiteListener);
         verify(suiteListener).onSuiteStarted();
         verify(suiteListener).onSuiteFinished();
         verifyNoMoreInteractions(suiteListener);

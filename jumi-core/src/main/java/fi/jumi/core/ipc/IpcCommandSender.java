@@ -5,7 +5,6 @@
 package fi.jumi.core.ipc;
 
 import com.google.common.util.concurrent.SettableFuture;
-import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.SuiteConfiguration;
 import fi.jumi.core.events.RequestListenerEventizer;
 import fi.jumi.core.ipc.api.*;
@@ -36,12 +35,12 @@ public class IpcCommandSender implements Closeable {
         requestWriter.close();
     }
 
-    public Future<IpcReader<SuiteListener>> runTests(SuiteConfiguration suiteConfiguration) {
-        SettableFuture<IpcReader<SuiteListener>> future = SettableFuture.create();
+    public Future<Path> runTests(SuiteConfiguration suiteConfiguration) {
+        SettableFuture<Path> future = SettableFuture.create();
         handlersForExpectedResponses.add(new ResponseListener() {
             @Override
             public void onSuiteStarted(Path suiteResults) {
-                future.set(IpcChannel.reader(suiteResults, SuiteListenerEncoding::new));
+                future.set(suiteResults);
             }
         });
         requestSender.runTests(suiteConfiguration);

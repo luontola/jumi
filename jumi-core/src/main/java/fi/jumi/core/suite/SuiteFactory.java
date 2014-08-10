@@ -29,6 +29,7 @@ public class SuiteFactory implements AutoCloseable {
     private final DaemonConfiguration config;
     private final OutputCapturer outputCapturer;
     private final PrintStream logOutput;
+    private final MessageListener messageListener;
 
     // some fields are package-private for testing purposes
 
@@ -40,10 +41,11 @@ public class SuiteFactory implements AutoCloseable {
     private RunIdSequence runIdSequence;
     MultiThreadedActors actors;
 
-    public SuiteFactory(DaemonConfiguration daemonConfiguration, OutputCapturer outputCapturer, PrintStream logOutput) {
+    public SuiteFactory(DaemonConfiguration daemonConfiguration, OutputCapturer outputCapturer, PrintStream logOutput, MessageListener messageListener) {
         this.config = daemonConfiguration;
         this.outputCapturer = outputCapturer;
         this.logOutput = logOutput;
+        this.messageListener = messageListener;
     }
 
     public void configure(SuiteConfiguration suite) {
@@ -62,9 +64,6 @@ public class SuiteFactory implements AutoCloseable {
 
         // logging configuration
         FailureHandler failureHandler = new InternalErrorReportingFailureHandler(suiteListener, logOutput);
-        MessageListener messageListener = config.getLogActorMessages()
-                ? new PrintStreamMessageLogger(logOutput)
-                : new NullMessageListener();
 
         // actor messages are already logged by the actors container, but the test thread pool must be hooked separately
         Executor testExecutor = messageListener.getListenedExecutor(testThreadPool);

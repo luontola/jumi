@@ -9,7 +9,8 @@ import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.dirs.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
@@ -17,8 +18,10 @@ public class CommandsDirectoryObserver implements Runnable {
 
     private final DirectoryObserver directoryObserver;
 
-    public CommandsDirectoryObserver(DaemonDir daemonDir, Executor executor, ActorThread actorThread, CommandListener commandListener) {
-        directoryObserver = new DirectoryObserver(daemonDir.getCommandsDir(), new DirectoryObserver.Listener() {
+    public CommandsDirectoryObserver(DaemonDir daemonDir, Executor executor, ActorThread actorThread, CommandListener commandListener) throws IOException {
+        Path commandsDir = daemonDir.getCommandsDir();
+        Files.createDirectories(commandsDir);
+        directoryObserver = new DirectoryObserver(commandsDir, new DirectoryObserver.Listener() {
             @Override
             public void onFileNoticed(Path path) {
                 // TODO: check that the path is really a directory?

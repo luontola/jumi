@@ -1,19 +1,27 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.daemon;
 
+import fi.jumi.actors.*;
+import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
+import fi.jumi.actors.listeners.*;
+import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
+import fi.jumi.core.ipc.CommandsDirectoryObserver;
+import fi.jumi.core.ipc.api.CommandListener;
+import fi.jumi.core.ipc.dirs.DaemonDir;
 import fi.jumi.core.network.*;
 import fi.jumi.core.stdout.*;
 import fi.jumi.core.suite.SuiteFactory;
+import fi.jumi.core.util.PrefixedThreadFactory;
 import fi.jumi.core.util.timeout.*;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.*;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @ThreadSafe
 public class Main {
@@ -47,11 +55,50 @@ public class Main {
         OutputCapturer outputCapturer = new OutputCapturer(stdout, stderr, Charset.defaultCharset());
         new OutputCapturerInstaller(new SystemOutErr()).install(outputCapturer);
 
-        // entry point of the application
-        SuiteFactory suiteFactory = new SuiteFactory(config, outputCapturer, stdout);
+        // logging
+        PrintStream logOutput = stdout;
+        MessageListener actorMessageLogger = config.getLogActorMessages()
+                ? new PrintStreamMessageLogger(logOutput)
+                : new NullMessageListener();
 
+        // entry point of the application
+        SuiteFactory suiteFactory = new SuiteFactory(config, outputCapturer, logOutput, actorMessageLogger);
+
+        // listen for commands through IPC files
+        DaemonDir daemonDir = new DaemonDir(config.getDaemonDir());
+        Executor executor = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-ipc-"));
+        MultiThreadedActors actors = new MultiThreadedActors(
+                executor,
+                new DynamicEventizerProvider(), // TODO: use ComposedEventizerProvider
+                new PrintStreamFailureLogger(logOutput),
+                actorMessageLogger
+        );
+        executor.execute(new CommandsDirectoryObserver(daemonDir, executor, actors.startActorThread(), new MyCommandListener(suiteFactory)));
+
+        // listen for commands through network sockets
         NetworkClient client = new NettyNetworkClient();
         client.connect("127.0.0.1", config.getLauncherPort(),
-                new DaemonNetworkEndpoint(suiteFactory, SHUTDOWN_ON_USER_COMMAND, startupTimeout, idleTimeout));
+                new DaemonNetworkEndpoint(suiteFactory, SHUTDOWN_ON_USER_COMMAND, startupTimeout, idleTimeout, daemonDir));
+    }
+
+    @NotThreadSafe
+    private static class MyCommandListener implements CommandListener {
+        private final SuiteFactory suiteFactory;
+
+        public MyCommandListener(SuiteFactory suiteFactory) {
+            this.suiteFactory = suiteFactory;
+        }
+        // XXX: this should be used as an actor (it works now just because we only send one message to the daemon)
+
+        @Override
+        public void runTests(SuiteConfiguration suiteConfiguration, ActorRef<SuiteListener> suiteListener) {
+            suiteFactory.configure(suiteConfiguration);
+            suiteFactory.start(suiteListener.tell());
+        }
+
+        @Override
+        public void shutdown() {
+            SHUTDOWN_ON_USER_COMMAND.run();
+        }
     }
 }
