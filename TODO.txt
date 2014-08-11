@@ -210,6 +210,8 @@ OK - refactor BuildTest & SuiteConfiguration
 		- remove NetworkedProcessStartingDaemonSummoner
 		- remove DaemonNetworkEndpoint
 		- remove fi.jumi.core.network and all that depends on it
+		- enable fi.jumi.test.DaemonProcessTest#classes_showing_up_in_actor_logs_have_custom_toString_methods
+			- possibly subclass SuiteListenerToEvent (IPC writer?) and give it a custom toString
 	- after implementing, consider refactoring the following places:
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
