@@ -1,8 +1,10 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.launcher.daemon;
+
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.*;
@@ -19,7 +21,7 @@ public class EmbeddedDaemonJar implements DaemonJar {
             p.load(in);
             daemonJarName = p.getProperty("daemonJarName");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 

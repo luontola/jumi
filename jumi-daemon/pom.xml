@@ -58,7 +58,7 @@
                                 <!-- Hidden dependencies -->
                             </relocations>
                             <filters>
-                                <!-- Throw away license files, POMs etc. of hidden dependencies -->
+                                <!-- Throw away non-class files of hidden dependencies -->
                             </filters>
                         </configuration>
                     </execution>

@@ -13,6 +13,7 @@ import fi.jumi.core.config.*;
 import fi.jumi.core.events.suiteListener.*;
 import fi.jumi.core.ipc.api.RequestListener;
 import fi.jumi.core.network.*;
+import fi.jumi.core.util.Boilerplate;
 import fi.jumi.core.util.timeout.InitialMessageTimeout;
 import fi.jumi.launcher.daemon.Steward;
 import fi.jumi.launcher.process.*;
@@ -69,7 +70,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
             Process process = processStarter.startJavaProcess(jvmArgs);
             copyInBackground(process.getInputStream(), outputListener); // TODO: write the output to a log file using OS pipes, read it from there with AppRunner
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 
@@ -97,7 +98,7 @@ public class ProcessStartingDaemonSummoner implements DaemonSummoner {
             try {
                 IOUtils.copy(src, dest);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw Boilerplate.rethrow(e);
             } finally {
                 IOUtils.closeQuietly(src);
                 IOUtils.closeQuietly(dest);

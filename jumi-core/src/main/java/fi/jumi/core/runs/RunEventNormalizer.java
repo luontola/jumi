@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -6,6 +6,7 @@ package fi.jumi.core.runs;
 
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.*;
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
@@ -29,7 +30,7 @@ public class RunEventNormalizer implements RunListener {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + testFile + ")";
+        return Boilerplate.toString(getClass(), testFile);
     }
 
     private String withContext(String message) {

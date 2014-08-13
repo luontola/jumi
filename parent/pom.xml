@@ -621,6 +621,10 @@
                                 <!-- Lambdas don't have debug information so PIT can't mutate them (and anyways they are generated) -->
                                 <pattern>*$$Lambda$*</pattern>
                             </excludedClasses>
+                            <avoidCallsTo>
+                                <!-- Avoid warnings due to trivial boilerplate code -->
+                                <pattern>fi.jumi.core.util.Boilerplate</pattern>
+                            </avoidCallsTo>
                             <failWhenNoMutations>false</failWhenNoMutations>
                             <timestampedReports>false</timestampedReports>
                             <mutators>

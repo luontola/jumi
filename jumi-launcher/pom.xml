@@ -104,7 +104,7 @@
                                 </relocation>
                             </relocations>
                             <filters>
-                                <!-- Throw away license files, POMs etc. of hidden dependencies -->
+                                <!-- Throw away non-class files of hidden dependencies -->
                                 <filter>
                                     <artifact>commons-io:commons-io</artifact>
                                     <excludes>

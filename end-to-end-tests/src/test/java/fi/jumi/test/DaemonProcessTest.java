@@ -74,7 +74,6 @@ public class DaemonProcessTest {
         assertThat(app.getFinishedDaemonOutput(), containsString("The system will now exit: timed out before anybody connected"));
     }
 
-    @Ignore // TODO: enable me, investigate and fix the failure cause
     @Test
     public void classes_showing_up_in_actor_logs_have_custom_toString_methods() throws Exception {
         List<String> irrelevantClasses = Arrays.asList(
@@ -85,10 +84,8 @@ public class DaemonProcessTest {
                 "sample.BuggyDriver$$Lambda$1",
                 "fi.jumi.simpleunit.SimpleUnit",
                 "fi.jumi.simpleunit.SimpleUnit$RunTestMethod",
-                // Jumi classes which don't contain interesting state
-                // TODO: remove me, if SuiteRunner starts containing interesting information
-                "fi.jumi.core.suite.SuiteRunner",
-                "fi.jumi.core.suite.SuiteRunner$1FireSuiteFinished"
+                // TODO: remove me; investigate the cause and create a better toString for the actor
+                "fi.jumi.core.events.suiteListener.SuiteListenerToEvent"
         );
         app.daemon.setLogActorMessages(true);
 

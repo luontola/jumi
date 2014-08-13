@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,6 +8,7 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.api.RunId;
 import fi.jumi.core.stdout.*;
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
@@ -114,7 +115,9 @@ class Run {
             for (Test t = this; t != null; t = t.parent) {
                 activeTestsStack.push(t.testId);
             }
-            return "TestNotifier(" + runId + ", " + activeTestsStack + ")";
+            Class<?> displayedClassName = TestNotifier.class;
+            assert displayedClassName.isInstance(this);
+            return Boilerplate.toString(displayedClassName, runId, activeTestsStack);
         }
     }
 

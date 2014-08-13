@@ -6,6 +6,7 @@ package fi.jumi.core.discovery;
 
 import fi.jumi.actors.ActorRef;
 import fi.jumi.core.api.TestFile;
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
@@ -42,6 +43,6 @@ public class PathMatcherTestFileFinder implements TestFileFinder {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + matcher + ", " + baseDir + ")";
+        return Boilerplate.toString(getClass(), matcher, baseDir);
     }
 }

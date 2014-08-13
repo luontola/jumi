@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,6 +8,7 @@ import fi.jumi.actors.*;
 import fi.jumi.actors.workers.*;
 import fi.jumi.core.api.*;
 import fi.jumi.core.discovery.TestFileFinderListener;
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.PrintStream;
@@ -16,7 +17,6 @@ import java.util.concurrent.Executor;
 @NotThreadSafe
 public class SuiteRunner implements TestFileFinderListener {
 
-    // TODO: if SuiteRunner starts containing interesting state, update DaemonProcessTest to require a custom toString() from it
     private final DriverFactory driverFactory;
     private final SuiteListener suiteListener;
     private final ActorThread actorThread;
@@ -50,7 +50,7 @@ public class SuiteRunner implements TestFileFinderListener {
 
             @Override
             public String toString() {
-                return getClass().getName() + "(" + testFile + ")";
+                return Boilerplate.toString(getClass(), testFile);
             }
         }
 
@@ -70,6 +70,11 @@ public class SuiteRunner implements TestFileFinderListener {
             public void onAllWorkersFinished() {
                 suiteListener.onSuiteFinished();
             }
+
+            @Override
+            public String toString() {
+                return Boilerplate.toString(getClass());
+            }
         }
 
         suiteCompletionMonitor.afterPreviousWorkersFinished(asActor(new FireSuiteFinished()));
@@ -77,5 +82,11 @@ public class SuiteRunner implements TestFileFinderListener {
 
     private ActorRef<WorkerListener> asActor(WorkerListener rawActor) {
         return actorThread.bindActor(WorkerListener.class, rawActor);
+    }
+
+    @Override
+    public String toString() {
+        // TODO: later this class may attract interesting state; then update this to show them in logs
+        return Boilerplate.toString(getClass());
     }
 }

@@ -4,6 +4,8 @@
 
 package fi.jumi.core.ipc.dirs;
 
+import fi.jumi.core.util.Boilerplate;
+
 import javax.annotation.concurrent.Immutable;
 import java.nio.file.Path;
 
@@ -30,6 +32,6 @@ public final class CommandDir {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + path + ")";
+        return Boilerplate.toString(getClass(), path);
     }
 }

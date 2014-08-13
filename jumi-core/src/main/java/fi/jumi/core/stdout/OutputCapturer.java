@@ -1,9 +1,10 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.stdout;
 
+import fi.jumi.core.util.Boilerplate;
 import org.apache.commons.io.output.*;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -35,7 +36,7 @@ public class OutputCapturer {
         try {
             return new PrintStream(out, false, charset.name());
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 

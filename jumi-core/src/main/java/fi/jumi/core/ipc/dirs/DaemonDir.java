@@ -4,6 +4,8 @@
 
 package fi.jumi.core.ipc.dirs;
 
+import fi.jumi.core.util.Boilerplate;
+
 import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,6 +41,6 @@ public final class DaemonDir {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + baseDir + ")";
+        return Boilerplate.toString(getClass(), baseDir);
     }
 }

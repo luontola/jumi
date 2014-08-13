@@ -13,6 +13,7 @@ import fi.jumi.core.ipc.api.*;
 import fi.jumi.core.ipc.channel.*;
 import fi.jumi.core.ipc.dirs.*;
 import fi.jumi.core.ipc.encoding.*;
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class IpcCommandReceiver implements Runnable {
                 return daemonDir.createSuiteDir().getSuiteResultsPath();
             } catch (IOException e) {
                 // TODO: write a failure to results file?
-                throw new RuntimeException(e);
+                throw Boilerplate.rethrow(e);
             }
         }
 
@@ -113,7 +114,7 @@ public class IpcCommandReceiver implements Runnable {
 
         @Override
         public String toString() {
-            return getClass().getName() + "(" + commandDir + ")";
+            return Boilerplate.toString(getClass(), commandDir);
         }
     }
 }

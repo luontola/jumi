@@ -1,8 +1,10 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.core.config;
+
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Method;
@@ -27,7 +29,7 @@ class SystemProperty {
             type = getter.getReturnType();
             setter = DaemonConfigurationBuilder.class.getMethod(setterName(beanProperty), type);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 
@@ -51,7 +53,7 @@ class SystemProperty {
         try {
             return getter.invoke(source);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 
@@ -59,7 +61,7 @@ class SystemProperty {
         try {
             setter.invoke(target, parse(type, value));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 

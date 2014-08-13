@@ -5,6 +5,7 @@
 package fi.jumi.core.ipc.encoding;
 
 import fi.jumi.core.ipc.buffer.IpcBuffer;
+import fi.jumi.core.util.Boilerplate;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.*;
@@ -47,7 +48,7 @@ public abstract class EncodingUtil {
         try {
             return new URI(readString());
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw Boilerplate.rethrow(e);
         }
     }
 
