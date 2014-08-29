@@ -22,12 +22,6 @@ Also execute mutation tests and produce code coverage reports
 
     mvn clean verify -P coverage-report
 
-Looking at dependencies etc. requires first executing the package
-phase, because other modules depend on jumi-actors-maven-plugin to be
-found from the Maven reactor
-
-    mvn package dependency:tree
-
 Some other useful commands
 
     mvn versions:display-plugin-updates
