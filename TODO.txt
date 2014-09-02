@@ -326,6 +326,8 @@ OK - Eclipse's JUnit integration adds to classpath entries that are not valid fi
 	>	(2) Or then keep it as is. That would be the way that System.out works normally. Principle of least surprise?
 
 - misc refactoring (choose some, defer others)
+	- SuiteMother: twoInterleavedRuns seems to be missing onTestFound for the root test
+	- EventBuilder: nextRunId could use the RunIdSequence
 	- upgrade to Java 8
 		- check that most developers have upgraded to Java 8, or wait for Java 7 end-of-life (April 2015, as estimated as of May 2014)
 		- search the code for "Java 8" TODO comments and upgrade those to use Java 8 APIs
@@ -380,6 +382,7 @@ OK - Eclipse's JUnit integration adds to classpath entries that are not valid fi
 		- actors: extract AbstractMessageLogger from PrintStreamMessageLogger
 		- create logger specific implementation of AbstractMessageLogger
 		- customize MinLog's output to use microsecond accuracy, similar to PrintStreamMessageLogger
+	- consider using http://mojo.codehaus.org/flatten-maven-plugin/
 
 - minor release
 	- tidy up release notes
