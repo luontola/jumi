@@ -216,6 +216,18 @@ OK - refactor BuildTest & SuiteConfiguration
 		fi.jumi.core.TestRunCoordinator#addSuiteListener
 		fi.jumi.daemon.DaemonNetworkEndpoint#onConnected
 		fi.jumi.launcher.remote.RemoteSuiteLauncher#onDisconnected
+	- DirectoryObserverTest: on OS X 10.9.4 it takes 10 seconds for the WatchService to notice changes; file system format: Mac OS Extended (Journaled, Encrypted)
+		* no native support for OS X
+			http://stackoverflow.com/questions/9588737/is-java-7-watchservice-slow-for-anyone-else
+		FAIL - SensitivityWatchEventModifier.HIGH only lowers the delay to 2 seconds, which is too much
+			http://stackoverflow.com/a/18362404
+		- use a faster poller (50-100ms) as a failsafe?
+		- custom support for Mac?
+			! https://code.google.com/p/barbarywatchservice/
+			http://en.wikipedia.org/wiki/FSEvents
+			https://github.com/zch/NativeFSEvents
+			http://lists.apple.com/archives/java-dev/2009/May/msg00238.html
+			http://stackoverflow.com/questions/1515730/is-there-a-command-like-watch-or-inotifywait-on-the-mac
 	- DirBasedSteward: remove old daemon dirs after they are no more needed (keep last X dirs, at least Y days)
 	- refactor: do not convert to a Path at SuiteEventSerializer#readTestFile and then back to String in TestFile#fromPath, but expose a raw String constructor or factory?
 	- save v1 events to file for testing compatibility
