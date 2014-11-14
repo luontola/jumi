@@ -85,7 +85,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.catch-exception</groupId>
+            <groupId>eu.codearte.catch-exception</groupId>
             <artifactId>catch-exception</artifactId>
             <scope>test</scope>
         </dependency>
@@ -159,7 +159,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>17.0</version>
+                <version>18.0</version>
             </dependency>
 
             <dependency>
@@ -206,7 +206,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>4.12-beta-3</version>
             </dependency>
 
             <dependency>
@@ -229,13 +229,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.9.5</version>
+                <version>1.10.8</version>
             </dependency>
 
             <dependency>
-                <groupId>com.googlecode.catch-exception</groupId>
+                <groupId>eu.codearte.catch-exception</groupId>
                 <artifactId>catch-exception</artifactId>
-                <version>1.2.0</version>
+                <version>1.3.2</version>
             </dependency>
 
             <dependency>
@@ -259,7 +259,7 @@
             <dependency>
                 <groupId>fi.luontola.buildtest</groupId>
                 <artifactId>buildtest</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2</version>
             </dependency>
 
         </dependencies>
@@ -473,7 +473,7 @@
                     <!-- TODO: Java 8, remove me -->
                     <groupId>net.orfjackal.retrolambda</groupId>
                     <artifactId>retrolambda-maven-plugin</artifactId>
-                    <version>1.6.1</version>
+                    <version>1.7.0</version>
                     <configuration>
                         <target>1.7</target>
                         <java8home>${env.JAVA8_HOME}</java8home>

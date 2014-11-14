@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -23,7 +23,8 @@ public class TestEnvironment {
             Properties testing = new Properties();
             testing.load(in);
 
-            ARTIFACTS = new ProjectArtifacts(getDirectory(testing, "test.projectArtifactsDir").toFile());
+            ARTIFACTS = new ProjectArtifacts(getDirectory(testing, "test.projectArtifactsDir").toFile(),
+                    new VersionNumbering("\\d+.*", "")); // relaxed pattern to match both our and JUnit's version numbering
             SANDBOX_DIR = getDirectory(testing, "test.sandbox");
             SAMPLE_CLASSES_DIR = getDirectory(testing, "test.sampleClasses");
             EXTRA_CLASSPATH = getDirectory(testing, "test.extraClasspath");

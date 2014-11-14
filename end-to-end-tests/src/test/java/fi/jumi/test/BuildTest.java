@@ -6,7 +6,7 @@ package fi.jumi.test;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
-import com.google.common.io.*;
+import com.google.common.io.ByteStreams;
 import fi.jumi.launcher.daemon.EmbeddedDaemonJar;
 import fi.jumi.test.PartiallyParameterized.NonParameterized;
 import fi.luontola.buildtest.*;
@@ -19,7 +19,6 @@ import org.objectweb.asm.tree.ClassNode;
 
 import javax.annotation.concurrent.*;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.*;
 import java.util.*;
 
@@ -151,7 +150,7 @@ public class BuildTest {
              InputStream in2 = Files.newInputStream(publishedJar)) {
 
             assertTrue("the embedded daemon JAR was not equal to " + publishedJar,
-                    ByteStreams.equal(asSupplier(in1), asSupplier(in2)));
+                    Arrays.equals(ByteStreams.toByteArray(in1), ByteStreams.toByteArray(in2)));
         }
     }
 
@@ -226,9 +225,5 @@ public class BuildTest {
 
     private Properties getMavenArtifactProperties(File jarFile, String filename) {
         return JarUtils.getProperties(jarFile, POM_FILES + artifactId + "/" + filename);
-    }
-
-    private static InputSupplier<InputStream> asSupplier(final InputStream in) {
-        return () -> in;
     }
 }
