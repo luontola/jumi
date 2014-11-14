@@ -1,4 +1,4 @@
-// Copyright © 2011-2012, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -26,5 +26,14 @@ public class Asserts {
         if (Strings.containsSubStrings(actual, expectedSubStrings)) {
             throw new ComparisonFailure(message, Strings.asLines(expectedSubStrings), actual);
         }
+    }
+
+    public static Exception catchException(Runnable r) {
+        try {
+            r.run();
+        } catch (Exception e) {
+            return e;
+        }
+        throw new AssertionError("did not throw an exception");
     }
 }

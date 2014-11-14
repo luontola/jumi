@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -7,15 +7,15 @@ package fi.jumi.core.discovery;
 import fi.jumi.actors.ActorRef;
 import fi.jumi.core.api.TestFile;
 import fi.jumi.core.util.SpyListener;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.mockito.Matchers;
 
 import java.util.*;
 
-import static com.googlecode.catchexception.CatchException.*;
-import static com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers.hasMessage;
+import static fi.jumi.core.util.Asserts.catchException;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.*;
 
 public class CompositeTestFileFinderTest {
@@ -59,8 +59,8 @@ public class CompositeTestFileFinderTest {
         expect.onAllTestFilesFound();
 
         spy.replay();
-        catchException(composite).findTestFiles(ActorRef.wrap(expect));
-        assertThat(caughtException(), (Matcher) hasMessage("dummy exception"));
+        Exception e = catchException(() -> composite.findTestFiles(ActorRef.wrap(expect)));
+        assertThat(e, hasMessage(equalTo("dummy exception")));
         spy.verify();
     }
 

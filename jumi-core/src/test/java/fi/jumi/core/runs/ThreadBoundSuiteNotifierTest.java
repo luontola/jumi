@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -9,7 +9,6 @@ import fi.jumi.actors.ActorRef;
 import fi.jumi.api.drivers.*;
 import fi.jumi.core.api.RunId;
 import fi.jumi.core.stdout.OutputCapturer;
-import org.hamcrest.Matcher;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mockito.*;
@@ -17,14 +16,14 @@ import org.mockito.*;
 import java.io.PrintStream;
 import java.util.concurrent.*;
 
-import static com.googlecode.catchexception.CatchException.*;
-import static com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers.hasMessage;
+import static fi.jumi.core.util.Asserts.catchException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "Convert2MethodRef"})
+@SuppressWarnings("Convert2MethodRef")
 public class ThreadBoundSuiteNotifierTest {
 
     private static final RunId FIRST_RUN_ID = new RunId(RunId.FIRST_ID);
@@ -137,11 +136,11 @@ public class ThreadBoundSuiteNotifierTest {
         TestNotifier tn1 = notifier.fireTestStarted(TestId.ROOT);
         TestNotifier tn2 = notifier.fireTestStarted(TestId.of(0));
 
-        Throwable originalTestFailure = new Exception("original test failure");
+        Exception originalTestFailure = new Exception("original test failure");
+        Exception thrownException = catchException(() -> tn1.fireFailure(originalTestFailure));
 
-        catchException(tn1).fireFailure(originalTestFailure);
-        assertThat("chained exception", caughtException(), (Matcher)
-                allOf(instanceOf(IllegalStateException.class),
+        assertThat("chained exception", thrownException,
+                allOf(instanceOf(IllegalStateException.class), // because not called on the innermost TestNotifier
                         hasCause(equalTo(originalTestFailure))));
     }
 
@@ -228,10 +227,9 @@ public class ThreadBoundSuiteNotifierTest {
     // helpers
 
     private void expectIllegalStateException(String expectedMessage, Runnable command) {
-        catchException(command).run();
-        Exception e = caughtException();
+        Exception e = catchException(command);
         lastError = e;
-        assertThat(e, (Matcher) allOf(instanceOf(IllegalStateException.class), hasMessage(expectedMessage)));
+        assertThat(e, allOf(instanceOf(IllegalStateException.class), hasMessage(equalTo(expectedMessage))));
     }
 
     private static <T> T inNewThread(Callable<T> callable) throws Exception {
