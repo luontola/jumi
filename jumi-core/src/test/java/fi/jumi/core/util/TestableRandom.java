@@ -1,4 +1,4 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -34,7 +34,8 @@ public class TestableRandom implements TestRule {
                 try {
                     base.evaluate();
                 } catch (Throwable t) {
-                    throw new ExtraMessageAssertionError(getDebugInformation(), t);
+                    t.addSuppressed(new DebugInformation(getDebugInformation()));
+                    throw t;
                 }
             }
         };
@@ -119,19 +120,9 @@ public class TestableRandom implements TestRule {
         }
     }
 
-    private static class ExtraMessageAssertionError extends AssertionError {
-        private final String extraMessage;
-        private final Throwable realException;
-
-        public ExtraMessageAssertionError(String extraMessage, Throwable realException) {
-            this.extraMessage = extraMessage;
-            this.realException = realException;
-            this.setStackTrace(realException.getStackTrace());
-        }
-
-        @Override
-        public String toString() {
-            return extraMessage + "\n" + realException.toString();
+    private static class DebugInformation extends RuntimeException {
+        public DebugInformation(String message) {
+            super("\n" + message);
         }
     }
 }
