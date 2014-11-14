@@ -47,11 +47,19 @@
         <module name="simpleunit" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="end-to-end-tests" target="1.8" />
+      <module name="jumi-api" target="1.8" />
+      <module name="jumi-core" target="1.8" />
+      <module name="jumi-daemon" target="1.8" />
+      <module name="jumi-launcher" target="1.8" />
+      <module name="parent" target="1.8" />
+      <module name="project" target="1.8" />
+      <module name="simpleunit" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="EclipseCompilerSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />
     <option name="DEPRECATION" value="false" />
   </component>
 </project>
-
