@@ -300,6 +300,7 @@ OK - Eclipse's JUnit integration adds to classpath entries that are not valid fi
 	- where to find a multi-core ARM for a test drive? and are the newer ARMs anyhow cache coherent?
 		http://www.calxeda.com/trystack/
 		http://trystack.org/
+		RPI 2 is a quad core ARMv7: http://www.theverge.com/2015/2/2/7954617/raspberry-pi-2-announced-on-sale
 	- are there Itaniums (IA64) on any cloud for rent?
 	- Azul's Vega should have a relaxed memory model; ask for co-operation, also to ensure scalability?
 		"Azul hands out 'academic' accounts all the time." https://groups.google.com/d/msg/clojure/XHqWLMcsH-c/ZYeyMP_w66cJ
