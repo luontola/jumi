@@ -3,7 +3,7 @@ layout: page
 ---
 {% include JB/setup %}
 
-Common test runner for the JVM. Natively supports running tests in parallel, class loader caching, test order priorization and other measures to run tests faster. Contains the full stack for running tests (the responsibilities which used to be spread over build tools, IDEs and test runners) in order to overcome limitations of previously existing tools. Will overcome JUnit's test runner's limitations to better support all testing frameworks on the JVM.
+Jumi is a test runner for all programming languages on the JVM. It will natively support running tests in parallel, class loader caching, test order priorization and other measures to run tests faster. It covers the full stack for running tests (the responsibilities which used to be spread over build tools, IDEs and test runners) in order to overcome limitations of previously existing tools, specifically JUnit's test runner, to better support all testing frameworks on the JVM.
 
 Jumi is not only open source, but also open development. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code> The long-term roadmap is in [ROADMAP.txt](https://github.com/orfjackal/jumi/blob/master/ROADMAP.txt) and the short-term task list is in [TODO.txt](https://github.com/orfjackal/jumi/blob/master/TODO.txt).
 
@@ -20,6 +20,8 @@ Jumi is not only open source, but also open development. The process of how Jumi
 
 Main Features
 -------------
+
+All the following features have been implemented and more are on the way.
 
 - **Runs Tests in Parallel** - Faster feedback by distributing the load over all your CPU cores. A testing framework that runs on Jumi can easily run even each test method in its own thread.
 

@@ -10,8 +10,8 @@ markdown: rdiscount
 # so be sure to set them if your theme uses them.
 #
 title: Jumi
-tagline: common test runner for the JVM
-description: Common test runner for the JVM. Natively supports running tests in parallel. Full stack from UI to class loading. Overcomes a bunch of limitations in JUnit's test runner, IDEs and build tools.
+tagline: test runner for all JVM languages
+description: Test runner for all JVM languages. Natively supports running tests in parallel. Full stack from UI to class loading. Overcomes a bunch of limitations in JUnit's test runner, IDEs and build tools.
 author:
   name: Esko Luontola
   url: http://www.orfjackal.net/
