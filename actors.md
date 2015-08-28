@@ -7,10 +7,10 @@ group: navigation
 
 Jumi has its own little [actor](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actor library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
-To get started, read [the user guide](https://github.com/orfjackal/jumi-actors/wiki/User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22). For release details see [the release notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md).
+To get started, read [the user guide](https://github.com/orfjackal/jumi-actors/wiki/User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi.actors%22). For release details see [the release notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md).
 
 - Documentation: <https://github.com/orfjackal/jumi-actors/wiki>
-- Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md))
+- Downloads: [fi.jumi.actors in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi.actors%22) ([Release Notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md))
 - Source code:
     - <https://github.com/orfjackal/jumi-actors>
     - <https://github.com/orfjackal/jumi-scripts>
