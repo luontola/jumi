@@ -227,7 +227,7 @@
                                 </artifactItem>
 
                                 <artifactItem>
-                                    <groupId>fi.jumi</groupId>
+                                    <groupId>fi.jumi.actors</groupId>
                                     <artifactId>thread-safety-agent</artifactId>
                                     <version>${jumi-actors.version}</version>
                                 </artifactItem>

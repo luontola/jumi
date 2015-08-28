@@ -21,11 +21,16 @@
 
         <dependency>
             <groupId>fi.jumi</groupId>
+            <artifactId>jumi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>fi.jumi.actors</groupId>
             <artifactId>jumi-actors</artifactId>
         </dependency>
         <dependency>
-            <groupId>fi.jumi</groupId>
-            <artifactId>jumi-api</artifactId>
+            <groupId>fi.jumi.actors</groupId>
+            <artifactId>jumi-actors-generator</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -90,34 +95,6 @@
                 </executions>
             </plugin>
 
-            <!-- Event stubs -->
-
-            <plugin>
-                <groupId>fi.jumi</groupId>
-                <artifactId>jumi-actors-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate-event-stubs</goal>
-                        </goals>
-                        <configuration>
-                            <targetPackage>fi.jumi.core.events</targetPackage>
-                            <eventInterfaces>
-                                <interface>java.lang.Runnable</interface>
-                                <interface>java.util.concurrent.Executor</interface>
-                                <interface>fi.jumi.actors.workers.WorkerListener</interface>
-                                <interface>fi.jumi.core.ipc.api.RequestListener</interface>
-                                <interface>fi.jumi.core.ipc.api.ResponseListener</interface>
-                                <interface>fi.jumi.core.util.Startable</interface>
-                                <interface>fi.jumi.core.api.SuiteListener</interface>
-                                <interface>fi.jumi.core.discovery.TestFileFinderListener</interface>
-                                <interface>fi.jumi.core.runs.RunListener</interface>
-                            </eventInterfaces>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Hide external dependencies -->
 
             <plugin>
@@ -131,7 +108,7 @@
                             <artifactSet>
                                 <excludes>
                                     <!-- Regular dependencies (transitive) -->
-                                    <exclude>fi.jumi:jumi-actors</exclude>
+                                    <exclude>fi.jumi.actors:jumi-actors</exclude>
                                     <exclude>fi.jumi:jumi-api</exclude>
                                 </excludes>
                             </artifactSet>

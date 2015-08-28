@@ -4,8 +4,11 @@
 
 package fi.jumi.core.ipc.api;
 
+import fi.jumi.actors.generator.GenerateEventizer;
+
 import java.nio.file.Path;
 
+@GenerateEventizer(targetPackage = "fi.jumi.core.events")
 public interface ResponseListener {
 
     void onSuiteStarted(Path suiteResults);

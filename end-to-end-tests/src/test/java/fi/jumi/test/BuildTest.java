@@ -36,6 +36,7 @@ public class BuildTest {
 
     private static final String MANIFEST = "META-INF/MANIFEST.MF";
     private static final String POM_FILES = "META-INF/maven/fi.jumi/";
+    private static final String ACTORS_POM_FILES = "META-INF/maven/fi.jumi.actors/";
     private static final String BASE_PACKAGE = "fi/jumi/";
 
     private static final String[] DOES_NOT_NEED_JSR305_ANNOTATIONS = {
@@ -78,8 +79,8 @@ public class BuildTest {
                 {"jumi-core",
                         asList(Opcodes.V1_2, Opcodes.V1_5, Opcodes.V1_6, Opcodes.V1_7),
                         asList(
-                                "fi.jumi:jumi-actors",
-                                "fi.jumi:jumi-api"),
+                                "fi.jumi:jumi-api",
+                                "fi.jumi.actors:jumi-actors"),
                         asList(
                                 MANIFEST,
                                 POM_FILES,
@@ -93,6 +94,7 @@ public class BuildTest {
                         asList(
                                 MANIFEST,
                                 POM_FILES,
+                                ACTORS_POM_FILES,
                                 BASE_PACKAGE + "actors/",
                                 BASE_PACKAGE + "api/",
                                 BASE_PACKAGE + "core/",
@@ -157,16 +159,18 @@ public class BuildTest {
     @Test
     public void none_of_the_artifacts_may_have_dependencies_to_external_libraries() {
         for (String dependency : expectedDependencies) {
-            assertThat("artifact " + artifactId, dependency, startsWith("fi.jumi:"));
+            assertThat("artifact " + artifactId, dependency,
+                    either(startsWith("fi.jumi:")).or(startsWith("fi.jumi.actors:")));
         }
     }
 
     @Test
     public void none_of_the_artifacts_may_contain_classes_from_external_libraries_without_shading_them() {
         for (String content : expectedContents) {
-            assertThat("artifact " + artifactId, content, Matchers.<String>
+            assertThat("artifact " + artifactId, content, Matchers.
                     either(startsWith(BASE_PACKAGE))
                     .or(startsWith(POM_FILES))
+                    .or(startsWith(ACTORS_POM_FILES))
                     .or(startsWith(MANIFEST)));
         }
     }

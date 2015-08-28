@@ -4,8 +4,10 @@
 
 package fi.jumi.core.api;
 
+import fi.jumi.actors.generator.GenerateEventizer;
 import fi.jumi.api.drivers.TestId;
 
+@GenerateEventizer(targetPackage = "fi.jumi.core.events")
 public interface SuiteListener {
 
     void onSuiteStarted();

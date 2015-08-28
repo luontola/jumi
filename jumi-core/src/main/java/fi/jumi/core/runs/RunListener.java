@@ -4,9 +4,11 @@
 
 package fi.jumi.core.runs;
 
+import fi.jumi.actors.generator.GenerateEventizer;
 import fi.jumi.api.drivers.TestId;
 import fi.jumi.core.api.RunId;
 
+@GenerateEventizer(targetPackage = "fi.jumi.core.events")
 public interface RunListener {
 
     void onInternalError(String message, Throwable cause);

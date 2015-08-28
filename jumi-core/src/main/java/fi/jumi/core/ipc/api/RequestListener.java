@@ -4,8 +4,10 @@
 
 package fi.jumi.core.ipc.api;
 
+import fi.jumi.actors.generator.GenerateEventizer;
 import fi.jumi.core.config.SuiteConfiguration;
 
+@GenerateEventizer(targetPackage = "fi.jumi.core.events")
 public interface RequestListener {
 
     void runTests(SuiteConfiguration suiteConfiguration);

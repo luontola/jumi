@@ -4,8 +4,10 @@
 
 package fi.jumi.core.discovery;
 
+import fi.jumi.actors.generator.GenerateEventizer;
 import fi.jumi.core.api.TestFile;
 
+@GenerateEventizer(targetPackage = "fi.jumi.core.events")
 public interface TestFileFinderListener {
 
     void onTestFileFound(TestFile testFile);

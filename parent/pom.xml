@@ -48,7 +48,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <minimumMavenVersion>3.1</minimumMavenVersion>
-        <jumi-actors.version>0.1.196</jumi-actors.version>
+        <jumi-actors.version>1.0.270</jumi-actors.version>
         <testTempDir>${project.build.directory}/tmp</testTempDir>
     </properties>
 
@@ -135,8 +135,13 @@
             <!-- Jumi Actors -->
 
             <dependency>
-                <groupId>fi.jumi</groupId>
+                <groupId>fi.jumi.actors</groupId>
                 <artifactId>jumi-actors</artifactId>
+                <version>${jumi-actors.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>fi.jumi.actors</groupId>
+                <artifactId>jumi-actors-generator</artifactId>
                 <version>${jumi-actors.version}</version>
             </dependency>
 
@@ -453,20 +458,10 @@
             <plugins>
 
                 <plugin>
-                    <groupId>fi.jumi</groupId>
-                    <artifactId>jumi-actors-maven-plugin</artifactId>
-                    <version>${jumi-actors.version}</version>
-                    <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
-                    </configuration>
-                </plugin>
-
-                <plugin>
                     <!-- TODO: Java 8, remove me -->
                     <groupId>net.orfjackal.retrolambda</groupId>
                     <artifactId>retrolambda-maven-plugin</artifactId>
-                    <version>1.8.1</version>
+                    <version>1.8.0</version>
                     <configuration>
                         <target>1.7</target>
                         <java8home>${env.JAVA8_HOME}</java8home>

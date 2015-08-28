@@ -91,7 +91,7 @@
                             <artifactSet>
                                 <excludes>
                                     <!-- Regular dependencies (transitive) -->
-                                    <exclude>fi.jumi:jumi-actors</exclude>
+                                    <exclude>fi.jumi.actors:jumi-actors</exclude>
                                     <exclude>fi.jumi:jumi-api</exclude>
                                     <exclude>fi.jumi:jumi-core</exclude>
                                 </excludes>

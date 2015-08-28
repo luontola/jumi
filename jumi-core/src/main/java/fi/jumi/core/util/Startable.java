@@ -4,6 +4,9 @@
 
 package fi.jumi.core.util;
 
+import fi.jumi.actors.generator.GenerateEventizer;
+
+@GenerateEventizer(targetPackage = "fi.jumi.core.events")
 public interface Startable {
 
     void start();
