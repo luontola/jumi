@@ -36,15 +36,47 @@
       <profile default="true" name="Default" enabled="false">
         <processorPath useClasspath="true" />
       </profile>
-      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+      <profile default="false" name="Annotation profile for jumi-core" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="jumi-core" />
+      </profile>
+      <profile default="false" name="Annotation profile for jumi-api" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="jumi-api" />
+      </profile>
+      <profile default="false" name="Annotation profile for simpleunit" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="simpleunit" />
+      </profile>
+      <profile default="false" name="Annotation profile for jumi-daemon" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="jumi-daemon" />
+      </profile>
+      <profile default="false" name="Annotation profile for end-to-end-tests" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="end-to-end-tests" />
-        <module name="jumi-api" />
-        <module name="jumi-core" />
-        <module name="jumi-daemon" />
+      </profile>
+      <profile default="false" name="Annotation profile for jumi-launcher" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
         <module name="jumi-launcher" />
-        <module name="simpleunit" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
