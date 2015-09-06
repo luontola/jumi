@@ -1,14 +1,15 @@
-// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2015, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.daemon;
 
 import fi.jumi.actors.*;
-import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
+import fi.jumi.actors.eventizers.ComposedEventizerProvider;
 import fi.jumi.actors.listeners.*;
 import fi.jumi.core.api.SuiteListener;
 import fi.jumi.core.config.*;
+import fi.jumi.core.events.*;
 import fi.jumi.core.ipc.CommandsDirectoryObserver;
 import fi.jumi.core.ipc.api.CommandListener;
 import fi.jumi.core.ipc.dirs.DaemonDir;
@@ -69,7 +70,10 @@ public class Main {
         Executor executor = Executors.newCachedThreadPool(new PrefixedThreadFactory("jumi-ipc-"));
         MultiThreadedActors actors = new MultiThreadedActors(
                 executor,
-                new DynamicEventizerProvider(), // TODO: use ComposedEventizerProvider
+                new ComposedEventizerProvider(
+                        new RequestHandlerEventizer(),
+                        new SuiteListenerEventizer()
+                ),
                 new PrintStreamFailureLogger(logOutput),
                 actorMessageLogger
         );

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: fi.jumi.actors:jumi-actors-generator:1.0.277">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/fi/jumi/actors/jumi-actors-generator/1.0.277/jumi-actors-generator-1.0.277.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/fi/jumi/actors/jumi-actors-generator/1.0.277/jumi-actors-generator-1.0.277-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/fi/jumi/actors/jumi-actors-generator/1.0.277/jumi-actors-generator-1.0.277-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

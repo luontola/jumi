@@ -48,7 +48,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <minimumMavenVersion>3.1</minimumMavenVersion>
-        <jumi-actors.version>1.0.270</jumi-actors.version>
+        <jumi-actors.version>1.0.277</jumi-actors.version>
         <testTempDir>${project.build.directory}/tmp</testTempDir>
     </properties>
 

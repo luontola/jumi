@@ -33,6 +33,12 @@
         </dependency>
 
         <dependency>
+            <groupId>fi.jumi.actors</groupId>
+            <artifactId>jumi-actors-generator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>

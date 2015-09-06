@@ -1,15 +1,16 @@
-// Copyright © 2011-2013, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2015, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
 package fi.jumi.launcher;
 
 import fi.jumi.actors.*;
-import fi.jumi.actors.eventizers.dynamic.DynamicEventizerProvider;
+import fi.jumi.actors.eventizers.ComposedEventizerProvider;
 import fi.jumi.actors.listeners.*;
 import fi.jumi.core.network.*;
 import fi.jumi.core.util.PrefixedThreadFactory;
 import fi.jumi.launcher.daemon.*;
+import fi.jumi.launcher.events.*;
 import fi.jumi.launcher.process.*;
 import fi.jumi.launcher.remote.*;
 import org.apache.commons.io.output.NullOutputStream;
@@ -31,7 +32,11 @@ public class JumiLauncherBuilder {
 
         Actors actors = new MultiThreadedActors(
                 actorsThreadPool,
-                new DynamicEventizerProvider(),
+                new ComposedEventizerProvider(
+                        new DaemonSummonerEventizer(),
+                        new SuiteLauncherEventizer(),
+                        new DaemonListenerEventizer()
+                ),
                 new PrintStreamFailureLogger(System.out),
                 new NullMessageListener()
         );

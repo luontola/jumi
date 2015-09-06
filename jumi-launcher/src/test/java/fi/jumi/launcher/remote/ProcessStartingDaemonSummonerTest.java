@@ -1,4 +1,4 @@
-// Copyright © 2011-2014, Esko Luontola <www.orfjackal.net>
+// Copyright © 2011-2015, Esko Luontola <www.orfjackal.net>
 // This software is released under the Apache License 2.0.
 // The license text is at http://www.apache.org/licenses/LICENSE-2.0
 
@@ -91,9 +91,10 @@ public class ProcessStartingDaemonSummonerTest {
 
         NetworkEndpoint<Event<SuiteListener>, Event<RequestListener>> endpoint = daemonConnector.lastEndpointFactory.createEndpoint();
 
-        OnSuiteStartedEvent anyMessage = new OnSuiteStartedEvent();
+        Event<SuiteListener> anyMessage = new OnSuiteStartedEvent();
         endpoint.onMessage(anyMessage);
-        verify(daemonListener).onMessage(anyMessage);
+        // XXX: Mockito has problems with bridge methods; it thinks that there are two different `onMessage` methods, so we must upcast for the verification call
+        verify((NetworkEndpoint<Event<SuiteListener>, Event<RequestListener>>) daemonListener).onMessage(anyMessage);
     }
 
     @Test

@@ -20,7 +20,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="jumi-core" />
     <orderEntry type="module" module-name="jumi-api" />
-    <orderEntry type="library" name="Maven: fi.jumi.actors:jumi-actors:1.0.270" level="project" />
+    <orderEntry type="library" name="Maven: fi.jumi.actors:jumi-actors:1.0.277" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty:3.5.5.Final" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.3.2" level="project" />
