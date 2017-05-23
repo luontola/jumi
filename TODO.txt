@@ -305,7 +305,9 @@ OK - Eclipse's JUnit integration adds to classpath entries that are not valid fi
 	- Azul's Vega should have a relaxed memory model; ask for co-operation, also to ensure scalability?
 		"Azul hands out 'academic' accounts all the time." https://groups.google.com/d/msg/clojure/XHqWLMcsH-c/ZYeyMP_w66cJ
 
-- class loader caching
+- JVM/ClassLoader caching: reuse loaded vendor libraries and JVM after previous test runs
+
+- JVM/ClassLoader preloading: load vendor libraries in a new JVM before user runs tests, thrown away the JVM after one test run - should be more reliable than class loader caching
 
 - release
 	- tidy up release notes
