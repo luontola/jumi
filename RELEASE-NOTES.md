@@ -8,7 +8,7 @@ Release Notes
 
 ### Jumi 0.5.437 (2014-02-07)
 
-- Workaround for Eclipse's JUnit integration producing non-standard classpath elements on Windows ([Issue #6](https://github.com/orfjackal/jumi/issues/6))
+- Workaround for Eclipse's JUnit integration producing non-standard classpath elements on Windows ([Issue #6](https://github.com/luontola/jumi/issues/6))
 - Deprecated the `SuiteConfiguration.classPath` property. Use `classpath` instead. The old methods will be removed after about 180 days
 - Made `TestId.getPath()` public
 
@@ -26,7 +26,7 @@ Release Notes
 
 ### Jumi 0.4.350 (2013-07-10)
 
-- Moved `TestBench` out of jumi-core's test-jar, into the main jumi-core.jar, so that declaring a dependency to it would be easier ([Issue #5](https://github.com/orfjackal/jumi/issues/5))
+- Moved `TestBench` out of jumi-core's test-jar, into the main jumi-core.jar, so that declaring a dependency to it would be easier ([Issue #5](https://github.com/luontola/jumi/issues/5))
 
 ### Jumi 0.4.345 (2013-07-09)
 
@@ -42,16 +42,16 @@ Release Notes
 
 This release makes it possible to run your existing JUnit tests using the Jumi test runner. All testing frameworks that run on JUnit should also run on Jumi, though incompatibilities are possible for testing frameworks that use JUnit's APIs incorrectly, because Jumi is stricter than JUnit about incorrect API usage.
 
-JUnit tests benefit from test class level parallelism through Jumi's JUnit compatibility layer. For test method level parallelism, JUnit and other testing frameworks will need to implement their own Jumi driver. Visit [our wiki](https://github.com/orfjackal/jumi/wiki) for tips on making your test suites capable of being run in parallel (e.g. avoiding various forms of global mutable state).
+JUnit tests benefit from test class level parallelism through Jumi's JUnit compatibility layer. For test method level parallelism, JUnit and other testing frameworks will need to implement their own Jumi driver. Visit [our wiki](https://github.com/luontola/jumi/wiki) for tips on making your test suites capable of being run in parallel (e.g. avoiding various forms of global mutable state).
 
 - JUnit backward compatibility: Jumi now runs JUnit 3, JUnit 4 and `@RunWith` annotated test classes. Requires you to have JUnit on your test classpath
 - Can configure the number of threads to use for running tests. Defaults to the number of CPU cores
 - Reports internal errors to the user
-- Sets the context class loader for test threads ([Issue #2](https://github.com/orfjackal/jumi/issues/2)), as required by many frameworks
-- Fixed a deadlock when calling `Throwable.printStackTrace()` and printing to `System.err` concurrently ([Issue #3](https://github.com/orfjackal/jumi/issues/3))
+- Sets the context class loader for test threads ([Issue #2](https://github.com/luontola/jumi/issues/2)), as required by many frameworks
+- Fixed a deadlock when calling `Throwable.printStackTrace()` and printing to `System.err` concurrently ([Issue #3](https://github.com/luontola/jumi/issues/3))
 - Prevents `Throwable.printStackTrace()` from being interleaved with printing to `System.out` from parallel threads of the same test run (this is in addition to the stdout/stderr isolation of parallel test runs that we've had since ever). Note that we can handle only the common case; `Throwable.printStackTrace(System.out)` can still interleave with printing to `System.err` as usual
-- Fixed a crash if a test prints something (from a background thread) after it's finished ([Issue #1](https://github.com/orfjackal/jumi/issues/1)). The current text UI hides the late printed output, but in the future we'll create a GUI that will show all of the output
-- Will not try to run abstract test classes ([Issue #4](https://github.com/orfjackal/jumi/issues/4))
+- Fixed a crash if a test prints something (from a background thread) after it's finished ([Issue #1](https://github.com/luontola/jumi/issues/1)). The current text UI hides the late printed output, but in the future we'll create a GUI that will show all of the output
+- Will not try to run abstract test classes ([Issue #4](https://github.com/luontola/jumi/issues/4))
 - Will not try to run classes that are not identified as a test class, even though the class name matches the test file pattern. This the same as how the Maven Surefire Plugin and most IDEs work
 
 ### Jumi 0.3.257 (2013-01-07)
@@ -95,7 +95,7 @@ First release of the Jumi test runner. This release is targeted at the developer
   - New tests can be discovered as test execution progresses; no need to know all tests up-front
 - Reports what tests print to `System.out` and `System.err` more accurately than all other test runners
 - Text user interface for showing the results, including exact events of when nested tests start and finish
-- An example [SimpleUnit](https://github.com/orfjackal/jumi/tree/master/simpleunit) testing framework to show how to write a testing framework driver for Jumi
+- An example [SimpleUnit](https://github.com/luontola/jumi/tree/master/simpleunit) testing framework to show how to write a testing framework driver for Jumi
 
 Some features critical for regular users are still missing and will be implemented in following releases. Some of the most obvious limitations are:
 

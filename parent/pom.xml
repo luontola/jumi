@@ -33,15 +33,14 @@
 
     <developers>
         <developer>
-            <id>orfjackal</id>
             <name>Esko Luontola</name>
-            <url>http://www.orfjackal.net/</url>
+            <url>http://luontola.fi</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/orfjackal/jumi.git</connection>
-        <url>https://github.com/orfjackal/jumi</url>
+        <connection>scm:git:git://github.com/luontola/jumi.git</connection>
+        <url>https://github.com/luontola/jumi</url>
     </scm>
 
     <properties>

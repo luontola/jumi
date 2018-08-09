@@ -28,7 +28,7 @@ public abstract class Driver {
      * @param notifier  through which Jumi is told about test executions.
      * @param executor  recommended for executing tests asynchronously, instead of running them synchronously in this
      *                  method.
-     * @reference [1]: <a href="https://github.com/orfjackal/jumi/blob/1eddce9866f4bcc3e9b08b9b447ab6d19f4ec1fc/end-to-end-tests/src/test/java/fi/jumi/test/RunningTestsTest.java#L103">
+     * @reference [1]: <a href="https://github.com/luontola/jumi/blob/1eddce9866f4bcc3e9b08b9b447ab6d19f4ec1fc/end-to-end-tests/src/test/java/fi/jumi/test/RunningTestsTest.java#L103">
      * tests_are_run_in_parallel</a>
      */
     public abstract void findTests(Class<?> testClass, SuiteNotifier notifier, Executor executor);
