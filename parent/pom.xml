@@ -21,7 +21,7 @@
         Overcomes a bunch of limitations in JUnit's test runner, IDEs
         and build tools.
     </description>
-    <url>http://jumi.fi</url>
+    <url>https://jumi.fi</url>
     <inceptionYear>2011</inceptionYear>
 
     <licenses>
