@@ -7,16 +7,16 @@ group: navigation
 
 Jumi has its own little [actor](http://en.wikipedia.org/wiki/Actor_model) library to support concurrency and asynchronous event-driven programming. But since it's such a cool little actor library, also other projects might want to use it. Jumi Actors is written in Java and has no dependencies.
 
-To get started, read [the user guide](https://github.com/orfjackal/jumi-actors/wiki/User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi.actors%22). For release details see [the release notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md).
+To get started, read [the user guide](https://github.com/luontola/jumi-actors/wiki/User-Guide). The latest release of the *jumi-actors* module can be [downloaded from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi.actors%22). For release details see [the release notes](https://github.com/luontola/jumi-actors/blob/master/RELEASE-NOTES.md).
 
-- Documentation: <https://github.com/orfjackal/jumi-actors/wiki>
+- Documentation: <https://github.com/luontola/jumi-actors/wiki>
 - Mailing list: <https://groups.google.com/d/forum/jumi-test-runner>
-- Downloads: [fi.jumi.actors in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi.actors%22) ([Release Notes](https://github.com/orfjackal/jumi-actors/blob/master/RELEASE-NOTES.md))
+- Downloads: [fi.jumi.actors in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi.actors%22) ([Release Notes](https://github.com/luontola/jumi-actors/blob/master/RELEASE-NOTES.md))
 - Source code:
-    - <https://github.com/orfjackal/jumi-actors>
-    - <https://github.com/orfjackal/jumi-scripts>
+    - <https://github.com/luontola/jumi-actors>
+    - <https://github.com/luontola/jumi-scripts>
 - License: [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
-- Developer: [Esko Luontola](https://github.com/orfjackal) ([@orfjackal](http://twitter.com/orfjackal))
+- Developer: [Esko Luontola](https://github.com/luontola) ([@orfjackal](http://twitter.com/orfjackal))
 
 
 Example
@@ -64,7 +64,7 @@ Wazzup from main
 Hello World from pool-1-thread-1
 </pre>
 
-For some explanations and more information, see [the user guide](https://github.com/orfjackal/jumi-actors/wiki/User-Guide) and [examples](https://github.com/orfjackal/jumi-actors/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
+For some explanations and more information, see [the user guide](https://github.com/luontola/jumi-actors/wiki/User-Guide) and [examples](https://github.com/luontola/jumi-actors/tree/master/jumi-actors/src/test/java/fi/jumi/actors/examples). You may also [browse the Javadocs](api/jumi-actors/).
 
 
 Features
@@ -84,6 +84,6 @@ Features
 
 - **Garbage Collected Actors** - After nobody can send messages to an actor, it will be garbage collected the same way as normal Java objects. Note however that the lifecycle of actor *threads* must be managed manually.
 
-- **Deterministic Testing** - Jumi Actors has [a single-threaded implementation](https://github.com/orfjackal/jumi-actors/blob/master/jumi-actors/src/main/java/fi/jumi/actors/SingleThreadedActors.java) which is useful for integration testing actors with the container (unit tests should be written without any containers).
+- **Deterministic Testing** - Jumi Actors has [a single-threaded implementation](https://github.com/luontola/jumi-actors/blob/master/jumi-actors/src/main/java/fi/jumi/actors/SingleThreadedActors.java) which is useful for integration testing actors with the container (unit tests should be written without any containers).
 
-- **No Reflection** (optional) - It's possible to avoid reflection by using [jumi-actors-maven-plugin](https://github.com/orfjackal/jumi-actors/tree/master/jumi-actors-maven-plugin) to generate the necessary event stubs at build time. Though using reflection requires less setup and thus might be preferable at least in tests.
+- **No Reflection** (optional) - It's possible to avoid reflection by using [jumi-actors-maven-plugin](https://github.com/luontola/jumi-actors/tree/master/jumi-actors-maven-plugin) to generate the necessary event stubs at build time. Though using reflection requires less setup and thus might be preferable at least in tests.

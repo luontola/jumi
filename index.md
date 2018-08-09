@@ -5,17 +5,17 @@ layout: page
 
 Jumi is a test runner for all programming languages on the JVM. It will natively support running tests in parallel, class loader caching, test order priorization and other measures to run tests faster. It covers the full stack for running tests (the responsibilities which used to be spread over build tools, IDEs and test runners) in order to overcome limitations of previously existing tools, specifically JUnit's test runner, to better support all testing frameworks on the JVM.
 
-Jumi is not only open source, but also open development. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code> The long-term roadmap is in [ROADMAP.txt](https://github.com/orfjackal/jumi/blob/master/ROADMAP.txt) and the short-term task list is in [TODO.txt](https://github.com/orfjackal/jumi/blob/master/TODO.txt).
+Jumi is not only open source, but also open development. The process of how Jumi is developed is being screencasted at <http://www.orfjackal.net/lets-code> The long-term roadmap is in [ROADMAP.txt](https://github.com/luontola/jumi/blob/master/ROADMAP.txt) and the short-term task list is in [TODO.txt](https://github.com/luontola/jumi/blob/master/TODO.txt).
 
 - Mailing list: <https://groups.google.com/d/forum/jumi-test-runner>
-- Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/orfjackal/jumi/blob/master/RELEASE-NOTES.md))
-- Issue tracker: <https://github.com/orfjackal/jumi/issues>
+- Downloads: [fi.jumi in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fi.jumi%22) ([Release Notes](https://github.com/luontola/jumi/blob/master/RELEASE-NOTES.md))
+- Issue tracker: <https://github.com/luontola/jumi/issues>
 - Source code:
-    - <https://github.com/orfjackal/jumi>
-    - <https://github.com/orfjackal/jumi-scripts>
-    - <https://github.com/orfjackal/sbt-jumi>
+    - <https://github.com/luontola/jumi>
+    - <https://github.com/luontola/jumi-scripts>
+    - <https://github.com/luontola/sbt-jumi>
 - License: [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
-- Developer: [Esko Luontola](https://github.com/orfjackal) ([@orfjackal](http://twitter.com/orfjackal))
+- Developer: [Esko Luontola](https://github.com/luontola) ([@orfjackal](http://twitter.com/orfjackal))
 
 
 Main Features
@@ -31,7 +31,7 @@ All the following features have been implemented and more are on the way.
 
 - **Expressive Execution Model** - Supports better all testing frameworks. Unlike with JUnit, with Jumi it's not necessary for a testing framework to know what tests exist before it executes the tests. Also tests may consist of multiple steps ("nested tests"), instead of just a flat JUnit-like organization.
 
-[Continue to the documentation](https://github.com/orfjackal/jumi/wiki) to find out how to run your tests on Jumi.
+[Continue to the documentation](https://github.com/luontola/jumi/wiki) to find out how to run your tests on Jumi.
 
 
 Articles
@@ -50,7 +50,7 @@ What's compatible with Jumi?
 Jumi has just recently been released and it's missing some important features, but it's already at a stage where early adopters can start using it and testing framework developers can implement support for it. Here is a list of frameworks and tools that already have Jumi support:
 
 - [JUnit](http://www.junit.org/) and **any testing frameworks that run on JUnit**, through Jumi's JUnit backward compatibility (parallelism is limited to test class level)
-- [sbt](http://www.scala-sbt.org/) build tool, through the [sbt-jumi](https://github.com/orfjackal/sbt-jumi) plugin
+- [sbt](http://www.scala-sbt.org/) build tool, through the [sbt-jumi](https://github.com/luontola/sbt-jumi) plugin
 - [Specsy](http://specsy.org/), a testing framework for Scala, Groovy, Java and easily any other JVM-based language
 
 
