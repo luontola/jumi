@@ -1,4 +1,22 @@
 
+!! - memory-mapped files don't work on macOS: communicate by writing/tailing normal files
+
+- upgrade to Java 21
+	- commit the generated event files to Git
+	- stop using jumi-actors-generator
+	- convert the events to record classes
+		https://openjdk.org/jeps/395 (Java 16)
+	- seal the classes: SuiteEvent, RunEvent etc.
+		https://openjdk.org/jeps/409 (Java 17)
+	- use pattern matching switch/case instead of visitor pattern
+		https://openjdk.org/jeps/441 (Java 21)
+	- remove the old visitor-based event interfaces
+	- rewatch "A Classfile API for the JDK" and think if our current event model is good enough
+		 https://www.youtube.com/watch?v=pcg-E_qyMOI
+		 - is the current normalized event format ok?
+		 - normalize only when serializing, and use denormalized events in memory?
+		 - do we need helpers for easier consumption?
+
 OK - refactor BuildTest & SuiteConfiguration
 	OK - extract reusable components from BuildTest to an external library
 		OK - jumi: extract reusable components from TestEnvironment
